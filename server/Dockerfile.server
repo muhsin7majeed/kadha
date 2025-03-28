@@ -1,8 +1,13 @@
-FROM node:20
+# Use Node.js for building the app
+FROM node:20 
+
 WORKDIR /app
+
+# Install dependencies
 COPY package.json package-lock.json ./
 RUN npm install
-COPY . .
-RUN npm run build
+
+# Install TypeScript tools globally
+RUN npm install -g typescript ts-node nodemon
+
 EXPOSE 5000
-CMD ["node", "dist/index.js"]

@@ -4,4 +4,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
+  server: {
+    port: 3000,
+    host: true, // Needed for Docker
+    strictPort: true, // Fail if port is in use
+  },
 });
