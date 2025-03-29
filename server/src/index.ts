@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import { envConfig } from "./config/env";
 import { connectDB } from "./config/db";
+import authRoutes from "./routes/auth";
+import { errorHandler } from "./middlewares/errorHandler";
 
 const app: Express = express();
 
@@ -13,10 +15,15 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to MongoDB
 connectDB();
 
+app.use("/api/auth", authRoutes);
+
 // Basic route
 app.get("/", (req: Request, res: Response) => {
   res.json({ message: "Welcome to What to Watch API" });
 });
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Start server
 app.listen(envConfig.port, "0.0.0.0", () => {

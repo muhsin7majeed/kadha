@@ -7,20 +7,30 @@ import { authAtom, setAuth } from '@/store/auth';
 import { LocationState } from '@/types';
 import AuthForm from './AuthForm';
 import { LoginInputs } from './AuthForm';
+import useLogin from '@/apis/useLogin';
 
 const Login = () => {
   const [, setAuthState] = useAtom(authAtom);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { mutate } = useLogin();
+
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
-    const dummyToken = 'dummy.jwt.token';
-    const dummyUser = { id: '1', username: data.username };
+    mutate(data, {
+      onSuccess: (data) => {
+        console.log('SUCCESS YO');
 
-    setAuthState(setAuth(dummyUser, dummyToken));
+        // setAuthState(setAuth(data.user, data.token));
+        // navigate('/', { replace: true });
+      },
+    });
 
-    const from = (location.state as LocationState)?.from?.pathname || '/';
-    navigate(from, { replace: true });
+    // const dummyToken = 'dummy.jwt.token';
+    // const dummyUser = { id: '1', username: data.username };
+    // setAuthState(setAuth(dummyUser, dummyToken));
+    // const from = (location.state as LocationState)?.from?.pathname || '/';
+    // navigate(from, { replace: true });
   };
 
   return (
