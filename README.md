@@ -2,7 +2,6 @@
 
 Welcome to the **What to Watch** app! Follow these instructions to set up and run the application locally using Docker.
 
----
 
 ## ⚙️ Prerequisites
 
@@ -13,7 +12,6 @@ Make sure you have the following installed:
 - Node.js (if running outside of Docker)
 - WSL (if using Windows)
 
----
 
 ## 🚀 Setup with Docker
 
@@ -23,7 +21,6 @@ Make sure you have the following installed:
 git clone <repo-url>
 cd what-to-watch-app
 ```
-````
 
 ### 2️⃣ Environment Variables
 
@@ -51,7 +48,6 @@ docker-compose up --build
 - Client: [http://localhost:3000](http://localhost:3000)
 - Server API: [http://localhost:5000](http://localhost:5000)
 
----
 
 ## 🐳 Docker Commands Cheat Sheet
 
@@ -91,7 +87,6 @@ docker exec -it <container_name> /bin/bash
 docker ps
 ```
 
----
 
 ## 🛠 Development Notes
 
@@ -100,8 +95,5 @@ docker ps
 - MongoDB runs on **port 27017**.
 - Nodemon is used for live server reloading in development.
 
----
 
 Happy coding! 🚀
-
-```
