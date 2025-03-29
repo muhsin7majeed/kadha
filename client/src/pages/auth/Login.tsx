@@ -2,10 +2,11 @@ import { Box, Text } from '@chakra-ui/react';
 import { useAtom } from 'jotai';
 import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
+
+import { authAtom, setAuth } from '@/store/auth';
+import { LocationState } from '@/types';
 import AuthForm from './AuthForm';
 import { LoginInputs } from './AuthForm';
-import { authAtom, setAuth } from '../../store/auth';
-import { LocationState } from '../../types';
 
 const Login = () => {
   const [, setAuthState] = useAtom(authAtom);

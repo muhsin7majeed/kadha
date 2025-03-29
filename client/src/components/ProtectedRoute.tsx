@@ -1,6 +1,7 @@
 import { useAtom } from 'jotai';
 import { Navigate, useLocation } from 'react-router';
-import { authAtom } from '../store/auth';
+
+import { authAtom } from '@/store/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

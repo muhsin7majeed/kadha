@@ -1,11 +1,12 @@
 import { Route, Routes } from 'react-router';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import Landing from './pages/landing/Landing';
 import { Container } from '@chakra-ui/react';
-import AuthLayout from './pages/auth/AuthLayout';
-import ProtectedRoute from './components/ProtectedRoute';
-import AuthProvider from './components/AuthProvider';
+
+import Login from '@/pages/auth/Login';
+import Register from '@/pages/auth/Register';
+import Landing from '@/pages/landing/Landing';
+import AuthLayout from '@/pages/auth/AuthLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import AuthProvider from '@/components/AuthProvider';
 
 function App() {
   return (

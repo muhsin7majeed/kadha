@@ -1,7 +1,8 @@
 import { Button, Heading, Text, VStack } from '@chakra-ui/react';
 import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router';
-import { authAtom, clearAuth } from '../../store/auth';
+
+import { authAtom, clearAuth } from '@/store/auth';
 
 const Landing = () => {
   const [auth, setAuth] = useAtom(authAtom);

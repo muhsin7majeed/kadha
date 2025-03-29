@@ -1,7 +1,8 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { authAtom, getStoredToken } from '../store/auth';
 import { Box, Spinner } from '@chakra-ui/react';
+
+import { authAtom, getStoredToken } from '@/store/auth';
 
 interface AuthProviderProps {
   children: React.ReactNode;

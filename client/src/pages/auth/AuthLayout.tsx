@@ -1,7 +1,8 @@
 import { Box, Text } from '@chakra-ui/react';
 import { Outlet, Navigate } from 'react-router';
 import { useAtom } from 'jotai';
-import { authAtom } from '../../store/auth';
+
+import { authAtom } from '@/store/auth';
 
 const AuthLayout = () => {
   const [auth] = useAtom(authAtom);
