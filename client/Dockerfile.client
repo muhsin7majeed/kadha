@@ -7,7 +7,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 
-# Install TypeScript tools globally
-RUN npm install -g typescript ts-node nodemon
+# Copy the rest of the app files
+COPY . .
 
 EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
