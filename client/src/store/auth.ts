@@ -1,7 +1,7 @@
 import { atom } from 'jotai';
 
 export interface User {
-  id: string;
+  _id: string;
   username: string;
 }
 
@@ -23,8 +23,9 @@ export const setAuth = (user: User, token: string) => {
 };
 
 export const clearAuth = () => {
-  localStorage.removeItem('token');
+  removeStoredToken();
   return initialState;
 };
 
 export const getStoredToken = () => localStorage.getItem('token');
+export const removeStoredToken = () => localStorage.removeItem('token');

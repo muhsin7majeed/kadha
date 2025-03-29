@@ -1,5 +1,6 @@
 import { Button, Field, Fieldset, Input } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { BiLogInCircle, BiRightArrowAlt } from 'react-icons/bi';
 
 export interface LoginInputs {
   username: string;
@@ -10,17 +11,14 @@ export interface RegisterInputs extends LoginInputs {
   confirmPassword: string;
 }
 
-type AuthFormProps =
-  | {
-      onSubmit: SubmitHandler<RegisterInputs>;
-      type: 'register';
-    }
-  | {
-      onSubmit: SubmitHandler<LoginInputs>;
-      type: 'login';
-    };
+interface AuthFormProps {
+  apiFieldErrors?: Record<'username', string>;
+  isLoading?: boolean;
+  type: 'register' | 'login';
+  onSubmit: SubmitHandler<LoginInputs> | SubmitHandler<RegisterInputs>;
+}
 
-const AuthForm = ({ onSubmit, type }: AuthFormProps) => {
+const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) => {
   const {
     register,
     handleSubmit,
@@ -38,13 +36,13 @@ const AuthForm = ({ onSubmit, type }: AuthFormProps) => {
       <Fieldset.Root size="lg" maxW="md">
         <Fieldset.Content>
           <Fieldset.Content>
-            <Field.Root invalid={!!errors.username}>
+            <Field.Root invalid={!!errors.username || !!apiFieldErrors?.username}>
               <Input
                 type="text"
                 {...register('username', { required: 'Username is required' })}
                 placeholder="Username"
               />
-              <Field.ErrorText>{errors.username?.message}</Field.ErrorText>
+              <Field.ErrorText>{errors.username?.message || apiFieldErrors?.username}</Field.ErrorText>
             </Field.Root>
 
             <Field.Root invalid={!!errors.password}>
@@ -74,8 +72,8 @@ const AuthForm = ({ onSubmit, type }: AuthFormProps) => {
             )}
           </Fieldset.Content>
 
-          <Button type="submit" variant="surface">
-            {isRegister ? 'Register' : 'Login'}
+          <Button type="submit" variant="surface" loading={isLoading} disabled={isLoading}>
+            {isRegister ? 'Register' : 'Login'} {isRegister ? <BiRightArrowAlt /> : <BiLogInCircle />}
           </Button>
         </Fieldset.Content>
       </Fieldset.Root>

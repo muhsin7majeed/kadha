@@ -6,26 +6,35 @@ import { useAtom } from 'jotai';
 import { authAtom, setAuth } from '@/store/auth';
 import { LocationState } from '@/types';
 import AuthForm, { RegisterInputs } from './AuthForm';
+import useRegister from './apis/useRegister';
 
 const Register = () => {
   const [, setAuthState] = useAtom(authAtom);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const onSubmit: SubmitHandler<RegisterInputs> = (data) => {
-    const dummyToken = 'dummy.jwt.token';
-    const dummyUser = { id: '1', username: data.username };
+  const { mutate, error, isPending } = useRegister();
 
-    setAuthState(setAuth(dummyUser, dummyToken));
+  const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
+    mutate(payload, {
+      onSuccess: (data) => {
+        setAuthState(setAuth({ _id: data.userId, username: payload.username }, data.token));
 
-    const from = (location.state as LocationState)?.from?.pathname || '/';
-    navigate(from, { replace: true });
+        const from = (location.state as LocationState)?.from?.pathname || '/';
+        navigate(from, { replace: true });
+      },
+    });
   };
 
   return (
     <>
       <Box>
-        <AuthForm onSubmit={onSubmit} type="register" />
+        <AuthForm
+          onSubmit={onSubmit}
+          type="register"
+          apiFieldErrors={(error as any)?.response?.data?.fieldErrors}
+          isLoading={isPending}
+        />
 
         <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
           Already have an account?{' '}

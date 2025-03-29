@@ -11,9 +11,9 @@ services:
       - ./client:/app
       - /app/node_modules
     command:
-    - npm
-    - run
-    - dev
+      - npm
+      - run
+      - dev
 
   server:
     build:
@@ -23,15 +23,16 @@ services:
       - "5000:5000"
     environment:
       - MONGO_URI=mongodb://mongo:27017/what-to-watch
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - mongo
     volumes:
       - ./server:/app
       - /app/node_modules
     command:
-    - npm
-    - run
-    - dev
+      - npm
+      - run
+      - dev
 
   mongo:
     image: mongo:7

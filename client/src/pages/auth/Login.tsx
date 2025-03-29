@@ -7,41 +7,37 @@ import { authAtom, setAuth } from '@/store/auth';
 import { LocationState } from '@/types';
 import AuthForm from './AuthForm';
 import { LoginInputs } from './AuthForm';
-import useLogin from '@/apis/useLogin';
+import useLogin from '@/pages/auth/apis/useLogin';
 
 const Login = () => {
   const [, setAuthState] = useAtom(authAtom);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { mutate } = useLogin();
+  const { mutate, isPending } = useLogin();
 
-  const onSubmit: SubmitHandler<LoginInputs> = (data) => {
-    mutate(data, {
+  const onSubmit: SubmitHandler<LoginInputs> = (payload) => {
+    mutate(payload, {
       onSuccess: (data) => {
-        console.log('SUCCESS YO');
+        setAuthState(setAuth({ _id: data.userId, username: payload.username }, data.token));
 
-        // setAuthState(setAuth(data.user, data.token));
-        // navigate('/', { replace: true });
+        const from = (location.state as LocationState)?.from?.pathname || '/';
+        navigate(from, { replace: true });
       },
     });
-
-    // const dummyToken = 'dummy.jwt.token';
-    // const dummyUser = { id: '1', username: data.username };
-    // setAuthState(setAuth(dummyUser, dummyToken));
-    // const from = (location.state as LocationState)?.from?.pathname || '/';
-    // navigate(from, { replace: true });
   };
 
   return (
     <>
       <Box>
-        <AuthForm onSubmit={onSubmit} type="login" />
+        <AuthForm onSubmit={onSubmit} type="login" isLoading={isPending} />
 
         <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
           Don't have an account?{' '}
           <Text as="span" color="purple.400">
-            <Link to="/auth/register">Register</Link>
+            <Link to="/auth/register" state={{ from: (location.state as LocationState)?.from?.pathname || '/' }}>
+              Register
+            </Link>
           </Text>
         </Text>
       </Box>
