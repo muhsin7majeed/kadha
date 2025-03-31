@@ -7,7 +7,7 @@ import { connectDB } from "./config/db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
 import { errorHandler } from "./middlewares/errorHandler";
-
+import mediaRoutes from "./routes/media";
 const app: Express = express();
 
 // Middlewarezz
@@ -20,6 +20,7 @@ connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/media", mediaRoutes);
 
 // Basic route
 app.get("/", (req: Request, res: Response) => {

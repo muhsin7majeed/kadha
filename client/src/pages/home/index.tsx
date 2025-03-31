@@ -3,15 +3,20 @@ import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router';
 
 import { authAtom, clearAuth } from '@/store/auth';
+import useTrendingMovies from './apis/useTrendingMovies';
 
-const Landing = () => {
+const Home = () => {
   const [auth, setAuth] = useAtom(authAtom);
   const navigate = useNavigate();
+
+  const { data: trendingMovies } = useTrendingMovies();
 
   const handleLogout = () => {
     setAuth(clearAuth());
     navigate('/auth/login');
   };
+
+  console.log(trendingMovies);
 
   return (
     <VStack gap={4} align="stretch">
@@ -24,4 +29,4 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+export default Home;

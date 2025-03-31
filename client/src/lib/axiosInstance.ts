@@ -5,14 +5,12 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
 });
 
-export default api;
-
 api.interceptors.request.use(
   (config) => {
     const token = getStoredToken();
 
     if (token) {
-      config.headers.Authorization = token;
+      config.headers && (config.headers.Authorization = token);
     }
 
     return config;
@@ -35,3 +33,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+export default api;

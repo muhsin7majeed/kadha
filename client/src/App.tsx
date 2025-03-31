@@ -3,9 +3,9 @@ import { Container } from '@chakra-ui/react';
 
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
-import Landing from '@/pages/landing/Landing';
 import AuthLayout from '@/pages/auth/AuthLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Home from '@/pages/home';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
           index
           element={
             <ProtectedRoute>
-              <Landing />
+              <Home />
             </ProtectedRoute>
           }
         />
