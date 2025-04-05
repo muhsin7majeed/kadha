@@ -24,7 +24,7 @@ export interface Tv extends BaseMedia {
   name: string;
 }
 
-export interface MovieDBTrendingResponse {
+export interface MovieDBResponse {
   page: number;
   results: Movie[] | Tv[];
   total_pages: number;

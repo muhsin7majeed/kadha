@@ -1,5 +1,5 @@
 import { useGenreAtom } from '@/atoms/genreAtom';
-import { Badge, Box, Image, Text } from '@chakra-ui/react';
+import { Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
 import { HiStar } from 'react-icons/hi';
 
 import { Movie, Tv } from '@/lib/types';
@@ -14,20 +14,14 @@ const MediaCard = ({ media, mediaType }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   return (
-    <Box
-      flex="0 0 200px"
-      height="300px"
-      borderRadius="lg"
-      transition="transform 0.2s"
-      _hover={{ transform: 'scale(1.05)' }}
-      position="relative"
-    >
+    <Box flex="0 0 200px" height="300px" borderRadius="lg" transition="transform 0.2s" position="relative">
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
         alt={mediaType === 'movie' ? (media as Movie).title : (media as Tv).name}
         width="100%"
         height="100%"
         objectFit="cover"
+        borderRadius="lg"
       />
 
       <Badge position="absolute" top={2} left={2} variant="surface" colorPalette="blackAlpha">
@@ -50,11 +44,13 @@ const MediaCard = ({ media, mediaType }: MediaCardProps) => {
           {formatDate(mediaType === 'movie' ? (media as Movie).release_date : (media as Tv).first_air_date, 'YYYY')})
         </Text>
 
-        {media.genre_ids.map((genre) => (
-          <Badge key={genre} variant="plain" colorPalette="cyan" mr={1}>
-            {genreMap[genre]}
-          </Badge>
-        ))}
+        <Flex gap={1} overflowX="auto" css={{ scrollbarWidth: 'none' }} my={1}>
+          {media.genre_ids.map((genre) => (
+            <Badge key={genre} variant="plain" colorPalette="cyan" mr={1}>
+              {genreMap[genre]}
+            </Badge>
+          ))}
+        </Flex>
       </Box>
     </Box>
   );

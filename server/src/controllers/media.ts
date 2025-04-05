@@ -1,16 +1,40 @@
 import api from "@/lib/axiosInstance";
 import { MovieDBGenreResponse } from "@/lib/types";
-import { MovieDBTrendingResponse } from "@/lib/types";
+import { MovieDBResponse } from "@/lib/types";
 import { Request, Response } from "express";
 
 export const getTrendingMovies = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBTrendingResponse>("/movie/popular");
+  const response = await api.get<MovieDBResponse>("/trending/movie/day");
 
   res.json({ movies: response.data.results });
 };
 
-export const getTrendingTv = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBTrendingResponse>("/tv/popular");
+export const getTrendingTvs = async (req: Request, res: Response) => {
+  const response = await api.get<MovieDBResponse>("/trending/tv/day");
+
+  res.json({ tv: response.data.results });
+};
+
+export const getPopularMovies = async (req: Request, res: Response) => {
+  const response = await api.get<MovieDBResponse>("/movie/popular");
+
+  res.json({ movies: response.data.results });
+};
+
+export const getPopularTvs = async (req: Request, res: Response) => {
+  const response = await api.get<MovieDBResponse>("/tv/popular");
+
+  res.json({ tv: response.data.results });
+};
+
+export const getTopRatedMovies = async (req: Request, res: Response) => {
+  const response = await api.get<MovieDBResponse>("/movie/top_rated");
+
+  res.json({ movies: response.data.results });
+};
+
+export const getTopRatedTvs = async (req: Request, res: Response) => {
+  const response = await api.get<MovieDBResponse>("/tv/top_rated");
 
   res.json({ tv: response.data.results });
 };
