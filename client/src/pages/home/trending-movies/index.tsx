@@ -1,3 +1,5 @@
+import MediaCarousal from '@/components/media-carousal';
+
 const trendingMovies = [
   {
     adult: false,
@@ -210,8 +212,7 @@ const trendingMovies = [
     id: 1297763,
     original_language: 'ja',
     original_title: 'ニンジャバットマン対ヤクザリーグ',
-    overview:
-      'The Batman family has returned to the present to discover that Japan has disappeared, and a giant island - Hinomoto - is now in the sky over Gotham City.  At the top sit the Yakuza, a group of superpowered individuals who reign without honor or humanity and look suspiciously like the Justice League. Now, it’s up to Batman and his allies to save Gotham!',
+    overview: `The Batman family has returned to the present to discover that Japan has disappeared, and a giant island - Hinomoto - is now in the sky over Gotham City.  At the top sit the Yakuza, a group of superpowered individuals who reign without honor or humanity and look suspiciously like the Justice League. Now, it's up to Batman and his allies to save Gotham!`,
     popularity: 175.1912,
     poster_path: '/sVVT6GYFErVv0Lcc9NvqCu0iOxO.jpg',
     release_date: '2025-03-17',
@@ -342,7 +343,7 @@ const trendingMovies = [
 ];
 
 const TrendingMovies = () => {
-  return <div>TrendingMovies</div>;
+  return <MediaCarousal mediaType="movie" title="Trending Movies" data={trendingMovies} />;
 };
 
 export default TrendingMovies;

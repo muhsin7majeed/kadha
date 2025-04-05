@@ -7,8 +7,11 @@ import AuthLayout from '@/pages/auth/AuthLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import MainLayout from '@/components/mainLayout';
 import Home from './pages/home';
+import { useGenreMap } from './hooks/useGenreMap';
 
 function App() {
+  useGenreMap(); // fetch and store genre map
+
   return (
     <Container>
       <Routes>

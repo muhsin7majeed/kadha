@@ -23,7 +23,14 @@ const Navbar = () => {
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginTop={4}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        backgroundColor="Background"
+        rounded="md"
+        p={'2'}
+      >
         <Heading>What to watch</Heading>
 
         <Box>

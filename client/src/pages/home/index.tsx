@@ -1,4 +1,4 @@
-import TrendingMovies from './trendingMovies';
+import TrendingMovies from './trending-movies';
 
 const Home = () => {
   // const { data: trendingMovies } = useTrendingMovies();

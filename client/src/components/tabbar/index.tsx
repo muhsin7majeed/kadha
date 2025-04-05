@@ -7,33 +7,23 @@ import { TbListCheck } from 'react-icons/tb';
 const TabBar = () => {
   return (
     <>
-      <Tabs.Root
-        variant="enclosed"
-        maxW="md"
-        fitted
-        defaultValue={'home'}
-        position={'fixed'}
-        bottom={5}
-        left={'50%'}
-        transform="translate(-50%)"
-        w="90%"
-      >
+      <Tabs.Root variant="enclosed" maxW="md" fitted defaultValue={'home'}>
         <Tabs.List>
           <Tabs.Trigger value="home" asChild>
             <Link to="/">
-              <AiOutlineHome />
-            </Link>
-          </Tabs.Trigger>
-
-          <Tabs.Trigger value="watched" asChild>
-            <Link to="/watched">
-              <AiFillCheckCircle />
+              <AiOutlineHome size={24} />
             </Link>
           </Tabs.Trigger>
 
           <Tabs.Trigger value="watchlist" asChild>
             <Link to="/watchlist">
-              <TbListCheck />
+              <TbListCheck size={24} />
+            </Link>
+          </Tabs.Trigger>
+
+          <Tabs.Trigger value="watched" asChild>
+            <Link to="/watched">
+              <AiFillCheckCircle size={24} />
             </Link>
           </Tabs.Trigger>
         </Tabs.List>
