@@ -10,7 +10,9 @@ export const getTrendingMovies = async (req: Request, res: Response) => {
 };
 
 export const getTrendingTv = async (req: Request, res: Response) => {
-  res.json({ tv: [{ id: 1, title: "TV 1" }] });
+  const response = await api.get<MovieDBTrendingResponse>("/tv/popular");
+
+  res.json({ tv: response.data.results });
 };
 
 export const getGenre = async (req: Request, res: Response) => {

@@ -2,13 +2,17 @@ import { useRef } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Box, Flex, IconButton, Heading } from '@chakra-ui/react';
 
-import { Movie } from '@/lib/types';
+import { Movie, Tv } from '@/lib/types';
 import MediaCard from '../media-card';
+import MediaCarousalSkeleton from './MediaCarousalSkeleton';
+import SyncSpinner from '../spinners';
 
 interface MediaCarousalProps {
   mediaType: 'movie' | 'tv';
   title: string;
-  data: Movie[];
+  data: Movie[] | Tv[];
+  isLoading?: boolean;
+  isFetching?: boolean;
 }
 
 const SCROLL_AMOUNT = 400;
@@ -27,7 +31,7 @@ const ScrollButton = ({ direction, onClick }: { direction: 'left' | 'right'; onC
   );
 };
 
-const MediaCarousal = ({ mediaType, title, data }: MediaCarousalProps) => {
+const MediaCarousal = ({ title, data, isLoading, isFetching, mediaType }: MediaCarousalProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -51,11 +55,15 @@ const MediaCarousal = ({ mediaType, title, data }: MediaCarousalProps) => {
     }
   };
 
+  if (isLoading) {
+    return <MediaCarousalSkeleton />;
+  }
+
   return (
     <Box>
-      <Flex justifyContent="space-between" alignItems="center">
-        <Heading fontSize="lg" fontWeight="bold" mb={4}>
-          {title}
+      <Flex justifyContent="space-between" alignItems="center" mb={4}>
+        <Heading fontSize="lg" fontWeight="bold" display="flex" alignItems="center" gap={2}>
+          <span>{title}</span> {isFetching && <SyncSpinner size={16} />}
         </Heading>
 
         <Flex gap={1} alignItems="center">
@@ -74,7 +82,7 @@ const MediaCarousal = ({ mediaType, title, data }: MediaCarousalProps) => {
       >
         <Flex gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.id} media={media} />
+            <MediaCard key={media.id} media={media} mediaType={mediaType} />
           ))}
         </Flex>
       </Box>

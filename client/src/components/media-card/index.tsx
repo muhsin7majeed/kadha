@@ -1,15 +1,16 @@
 import { useGenreAtom } from '@/atoms/genreAtom';
-import { Badge, Box, Image, Tag, Text } from '@chakra-ui/react';
+import { Badge, Box, Image, Text } from '@chakra-ui/react';
 import { HiStar } from 'react-icons/hi';
 
-import { Movie } from '@/lib/types';
+import { Movie, Tv } from '@/lib/types';
 import { formatDate } from '@/lib/dateFns';
 
 interface MediaCardProps {
-  media: Movie;
+  media: Movie | Tv;
+  mediaType: 'movie' | 'tv';
 }
 
-const MediaCard = ({ media }: MediaCardProps) => {
+const MediaCard = ({ media, mediaType }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   return (
@@ -23,7 +24,7 @@ const MediaCard = ({ media }: MediaCardProps) => {
     >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
-        alt={media.title}
+        alt={mediaType === 'movie' ? (media as Movie).title : (media as Tv).name}
         width="100%"
         height="100%"
         objectFit="cover"
@@ -32,20 +33,21 @@ const MediaCard = ({ media }: MediaCardProps) => {
       <Badge position="absolute" top={2} left={2} variant="surface" colorPalette="blackAlpha">
         <HiStar />
 
-        {media.vote_average}
+        {media.vote_average.toFixed(1)}
 
         <Text fontSize="sm" color="gray.400">
           from {media.vote_count} votes
         </Text>
       </Badge>
 
-      <Tag.Root position="absolute" top={8} left={2} variant="subtle">
-        <Tag.Label>{media.adult ? 'R' : 'PG-13'}</Tag.Label>
-      </Tag.Root>
+      <Badge position="absolute" top={8} left={2} variant="subtle">
+        {media.adult ? 'R' : 'PG-13'}
+      </Badge>
 
       <Box position="absolute" bottom={0} left={0} right={0} bg="blackAlpha.700" p={2} color="white">
         <Text fontSize="md" fontWeight="bold" lineClamp={2}>
-          {media.title} ({formatDate(media.release_date, 'YYYY')})
+          {mediaType === 'movie' ? (media as Movie).title : (media as Tv).name} (
+          {formatDate(mediaType === 'movie' ? (media as Movie).release_date : (media as Tv).first_air_date, 'YYYY')})
         </Text>
 
         {media.genre_ids.map((genre) => (

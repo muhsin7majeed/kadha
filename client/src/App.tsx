@@ -5,7 +5,7 @@ import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import AuthLayout from '@/pages/auth/AuthLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import MainLayout from '@/components/mainLayout';
+import MainLayout from '@/components/main-layout';
 import Home from './pages/home';
 import { useGenreMap } from './hooks/useGenreMap';
 

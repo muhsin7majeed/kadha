@@ -7,7 +7,7 @@ import { TbListCheck } from 'react-icons/tb';
 const TabBar = () => {
   return (
     <>
-      <Tabs.Root variant="enclosed" maxW="md" fitted defaultValue={'home'}>
+      <Tabs.Root variant="enclosed" fitted defaultValue={'home'} mx="auto" w="sm">
         <Tabs.List>
           <Tabs.Trigger value="home" asChild>
             <Link to="/">

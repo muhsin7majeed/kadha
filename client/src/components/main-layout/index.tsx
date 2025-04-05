@@ -8,7 +8,7 @@ const MainLayout = () => {
     <VStack alignItems="stretch" w="100%" height="100vh" py={4}>
       <Navbar />
 
-      <Box height="100%" overflow="auto" my={4}>
+      <Box height="100%" overflow="auto" my={4} css={{ scrollbarWidth: 'none' }}>
         <Outlet />
       </Box>
 
