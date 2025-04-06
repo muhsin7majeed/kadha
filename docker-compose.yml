@@ -11,7 +11,7 @@ services:
     volumes:
       - ./client:/app/client # Sync your source code
       - /app/node_modules # Keeps container's deps intact
-    command: npm run dev --workspace=client
+    command: npm run start:client
     depends_on:
       - server
 
@@ -31,7 +31,7 @@ services:
     volumes:
       - ./server:/app/server # Sync server code
       - /app/node_modules # Prevent local node_modules from overriding
-    command: npm run dev --workspace=server
+    command: npm run start:server
     depends_on:
       - mongo
 
