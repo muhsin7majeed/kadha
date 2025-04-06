@@ -7,9 +7,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Copy everything else (client and server included)
-COPY . .
+# COPY . .
 
 # Install all dependencies (including client/server workspaces)
-RUN npm install
+# RUN npm install
 
 EXPOSE 3000 5000

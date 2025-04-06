@@ -8,10 +8,9 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - /app/node_modules
     depends_on:
       - server
-    command: npm run dev --workspace=client
+    command: sh -c "npm install && npm run dev --workspace=client"
 
   server:
     build:
@@ -22,7 +21,6 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-      - /app/node_modules
     depends_on:
       - mongo
     environment:
@@ -30,7 +28,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - TMDB_API_KEY=${TMDB_API_KEY}
       - TMDB_BEARER_TOKEN=${TMDB_BEARER_TOKEN}
-    command: npm run dev --workspace=server
+    command: sh -c "npm install && npm run dev --workspace=server"
 
   mongo:
     image: mongo:7
