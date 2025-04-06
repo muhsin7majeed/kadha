@@ -7,7 +7,7 @@ services:
       - "3000:3000"
     volumes:
       - ./client:/app/client
-      - /app/node_modules
+      - client_node_modules:/app/client/node_modules
     depends_on:
       - server
     command: npm run dev --workspace=client
@@ -25,7 +25,7 @@ services:
       - TMDB_BEARER_TOKEN=${TMDB_BEARER_TOKEN}
     volumes:
       - ./server:/app/server
-      - /app/node_modules
+      - server_node_modules:/app/server/node_modules
     depends_on:
       - mongo
     command: npm run dev --workspace=server
@@ -39,3 +39,5 @@ services:
 
 volumes:
   mongo-data:
+  client_node_modules:
+  server_node_modules:
