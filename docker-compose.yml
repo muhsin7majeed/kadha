@@ -7,7 +7,8 @@ services:
       - "3000:3000"
     working_dir: /app
     volumes:
-      - .:/app # mount whole monorepo
+      - .:/app
+      - /app/node_modules
     depends_on:
       - server
     command: npm run dev --workspace=client
@@ -20,7 +21,8 @@ services:
       - "5000:5000"
     working_dir: /app
     volumes:
-      - .:/app # mount whole monorepo
+      - .:/app
+      - /app/node_modules
     depends_on:
       - mongo
     environment:
