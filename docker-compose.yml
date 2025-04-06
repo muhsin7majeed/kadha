@@ -5,15 +5,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    working_dir: /app/client
-    environment:
-      - NODE_ENV=${NODE_ENV}
+    working_dir: /app
     volumes:
-      - ./client:/app/client # Sync your source code
-      - /app/node_modules # Keeps container's deps intact
-    command: npm run dev --workspace=client
+      - .:/app # mount whole monorepo
     depends_on:
       - server
+    command: npm run dev --workspace=client
 
   server:
     build:
@@ -21,19 +18,17 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    working_dir: /app/server
+    working_dir: /app
+    volumes:
+      - .:/app # mount whole monorepo
+    depends_on:
+      - mongo
     environment:
-      - NODE_ENV=${NODE_ENV}
       - MONGO_URI=${MONGO_URI}
       - JWT_SECRET=${JWT_SECRET}
       - TMDB_API_KEY=${TMDB_API_KEY}
       - TMDB_BEARER_TOKEN=${TMDB_BEARER_TOKEN}
-    volumes:
-      - ./server:/app/server # Sync server code
-      - /app/node_modules # Prevent local node_modules from overriding
     command: npm run dev --workspace=server
-    depends_on:
-      - mongo
 
   mongo:
     image: mongo:7
