@@ -11,7 +11,7 @@ interface LoginResponse {
 }
 
 const login = async (data: LoginInputs) => {
-  const response = await api.post('/api/auth/login', data);
+  const response = await api.post<LoginResponse>('/api/auth/login', data);
   return response.data;
 };
 

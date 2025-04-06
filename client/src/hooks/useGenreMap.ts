@@ -3,10 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import { genreMapAtom } from '@/atoms/genreAtom';
 import api from '@/lib/axiosInstance';
-import { MovieDBGenreResponse } from '@/lib/types';
 
 const fetchGenres = async () => {
-  const response = await api.get<MovieDBGenreResponse>('/api/media/genres');
+  const response = await api.get<{ genres: Record<number, string> }>('/api/media/genres');
   return response.data.genres;
 };
 

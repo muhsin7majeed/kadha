@@ -11,7 +11,7 @@ interface RegisterResponse {
 }
 
 const register = async (data: RegisterInputs) => {
-  const response = await api.post('/api/auth/register', data);
+  const response = await api.post<RegisterResponse>('/api/auth/register', data);
   return response.data;
 };
 
