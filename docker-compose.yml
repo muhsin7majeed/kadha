@@ -2,33 +2,34 @@ services:
   client:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: client/Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./client:/app/client
+      - ./client:/app
       - /app/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV}
     depends_on:
       - server
-    command: npm run dev --workspace=client
 
   server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: server/Dockerfile
     ports:
       - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
     environment:
+      - NODE_ENV=${NODE_ENV}
       - MONGO_URI=${MONGO_URI}
       - JWT_SECRET=${JWT_SECRET}
       - TMDB_API_KEY=${TMDB_API_KEY}
       - TMDB_BEARER_TOKEN=${TMDB_BEARER_TOKEN}
-    volumes:
-      - ./server:/app/server
-      - /app/node_modules
     depends_on:
       - mongo
-    command: npm run dev --workspace=server
 
   mongo:
     image: mongo:7

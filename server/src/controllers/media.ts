@@ -45,11 +45,11 @@ export const getGenre = async (req: Request, res: Response) => {
 
   let genreHashMap: Record<number, string> = {};
 
-  movieGenre.data.genres.forEach((genre) => {
+  movieGenre.data.genres.forEach((genre: { id: number; name: string }) => {
     genreHashMap[genre.id] = genre.name;
   });
 
-  tvGenre.data.genres.forEach((genre) => {
+  tvGenre.data.genres.forEach((genre: { id: number; name: string }) => {
     genreHashMap[genre.id] = genre.name;
   });
 
