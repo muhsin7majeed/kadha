@@ -1,25 +1,4 @@
 services:
-  client:
-    build:
-      context: .
-      dockerfile: client/Dockerfile.prod
-    volumes:
-      - client-build:/app/dist
-    environment:
-      - NODE_ENV=production
-
-  server:
-    build:
-      context: .
-      dockerfile: server/Dockerfile
-    environment:
-      - NODE_ENV=production
-      - MONGO_URI=${MONGO_URI}
-    expose:
-      - "5000"
-    depends_on:
-      - mongo
-
   mongo:
     image: mongo:7
     volumes:
@@ -27,4 +6,3 @@ services:
 
 volumes:
   mongo-data:
-  client-build:
