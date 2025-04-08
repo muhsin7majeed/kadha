@@ -1,8 +1,35 @@
 services:
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      NODE_ENV: production
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      TMDB_API_KEY: ${TMDB_API_KEY}
+      TMDB_BEARER_TOKEN: ${TMDB_BEARER_TOKEN}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+
   mongo:
     image: mongo:7
+    restart: always
     volumes:
-      - mongo-data:/data/db
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
 
 volumes:
-  mongo-data:
+  mongo_data:
