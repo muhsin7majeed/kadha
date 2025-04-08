@@ -10,19 +10,19 @@ const TabBar = () => {
       <Tabs.Root variant="enclosed" fitted defaultValue={'home'} mx="auto" w="sm">
         <Tabs.List>
           <Tabs.Trigger value="home" asChild>
-            <Link to="/">
+            <Link to="/app">
               <AiOutlineHome size={24} />
             </Link>
           </Tabs.Trigger>
 
           <Tabs.Trigger value="watchlist" asChild>
-            <Link to="/watchlist">
+            <Link to="/app/watchlist">
               <TbListCheck size={24} />
             </Link>
           </Tabs.Trigger>
 
           <Tabs.Trigger value="watched" asChild>
-            <Link to="/watched">
+            <Link to="/app/watched">
               <AiFillCheckCircle size={24} />
             </Link>
           </Tabs.Trigger>

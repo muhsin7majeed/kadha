@@ -1,23 +1,39 @@
-import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { Box, Spinner } from '@chakra-ui/react';
 
-import { authAtom, getStoredToken } from '@/store/auth';
+import { useAuthAtom, useSetAuthAtom } from '@/atoms/authAtom';
 import { useGetMe } from '@/pages/profile/apis/useGetMe';
+import { getStoredToken } from '@/lib/auth';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [, setAuth] = useAtom(authAtom);
-  const { data: me, isLoading } = useGetMe(Boolean(getStoredToken()));
+  const auth = useAuthAtom();
+  const setAuth = useSetAuthAtom();
+
+  const { data: userInfo, isLoading } = useGetMe();
 
   useEffect(() => {
-    if (me) {
-      setAuth({ user: { _id: me._id, username: me.username }, token: getStoredToken() });
+    if (!getStoredToken()) {
+      setAuth({
+        user: null,
+        token: null,
+        isLoading: false,
+      });
     }
-  }, [me]);
+  }, [setAuth]);
+
+  useEffect(() => {
+    if (userInfo && !auth.user) {
+      setAuth({
+        user: { _id: userInfo._id, username: userInfo.username },
+        token: getStoredToken(),
+        isLoading: false,
+      });
+    }
+  }, [auth.user, setAuth, userInfo]);
 
   if (isLoading) {
     return (

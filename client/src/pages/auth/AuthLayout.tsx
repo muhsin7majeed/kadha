@@ -1,16 +1,7 @@
 import { Box, Text } from '@chakra-ui/react';
-import { Outlet, Navigate } from 'react-router';
-import { useAtom } from 'jotai';
-
-import { authAtom } from '@/store/auth';
+import { Outlet } from 'react-router';
 
 const AuthLayout = () => {
-  const [auth] = useAtom(authAtom);
-
-  if (auth.user) {
-    return <Navigate to="/" replace />;
-  }
-
   return (
     <Box
       display="flex"

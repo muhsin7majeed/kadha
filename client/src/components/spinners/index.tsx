@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Spinner } from '@chakra-ui/react';
 import { FaSyncAlt } from 'react-icons/fa';
 
 const SyncSpinner = ({ size = 24 }: { size?: number }) => {
@@ -10,3 +10,11 @@ const SyncSpinner = ({ size = 24 }: { size?: number }) => {
 };
 
 export default SyncSpinner;
+
+export const FullScreenSpinner = () => {
+  return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Spinner size="sm" />
+    </Box>
+  );
+};

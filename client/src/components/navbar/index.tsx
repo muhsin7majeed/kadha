@@ -1,24 +1,22 @@
-import { useAtom } from 'jotai';
-import { Avatar, Box, Button, CloseButton, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
-import { useNavigate } from 'react-router';
 import { useState } from 'react';
+import { Avatar, Box, Button, CloseButton, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
 
-import { authAtom, clearAuth } from '@/store/auth';
+import { useAuthAtom } from '@/atoms/authAtom';
+import { useLogout } from '@/lib/auth';
 
 const Navbar = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
-  const [auth] = useAtom(authAtom);
+  const auth = useAuthAtom();
 
-  const navigate = useNavigate();
+  const logout = useLogout();
 
   const handleLogout = () => {
     setShowLogoutWarning(true);
   };
 
   const handleLogoutConfirm = () => {
-    clearAuth();
-    navigate('/login');
     setShowLogoutWarning(false);
+    logout();
   };
 
   return (
