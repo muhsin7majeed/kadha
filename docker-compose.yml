@@ -2,7 +2,7 @@ services:
   client:
     build:
       context: .
-      dockerfile: client/Dockerfile.dev
+      dockerfile: docker/client.dev.Dockerfile
     ports:
       - "3000:3000"
     volumes:
@@ -16,7 +16,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: docker/server.dev.Dockerfile
     ports:
       - "5000:5000"
     volumes:

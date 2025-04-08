@@ -2,7 +2,7 @@ services:
   client:
     build:
       context: .
-      dockerfile: client/Dockerfile
+      dockerfile: docker/client.prod.Dockerfile
     ports:
       - "80:80"
     depends_on:
@@ -11,7 +11,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: server/Dockerfile
+      dockerfile: docker/server.prod.Dockerfile
     environment:
       NODE_ENV: production
       MONGO_URI: ${MONGO_URI}
