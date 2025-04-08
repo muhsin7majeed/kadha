@@ -82,7 +82,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching, mediaType }: MediaC
       >
         <Flex gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.id} media={media} mediaType={mediaType} />
+            <MediaCard key={media.id} media={media} mediaType={mediaType} isLink />
           ))}
         </Flex>
       </Box>

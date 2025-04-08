@@ -8,6 +8,8 @@ import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
 import { errorHandler } from "./middlewares/errorHandler";
 import mediaRoutes from "./routes/media";
+import { authMiddleware } from "./middlewares/auth";
+
 const app: Express = express();
 
 // Middlewarezz
@@ -20,7 +22,7 @@ connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/media", mediaRoutes);
+app.use("/api/media", authMiddleware, mediaRoutes);
 
 // Basic route
 app.get("/", (req: Request, res: Response) => {

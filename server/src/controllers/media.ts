@@ -39,6 +39,14 @@ export const getTopRatedTvs = async (req: Request, res: Response) => {
   res.json({ tv: response.data.results });
 };
 
+export const getMediaDetails = async (req: Request, res: Response) => {
+  const { mediaType, id } = req.params;
+
+  const response = await api.get<MovieDBResponse>(`/${mediaType}/${id}`);
+
+  res.json({ media: response.data });
+};
+
 export const getGenre = async (req: Request, res: Response) => {
   const movieGenre = await api.get<MovieDBGenreResponse>("/genre/movie/list");
   const tvGenre = await api.get<MovieDBGenreResponse>("/genre/tv/list");

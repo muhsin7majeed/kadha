@@ -4,17 +4,28 @@ import { HiStar } from 'react-icons/hi';
 
 import { Movie, Tv } from '@/lib/types';
 import { formatDate } from '@/lib/dateFns';
+import CustomLinkOverlay from '../CustomLinkOverlay';
 
 interface MediaCardProps {
   media: Movie | Tv;
   mediaType: 'movie' | 'tv';
+  isLink?: boolean;
 }
 
-const MediaCard = ({ media, mediaType }: MediaCardProps) => {
+const MediaCard = ({ media, mediaType, isLink = false }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
+  const WrapperElement = isLink ? CustomLinkOverlay : Box;
+
   return (
-    <Box flex="0 0 200px" height="300px" borderRadius="lg" transition="transform 0.2s" position="relative">
+    <WrapperElement
+      flex="0 0 200px"
+      height="300px"
+      borderRadius="lg"
+      transition="transform 0.2s"
+      position="relative"
+      to={`/media/${mediaType}/${media.id}`}
+    >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
         alt={mediaType === 'movie' ? (media as Movie).title : (media as Tv).name}
@@ -52,7 +63,7 @@ const MediaCard = ({ media, mediaType }: MediaCardProps) => {
           ))}
         </Flex>
       </Box>
-    </Box>
+    </WrapperElement>
   );
 };
 

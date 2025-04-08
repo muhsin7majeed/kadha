@@ -4,7 +4,7 @@
 
 - [ ] **API Integration**: Build endpoints for:
   - [x] Trending movies
-  - [ ] Popular movies
+  - [x] Popular movies
   - [ ] Upcoming movies
   - [ ] Movie details
 - [ ] **Homepage**: Display movies using responsive carousels or grids.
