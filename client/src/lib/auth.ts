@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 
 import { authInitialState, useSetAuthAtom } from '@/atoms/authAtom';
-import { AuthState } from '@/types';
+import { AuthState } from '@/types/user';
 
 export const useLoginAuth = () => {
   const setAuth = useSetAuthAtom();

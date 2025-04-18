@@ -7,6 +7,7 @@ import {
   getTopRatedTvs,
   getTrendingMovies,
   getTrendingTvs,
+  getMediaDetails,
 } from "@/controllers/media";
 
 const router = Router();
@@ -21,5 +22,7 @@ router.get("/popular-movies", getPopularMovies);
 router.get("/popular-tvs", getPopularTvs);
 
 router.get("/genres", getGenre);
+
+router.get("/:mediaType/:id", getMediaDetails);
 
 export default router;

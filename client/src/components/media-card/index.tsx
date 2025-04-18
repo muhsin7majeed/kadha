@@ -2,7 +2,7 @@ import { useGenreAtom } from '@/atoms/genreAtom';
 import { Badge, Box, Flex, Image, Text } from '@chakra-ui/react';
 import { HiStar } from 'react-icons/hi';
 
-import { Movie, Tv } from '@/lib/types';
+import { Movie, Tv } from '@/types/media';
 import { formatDate } from '@/lib/dateFns';
 import CustomLinkOverlay from '../CustomLinkOverlay';
 

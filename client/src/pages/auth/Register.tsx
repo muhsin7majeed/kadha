@@ -2,7 +2,7 @@ import { Box, Text } from '@chakra-ui/react';
 import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
-import { LocationState } from '@/types';
+import { LocationState } from '@/types/general';
 import AuthForm, { RegisterInputs } from './AuthForm';
 import useRegister from './apis/useRegister';
 import { useLoginAuth } from '@/lib/auth';

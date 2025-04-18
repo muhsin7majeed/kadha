@@ -11,6 +11,7 @@ import { useAuthAtom } from '@/atoms/authAtom';
 import AuthProvider from './components/AuthProvider';
 import Landing from './pages/landing';
 import Home from './pages/home';
+import MediaDetails from './pages/media-details';
 
 function App() {
   const auth = useAuthAtom();
@@ -33,7 +34,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="watched" element={<div>Watched</div>} />
               <Route path="watchlist" element={<div>Watchlist</div>} />
-              <Route path="media/:mediaType/:id" element={<div>Details</div>} />
+              <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             </Route>
           </Route>
 

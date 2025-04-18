@@ -1,6 +1,6 @@
 import api from '@/lib/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { Movie } from '@/lib/types';
+import { Movie } from '@/types/media';
 
 const fetchTrendingMovies = async () => {
   const response = await api.get<{ movies: Movie[] }>('/api/media/trending-movies');

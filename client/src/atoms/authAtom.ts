@@ -1,4 +1,4 @@
-import { AuthState } from '@/types';
+import { AuthState } from '@/types/user';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 export const authInitialState: AuthState = {

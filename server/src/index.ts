@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/user", authMiddleware, userRoutes);
 app.use("/api/media", authMiddleware, mediaRoutes);
 
 // Basic route

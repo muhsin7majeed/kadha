@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Box, Flex, IconButton, Heading } from '@chakra-ui/react';
 
-import { Movie, Tv } from '@/lib/types';
+import { Movie, Tv } from '@/types/media';
 import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './MediaCarousalSkeleton';
 import SyncSpinner from '../spinners';

@@ -1,6 +1,6 @@
 import { useMediaType } from '@/atoms/mediaType';
 import { SegmentGroup, SegmentGroupRootProps } from '@chakra-ui/react';
-import { MediaType } from '@/lib/types';
+import { MediaType } from '@/types/media';
 
 const FILTER_OPTIONS = ['All', 'Movie', 'TV'];
 

@@ -1,7 +1,7 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { MediaType } from '@/lib/types';
+import { MediaType } from '@/types/media';
 
 export const mediaTypeAtom = atomWithStorage<MediaType>('mediaType', 'All', undefined, { getOnInit: true });
 
