@@ -16,7 +16,7 @@ export const addToLiked = async (req: Request, res: Response) => {
   } = req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user._id, mediaId, mediaType },
+    { userId: req.user.id, mediaId, mediaType },
     {
       $set: {
         liked,
@@ -28,7 +28,8 @@ export const addToLiked = async (req: Request, res: Response) => {
         genreIds,
         releaseDate,
       },
-    }
+    },
+    { upsert: true, new: true }
   );
 
   return res.json({ message: `${mediaType} ${liked ? "liked" : "unliked"}` });
@@ -49,7 +50,7 @@ export const addToWatched = async (req: Request, res: Response) => {
   } = req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user._id, mediaId, mediaType },
+    { userId: req.user.id, mediaId, mediaType },
     {
       $set: {
         watched,
@@ -61,7 +62,8 @@ export const addToWatched = async (req: Request, res: Response) => {
         genreIds,
         releaseDate,
       },
-    }
+    },
+    { upsert: true, new: true }
   );
 
   return res.json({
@@ -84,7 +86,7 @@ export const addToWatchlist = async (req: Request, res: Response) => {
   } = req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user._id, mediaId, mediaType },
+    { userId: req.user.id, mediaId, mediaType },
     {
       $set: {
         watchlist,
@@ -96,7 +98,8 @@ export const addToWatchlist = async (req: Request, res: Response) => {
         genreIds,
         releaseDate,
       },
-    }
+    },
+    { upsert: true, new: true }
   );
 
   return res.json({

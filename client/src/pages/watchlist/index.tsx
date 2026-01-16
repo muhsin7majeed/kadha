@@ -25,7 +25,7 @@ const Watchlist = () => {
       ) : (
         <SimpleGrid columns={[2, 4, 6]} gap={4}>
           {watchList?.map((movie) => (
-            <MediaCard key={movie.id} media={movie} mediaType="movie" />
+            <MediaCard key={movie._id} media={movie} mediaType={movie.mediaType} />
           ))}
         </SimpleGrid>
       )}

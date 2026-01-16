@@ -1,10 +1,10 @@
 import api from '@/lib/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { UserMediaResponse } from '@/types/user-media';
+import { Movie } from '@/types/media';
 
 const fetchWatchList = async () => {
-  const response = await api.get<UserMediaResponse[]>('/api/user/watchlist');
-  return response.data;
+  const response = await api.get<{ movies: Movie[] }>('/api/user/watchlist');
+  return response.data.movies;
 };
 
 const useWatchList = () => {

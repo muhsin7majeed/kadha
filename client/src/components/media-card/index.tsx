@@ -6,9 +6,10 @@ import { Movie, Tv } from '@/types/media';
 import { formatDate } from '@/lib/dateFns';
 import CustomLinkOverlay from '../CustomLinkOverlay';
 import MediaActions from './media-actions';
+import { UserMediaResponse } from '@/types/user-media';
 
 interface MediaCardProps {
-  media: Movie | Tv;
+  media: Movie | Tv | UserMediaResponse;
   mediaType: 'movie' | 'tv';
   isLink?: boolean;
 }

@@ -21,7 +21,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const handleWatchlist = () => {
     if (isAddingToWatchList) return;
 
-    const payload = getUserMediaPayload(media);
+    const payload = getUserMediaPayload(media, 'watchlist');
 
     addToWatchList(payload);
   };
@@ -29,7 +29,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const handleWatched = () => {
     if (isAddingToWatched) return;
 
-    const payload = getUserMediaPayload(media);
+    const payload = getUserMediaPayload(media, 'watched');
 
     addToWatched(payload);
   };
@@ -37,7 +37,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const handleLike = () => {
     if (isAddingToLiked) return;
 
-    const payload = getUserMediaPayload(media);
+    const payload = getUserMediaPayload(media, 'liked');
 
     addToLiked(payload);
   };
@@ -51,7 +51,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         onClick={handleLike}
         loading={isAddingToLiked}
       >
-        <LuHeart fill={media.isLiked ? 'red' : 'none'} />
+        <LuHeart fill={media.liked ? 'red' : 'none'} />
       </IconButton>
 
       <IconButton
@@ -61,7 +61,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         onClick={handleWatched}
         loading={isAddingToWatched}
       >
-        {media.isWatched ? <LuCheck fill="blue" /> : <LuEye />}
+        {media.watched ? <LuCheck fill="blue" /> : <LuEye />}
       </IconButton>
 
       <IconButton
@@ -71,7 +71,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         onClick={handleWatchlist}
         loading={isAddingToWatchList}
       >
-        {media.isWatchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
+        {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
       </IconButton>
     </VStack>
   );

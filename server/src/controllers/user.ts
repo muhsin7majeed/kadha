@@ -22,8 +22,6 @@ export const getUserWatchlist = async (req: Request, res: Response) => {
     watchlist: true,
   }).sort({ updatedAt: -1 });
 
-  console.log({ watchlist });
-
   res.json({
     data: watchlist,
   });

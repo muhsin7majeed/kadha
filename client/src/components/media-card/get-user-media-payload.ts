@@ -1,7 +1,8 @@
+import { MediaAction } from '@/types/general';
 import { Movie, Tv } from '@/types/media';
 import { UserMediaPayload } from '@/types/user-media';
 
-const getUserMediaPayload = (media: Movie | Tv): UserMediaPayload => {
+const getUserMediaPayload = (media: Movie | Tv, action: MediaAction): UserMediaPayload => {
   return {
     mediaId: media.id,
     mediaType: media.media_type,
@@ -12,6 +13,7 @@ const getUserMediaPayload = (media: Movie | Tv): UserMediaPayload => {
     adult: media.adult,
     genreIds: media.genre_ids,
     releaseDate: media.media_type === 'movie' ? (media as Movie).release_date : (media as Tv).first_air_date,
+    [action]: media[action] ? false : true,
   };
 };
 

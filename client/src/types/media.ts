@@ -12,9 +12,9 @@ interface BaseMedia {
   vote_average: number;
   vote_count: number;
   media_type: TMDBMediaType;
-  isLiked?: boolean;
-  isWatched?: boolean;
-  isWatchlist?: boolean;
+  liked?: boolean;
+  watched?: boolean;
+  watchlist?: boolean;
 }
 
 export interface Movie extends BaseMedia {
