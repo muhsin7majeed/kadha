@@ -5,41 +5,90 @@ import { MovieDBResponse } from '@/types/themoviedb';
 import { Request, Response } from 'express';
 import { getParsedMovieDBResponse, getParsedMovieDBDetailsResponse } from '@/utils/getParsedMovieDBResponse';
 import { BaseResponse } from '@/types/common';
+import userMedia from '@/models/user-media';
+
+const enrichMediaWithUserInteractions = async (media: Media[], userId: string) => {
+  const mediaIds = media.map((m) => m.mediaId);
+
+  const interactions = await userMedia.find({
+    userId,
+    mediaId: { $in: mediaIds },
+  });
+
+  const map = new Map();
+
+  interactions.forEach((i) => {
+    map.set(i.mediaId, i);
+  });
+
+  const enriched = media.map((m) => ({
+    ...m,
+    liked: map.get(m.mediaId)?.liked ?? false,
+    watched: map.get(m.mediaId)?.watched ?? false,
+    watchlist: map.get(m.mediaId)?.watchlist ?? false,
+  }));
+
+  return enriched;
+};
 
 export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/trending/movie/day');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getTrendingTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/trending/tv/day');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getPopularMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/movie/popular');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getPopularTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/tv/popular');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getTopRatedMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/movie/top_rated');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getTopRatedTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
   const response = await api.get<MovieDBResponse>('/tv/top_rated');
 
-  res.json({ data: getParsedMovieDBResponse(response.data.results) });
+  const parsedResponse = getParsedMovieDBResponse(response.data.results);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ data: enriched });
 };
 
 export const getMediaDetails = async (req: Request, res: Response<BaseResponse<MediaDetails>>) => {
@@ -47,7 +96,22 @@ export const getMediaDetails = async (req: Request, res: Response<BaseResponse<M
 
   const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
 
-  res.json({ data: getParsedMovieDBDetailsResponse(response.data) });
+  const parsedResponse = getParsedMovieDBDetailsResponse(response.data);
+
+  const interactions = await userMedia.findOne({
+    userId: req.user.id,
+    mediaId: id,
+    mediaType,
+  });
+
+  const enriched = {
+    ...parsedResponse,
+    liked: interactions?.liked ?? false,
+    watched: interactions?.watched ?? false,
+    watchlist: interactions?.watchlist ?? false,
+  };
+
+  res.json({ data: enriched });
 };
 
 export const getGenre = async (req: Request, res: Response) => {
@@ -76,5 +140,9 @@ export const searchMedia = async (req: Request, res: Response) => {
     (result) => result.media_type === 'movie' || result.media_type === 'tv',
   );
 
-  res.json({ media: justMoviesAndTvs });
+  const parsedResponse = getParsedMovieDBResponse(justMoviesAndTvs);
+
+  const enriched = await enrichMediaWithUserInteractions(parsedResponse, req.user.id);
+
+  res.json({ media: enriched });
 };

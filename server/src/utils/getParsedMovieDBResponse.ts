@@ -1,7 +1,7 @@
 import { Media, MediaDetails, MediaType } from '@/types/media';
 import { MovieDBResponse, TMDBMovie, TMDBMovieDetails, TMDBTv, TMDBTvDetails } from '@/types/themoviedb';
 
-export const getParsedMovieDBResponse = (media: MovieDBResponse['results']): Media[] => {
+export const getParsedMovieDBResponse = (media: (TMDBMovie | TMDBTv)[]): Media[] => {
   if (media.length === 0) return [];
 
   return media.map((item) => {
@@ -12,7 +12,7 @@ export const getParsedMovieDBResponse = (media: MovieDBResponse['results']): Med
     const firstAirDate = (item as TMDBTv).first_air_date;
 
     return {
-      id: item.id,
+      mediaId: item.id,
       posterPath: item.poster_path,
       voteAverage: item.vote_average,
       voteCount: item.vote_count,
@@ -40,7 +40,7 @@ export const getParsedMovieDBDetailsResponse = (media: TMDBMovieDetails | TMDBTv
     mediaType === 'movie' ? (media as TMDBMovieDetails).backdrop_path : (media as TMDBTvDetails).still_path;
 
   return {
-    id: media.id,
+    mediaId: media.id,
     backDropPath,
     genres: media.genres,
     runtime: totalRuntime,

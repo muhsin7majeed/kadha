@@ -1,9 +1,8 @@
 import { Media } from '@/types/media';
-import { UserMediaPayload } from '@/types/user-media';
 
-const getUserMediaPayload = (media: Media, action: 'liked' | 'watched' | 'watchlist'): UserMediaPayload => {
+const getUserMediaPayload = (media: Media, action: 'liked' | 'watched' | 'watchlist'): Media => {
   return {
-    mediaId: media.id,
+    mediaId: media.mediaId,
     mediaType: media.mediaType,
     title: media.title,
     posterPath: media.posterPath,

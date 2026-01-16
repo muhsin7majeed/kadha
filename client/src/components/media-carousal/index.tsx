@@ -2,15 +2,15 @@ import { useRef } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Box, Flex, IconButton, Heading, SimpleGrid } from '@chakra-ui/react';
 
-import { Movie, Tv } from '@/types/media';
 import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './MediaCarousalSkeleton';
 import SyncSpinner from '../spinners';
+import { Media } from '@/types/media';
 
 interface MediaCarousalProps {
   mediaType: 'movie' | 'tv';
   title: string;
-  data: Movie[] | Tv[];
+  data: Media[];
   isLoading?: boolean;
   isFetching?: boolean;
 }
@@ -31,7 +31,7 @@ const ScrollButton = ({ direction, onClick }: { direction: 'left' | 'right'; onC
   );
 };
 
-const MediaCarousal = ({ title, data, isLoading, isFetching, mediaType }: MediaCarousalProps) => {
+const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -82,7 +82,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching, mediaType }: MediaC
       >
         <SimpleGrid columns={[1, 2, 4, 6]} gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.id} media={media} mediaType={mediaType} isLink />
+            <MediaCard key={media.mediaId} media={media} isLink />
           ))}
         </SimpleGrid>
       </Box>

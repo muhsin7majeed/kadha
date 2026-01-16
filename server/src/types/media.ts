@@ -3,7 +3,7 @@ import { TMDBGenre } from './themoviedb';
 export type MediaType = 'movie' | 'tv';
 
 export interface Media {
-  id: number;
+  mediaId: number;
   posterPath: string;
   voteAverage: number;
   voteCount: number;

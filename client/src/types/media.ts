@@ -1,6 +1,6 @@
 export type MediaType = 'movie' | 'tv';
 export interface Media {
-  id: number;
+  mediaId: number;
   posterPath: string;
   voteAverage: number;
   voteCount: number;
@@ -19,7 +19,7 @@ export interface MediaGenre {
   name: string;
 }
 export interface MediaDetails {
-  id: number;
+  mediaId: number;
   backDropPath: string;
   genres: MediaGenre[];
   runtime: number | null;

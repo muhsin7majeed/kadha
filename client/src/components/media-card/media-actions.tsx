@@ -13,32 +13,41 @@ interface MediaActionsProps {
 }
 
 const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
-  const { mutate: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
-  const { mutate: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
-  const { mutate: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
+  const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
+  const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
+  const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
 
-  const handleWatchlist = () => {
+  const handleWatchlist = async () => {
     if (isAddingToWatchList) return;
 
     const payload = getUserMediaPayload(media, 'watchlist');
 
-    addToWatchList(payload);
+    await addToWatchList(payload);
+
+    // TODO: Check if mutation will cause issue
+    media.watchlist = !media.watchlist;
   };
 
-  const handleWatched = () => {
+  const handleWatched = async () => {
     if (isAddingToWatched) return;
 
     const payload = getUserMediaPayload(media, 'watched');
 
-    addToWatched(payload);
+    await addToWatched(payload);
+
+    // TODO: Check if mutation will cause issue
+    media.watched = !media.watched;
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (isAddingToLiked) return;
 
     const payload = getUserMediaPayload(media, 'liked');
 
-    addToLiked(payload);
+    await addToLiked(payload);
+
+    // TODO: Check if mutation will cause issue
+    media.liked = !media.liked;
   };
 
   return (

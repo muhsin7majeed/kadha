@@ -24,7 +24,7 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
       borderRadius="lg"
       transition="transform 0.2s"
       position="relative"
-      to={`/app/media/${media.mediaType}/${media.id}`}
+      to={`/app/media/${media.mediaType}/${media.mediaId}`}
     >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.posterPath}`}
