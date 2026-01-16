@@ -1,14 +1,16 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
-import { MediaType } from '@/types/media';
+import { MediaTypeFilter } from '@/types/common';
 
-export const mediaTypeAtom = atomWithStorage<MediaType>('mediaType', 'All', undefined, { getOnInit: true });
+export const mediaTypeAtom = atomWithStorage<MediaTypeFilter>('mediaType', 'All', undefined, {
+  getOnInit: true,
+});
 
 export const useMediaType = () => {
   return useAtom(mediaTypeAtom);
 };
 
-export const useMediaTypeValue = () => {
+export const useMediaTypeValue = (): MediaTypeFilter => {
   return useAtomValue(mediaTypeAtom);
 };

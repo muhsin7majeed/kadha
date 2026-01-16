@@ -1,8 +1,7 @@
 import { useMediaType } from '@/atoms/mediaType';
 import { SegmentGroup, SegmentGroupRootProps } from '@chakra-ui/react';
-import { MediaType } from '@/types/media';
-
-const FILTER_OPTIONS = ['All', 'Movie', 'TV'];
+import type { MediaTypeFilter } from '@/types/common';
+import MEDIA from '@/constants/media';
 
 interface MediaTypeFilterProps {
   chakraProps?: SegmentGroupRootProps;
@@ -11,18 +10,18 @@ interface MediaTypeFilterProps {
 const MediaTypeFilter = ({ chakraProps }: MediaTypeFilterProps) => {
   const [mediaType, setMediaType] = useMediaType();
 
-  const handleMediaTypeChange = (value: MediaType) => {
+  const handleMediaTypeChange = (value: MediaTypeFilter) => {
     setMediaType(value);
   };
 
   return (
     <SegmentGroup.Root
       value={mediaType}
-      onValueChange={(e) => handleMediaTypeChange(e.value as MediaType)}
+      onValueChange={(e) => handleMediaTypeChange(e.value as MediaTypeFilter)}
       {...chakraProps}
     >
       <SegmentGroup.Indicator />
-      <SegmentGroup.Items items={FILTER_OPTIONS} />
+      <SegmentGroup.Items items={Object.values(MEDIA.MEDIA_TYPE_FILTER)} />
     </SegmentGroup.Root>
   );
 };

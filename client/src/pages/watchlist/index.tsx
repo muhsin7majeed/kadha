@@ -8,8 +8,6 @@ import PageHeader from '@/components/page-header';
 const Watchlist = () => {
   const { data: watchList, isLoading, isFetching, error, refetch } = useWatchList();
 
-  console.log(watchList);
-
   return (
     <Box>
       <PageHeader isFetching={isFetching}>Watchlist</PageHeader>
@@ -25,7 +23,7 @@ const Watchlist = () => {
       ) : (
         <SimpleGrid columns={[2, 4, 6]} gap={4}>
           {watchList?.map((movie) => (
-            <MediaCard key={movie._id} media={movie} mediaType={movie.mediaType} />
+            <MediaCard key={movie.id} media={movie} />
           ))}
         </SimpleGrid>
       )}

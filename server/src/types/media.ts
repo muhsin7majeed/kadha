@@ -13,10 +13,14 @@ export interface Media {
   title: string;
   releaseDate: string | undefined;
   firstAirDate: string | undefined;
+  liked?: boolean;
+  watched?: boolean;
+  watchlist?: boolean;
 }
 
 export interface MediaDetails extends Omit<Media, 'genreIds'> {
   backDropPath: string;
+  posterPath: string;
   genres: TMDBGenre[];
   runtime: number | null;
   tagline: string | null;

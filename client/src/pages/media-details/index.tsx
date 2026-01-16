@@ -8,6 +8,8 @@ import { formatDate, minutesToHours } from '@/lib/dateFns';
 
 const MediaDetails = () => {
   const { mediaType, id } = useParams<{ mediaType: MediaType; id: string }>();
+  const { data, isLoading } = useMediaDetails(mediaType!, id!);
+
   const navigate = useNavigate();
 
   if (!mediaType || !id) {
@@ -19,7 +21,6 @@ const MediaDetails = () => {
     return;
   }
 
-  const { data, isLoading, error } = useMediaDetails(mediaType, id);
   console.log(data);
 
   if (isLoading || !data) {
@@ -45,8 +46,8 @@ const MediaDetails = () => {
           }}
         >
           <Image
-            src={`https://image.tmdb.org/t/p/w500${data.backdrop_path}`}
-            alt={data?.title}
+            src={`https://image.tmdb.org/t/p/w500${data.backDropPath}`}
+            alt={data.title}
             width="100%"
             height="100%"
             objectFit="cover"
@@ -63,18 +64,18 @@ const MediaDetails = () => {
           height="300px"
           aspectRatio={9 / 16}
           borderRadius="md"
-          src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+          src={`https://image.tmdb.org/t/p/w500${data.posterPath}`}
           alt={data.title}
           objectFit="cover"
         />
 
         <Box textAlign={'center'}>
           <Text fontSize="3xl" fontWeight="bold">
-            {data.title} ({formatDate(data.release_date, 'YYYY')})
+            {data.title} ({formatDate(data.releaseDate, 'YYYY')})
           </Text>
 
           <Text fontSize="lg" color="gray.500">
-            {data.adult ? 'Adult' : 'PG-13'} - {minutesToHours(data.runtime)} -{' '}
+            {data.adult ? 'Adult' : 'PG-13'} - {minutesToHours(data.runtime || 0)} -{' '}
             {data.genres.map((genre) => genre.name).join(', ')}
           </Text>
         </Box>

@@ -34,6 +34,7 @@ export const addToWatched = async (req: Request, res: Response) => {
     {
       $set: {
         watched,
+        watchlist: false,
         title,
         posterPath,
         voteAverage,
@@ -45,6 +46,8 @@ export const addToWatched = async (req: Request, res: Response) => {
     },
     { upsert: true, new: true },
   );
+
+  // TODO: Check if media needs to be removed from watchlist
 
   return res.json({
     message: `${mediaType} ${watched ? 'watched' : 'unwatched'}`,

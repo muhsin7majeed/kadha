@@ -5,8 +5,11 @@ export const getParsedMovieDBResponse = (media: MovieDBResponse['results']): Med
   if (media.length === 0) return [];
 
   return media.map((item) => {
-    const isMovie = item.media_type === 'movie';
-    const isTv = item.media_type === 'tv';
+    const mediaType = item.media_type || (item as TMDBMovie).title ? 'movie' : 'tv';
+
+    const title = (item as TMDBMovie).title || (item as TMDBTv).name;
+    const releaseDate = (item as TMDBMovie).release_date || (item as TMDBTv).first_air_date;
+    const firstAirDate = (item as TMDBTv).first_air_date;
 
     return {
       id: item.id,
@@ -15,23 +18,32 @@ export const getParsedMovieDBResponse = (media: MovieDBResponse['results']): Med
       voteCount: item.vote_count,
       adult: item.adult,
       genreIds: item.genre_ids,
-      mediaType: item.media_type as MediaType,
-      title: isMovie ? item.title : (item as TMDBTv).name,
-      releaseDate: isMovie ? item.release_date : undefined,
-      firstAirDate: isTv ? item.first_air_date : undefined,
+      mediaType,
+      title,
+      releaseDate,
+      firstAirDate,
     };
   });
 };
 
 export const getParsedMovieDBDetailsResponse = (media: TMDBMovieDetails | TMDBTvDetails): MediaDetails => {
-  const isMovie = media.media_type === 'movie';
-  const isTv = media.media_type === 'tv';
+  const mediaType = media.media_type || (media as TMDBMovieDetails).title ? 'movie' : 'tv';
+
+  const title = (media as TMDBMovieDetails).title || (media as TMDBTvDetails).name;
+  const releaseDate = (media as TMDBMovieDetails).release_date || (media as TMDBTvDetails).first_air_date;
+  const firstAirDate = (media as TMDBTvDetails).first_air_date;
+  const totalRuntime =
+    mediaType === 'movie'
+      ? (media as TMDBMovieDetails).runtime
+      : (media as TMDBTvDetails).episode_run_time.reduce((acc, curr) => acc + curr, 0);
+  const backDropPath =
+    mediaType === 'movie' ? (media as TMDBMovieDetails).backdrop_path : (media as TMDBTvDetails).still_path;
 
   return {
     id: media.id,
-    backDropPath: media.backdrop_path,
+    backDropPath,
     genres: media.genres,
-    runtime: isMovie ? media.runtime : null,
+    runtime: totalRuntime,
     tagline: media.tagline,
     overview: media.overview,
     posterPath: media.poster_path,
@@ -39,8 +51,8 @@ export const getParsedMovieDBDetailsResponse = (media: TMDBMovieDetails | TMDBTv
     voteCount: media.vote_count,
     adult: media.adult,
     mediaType: media.media_type as MediaType,
-    title: isMovie ? media.title : (media as TMDBTvDetails).name,
-    releaseDate: isMovie ? media.release_date : undefined,
-    firstAirDate: isTv ? media.first_air_date : undefined,
+    title,
+    releaseDate,
+    firstAirDate,
   };
 };

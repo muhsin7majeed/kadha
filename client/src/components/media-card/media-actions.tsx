@@ -2,15 +2,14 @@ import { VStack } from '@chakra-ui/react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye } from 'react-icons/lu';
 import { LuHeart } from 'react-icons/lu';
 import { IconButton } from '@chakra-ui/react';
-import { Tv } from '@/types/media';
-import { Movie } from '@/types/media';
+import { Media } from '@/types/media';
 import useAddToWatchList from './apis/useAddToWatchList';
 import useAddToWatched from './apis/useAddToWatched';
 import useAddToLiked from './apis/useAddToLiked';
 import getUserMediaPayload from './get-user-media-payload';
 
 interface MediaActionsProps {
-  media: Movie | Tv;
+  media: Media;
 }
 
 const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {

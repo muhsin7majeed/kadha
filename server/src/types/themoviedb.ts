@@ -132,6 +132,7 @@ export interface TMDBTvDetails extends Omit<TMDBTv, 'genre_ids'> {
   status: string;
   tagline: string | null;
   type: string;
+  still_path: string;
 }
 
 export interface MovieDBResponse {

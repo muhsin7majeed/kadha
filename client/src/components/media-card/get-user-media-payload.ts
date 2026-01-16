@@ -1,18 +1,17 @@
-import { MediaAction } from '@/types/general';
-import { Movie, Tv } from '@/types/media';
+import { Media } from '@/types/media';
 import { UserMediaPayload } from '@/types/user-media';
 
-const getUserMediaPayload = (media: Movie | Tv, action: MediaAction): UserMediaPayload => {
+const getUserMediaPayload = (media: Media, action: 'liked' | 'watched' | 'watchlist'): UserMediaPayload => {
   return {
     mediaId: media.id,
-    mediaType: media.media_type,
-    title: media.media_type === 'movie' ? (media as Movie).title : (media as Tv).name,
-    posterPath: media.poster_path,
-    voteAverage: media.vote_average,
-    voteCount: media.vote_count,
+    mediaType: media.mediaType,
+    title: media.title,
+    posterPath: media.posterPath,
+    voteAverage: media.voteAverage,
+    voteCount: media.voteCount,
     adult: media.adult,
-    genreIds: media.genre_ids,
-    releaseDate: media.media_type === 'movie' ? (media as Movie).release_date : (media as Tv).first_air_date,
+    genreIds: media.genreIds,
+    releaseDate: media.releaseDate,
     [action]: media[action] ? false : true,
   };
 };
