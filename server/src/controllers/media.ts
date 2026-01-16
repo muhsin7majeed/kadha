@@ -1,55 +1,58 @@
-import api from "@/lib/axiosInstance";
-import { MovieDBGenreResponse } from "@/lib/types";
-import { MovieDBResponse } from "@/lib/types";
-import { Request, Response } from "express";
+import api from '@/lib/axiosInstance';
+import { Media, MediaDetails } from '@/types/media';
+import { MovieDBGenreResponse, TMDBMovieDetails, TMDBTvDetails } from '@/types/themoviedb';
+import { MovieDBResponse } from '@/types/themoviedb';
+import { Request, Response } from 'express';
+import { getParsedMovieDBResponse, getParsedMovieDBDetailsResponse } from '@/utils/getParsedMovieDBResponse';
+import { BaseResponse } from '@/types/common';
 
-export const getTrendingMovies = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/trending/movie/day");
+export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/trending/movie/day');
 
-  res.json({ movies: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getTrendingTvs = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/trending/tv/day");
+export const getTrendingTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/trending/tv/day');
 
-  res.json({ tv: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getPopularMovies = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/movie/popular");
+export const getPopularMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/movie/popular');
 
-  res.json({ movies: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getPopularTvs = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/tv/popular");
+export const getPopularTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/tv/popular');
 
-  res.json({ tv: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getTopRatedMovies = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/movie/top_rated");
+export const getTopRatedMovies = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/movie/top_rated');
 
-  res.json({ movies: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getTopRatedTvs = async (req: Request, res: Response) => {
-  const response = await api.get<MovieDBResponse>("/tv/top_rated");
+export const getTopRatedTvs = async (req: Request, res: Response<BaseResponse<Media[]>>) => {
+  const response = await api.get<MovieDBResponse>('/tv/top_rated');
 
-  res.json({ tv: response.data.results });
+  res.json({ data: getParsedMovieDBResponse(response.data.results) });
 };
 
-export const getMediaDetails = async (req: Request, res: Response) => {
+export const getMediaDetails = async (req: Request, res: Response<BaseResponse<MediaDetails>>) => {
   const { mediaType, id } = req.params;
 
-  const response = await api.get<MovieDBResponse>(`/${mediaType}/${id}`);
+  const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
 
-  res.json({ media: response.data });
+  res.json({ data: getParsedMovieDBDetailsResponse(response.data) });
 };
 
 export const getGenre = async (req: Request, res: Response) => {
-  const movieGenre = await api.get<MovieDBGenreResponse>("/genre/movie/list");
-  const tvGenre = await api.get<MovieDBGenreResponse>("/genre/tv/list");
+  const movieGenre = await api.get<MovieDBGenreResponse>('/genre/movie/list');
+  const tvGenre = await api.get<MovieDBGenreResponse>('/genre/tv/list');
 
   let genreHashMap: Record<number, string> = {};
 
@@ -67,12 +70,10 @@ export const getGenre = async (req: Request, res: Response) => {
 export const searchMedia = async (req: Request, res: Response) => {
   const { query } = req.params;
 
-  const response = await api.get<MovieDBResponse>(
-    `/search/multi?query=${query}&include_adult=true`
-  );
+  const response = await api.get<MovieDBResponse>(`/search/multi?query=${query}&include_adult=true`);
 
   const justMoviesAndTvs = response.data.results.filter(
-    (result) => result.media_type === "movie" || result.media_type === "tv"
+    (result) => result.media_type === 'movie' || result.media_type === 'tv',
   );
 
   res.json({ media: justMoviesAndTvs });

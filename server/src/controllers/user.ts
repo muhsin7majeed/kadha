@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import userModel from "@/models/user";
-import UserMediaModel from "@/models/user-media";
+import { Request, Response } from 'express';
+import userModel from '@/models/user';
+import UserMediaModel from '@/models/user-media';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;

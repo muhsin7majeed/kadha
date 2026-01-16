@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const { Schema } = mongoose;
 
@@ -17,7 +17,7 @@ const UserMediaSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
       index: true,
     },
@@ -29,7 +29,7 @@ const UserMediaSchema = new Schema(
 
     mediaType: {
       type: String,
-      enum: ["movie", "tv"],
+      enum: ['movie', 'tv'],
       required: true,
     },
 
@@ -78,7 +78,7 @@ const UserMediaSchema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 /**
@@ -88,9 +88,6 @@ const UserMediaSchema = new Schema(
  * - A user can only have ONE document per media item
  * - Fast lookups when checking user interactions
  */
-UserMediaSchema.index(
-  { userId: 1, mediaId: 1, mediaType: 1 },
-  { unique: true }
-);
+UserMediaSchema.index({ userId: 1, mediaId: 1, mediaType: 1 }, { unique: true });
 
-export default mongoose.model("UserMedia", UserMediaSchema);
+export default mongoose.model('UserMedia', UserMediaSchema);

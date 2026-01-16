@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response } from 'express';
 import {
   getGenre,
   getPopularMovies,
@@ -9,23 +9,23 @@ import {
   getTrendingTvs,
   getMediaDetails,
   searchMedia,
-} from "@/controllers/media";
+} from '@/controllers/media';
 
 const router = Router();
 
-router.get("/trending-movies", getTrendingMovies);
-router.get("/trending-tvs", getTrendingTvs);
+router.get('/trending-movies', getTrendingMovies);
+router.get('/trending-tvs', getTrendingTvs);
 
-router.get("/top-rated-movies", getTopRatedMovies);
-router.get("/top-rated-tvs", getTopRatedTvs);
+router.get('/top-rated-movies', getTopRatedMovies);
+router.get('/top-rated-tvs', getTopRatedTvs);
 
-router.get("/popular-movies", getPopularMovies);
-router.get("/popular-tvs", getPopularTvs);
+router.get('/popular-movies', getPopularMovies);
+router.get('/popular-tvs', getPopularTvs);
 
-router.get("/genres", getGenre);
+router.get('/genres', getGenre);
 
-router.get("/search/:query", searchMedia);
+router.get('/search/:query', searchMedia);
 
-router.get("/:mediaType/:id", getMediaDetails);
+router.get('/:mediaType/:id', getMediaDetails);
 
 export default router;
