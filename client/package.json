@@ -13,7 +13,6 @@
     "@chakra-ui/react": "^3.14.2",
     "@emotion/react": "^11.14.0",
     "@tanstack/react-query": "^5.69.0",
-    "@types/axios": "^0.9.36",
     "axios": "^1.8.4",
     "dayjs": "^1.11.13",
     "jotai": "^2.12.2",

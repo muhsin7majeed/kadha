@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
-import { Box, Flex, IconButton, Heading } from '@chakra-ui/react';
+import { Box, Flex, IconButton, Heading, SimpleGrid } from '@chakra-ui/react';
 
 import { Movie, Tv } from '@/types/media';
 import MediaCard from '../media-card';
@@ -80,11 +80,11 @@ const MediaCarousal = ({ title, data, isLoading, isFetching, mediaType }: MediaC
           scrollbarWidth: 'none',
         }}
       >
-        <Flex gap={4}>
+        <SimpleGrid columns={[1, 2, 4, 6]} gap={4}>
           {data.map((media) => (
             <MediaCard key={media.id} media={media} mediaType={mediaType} isLink />
           ))}
-        </Flex>
+        </SimpleGrid>
       </Box>
     </Box>
   );

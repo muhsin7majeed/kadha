@@ -8,6 +8,7 @@ import {
   getTrendingMovies,
   getTrendingTvs,
   getMediaDetails,
+  searchMedia,
 } from "@/controllers/media";
 
 const router = Router();
@@ -22,6 +23,8 @@ router.get("/popular-movies", getPopularMovies);
 router.get("/popular-tvs", getPopularTvs);
 
 router.get("/genres", getGenre);
+
+router.get("/search/:query", searchMedia);
 
 router.get("/:mediaType/:id", getMediaDetails);
 

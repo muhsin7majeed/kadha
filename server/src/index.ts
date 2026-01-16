@@ -9,6 +9,7 @@ import userRoutes from "./routes/user";
 import { errorHandler } from "./middlewares/errorHandler";
 import mediaRoutes from "./routes/media";
 import { authMiddleware } from "./middlewares/auth";
+import userMediaRoutes from "./routes/user-media";
 
 const app: Express = express();
 
@@ -23,6 +24,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/user", authMiddleware, userRoutes);
 app.use("/api/media", authMiddleware, mediaRoutes);
+app.use("/api/user-media", authMiddleware, userMediaRoutes);
 
 // Basic route
 app.get("/", (req: Request, res: Response) => {

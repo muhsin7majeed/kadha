@@ -1,11 +1,17 @@
 import { toaster } from '@/components/ui/toaster';
+import type { AxiosError } from 'axios';
 
-export const useErrorHandler = (error: any) => {
-  if (Object(error?.response?.data).hasOwnProperty('fieldErrors')) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const useErrorHandler = (error: AxiosError<{ fieldErrors?: string[]; message?: string }> | any) => {
+  if (Object.prototype.hasOwnProperty.call(error?.response?.data, 'fieldErrors')) {
+    const combinedErrors: string[] = [];
+
     Object(error?.response?.data?.fieldErrors).forEach((error: string) => {
-      toaster.error({
-        title: error,
-      });
+      combinedErrors.push(error);
+    });
+
+    toaster.error({
+      title: combinedErrors.join(', '),
     });
 
     return;
@@ -13,7 +19,7 @@ export const useErrorHandler = (error: any) => {
 
   if (error) {
     toaster.error({
-      title: error.response.data.message,
+      title: error.response?.data.message,
     });
   } else {
     toaster.error({

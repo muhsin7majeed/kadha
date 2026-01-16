@@ -8,6 +8,7 @@ import PopularMovies from './popular-movies';
 import TrendingMovies from './trending-movies';
 import TrendingTvs from './trending-tvs';
 import PopularTvs from './popular-tvs';
+import SearchResults from './search-results';
 
 const Home = () => {
   const mediaType = useMediaTypeValue();
@@ -17,6 +18,8 @@ const Home = () => {
       <MediaTypeFilter chakraProps={{ mb: '2' }} />
 
       <Stack gap={4}>
+        <SearchResults />
+
         {(mediaType === 'Movie' || mediaType === 'All') && <TrendingMovies />}
         {(mediaType === 'TV' || mediaType === 'All') && <TrendingTvs />}
 

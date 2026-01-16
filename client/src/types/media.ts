@@ -1,3 +1,5 @@
+import { TMDBMediaType } from './general';
+
 interface BaseMedia {
   adult: boolean;
   backdrop_path: string;
@@ -9,6 +11,10 @@ interface BaseMedia {
   poster_path: string;
   vote_average: number;
   vote_count: number;
+  media_type: TMDBMediaType;
+  isLiked?: boolean;
+  isWatched?: boolean;
+  isWatchlist?: boolean;
 }
 
 export interface Movie extends BaseMedia {

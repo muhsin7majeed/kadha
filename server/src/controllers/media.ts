@@ -63,3 +63,17 @@ export const getGenre = async (req: Request, res: Response) => {
 
   res.json({ genres: genreHashMap });
 };
+
+export const searchMedia = async (req: Request, res: Response) => {
+  const { query } = req.params;
+
+  const response = await api.get<MovieDBResponse>(
+    `/search/multi?query=${query}&include_adult=true`
+  );
+
+  const justMoviesAndTvs = response.data.results.filter(
+    (result) => result.media_type === "movie" || result.media_type === "tv"
+  );
+
+  res.json({ media: justMoviesAndTvs });
+};

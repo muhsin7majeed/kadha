@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Button, CloseButton, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
+import { Avatar, Box, Button, CloseButton, Container, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
 
 import { useAuthAtom } from '@/atoms/authAtom';
 import { useLogout } from '@/lib/auth';
@@ -21,43 +21,38 @@ const Navbar = () => {
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        backgroundColor="Background"
-        rounded="md"
-        p={'2'}
-      >
-        <Heading>What to watch</Heading>
+      <Box backgroundColor="Background" rounded="md" py={'2'} px={[2, 4]} m={[2, 4]} borderRadius="lg">
+        <Container display="flex" justifyContent="space-between" alignItems="center">
+          <Heading>What to watch</Heading>
 
-        <Box>
-          <Menu.Root>
-            <Menu.Trigger asChild>
-              <Button variant="ghost" unstyled>
-                <Avatar.Root>
-                  <Avatar.Fallback name={auth.user?.username} />
-                  <Avatar.Image />
-                </Avatar.Root>
-              </Button>
-            </Menu.Trigger>
+          <Box>
+            <Menu.Root>
+              <Menu.Trigger asChild>
+                <Button variant="ghost" unstyled>
+                  <Avatar.Root>
+                    <Avatar.Fallback name={auth.user?.username} />
+                    <Avatar.Image />
+                  </Avatar.Root>
+                </Button>
+              </Menu.Trigger>
 
-            <Portal>
-              <Menu.Positioner>
-                <Menu.Content>
-                  <Menu.Item
-                    value="logout"
-                    onClick={handleLogout}
-                    color="fg.error"
-                    _hover={{ bg: 'bg.error', color: 'fg.error' }}
-                  >
-                    Logout
-                  </Menu.Item>
-                </Menu.Content>
-              </Menu.Positioner>
-            </Portal>
-          </Menu.Root>
-        </Box>
+              <Portal>
+                <Menu.Positioner>
+                  <Menu.Content>
+                    <Menu.Item
+                      value="logout"
+                      onClick={handleLogout}
+                      color="fg.error"
+                      _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                    >
+                      Logout
+                    </Menu.Item>
+                  </Menu.Content>
+                </Menu.Positioner>
+              </Portal>
+            </Menu.Root>
+          </Box>
+        </Container>
       </Box>
 
       <Dialog.Root

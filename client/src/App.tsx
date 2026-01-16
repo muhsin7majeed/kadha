@@ -1,5 +1,4 @@
 import { Route, Routes, Navigate } from 'react-router';
-import { Container } from '@chakra-ui/react';
 
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
@@ -12,35 +11,37 @@ import AuthProvider from './components/AuthProvider';
 import Landing from './pages/landing';
 import Home from './pages/home';
 import MediaDetails from './pages/media-details';
+import Watchlist from './pages/watchlist';
+import Liked from './pages/liked';
+import Watched from './pages/watched';
 
 function App() {
   const auth = useAuthAtom();
 
   return (
     <AuthProvider>
-      <Container>
-        <Routes>
-          <Route path="/" element={<Landing />} />
+      <Routes>
+        <Route path="/" element={<Landing />} />
 
-          <Route element={<PublicRoute />}>
-            <Route path="auth" element={<AuthLayout />}>
-              <Route path="login" element={<Login />} />
-              <Route path="register" element={<Register />} />
-            </Route>
+        <Route element={<PublicRoute />}>
+          <Route path="auth" element={<AuthLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
           </Route>
+        </Route>
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="app" element={<MainLayout />}>
-              <Route index element={<Home />} />
-              <Route path="watched" element={<div>Watched</div>} />
-              <Route path="watchlist" element={<div>Watchlist</div>} />
-              <Route path="media/:mediaType/:id" element={<MediaDetails />} />
-            </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route path="app" element={<MainLayout />}>
+            <Route index element={<Home />} />
+            <Route path="watched" element={<Watched />} />
+            <Route path="watchlist" element={<Watchlist />} />
+            <Route path="liked" element={<Liked />} />
+            <Route path="media/:mediaType/:id" element={<MediaDetails />} />
           </Route>
+        </Route>
 
-          <Route path="*" element={auth.token ? <Navigate to="/app" replace /> : <Navigate to="/" replace />} />
-        </Routes>
-      </Container>
+        <Route path="*" element={auth.token ? <Navigate to="/app" replace /> : <Navigate to="/" replace />} />
+      </Routes>
     </AuthProvider>
   );
 }
