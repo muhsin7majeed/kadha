@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
 import AuthForm, { RegisterInputs } from './auth-form';
 import useRegister from './apis/use-register';
-import { useLoginAuth } from '@/lib/auth';
+import useLoginAuth from '@/hooks/use-login';
 
 const Register = () => {
   const navigate = useNavigate();

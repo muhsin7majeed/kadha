@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Avatar, Box, Button, CloseButton, Container, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
 
 import { useAuthAtom } from '@/atoms/auth-atom';
-import { useLogout } from '@/lib/auth';
+import useLogout from '@/hooks/use-logout';
 
 const Navbar = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
