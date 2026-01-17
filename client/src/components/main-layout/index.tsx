@@ -12,8 +12,8 @@ const MainLayout = () => {
     <Box py={2}>
       <Navbar />
 
-      <Container w="100%" height="100vh" py={4}>
-        <Box height="100%" overflow="auto" paddingBottom={20} my={4} css={{ scrollbarWidth: 'none' }}>
+      <Container w="100%" minH="100vh" py={4}>
+        <Box  paddingBottom={20} my={4}>
           <Outlet />
         </Box>
 

@@ -49,7 +49,7 @@ const SearchInput = ({
       }
       {...props}
     >
-      <Input placeholder={placeholder} value={searchQuery} onChange={handleSearch} />
+      <Input borderRadius="lg" placeholder={placeholder} value={searchQuery} onChange={handleSearch} />
     </InputGroup>
   );
 };

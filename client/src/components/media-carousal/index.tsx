@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
-import { Box, Flex, IconButton, Heading, SimpleGrid } from '@chakra-ui/react';
+import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './MediaCarousalSkeleton';
-import SyncSpinner from '../spinners';
 import { Media } from '@/types/media';
+import PageHeader from '../page-header';
 
 interface MediaCarousalProps {
   mediaType: 'movie' | 'tv';
@@ -62,9 +62,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
   return (
     <Box>
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <Heading fontSize="lg" fontWeight="bold" display="flex" alignItems="center" gap={2}>
-          <span>{title}</span> {isFetching && <SyncSpinner size={16} />}
-        </Heading>
+        <PageHeader isFetching={isFetching}>{title}</PageHeader>
 
         <Flex gap={1} alignItems="center">
           <ScrollButton direction="left" onClick={() => scroll('left')} />
@@ -72,19 +70,12 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
         </Flex>
       </Flex>
 
-      <Box
-        ref={scrollContainerRef}
-        overflowX="auto"
-        scrollBehavior="smooth"
-        css={{
-          scrollbarWidth: 'none',
-        }}
-      >
-        <SimpleGrid columns={[1, 2, 4, 6]} gap={4}>
+      <Box ref={scrollContainerRef} overflowX="auto" scrollBehavior="smooth">
+        <Flex gap={4}>
           {data.map((media) => (
             <MediaCard key={media.mediaId} media={media} isLink />
           ))}
-        </SimpleGrid>
+        </Flex>
       </Box>
     </Box>
   );

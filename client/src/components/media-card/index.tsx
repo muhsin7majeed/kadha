@@ -1,11 +1,11 @@
 import { useGenreAtom } from '@/atoms/genreAtom';
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
-import { HiStar } from 'react-icons/hi';
 
 import { Media } from '@/types/media';
 import { formatDate } from '@/lib/dateFns';
 import CustomLinkOverlay from '../CustomLinkOverlay';
 import MediaActions from './media-actions';
+import { LuStar } from 'react-icons/lu';
 
 interface MediaCardProps {
   media: Media;
@@ -45,7 +45,7 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
         <Flex justify="space-between" w="100%">
           <VStack gap={1} alignItems="flex-start">
             <Badge variant="surface" colorPalette="blackAlpha">
-              <HiStar />
+              <LuStar fill="yellow" />
 
               {media.voteAverage.toFixed(1)}
 
