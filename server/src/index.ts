@@ -13,8 +13,15 @@ import userMediaRoutes from './routes/user-media';
 
 const app: Express = express();
 
+// CORS configuration - must specify origin (not wildcard) when using credentials
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true, // Allow cookies to be sent
+  optionsSuccessStatus: 200,
+};
+
 // Middlewarezz
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

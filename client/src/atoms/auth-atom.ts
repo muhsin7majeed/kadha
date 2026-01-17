@@ -3,7 +3,8 @@ import { atom, useAtomValue, useSetAtom } from 'jotai';
 
 export const authInitialState: AuthState = {
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   isLoading: true,
 };
 

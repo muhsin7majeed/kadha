@@ -97,9 +97,13 @@ export const refresh = async (req: Request, res: Response) => {
       if (err) {
         return res.status(401).json({ message: 'Unauthorized' });
       } else {
-        const accessToken = jwt.sign({ username: decoded.username }, envConfig.jwtAccessSecret, {
-          expiresIn: ACCESS_TOKEN_EXPIRATION,
-        });
+        const accessToken = jwt.sign(
+          { username: decoded.username, userId: decoded.userId },
+          envConfig.jwtAccessSecret,
+          {
+            expiresIn: ACCESS_TOKEN_EXPIRATION,
+          },
+        );
 
         return res.json({ accessToken });
       }
