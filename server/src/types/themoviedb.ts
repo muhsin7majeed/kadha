@@ -135,11 +135,17 @@ export interface TMDBTvDetails extends Omit<TMDBTv, 'genre_ids'> {
   still_path: string;
 }
 
-export interface MovieDBResponse {
+interface MovieDBBaseResponse {
   page: number;
-  results: TMDBMovie[] | TMDBTv[];
   total_pages: number;
   total_results: number;
+}
+export interface MovieDBMovieResponse extends MovieDBBaseResponse {
+  results: TMDBMovie[];
+}
+
+export interface MovieDBTvResponse extends MovieDBBaseResponse {
+  results: TMDBTv[];
 }
 
 export interface MovieDBGenreResponse {

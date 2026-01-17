@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import userModel from '@/models/user';
-import UserMediaModel from '@/models/user-media';
+import UserMediaSchema from '@/models/user-media';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;
@@ -17,7 +17,7 @@ export const getMe = async (req: Request, res: Response) => {
 export const getUserWatchlist = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const watchlist = await UserMediaModel.find({
+  const watchlist = await UserMediaSchema.find({
     userId: id,
     watchlist: true,
   }).sort({ updatedAt: -1 });
@@ -30,7 +30,7 @@ export const getUserWatchlist = async (req: Request, res: Response) => {
 export const getUserLiked = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const liked = await UserMediaModel.find({
+  const liked = await UserMediaSchema.find({
     userId: id,
     liked: true,
   }).sort({ updatedAt: -1 });
@@ -43,7 +43,7 @@ export const getUserLiked = async (req: Request, res: Response) => {
 export const getUserWatched = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const watched = await UserMediaModel.find({
+  const watched = await UserMediaSchema.find({
     userId: id,
     watched: true,
   }).sort({ updatedAt: -1 });

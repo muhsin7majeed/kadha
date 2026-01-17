@@ -2,46 +2,46 @@ import { Request, Response } from 'express';
 import UserMediaModel from '@/models/user-media';
 
 export const addToLiked = async (req: Request, res: Response) => {
-  const { mediaId, mediaType, liked, title, posterPath, voteAverage, voteCount, adult, genreIds, releaseDate } =
+  const { id, media_type, liked, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, mediaId, mediaType },
+    { userId: req.user.id, id, media_type },
     {
       $set: {
         liked,
         title,
-        posterPath,
-        voteAverage,
-        voteCount,
+        poster_path,
+        vote_average,
+        vote_count,
         adult,
-        genreIds,
-        releaseDate,
+        genre_ids,
+        release_date,
       },
     },
     { upsert: true, new: true },
   );
 
-  return res.json({ message: `${mediaType} ${liked ? 'liked' : 'unliked'}` });
+  return res.json({ message: `${media_type} ${liked ? 'liked' : 'unliked'}` });
 };
 
 export const addToWatched = async (req: Request, res: Response) => {
-  const { mediaId, mediaType, watched, title, posterPath, voteAverage, voteCount, adult, genreIds, releaseDate } =
+  const { id, media_type, watched, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, mediaId, mediaType },
+    { userId: req.user.id, id, media_type },
     {
       $set: {
         watched,
         watchlist: false,
         title,
-        posterPath,
-        voteAverage,
-        voteCount,
+        poster_path,
+        vote_average,
+        vote_count,
         adult,
-        genreIds,
-        releaseDate,
+        genre_ids,
+        release_date,
       },
     },
     { upsert: true, new: true },
@@ -50,32 +50,32 @@ export const addToWatched = async (req: Request, res: Response) => {
   // TODO: Check if media needs to be removed from watchlist
 
   return res.json({
-    message: `${mediaType} ${watched ? 'watched' : 'unwatched'}`,
+    message: `${media_type} ${watched ? 'watched' : 'unwatched'}`,
   });
 };
 
 export const addToWatchlist = async (req: Request, res: Response) => {
-  const { mediaId, mediaType, watchlist, title, posterPath, voteAverage, voteCount, adult, genreIds, releaseDate } =
+  const { id, media_type, watchlist, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, mediaId, mediaType },
+    { userId: req.user.id, id, media_type },
     {
       $set: {
         watchlist,
         title,
-        posterPath,
-        voteAverage,
-        voteCount,
+        poster_path,
+        vote_average,
+        vote_count,
         adult,
-        genreIds,
-        releaseDate,
+        genre_ids,
+        release_date,
       },
     },
     { upsert: true, new: true },
   );
 
   return res.json({
-    message: `${mediaType} ${watchlist ? 'added to watchlist' : 'removed from watchlist'}`,
+    message: `${media_type} ${watchlist ? 'added to watchlist' : 'removed from watchlist'}`,
   });
 };
