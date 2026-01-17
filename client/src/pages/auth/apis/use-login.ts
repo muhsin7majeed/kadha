@@ -4,9 +4,10 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import { LoginInputs } from '@/pages/auth/auth-form';
 import api from '@/lib/axios-instance';
 
-interface LoginResponse {
+export interface LoginResponse {
   message: string;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
   userId: string;
 }
 

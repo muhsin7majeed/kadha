@@ -9,6 +9,29 @@ interface LoginAndRegisterBody {
   password: string;
 }
 
+const ACCESS_TOKEN_EXPIRATION = '10m';
+const REFRESH_TOKEN_EXPIRATION = '1d';
+
+const getTokens = (username: string, userId: string) => {
+  const accessToken = jwt.sign({ username, userId }, envConfig.jwtAccessSecret, {
+    expiresIn: ACCESS_TOKEN_EXPIRATION,
+  });
+  const refreshToken = jwt.sign({ username, userId }, envConfig.jwtRefreshSecret, {
+    expiresIn: REFRESH_TOKEN_EXPIRATION,
+  });
+
+  return { accessToken, refreshToken };
+};
+
+const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
+  res.cookie('jwt', refreshToken, {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+};
+
 export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
   const { username, password } = req.body;
 
@@ -25,17 +48,22 @@ export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: 
     password: hashedPassword,
   });
 
-  const token = jwt.sign({ id: newUser._id }, envConfig.jwtSecret);
+  const { accessToken, refreshToken } = getTokens(newUser.username, newUser._id.toString());
+
+  setRefreshTokenCookie(res, refreshToken);
 
   res.json({
     message: 'User registered successfully',
-    token,
+    accessToken,
+    refreshToken,
     userId: newUser._id,
   });
 };
 
 export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
   const { username, password } = req.body;
+
+  console.log('username', username);
 
   const user = await userModel.findOne({ username });
 
@@ -49,11 +77,34 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
     return res.status(400).json({ message: 'Invalid username or password' });
   }
 
-  const token = jwt.sign({ id: user._id }, envConfig.jwtSecret);
+  const { accessToken, refreshToken } = getTokens(user.username, user._id.toString());
+
+  setRefreshTokenCookie(res, refreshToken);
 
   res.json({
     message: 'User logged in successfully',
-    token,
+    accessToken,
+    refreshToken,
     userId: user._id,
   });
+};
+
+export const refresh = async (req: Request, res: Response) => {
+  if (req.cookies?.jwt) {
+    const refreshToken = req.cookies.jwt;
+
+    jwt.verify(refreshToken, envConfig.jwtRefreshSecret, (err: any, decoded: any) => {
+      if (err) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      } else {
+        const accessToken = jwt.sign({ username: decoded.username }, envConfig.jwtAccessSecret, {
+          expiresIn: ACCESS_TOKEN_EXPIRATION,
+        });
+
+        return res.json({ accessToken });
+      }
+    });
+  } else {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 };

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getStoredToken, removeStoredToken } from '@/lib/auth';
+import { getStoredToken, removeStoredToken } from '@/lib/localstorage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',

@@ -1,6 +1,6 @@
 import { Button, Field, Fieldset, Input } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { BiLogInCircle, BiRightArrowAlt } from 'react-icons/bi';
+import { LuArrowRight, LuLogIn } from 'react-icons/lu';
 
 export interface LoginInputs {
   username: string;
@@ -24,7 +24,12 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<LoginInputs | RegisterInputs>();
+  } = useForm<LoginInputs | RegisterInputs>({
+    defaultValues: {
+      username: 'Ashe',
+      password: 'Password_123',
+    },
+  });
 
   const isRegister = type === 'register';
   const password = watch('password');
@@ -73,7 +78,7 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
           </Fieldset.Content>
 
           <Button type="submit" variant="surface" loading={isLoading} disabled={isLoading}>
-            {isRegister ? 'Register' : 'Login'} {isRegister ? <BiRightArrowAlt /> : <BiLogInCircle />}
+            {isRegister ? 'Register' : 'Login'} {isRegister ? <LuArrowRight /> : <LuLogIn />}
           </Button>
         </Fieldset.Content>
       </Fieldset.Root>

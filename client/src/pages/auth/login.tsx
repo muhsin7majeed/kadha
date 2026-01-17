@@ -19,12 +19,15 @@ const Login = () => {
   const onSubmit: SubmitHandler<LoginInputs> = (payload) => {
     mutate(payload, {
       onSuccess: (data) => {
+        console.log(data);
+
         login({
           user: {
             _id: data.userId,
             username: payload.username,
           },
-          token: data.token,
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
           isLoading: false,
         });
 
