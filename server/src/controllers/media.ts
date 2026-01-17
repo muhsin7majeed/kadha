@@ -11,8 +11,12 @@ import {
   TMDBTvDetails,
   MovieDBGenreResponse,
 } from '@/types/themoviedb';
+import { TMDBMovieWithMeta, TMDBTvWithMeta } from '@/types/media';
 
-const enrichMediaWithUserInteractions = async (media: TMDBMovie[] | TMDBTv[], userId: string) => {
+const enrichMediaWithUserInteractions = async (
+  media: TMDBMovie[] | TMDBTv[],
+  userId: string,
+): Promise<TMDBMovieWithMeta[] | TMDBTvWithMeta[]> => {
   const mediaIds = media.map((m) => m.id);
 
   const interactions = await UserMediaSchema.find({
@@ -33,7 +37,7 @@ const enrichMediaWithUserInteractions = async (media: TMDBMovie[] | TMDBTv[], us
     watchlist: map.get(m.id)?.watchlist ?? false,
   }));
 
-  return enriched;
+  return enriched as TMDBMovieWithMeta[] | TMDBTvWithMeta[];
 };
 
 export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<TMDBMovie[]>>) => {
@@ -41,7 +45,7 @@ export const getTrendingMovies = async (req: Request, res: Response<BaseResponse
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBMovie[] });
+  res.json({ data: enriched as TMDBMovieWithMeta[] });
 };
 
 export const getTrendingTvs = async (req: Request, res: Response<BaseResponse<TMDBTv[]>>) => {
@@ -49,7 +53,7 @@ export const getTrendingTvs = async (req: Request, res: Response<BaseResponse<TM
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBTv[] });
+  res.json({ data: enriched as TMDBTvWithMeta[] });
 };
 
 export const getPopularMovies = async (req: Request, res: Response<BaseResponse<TMDBMovie[]>>) => {
@@ -57,7 +61,7 @@ export const getPopularMovies = async (req: Request, res: Response<BaseResponse<
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBMovie[] });
+  res.json({ data: enriched as TMDBMovieWithMeta[] });
 };
 
 export const getPopularTvs = async (req: Request, res: Response<BaseResponse<TMDBTv[]>>) => {
@@ -65,7 +69,7 @@ export const getPopularTvs = async (req: Request, res: Response<BaseResponse<TMD
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBTv[] });
+  res.json({ data: enriched as TMDBTvWithMeta[] });
 };
 
 export const getTopRatedMovies = async (req: Request, res: Response<BaseResponse<TMDBMovie[]>>) => {
@@ -73,7 +77,7 @@ export const getTopRatedMovies = async (req: Request, res: Response<BaseResponse
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBMovie[] });
+  res.json({ data: enriched as TMDBMovieWithMeta[] });
 };
 
 export const getTopRatedTvs = async (req: Request, res: Response<BaseResponse<TMDBTv[]>>) => {
@@ -81,7 +85,7 @@ export const getTopRatedTvs = async (req: Request, res: Response<BaseResponse<TM
 
   const enriched = await enrichMediaWithUserInteractions(response.data.results, req.user.id);
 
-  res.json({ data: enriched as TMDBTv[] });
+  res.json({ data: enriched as TMDBTvWithMeta[] });
 };
 
 export const getMediaDetails = async (req: Request, res: Response<BaseResponse<TMDBMovieDetails | TMDBTvDetails>>) => {
@@ -135,5 +139,5 @@ export const searchMedia = async (req: Request, res: Response<BaseResponse<TMDBM
 
   const enriched = await enrichMediaWithUserInteractions(justMoviesAndTvs as TMDBMovie[] | TMDBTv[], req.user.id);
 
-  res.json({ data: enriched as TMDBMovie[] | TMDBTv[] });
+  res.json({ data: enriched as TMDBMovieWithMeta[] | TMDBTvWithMeta[] });
 };
