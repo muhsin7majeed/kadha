@@ -1,11 +1,11 @@
 import api from '@/lib/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { MediaType } from '@/types/media';
+import { MediaType } from '@/types/common';
 import { BaseResponse } from '@/types/common';
-import type { MediaDetails } from '@/types/media';
+import type { MovieDetails, TvDetails } from '@/types/media';
 
 const fetchMediaDetails = async (mediaType: MediaType, id: string) => {
-  const response = await api.get<BaseResponse<MediaDetails>>(`/api/media/${mediaType}/${id}`);
+  const response = await api.get<BaseResponse<MovieDetails | TvDetails>>(`/api/media/${mediaType}/${id}`);
   return response.data.data;
 };
 

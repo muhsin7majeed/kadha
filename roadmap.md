@@ -2,27 +2,27 @@
 
 ## 📦 **Phase 1: Core Features & Setup**
 
-- [ ] **API Integration**: Build endpoints for:
+- [x] **API Integration**: Build endpoints for:
   - [x] Trending movies
   - [x] Popular movies
-  - [ ] Upcoming movies
-  - [ ] Movie details
-- [ ] **Homepage**: Display movies using responsive carousels or grids.
-- [ ] **Movie Details Page**:
-  - [ ] Show title, cast, description, platform availability, and user actions.
+  - [x] Upcoming movies
+  - [x] Movie details
+- [x] **Homepage**: Display movies using responsive carousels or grids.
+- [x] **Movie Details Page**:
+  - [x] Show title, cast, description, platform availability, and user actions.
 
 ---
 
 ## ✅ **Phase 2: User Actions**
 
-- [ ] **Watched Movies**:
-  - [ ] API to mark movies as watched.
-  - [ ] API to get watched movies.
-- [ ] **Watchlist**:
-  - [ ] Add/remove movies from a watchlist.
-- [ ] **Likes & Dislikes**:
-  - [ ] Implement APIs to like/dislike movies.
-  - [ ] Track likes/dislikes in the database.
+- [x] **Watched Movies**:
+  - [x] API to mark movies as watched.
+  - [x] API to get watched movies.
+- [x] **Watchlist**:
+  - [x] Add/remove movies from a watchlist.
+- [x] **Likes & Dislikes**:
+  - [x] Implement APIs to like/dislike movies.
+  - [x] Track likes/dislikes in the database.
 - [ ] **Movie Platforms**:
   - [ ] Integrate with **JustWatch API** to show platform availability.
   - [ ] Display platform badges.

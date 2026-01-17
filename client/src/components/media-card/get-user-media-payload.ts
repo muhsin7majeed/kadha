@@ -1,16 +1,16 @@
-import { Media } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/types/media';
 
-const getUserMediaPayload = (media: Media, action: 'liked' | 'watched' | 'watchlist'): Media => {
+const getUserMediaPayload = (
+  media: MovieWithMeta | TvWithMeta,
+  action: 'liked' | 'watched' | 'watchlist',
+): MovieWithMeta | TvWithMeta => {
+  const title = 'title' in media ? media.title : media.name;
+  const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
+
   return {
-    mediaId: media.mediaId,
-    mediaType: media.mediaType,
-    title: media.title,
-    posterPath: media.posterPath,
-    voteAverage: media.voteAverage,
-    voteCount: media.voteCount,
-    adult: media.adult,
-    genreIds: media.genreIds,
-    releaseDate: media.releaseDate,
+    ...media,
+    title,
+    release_date: releaseDate,
     [action]: media[action] ? false : true,
   };
 };

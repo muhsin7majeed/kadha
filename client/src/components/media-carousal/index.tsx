@@ -4,13 +4,13 @@ import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './MediaCarousalSkeleton';
-import { Media } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import PageHeader from '../page-header';
 
 interface MediaCarousalProps {
   mediaType: 'movie' | 'tv';
   title: string;
-  data: Media[];
+  data: MovieWithMeta[] | TvWithMeta[];
   isLoading?: boolean;
   isFetching?: boolean;
 }
@@ -73,7 +73,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
       <Box ref={scrollContainerRef} overflowX="auto" scrollBehavior="smooth">
         <Flex gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.mediaId} media={media} isLink />
+            <MediaCard key={media.id} media={media} isLink />
           ))}
         </Flex>
       </Box>

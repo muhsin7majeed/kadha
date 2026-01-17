@@ -1,7 +1,7 @@
 import { Box, Flex, Image, Skeleton, Text } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router';
 
-import { MediaType } from '@/types/media';
+import { MediaType } from '@/types/common';
 import useMediaDetails from './apis/useMediaDetails';
 import { toaster } from '@/components/ui/toaster';
 import { formatDate, minutesToHours } from '@/lib/dateFns';
@@ -27,6 +27,10 @@ const MediaDetails = () => {
     return <Skeleton height="100vh" />;
   }
 
+  const title = 'title' in data ? data.title : data.name;
+  const releaseDate = 'release_date' in data ? data.release_date : data.first_air_date;
+  const runtime = 'runtime' in data ? data.runtime : undefined;
+
   return (
     <Box position="relative">
       <Box position="absolute" top={0} left={0} width="100%" height="50vh" minHeight="300px">
@@ -46,8 +50,8 @@ const MediaDetails = () => {
           }}
         >
           <Image
-            src={`https://image.tmdb.org/t/p/w500${data.backDropPath}`}
-            alt={data.title}
+            src={`https://image.tmdb.org/t/p/w500${data.backdrop_path}`}
+            alt={`${title} backdrop`}
             width="100%"
             height="100%"
             objectFit="cover"
@@ -64,18 +68,18 @@ const MediaDetails = () => {
           height="300px"
           aspectRatio={9 / 16}
           borderRadius="md"
-          src={`https://image.tmdb.org/t/p/w500${data.posterPath}`}
-          alt={data.title}
+          src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+          alt={`${title} poster`}
           objectFit="cover"
         />
 
         <Box textAlign={'center'}>
           <Text fontSize="3xl" fontWeight="bold">
-            {data.title} ({formatDate(data.releaseDate, 'YYYY')})
+            {title} ({formatDate(releaseDate, 'YYYY')})
           </Text>
 
           <Text fontSize="lg" color="gray.500">
-            {data.adult ? 'Adult' : 'PG-13'} - {minutesToHours(data.runtime || 0)} -{' '}
+            {data.adult ? 'Adult' : 'PG-13'} - {minutesToHours(runtime || 0)} -{' '}
             {data.genres.map((genre) => genre.name).join(', ')}
           </Text>
         </Box>

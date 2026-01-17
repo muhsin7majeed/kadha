@@ -23,7 +23,7 @@ const Watched = () => {
       ) : (
         <SimpleGrid columns={[2, 4, 6]} gap={4}>
           {watched?.map((movie) => (
-            <MediaCard key={movie.mediaId} media={movie} />
+            <MediaCard key={movie.id} media={movie} />
           ))}
         </SimpleGrid>
       )}

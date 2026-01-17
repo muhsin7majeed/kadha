@@ -22,12 +22,12 @@ const UserMediaSchema = new Schema(
       index: true,
     },
 
-    mediaId: {
+    media_id: {
       type: Number,
       required: true,
     },
 
-    mediaType: {
+    media_type: {
       type: String,
       enum: ['movie', 'tv'],
       required: true,
@@ -56,23 +56,23 @@ const UserMediaSchema = new Schema(
       type: String,
     },
 
-    posterPath: {
+    poster_path: {
       type: String,
     },
-    voteAverage: {
+    vote_average: {
       type: Number,
     },
-    voteCount: {
+    vote_count: {
       type: Number,
     },
     adult: {
       type: Boolean,
     },
-    genreIds: {
+    genre_ids: {
       type: [Number],
     },
 
-    releaseDate: {
+    release_date: {
       type: String,
     },
   },
@@ -88,6 +88,6 @@ const UserMediaSchema = new Schema(
  * - A user can only have ONE document per media item
  * - Fast lookups when checking user interactions
  */
-UserMediaSchema.index({ userId: 1, mediaId: 1, mediaType: 1 }, { unique: true });
+UserMediaSchema.index({ userId: 1, media_id: 1, media_type: 1 }, { unique: true });
 
 export default mongoose.model('UserMedia', UserMediaSchema);

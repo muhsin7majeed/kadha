@@ -27,7 +27,7 @@ const SearchResults = () => {
           ) : (
             <SimpleGrid columns={[2, 4, 6]} gap={4}>
               {searchMedia?.slice(0, 5).map((media) => (
-                <MediaCard key={media.mediaId} media={media} />
+                <MediaCard key={media.id} media={media} />
               ))}
             </SimpleGrid>
           )}

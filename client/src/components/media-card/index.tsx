@@ -1,14 +1,15 @@
 import { useGenreAtom } from '@/atoms/genreAtom';
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 
-import { Media } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import { formatDate } from '@/lib/dateFns';
 import CustomLinkOverlay from '../CustomLinkOverlay';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
+import { UserMedia } from '@/types/user-media';
 
 interface MediaCardProps {
-  media: Media;
+  media: MovieWithMeta | TvWithMeta | UserMedia;
   isLink?: boolean;
 }
 
@@ -17,6 +18,9 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
 
   const WrapperElement = isLink ? CustomLinkOverlay : Box;
 
+  const title = 'title' in media ? media.title : media.name;
+  const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
+
   return (
     <WrapperElement
       flex="0 0 200px"
@@ -24,11 +28,11 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
       borderRadius="lg"
       transition="transform 0.2s"
       position="relative"
-      to={`/app/media/${media.mediaType}/${media.mediaId}`}
+      to={`/app/media/${media.media_type}/${media.id}`}
     >
       <Image
-        src={`https://image.tmdb.org/t/p/w500${media.posterPath}`}
-        alt={`${media.title} poster`}
+        src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
+        alt={`${title} poster`}
         onError={(e) => {
           e.currentTarget.src = '/assets/images/image-placeholder.svg';
         }}
@@ -47,28 +51,28 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
             <Badge variant="surface" colorPalette="blackAlpha">
               <LuStar fill="yellow" />
 
-              {media.voteAverage.toFixed(1)}
+              {media.vote_average.toFixed(1)}
 
               <Text fontSize="sm" color="gray.400">
-                from {media.voteCount} votes
+                from {media.vote_count} votes
               </Text>
             </Badge>
 
             <Badge variant="subtle">{media.adult ? 'R' : 'PG-13'}</Badge>
 
-            <Badge variant="subtle">{media.mediaType === 'movie' ? 'Movie' : 'TV'}</Badge>
+            <Badge variant="subtle">{media.media_type === 'movie' ? 'Movie' : 'TV'}</Badge>
           </VStack>
 
-          <MediaActions media={media} />
+          <MediaActions media={media as MovieWithMeta | TvWithMeta} />
         </Flex>
 
         <Box bg="blackAlpha.700" p={2} color="white" backdropFilter="blur(10px)" borderRadius="lg" w="100%">
           <Text fontSize="md" fontWeight="bold" lineClamp={2}>
-            {media.title} ({formatDate(media.releaseDate, 'YYYY')})
+            {title} ({formatDate(releaseDate, 'YYYY')})
           </Text>
 
           <Flex gap={1} overflowX="auto" css={{ scrollbarWidth: 'none' }} my={1} maxW="200px" overflow="auto">
-            {media.genreIds.map((genre) => (
+            {media.genre_ids.map((genre) => (
               <Badge key={genre} variant="plain" colorPalette="cyan" mr={1}>
                 {genreMap[genre]}
               </Badge>

@@ -1,10 +1,10 @@
 import api from '@/lib/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { Media } from '@/types/media';
+import { TvWithMeta } from '@/types/media';
 import { BaseResponse } from '@/types/common';
 
 const fetchTopRatedTvs = async () => {
-  const response = await api.get<BaseResponse<Media[]>>('/api/media/top-rated-tvs');
+  const response = await api.get<BaseResponse<TvWithMeta[]>>('/api/media/top-rated-tvs');
   return response.data.data;
 };
 

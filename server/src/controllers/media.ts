@@ -21,13 +21,13 @@ const enrichMediaWithUserInteractions = async (
 
   const interactions = await UserMediaSchema.find({
     userId,
-    mediaId: { $in: mediaIds },
+    media_id: { $in: mediaIds },
   });
 
   const map = new Map();
 
   interactions.forEach((i) => {
-    map.set(i.mediaId, i);
+    map.set(i.media_id, i);
   });
 
   const enriched = media.map((m) => ({

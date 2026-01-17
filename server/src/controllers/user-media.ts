@@ -6,7 +6,7 @@ export const addToLiked = async (req: Request, res: Response) => {
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, id, media_type },
+    { userId: req.user.id, media_id: id, media_type: media_type },
     {
       $set: {
         liked,
@@ -30,7 +30,7 @@ export const addToWatched = async (req: Request, res: Response) => {
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, id, media_type },
+    { userId: req.user.id, media_id: id, media_type: media_type },
     {
       $set: {
         watched,
@@ -59,7 +59,7 @@ export const addToWatchlist = async (req: Request, res: Response) => {
     req.body;
 
   await UserMediaModel.findOneAndUpdate(
-    { userId: req.user.id, id, media_type },
+    { userId: req.user.id, media_id: id, media_type: media_type },
     {
       $set: {
         watchlist,

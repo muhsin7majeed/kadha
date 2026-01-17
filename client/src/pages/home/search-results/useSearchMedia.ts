@@ -1,9 +1,9 @@
 import api from '@/lib/axiosInstance';
 import { useQuery } from '@tanstack/react-query';
-import { Media } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/types/media';
 
 const fetchSearchMedia = async (query: string) => {
-  const response = await api.get<{ media: Media[] }>(`/api/media/search/${query}`);
+  const response = await api.get<{ media: MovieWithMeta[] | TvWithMeta[] }>(`/api/media/search/${query}`);
   return response.data.media;
 };
 

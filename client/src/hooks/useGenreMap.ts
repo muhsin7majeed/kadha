@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { genreMapAtom } from '@/atoms/genreAtom';
 import api from '@/lib/axiosInstance';
+import { BaseResponse } from '@/types/common';
 
 const fetchGenres = async () => {
-  const response = await api.get<{ genres: Record<number, string> }>('/api/media/genres');
-  return response.data.genres;
+  const response = await api.get<BaseResponse<Record<number, string>>>('/api/media/genres');
+  return response.data.data;
 };
 
 export const useGenreMap = () => {
