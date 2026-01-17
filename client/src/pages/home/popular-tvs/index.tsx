@@ -1,7 +1,7 @@
 import { Box } from '@chakra-ui/react';
 
-import EmptyState from '@/components/info-states/EmptyState';
-import ErrorState from '@/components/info-states/ErrorState';
+import EmptyState from '@/components/info-states/empty-state';
+import ErrorState from '@/components/info-states/error-state';
 import MediaCarousal from '@/components/media-carousal';
 import usePopularTvs from '../apis/usePopularTvs';
 

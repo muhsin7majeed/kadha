@@ -4,8 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
 import useLogin from '@/pages/auth/apis/useLogin';
 import { useLoginAuth } from '@/lib/auth';
-import AuthForm from './AuthForm';
-import { LoginInputs } from './AuthForm';
+import AuthForm from './auth-form';
+import { LoginInputs } from './auth-form';
 
 const Login = () => {
   const navigate = useNavigate();

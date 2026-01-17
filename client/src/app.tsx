@@ -1,13 +1,13 @@
 import { Route, Routes, Navigate } from 'react-router';
 
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import AuthLayout from '@/pages/auth/AuthLayout';
+import Login from '@/pages/auth/login';
+import Register from '@/pages/auth/register';
+import AuthLayout from '@/pages/auth/auth-layout';
 import MainLayout from '@/components/main-layout';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import PublicRoute from '@/components/PublicRoute';
+import ProtectedRoute from '@/components/protected-route';
+import PublicRoute from '@/components/public-route';
 import { useAuthAtom } from '@/atoms/authAtom';
-import AuthProvider from './components/AuthProvider';
+import AuthProvider from './components/auth-provider';
 import Landing from './pages/landing';
 import Home from './pages/home';
 import MediaDetails from './pages/media-details';

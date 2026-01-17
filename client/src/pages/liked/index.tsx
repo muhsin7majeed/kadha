@@ -1,7 +1,7 @@
-import ErrorState from '@/components/info-states/ErrorState';
+import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import { Box, Center, SimpleGrid, Spinner } from '@chakra-ui/react';
-import EmptyState from '@/components/info-states/EmptyState';
+import EmptyState from '@/components/info-states/empty-state';
 import useLiked from './apis/useLiked';
 import MediaCard from '@/components/media-card';
 

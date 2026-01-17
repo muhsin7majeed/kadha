@@ -3,10 +3,10 @@ import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import { formatDate } from '@/lib/dateFns';
-import CustomLinkOverlay from '../CustomLinkOverlay';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
 import { UserMedia } from '@/types/user-media';
+import CustomLinkOverlay from '../custom-link-overlay';
 
 interface MediaCardProps {
   media: MovieWithMeta | TvWithMeta | UserMedia;

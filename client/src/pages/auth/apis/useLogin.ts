@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { LoginInputs } from '@/pages/auth/AuthForm';
+import { LoginInputs } from '@/pages/auth/auth-form';
 import api from '@/lib/axiosInstance';
 
 interface LoginResponse {

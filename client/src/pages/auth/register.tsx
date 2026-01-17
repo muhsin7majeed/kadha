@@ -3,7 +3,7 @@ import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { LocationState } from '@/types/common';
-import AuthForm, { RegisterInputs } from './AuthForm';
+import AuthForm, { RegisterInputs } from './auth-form';
 import useRegister from './apis/useRegister';
 import { useLoginAuth } from '@/lib/auth';
 

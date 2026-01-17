@@ -3,7 +3,7 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
-import MediaCarousalSkeleton from './MediaCarousalSkeleton';
+import MediaCarousalSkeleton from './media-carousal-skeleton';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import PageHeader from '../page-header';
 

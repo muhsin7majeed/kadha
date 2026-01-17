@@ -4,8 +4,6 @@ import { useAuthAtom } from '@/atoms/authAtom';
 import { FullScreenSpinner } from './spinners';
 
 export const PublicRoute = () => {
-  console.log('PublicRoute');
-
   const auth = useAuthAtom();
 
   const location = useLocation();

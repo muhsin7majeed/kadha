@@ -1,8 +1,8 @@
 import { Box, Center, SimpleGrid, Spinner } from '@chakra-ui/react';
 import useWatched from './apis/useWatched';
 import MediaCard from '@/components/media-card';
-import EmptyState from '@/components/info-states/EmptyState';
-import ErrorState from '@/components/info-states/ErrorState';
+import EmptyState from '@/components/info-states/empty-state';
+import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 
 const Watched = () => {
