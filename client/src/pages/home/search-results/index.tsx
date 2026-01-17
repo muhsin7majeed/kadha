@@ -4,7 +4,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import { useState } from 'react';
 import SearchInput from '@/components/search-input';
-import useSearchMedia from './useSearchMedia';
+import useSearchMedia from './use-search-media';
 import MediaCard from '@/components/media-card';
 
 const SearchResults = () => {

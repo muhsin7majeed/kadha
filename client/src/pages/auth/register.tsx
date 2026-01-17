@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router';
 
 import { LocationState } from '@/types/common';
 import AuthForm, { RegisterInputs } from './auth-form';
-import useRegister from './apis/useRegister';
+import useRegister from './apis/use-register';
 import { useLoginAuth } from '@/lib/auth';
 
 const Register = () => {

@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Box, Spinner } from '@chakra-ui/react';
 
-import { useAuthAtom, useSetAuthAtom } from '@/atoms/authAtom';
-import { useGetMe } from '@/pages/profile/apis/useGetMe';
+import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
+import { useGetMe } from '@/pages/profile/apis/use-get-me';
 import { getStoredToken } from '@/lib/auth';
 
 interface AuthProviderProps {

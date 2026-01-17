@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import api from '@/lib/axiosInstance';
+import api from '@/lib/axios-instance';
 import { getStoredToken } from '@/lib/auth';
 import { User } from '@/types/user';
 

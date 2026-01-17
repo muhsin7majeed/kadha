@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { useErrorHandler } from '@/hooks/useErrorHandler';
-import api from '@/lib/axiosInstance';
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import api from '@/lib/axios-instance';
 import { toaster } from '@/components/ui/toaster';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
 

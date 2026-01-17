@@ -6,7 +6,7 @@ import AuthLayout from '@/pages/auth/auth-layout';
 import MainLayout from '@/components/main-layout';
 import ProtectedRoute from '@/components/protected-route';
 import PublicRoute from '@/components/public-route';
-import { useAuthAtom } from '@/atoms/authAtom';
+import { useAuthAtom } from '@/atoms/auth-atom';
 import AuthProvider from './components/auth-provider';
 import Landing from './pages/landing';
 import Home from './pages/home';

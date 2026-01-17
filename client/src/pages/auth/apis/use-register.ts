@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import { RegisterInputs } from '@/pages/auth/auth-form';
-import api from '@/lib/axiosInstance';
+import api from '@/lib/axios-instance';
 
 interface RegisterResponse {
   message: string;

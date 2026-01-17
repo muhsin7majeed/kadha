@@ -1,4 +1,4 @@
-import api from '@/lib/axiosInstance';
+import api from '@/lib/axios-instance';
 import { useQuery } from '@tanstack/react-query';
 import { MediaType } from '@/types/common';
 import { BaseResponse } from '@/types/common';

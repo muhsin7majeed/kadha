@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCarousal from '@/components/media-carousal';
-import usePopularMovies from '../apis/usePopularMovies';
+import usePopularMovies from '../apis/use-popular-movies';
 
 const PopularMovies = () => {
   const { data: popularMovies, isLoading, isFetching, error, refetch } = usePopularMovies();

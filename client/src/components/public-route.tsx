@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 
-import { useAuthAtom } from '@/atoms/authAtom';
+import { useAuthAtom } from '@/atoms/auth-atom';
 import { FullScreenSpinner } from './spinners';
 
 export const PublicRoute = () => {

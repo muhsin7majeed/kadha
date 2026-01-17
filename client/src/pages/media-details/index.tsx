@@ -2,9 +2,9 @@ import { Box, Flex, Image, Skeleton, Text } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
-import useMediaDetails from './apis/useMediaDetails';
+import useMediaDetails from './apis/use-media-details';
 import { toaster } from '@/components/ui/toaster';
-import { formatDate, minutesToHours } from '@/lib/dateFns';
+import { formatDate, minutesToHours } from '@/lib/date-fns';
 
 const MediaDetails = () => {
   const { mediaType, id } = useParams<{ mediaType: MediaType; id: string }>();

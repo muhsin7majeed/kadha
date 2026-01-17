@@ -3,9 +3,9 @@ import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye } from 'react-icons/lu';
 import { LuHeart } from 'react-icons/lu';
 import { IconButton } from '@chakra-ui/react';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
-import useAddToWatchList from './apis/useAddToWatchList';
-import useAddToWatched from './apis/useAddToWatched';
-import useAddToLiked from './apis/useAddToLiked';
+import useAddToWatchList from './apis/use-add-to-watch-list';
+import useAddToWatched from './apis/use-add-to-watched';
+import useAddToLiked from './apis/use-add-to-liked';
 import getUserMediaPayload from './get-user-media-payload';
 
 interface MediaActionsProps {

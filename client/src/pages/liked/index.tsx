@@ -2,7 +2,7 @@ import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import { Box, Center, SimpleGrid, Spinner } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
-import useLiked from './apis/useLiked';
+import useLiked from './apis/use-liked';
 import MediaCard from '@/components/media-card';
 
 const Liked = () => {

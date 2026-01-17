@@ -1,4 +1,4 @@
-import { useMediaType } from '@/atoms/mediaType';
+import { useMediaType } from '@/atoms/media-type';
 import { SegmentGroup, SegmentGroupRootProps } from '@chakra-ui/react';
 import type { MediaTypeFilter } from '@/types/common';
 import MEDIA from '@/constants/media';

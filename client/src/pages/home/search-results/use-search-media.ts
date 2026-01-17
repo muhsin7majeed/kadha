@@ -1,4 +1,4 @@
-import api from '@/lib/axiosInstance';
+import api from '@/lib/axios-instance';
 import { useQuery } from '@tanstack/react-query';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
 

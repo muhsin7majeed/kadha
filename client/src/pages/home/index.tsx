@@ -1,7 +1,7 @@
 import { Box, Stack } from '@chakra-ui/react';
 
 import MediaTypeFilter from '@/components/media-type-filter';
-import { useMediaTypeValue } from '@/atoms/mediaType';
+import { useMediaTypeValue } from '@/atoms/media-type';
 import TrendingMovies from './trending-movies';
 import TrendingTvs from './trending-tvs';
 import SearchResults from './search-results';

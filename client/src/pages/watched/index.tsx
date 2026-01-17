@@ -1,5 +1,5 @@
 import { Box, Center, SimpleGrid, Spinner } from '@chakra-ui/react';
-import useWatched from './apis/useWatched';
+import useWatched from './apis/use-watched';
 import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';

@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCarousal from '@/components/media-carousal';
-import useTrendingMovies from '@/pages/home/apis/useTrendingMovies';
+import useTrendingMovies from '@/pages/home/apis/use-trending-movies';
 
 const TrendingMovies = () => {
   const { data: trendingMovies, isLoading, isFetching, error, refetch } = useTrendingMovies();

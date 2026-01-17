@@ -3,7 +3,7 @@ import { Box } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCarousal from '@/components/media-carousal';
-import useTopRatedTvs from '@/pages/home/apis/useTopRatedTvs';
+import useTopRatedTvs from '@/pages/home/apis/use-top-rated-tvs';
 
 const TopRatedTvs = () => {
   const { data: topRatedTvs, isLoading, isFetching, error, refetch } = useTopRatedTvs();

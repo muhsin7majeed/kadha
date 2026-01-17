@@ -1,8 +1,8 @@
 import { useSetAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 
-import { genreMapAtom } from '@/atoms/genreAtom';
-import api from '@/lib/axiosInstance';
+import { genreMapAtom } from '@/atoms/genre-atom';
+import api from '@/lib/axios-instance';
 import { BaseResponse } from '@/types/common';
 
 const fetchGenres = async () => {
