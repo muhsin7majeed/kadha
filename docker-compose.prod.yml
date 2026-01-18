@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/client.prod.Dockerfile
     ports:
-      - "80:80"
+      - "127.0.0.1:3080:80"
     restart: unless-stopped
     depends_on:
       server:

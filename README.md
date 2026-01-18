@@ -30,66 +30,83 @@ docker compose up --build
 - App: http://localhost:3000
 - API: http://localhost:5000
 
-## Production Deployment
+## Production Deployment (Shared Server)
 
-### 1. Server Setup
+This setup supports multiple apps on one server using Caddy as reverse proxy.
+
+### 1. Server Setup (One Time)
 
 ```bash
 # Install Docker
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
+
+# Install Caddy
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy
 ```
 
-### 2. Deploy
+### 2. Deploy the App
 
 ```bash
 # Clone repo
-git clone <repo-url>
-cd what-to-watch-web
+git clone <repo-url> ~/apps/what-to-watch
+cd ~/apps/what-to-watch
 
 # Create .env file
 nano .env
 ```
 
-Add production environment variables:
+Add environment variables:
 
 ```env
 JWT_ACCESS_SECRET=your-production-secret
 JWT_REFRESH_SECRET=your-production-secret
 TMDB_API_KEY=your-tmdb-api-key
 TMDB_BEARER_TOKEN=your-tmdb-bearer-token
-CLIENT_URL=https://yourdomain.com
+CLIENT_URL=https://wtw.muhsi.in
 ```
 
-### 3. Run
+Start the app:
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-App will be available on port 80.
-
-### 4. HTTPS (Recommended)
-
-Use a reverse proxy like Caddy for automatic SSL:
+### 3. Configure Caddy (Reverse Proxy + SSL)
 
 ```bash
-# Install Caddy
-sudo apt install caddy
-
-# Configure
 sudo nano /etc/caddy/Caddyfile
 ```
 
 ```
-yourdomain.com {
-    reverse_proxy localhost:80
+wtw.muhsi.in {
+    reverse_proxy localhost:3080
+}
+
+# Your other apps
+muhsi.in {
+    root * /var/www/muhsi.in
+    file_server
 }
 ```
 
 ```bash
-sudo systemctl restart caddy
+sudo systemctl reload caddy
 ```
+
+Caddy automatically gets SSL certificates from Let's Encrypt.
+
+### 4. DNS Setup
+
+Add an A record for your subdomain:
+
+| Type | Name | Value          |
+| ---- | ---- | -------------- |
+| A    | wtw  | your-server-ip |
 
 ## Common Commands
 
@@ -117,3 +134,16 @@ docker compose -f docker-compose.prod.yml exec mongo mongodump --archive > backu
 # Restore
 docker compose -f docker-compose.prod.yml exec -T mongo mongorestore --archive < backup.archive
 ```
+
+## Adding More Apps
+
+To add another app on the same server:
+
+1. Deploy it on a different port (e.g., `127.0.0.1:3081:80`)
+2. Add to Caddyfile:
+   ```
+   newapp.muhsi.in {
+       reverse_proxy localhost:3081
+   }
+   ```
+3. Reload Caddy: `sudo systemctl reload caddy`
