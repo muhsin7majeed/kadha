@@ -26,8 +26,8 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
     watch,
   } = useForm<LoginInputs | RegisterInputs>({
     defaultValues: {
-      username: 'Ashe',
-      password: 'Password_123',
+      username: '',
+      password: '',
     },
   });
 

@@ -44,6 +44,7 @@ const Landing = () => {
               <IconButton variant="ghost" size="sm" onClick={() => toggleColorMode()}>
                 {colorMode === 'dark' ? <LuSun /> : <LuMoon />}
               </IconButton>
+
               <ChakraLink asChild>
                 <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                   <IconButton variant="ghost" size="sm">
@@ -51,10 +52,12 @@ const Landing = () => {
                   </IconButton>
                 </a>
               </ChakraLink>
-              <Button variant="ghost" size="sm" asChild>
+
+              <Button variant="ghost" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
                 <Link to="/auth/login">Login</Link>
               </Button>
-              <Button colorPalette="darkorange" size="sm" asChild>
+
+              <Button colorPalette="darkorange" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
                 <Link to="/auth/register">Sign Up</Link>
               </Button>
             </HStack>

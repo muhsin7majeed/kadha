@@ -123,6 +123,13 @@ docker compose -f docker-compose.prod.yml down
 # Update
 git pull
 docker compose -f docker-compose.prod.yml up -d --build
+
+# Force rebuild (when cached images cause issues)
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
+
+# Clean up unused images
+docker system prune -a
 ```
 
 ## Backup Database
@@ -134,6 +141,21 @@ docker compose -f docker-compose.prod.yml exec mongo mongodump --archive > backu
 # Restore
 docker compose -f docker-compose.prod.yml exec -T mongo mongorestore --archive < backup.archive
 ```
+
+## Auto-Deploy with GitHub Actions
+
+Automatically deploy when you push to master.
+
+### Setup
+
+1. Generate SSH key: `ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/github-deploy`
+2. Add public key to server: `ssh-copy-id -i ~/.ssh/github-deploy.pub user@server`
+3. Add secrets to GitHub repo (Settings → Secrets → Actions):
+   - `SERVER_HOST` - server IP
+   - `SERVER_USER` - SSH username
+   - `SERVER_SSH_KEY` - contents of private key file
+
+The workflow file is already included at `.github/workflows/deploy.yml`.
 
 ## Adding More Apps
 

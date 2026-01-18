@@ -12,6 +12,7 @@ const AuthLayout = () => {
       gap={10}
       maxW="md"
       mx="auto"
+      p={4}
     >
       <Text fontSize="2xl" fontWeight="bold" textAlign="center">
         What To Watch
