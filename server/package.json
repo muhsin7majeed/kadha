@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "test": "jest",
     "format": "prettier --write ."
   },
@@ -36,6 +36,7 @@
     "nodemon": "^3.0.1",
     "prettier": "^3.8.0",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.3.2"
   }
 }
