@@ -5,10 +5,13 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
 import AuthForm, { RegisterInputs } from './auth-form';
 import useRegister from './apis/use-register';
+import { setAccessToken } from '@/lib/token-manager';
+import { useSetAuthAtom } from '@/atoms/auth-atom';
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const setAuth = useSetAuthAtom();
 
   const from = (location.state as LocationState)?.from || '/app';
 
@@ -17,7 +20,16 @@ const Register = () => {
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
       onSuccess: (data) => {
-        // navigate(from, { replace: true });
+        setAccessToken(data.accessToken);
+        setAuth({
+          user: {
+            id: data.userId,
+            username: payload.username,
+          },
+          status: 'authenticated',
+        });
+
+        navigate(from, { replace: true });
       },
     });
   };
