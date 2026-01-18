@@ -3,14 +3,15 @@ import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
 import useLogin from '@/pages/auth/apis/use-login';
-import useLoginAuth from '@/hooks/use-login';
 import AuthForm from './auth-form';
 import { LoginInputs } from './auth-form';
+import { setAccessToken } from '@/lib/token-manager';
+import { useSetAuthAtom } from '@/atoms/auth-atom';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const login = useLoginAuth();
+  const setAuth = useSetAuthAtom();
 
   const { mutate, isPending } = useLogin();
 
@@ -19,16 +20,13 @@ const Login = () => {
   const onSubmit: SubmitHandler<LoginInputs> = (payload) => {
     mutate(payload, {
       onSuccess: (data) => {
-        console.log(data);
-
-        login({
+        setAccessToken(data.accessToken);
+        setAuth({
           user: {
-            _id: data.userId,
+            id: data.userId,
             username: payload.username,
           },
-          accessToken: data.accessToken,
-          refreshToken: data.refreshToken,
-          isLoading: false,
+          status: 'authenticated',
         });
 
         navigate(from, { replace: true });

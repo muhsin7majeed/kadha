@@ -5,12 +5,10 @@ import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
 import AuthForm, { RegisterInputs } from './auth-form';
 import useRegister from './apis/use-register';
-import useLoginAuth from '@/hooks/use-login';
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const login = useLoginAuth();
 
   const from = (location.state as LocationState)?.from || '/app';
 
@@ -19,13 +17,7 @@ const Register = () => {
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
       onSuccess: (data) => {
-        login({
-          user: { _id: data.userId, username: payload.username },
-          token: data.token,
-          isLoading: false,
-        });
-
-        navigate(from, { replace: true });
+        // navigate(from, { replace: true });
       },
     });
   };

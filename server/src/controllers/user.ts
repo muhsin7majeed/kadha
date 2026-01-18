@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import userModel from '@/models/user';
+import UserModel from '@/models/user';
 import UserMediaSchema from '@/models/user-media';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const user = await userModel.findById(id);
+  const user = await UserModel.findById(id);
 
   const userWithoutPassword = user?.toObject();
 
