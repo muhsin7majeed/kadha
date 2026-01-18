@@ -18,21 +18,23 @@ import { useSetAuthAtom } from './atoms/auth-atom';
 
 function App() {
   const setAuth = useSetAuthAtom();
-  const { data, isLoading } = useGetMe();
+  const { data, isError, isPending } = useGetMe();
 
   useEffect(() => {
+    if (isPending) return;
+
     if (data) {
       setAuth({
         user: data,
         status: 'authenticated',
       });
-    } else {
+    } else if (isError) {
       setAuth({
         user: null,
         status: 'unauthenticated',
       });
     }
-  }, [data, isLoading, setAuth]);
+  }, [data, isPending, isError, setAuth]);
 
   return (
     <>
