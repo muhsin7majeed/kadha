@@ -1,7 +1,7 @@
 services:
   server:
     # Replace with your actual image path: ghcr.io/YOUR_USERNAME/YOUR_REPO-server:latest
-    image: ${SERVER_IMAGE:-ghcr.io/placeholder/what-to-watch-server:latest}
+    image: ${SERVER_IMAGE:-ghcr.io/muhsin7majeed/what-to-watch-server:latest}
     environment:
       NODE_ENV: production
       MONGO_URI: mongodb://mongo:27017/what-to-watch
