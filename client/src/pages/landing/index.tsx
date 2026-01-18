@@ -267,6 +267,23 @@ const Landing = () => {
               </ChakraLink>
             </HStack>
           </Flex>
+
+          <Flex justify="center" mt={6} pt={6} borderTopWidth="1px" borderColor="border">
+            <Text fontSize="xs" color="fg.muted">
+              Movie and TV data powered by{' '}
+              <ChakraLink
+                href="https://www.themoviedb.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                color="fg.muted"
+                textDecoration="underline"
+                _hover={{ color: 'fg' }}
+              >
+                TMDB
+              </ChakraLink>
+              . This product uses the TMDB API but is not endorsed or certified by TMDB.
+            </Text>
+          </Flex>
         </Container>
       </Box>
     </Box>
