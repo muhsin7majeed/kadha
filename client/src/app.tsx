@@ -4,22 +4,45 @@ import Login from '@/pages/auth/login';
 import Register from '@/pages/auth/register';
 import AuthLayout from '@/pages/auth/auth-layout';
 import MainLayout from '@/components/main-layout';
-import ProtectedRoute from '@/components/protected-route';
 import PublicRoute from '@/components/public-route';
-import { useAuthAtom } from '@/atoms/auth-atom';
-import AuthProvider from './components/auth-provider';
 import Landing from './pages/landing';
 import Home from './pages/home';
 import MediaDetails from './pages/media-details';
 import Watchlist from './pages/watchlist';
 import Liked from './pages/liked';
 import Watched from './pages/watched';
+import PrivateRoute from './components/private-route';
+import { useGetMe } from './pages/profile/apis/use-get-me';
+import { useEffect } from 'react';
+import { useAuthAtom, useSetAuthAtom } from './atoms/auth-atom';
 
 function App() {
-  const auth = useAuthAtom();
+  const setAuth = useSetAuthAtom();
+  const { data, isLoading } = useGetMe();
+  const [auth] = useAuthAtom()
+
+  console.log("ME", data, isLoading, auth);
+
+  useEffect(() => {
+
+
+    if (data) {
+      setAuth({
+        user: data,
+        status: "authenticated"
+      });
+    } else {
+      setAuth({
+        user: null,
+        status: "unauthenticated"
+      });
+    }
+  }, [data, isLoading, setAuth])
+
+
 
   return (
-    <AuthProvider>
+    <>
       <Routes>
         <Route path="/" element={<Landing />} />
 
@@ -30,7 +53,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<ProtectedRoute />}>
+        <Route element={<PrivateRoute />}>
           <Route path="app" element={<MainLayout />}>
             <Route index element={<Home />} />
             <Route path="watched" element={<Watched />} />
@@ -40,9 +63,9 @@ function App() {
           </Route>
         </Route>
 
-        <Route path="*" element={auth.token ? <Navigate to="/app" replace /> : <Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </AuthProvider>
+    </>
   );
 }
 

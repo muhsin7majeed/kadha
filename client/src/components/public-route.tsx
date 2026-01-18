@@ -1,16 +1,16 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 
-import { useAuthAtom } from '@/atoms/auth-atom';
 import { FullScreenSpinner } from './spinners';
+import { useAuthAtom } from '@/atoms/auth-atom';
 
-export const PublicRoute = () => {
-  const auth = useAuthAtom();
+const PublicRoute = () => {
+  const [auth] = useAuthAtom();
 
   const location = useLocation();
 
-  if (auth.isLoading) return <FullScreenSpinner />;
+  if (auth.status === "pending") return <FullScreenSpinner />;
 
-  if (auth.token) {
+  if (auth.status === "authenticated") {
     return <Navigate to="/app" replace state={{ from: location.pathname }} />;
   }
 

@@ -1,13 +1,16 @@
-import { AuthState } from '@/types/user';
-import { atom, useAtomValue, useSetAtom } from 'jotai';
+import { atom, useAtom, useSetAtom } from "jotai";
+import { AuthState } from "@/types/user";
 
-export const authInitialState: AuthState = {
-  user: null,
-  accessToken: null,
-  refreshToken: null,
-  isLoading: true,
+
+const authAtom = atom<AuthState>({
+    user: null,
+    status: "pending"
+});
+
+export const useAuthAtom = () => {
+    return useAtom(authAtom);
 };
 
-const authAtom = atom<AuthState>(authInitialState);
-export const useAuthAtom = () => useAtomValue(authAtom);
-export const useSetAuthAtom = () => useSetAtom(authAtom);
+export const useSetAuthAtom = () => {
+    return useSetAtom(authAtom);
+};

@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { Avatar, Box, Button, CloseButton, Container, Dialog, Heading, Menu, Portal } from '@chakra-ui/react';
-
-import { useAuthAtom } from '@/atoms/auth-atom';
-import useLogout from '@/hooks/use-logout';
+import { useSetAuthAtom } from '@/atoms/auth-atom';
+import { removeAccessToken } from '@/lib/token-manager';
+import useLogout from '@/pages/auth/apis/use-logout';
 
 const Navbar = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
-  const auth = useAuthAtom();
+  const setAuth = useSetAuthAtom();
 
-  const logout = useLogout();
+  const { mutateAsync: logoutMutation } = useLogout();
+
+
+  const logout = async () => {
+    console.log('logout');
+    await logoutMutation();
+
+    removeAccessToken();
+
+    setAuth({
+      user: null,
+      status: "unauthenticated"
+    });
+
+  };
 
   const handleLogout = () => {
     setShowLogoutWarning(true);
@@ -30,7 +44,7 @@ const Navbar = () => {
               <Menu.Trigger asChild>
                 <Button variant="ghost" unstyled>
                   <Avatar.Root>
-                    <Avatar.Fallback name={auth.user?.username} />
+                    <Avatar.Fallback name="John Doe" />
                     <Avatar.Image />
                   </Avatar.Root>
                 </Button>
