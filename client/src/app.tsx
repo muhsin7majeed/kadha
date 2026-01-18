@@ -14,32 +14,25 @@ import Watched from './pages/watched';
 import PrivateRoute from './components/private-route';
 import { useGetMe } from './pages/profile/apis/use-get-me';
 import { useEffect } from 'react';
-import { useAuthAtom, useSetAuthAtom } from './atoms/auth-atom';
+import { useSetAuthAtom } from './atoms/auth-atom';
 
 function App() {
   const setAuth = useSetAuthAtom();
   const { data, isLoading } = useGetMe();
-  const [auth] = useAuthAtom()
-
-  console.log("ME", data, isLoading, auth);
 
   useEffect(() => {
-
-
     if (data) {
       setAuth({
         user: data,
-        status: "authenticated"
+        status: 'authenticated',
       });
     } else {
       setAuth({
         user: null,
-        status: "unauthenticated"
+        status: 'unauthenticated',
       });
     }
-  }, [data, isLoading, setAuth])
-
-
+  }, [data, isLoading, setAuth]);
 
   return (
     <>

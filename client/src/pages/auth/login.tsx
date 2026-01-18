@@ -20,15 +20,13 @@ const Login = () => {
   const onSubmit: SubmitHandler<LoginInputs> = (payload) => {
     mutate(payload, {
       onSuccess: (data) => {
-        console.log(data);
-
         setAccessToken(data.accessToken);
         setAuth({
           user: {
             id: data.userId,
             username: payload.username,
           },
-          status: "authenticated"
+          status: 'authenticated',
         });
 
         navigate(from, { replace: true });

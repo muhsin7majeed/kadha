@@ -4,17 +4,17 @@ import { FullScreenSpinner } from './spinners';
 import { useAuthAtom } from '@/atoms/auth-atom';
 
 const PrivateRoute = () => {
-    const [auth] = useAuthAtom();
+  const [auth] = useAuthAtom();
 
-    const location = useLocation();
+  const location = useLocation();
 
-    if (auth.status === "pending") return <FullScreenSpinner />;
+  if (auth.status === 'pending') return <FullScreenSpinner />;
 
-    if (auth.status === "unauthenticated") {
-        return <Navigate to="/auth/login" replace state={{ from: location.pathname }} />;
-    }
+  if (auth.status === 'unauthenticated') {
+    return <Navigate to="/auth/login" replace state={{ from: location.pathname }} />;
+  }
 
-    return <Outlet />;
+  return <Outlet />;
 };
 
 export default PrivateRoute;

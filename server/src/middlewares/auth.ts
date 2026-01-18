@@ -2,7 +2,6 @@ import { envConfig } from '@/config/env';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-
 type AccessTokenPayload = jwt.JwtPayload & {
   userId: string;
   username: string;
@@ -32,7 +31,8 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   try {
     const decoded = jwt.verify(token, envConfig.jwtAccessSecret) as AccessTokenPayload;
     req.user = {
-      id: decoded.userId, username: decoded.username
+      id: decoded.userId,
+      username: decoded.username,
     };
     next();
   } catch (error) {

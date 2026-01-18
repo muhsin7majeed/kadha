@@ -5,5 +5,5 @@ export interface User {
 
 export interface AuthState {
   user: User | null;
-  status: "pending" | "authenticated" | "unauthenticated";
+  status: 'pending' | 'authenticated' | 'unauthenticated';
 }

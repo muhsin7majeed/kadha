@@ -4,7 +4,7 @@ import refresh from '@/pages/auth/apis/use-refresh';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
-  withCredentials: true
+  withCredentials: true,
 });
 
 // Track if a token refresh is in progress and queue failed requests
@@ -46,8 +46,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    console.log("STATUS", error.response?.status);
-
     // Check if error has a response and is 401
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       // If already refreshing, queue this request
@@ -70,12 +68,8 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-
       try {
         const { accessToken } = await refresh();
-
-        console.log("ACCESS TOKEN", accessToken);
-
 
         // Store new tokens
         setAccessToken(accessToken);

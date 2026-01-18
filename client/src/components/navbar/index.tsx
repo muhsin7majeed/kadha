@@ -10,18 +10,15 @@ const Navbar = () => {
 
   const { mutateAsync: logoutMutation } = useLogout();
 
-
   const logout = async () => {
-    console.log('logout');
     await logoutMutation();
 
     removeAccessToken();
 
     setAuth({
       user: null,
-      status: "unauthenticated"
+      status: 'unauthenticated',
     });
-
   };
 
   const handleLogout = () => {

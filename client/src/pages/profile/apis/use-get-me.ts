@@ -13,6 +13,6 @@ export const useGetMe = () => {
     queryKey: ['me'],
     staleTime: Infinity,
     queryFn: () => getMe(),
-    retry: false
+    retry: false,
   });
 };

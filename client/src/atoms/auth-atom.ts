@@ -1,16 +1,15 @@
-import { atom, useAtom, useSetAtom } from "jotai";
-import { AuthState } from "@/types/user";
-
+import { atom, useAtom, useSetAtom } from 'jotai';
+import { AuthState } from '@/types/user';
 
 const authAtom = atom<AuthState>({
-    user: null,
-    status: "pending"
+  user: null,
+  status: 'pending',
 });
 
 export const useAuthAtom = () => {
-    return useAtom(authAtom);
+  return useAtom(authAtom);
 };
 
 export const useSetAuthAtom = () => {
-    return useSetAtom(authAtom);
+  return useSetAtom(authAtom);
 };

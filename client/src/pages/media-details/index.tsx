@@ -21,8 +21,6 @@ const MediaDetails = () => {
     return;
   }
 
-  console.log(data);
-
   if (isLoading || !data) {
     return <Skeleton height="100vh" />;
   }

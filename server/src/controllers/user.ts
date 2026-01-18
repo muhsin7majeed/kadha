@@ -7,10 +7,6 @@ export const getMe = async (req: Request, res: Response) => {
 
   const user = await UserModel.findById(id);
 
-  console.log("REQUEST USER", req.user);
-  console.log("USER", user);
-
-
   const userWithoutPassword = user?.toObject();
 
   delete (userWithoutPassword as any)?.password;

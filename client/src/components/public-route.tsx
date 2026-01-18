@@ -8,9 +8,9 @@ const PublicRoute = () => {
 
   const location = useLocation();
 
-  if (auth.status === "pending") return <FullScreenSpinner />;
+  if (auth.status === 'pending') return <FullScreenSpinner />;
 
-  if (auth.status === "authenticated") {
+  if (auth.status === 'authenticated') {
     return <Navigate to="/app" replace state={{ from: location.pathname }} />;
   }
 
