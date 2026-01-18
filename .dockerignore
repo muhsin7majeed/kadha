@@ -1,0 +1,39 @@
+# Dependencies
+**/node_modules
+
+# Build outputs
+**/dist
+**/build
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Environment files (don't include secrets in image)
+.env
+.env.*
+!.env.example
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+**/__tests__
+**/*.test.*
+**/*.spec.*
+coverage

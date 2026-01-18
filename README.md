@@ -1,106 +1,119 @@
-# 🛠 What to Watch - Project Setup Guide
+# What to Watch
 
-Welcome to the **What to Watch** app! Follow these instructions to set up and run the application locally using Docker.
+A web app to track movies and TV shows you want to watch.
 
-## ⚙️ Prerequisites
+## Prerequisites
 
-Make sure you have the following installed:
+- Docker and Docker Compose
+- [TMDB API Key](https://www.themoviedb.org/settings/api)
 
-- Docker Desktop
-- Docker Compose
-- Node.js (if running outside of Docker)
-- WSL (if using Windows)
+## Environment Variables
 
-## 🚀 Setup with Docker
+Create a `.env` file in the project root:
 
-### 1️⃣ Clone the Repository
+```env
+JWT_ACCESS_SECRET=your-random-secret-min-32-chars
+JWT_REFRESH_SECRET=another-random-secret-min-32-chars
+TMDB_API_KEY=your-tmdb-api-key
+TMDB_BEARER_TOKEN=your-tmdb-bearer-token
+CLIENT_URL=http://localhost:3000
+```
+
+Generate secrets with: `openssl rand -base64 32`
+
+## Local Development
 
 ```bash
+docker compose up --build
+```
+
+- App: http://localhost:3000
+- API: http://localhost:5000
+
+## Production Deployment
+
+### 1. Server Setup
+
+```bash
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+```
+
+### 2. Deploy
+
+```bash
+# Clone repo
 git clone <repo-url>
-cd what-to-watch-app
+cd what-to-watch-web
+
+# Create .env file
+nano .env
 ```
 
-### 2️⃣ Environment Variables
+Add production environment variables:
 
-- Create a `.env` file in the **server** directory:
-  ```bash
-  touch server/.env
-  ```
-- Add the following variables:
-  ```env
-  PORT=5000
-  MONGO_URI=mongodb://mongo:27017/what-to-watch
-  ```
-- For the client, add a `.env` file if needed, with Vite-specific variables (optional).
+```env
+JWT_ACCESS_SECRET=your-production-secret
+JWT_REFRESH_SECRET=your-production-secret
+TMDB_API_KEY=your-tmdb-api-key
+TMDB_BEARER_TOKEN=your-tmdb-bearer-token
+CLIENT_URL=https://yourdomain.com
+```
 
-### 3️⃣ Build and Run Containers
+### 3. Run
 
 ```bash
-docker-compose up --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-- `--build` ensures fresh images are created if there are code or config changes.
+App will be available on port 80.
 
-### 4️⃣ Access the App
+### 4. HTTPS (Recommended)
 
-- Client: [http://localhost:3000](http://localhost:3000)
-- Server API: [http://localhost:5000](http://localhost:5000)
-
-## 🐳 Docker Commands Cheat Sheet
-
-### Start Containers
+Use a reverse proxy like Caddy for automatic SSL:
 
 ```bash
-docker-compose up
+# Install Caddy
+sudo apt install caddy
+
+# Configure
+sudo nano /etc/caddy/Caddyfile
 ```
 
-### Rebuild and Start
+```
+yourdomain.com {
+    reverse_proxy localhost:80
+}
+```
 
 ```bash
-docker-compose up --build
+sudo systemctl restart caddy
 ```
 
-### Stop Containers
+## Common Commands
 
 ```bash
-docker-compose down
+# View logs
+docker compose -f docker-compose.prod.yml logs -f
+
+# Restart
+docker compose -f docker-compose.prod.yml restart
+
+# Stop
+docker compose -f docker-compose.prod.yml down
+
+# Update
+git pull
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### View Logs
+## Backup Database
 
 ```bash
-docker-compose logs -f
+# Backup
+docker compose -f docker-compose.prod.yml exec mongo mongodump --archive > backup.archive
+
+# Restore
+docker compose -f docker-compose.prod.yml exec -T mongo mongorestore --archive < backup.archive
 ```
-
-### Access a Running Container
-
-```bash
-docker exec -it <container_name> /bin/bash
-```
-
-### Check Container Status
-
-```bash
-docker ps
-```
-
-### Reinstall Packages Without Rebuilding
-
-```bash
-docker exec -it <container_name> npm install
-```
-
-### Clear cache
-
-```bash
-docker system prune -a
-```
-
-## 🛠 Development Notes
-
-- Server runs on **port 5000**.
-- Client runs on **port 3000** using Vite.
-- MongoDB runs on **port 27017**.
-- Nodemon is used for live server reloading in development.
-
-Happy coding! 🚀

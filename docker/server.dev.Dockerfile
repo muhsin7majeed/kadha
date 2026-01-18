@@ -1,13 +1,13 @@
-FROM node:20
+FROM node:20-alpine
 
 WORKDIR /app
+
 COPY server/package*.json ./
-RUN npm install
+
+RUN npm ci
 
 COPY server ./
 
-# For hot reload, install nodemon
-RUN npm install -g nodemon
-
 EXPOSE 5000
+
 CMD ["npm", "run", "dev"]

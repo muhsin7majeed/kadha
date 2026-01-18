@@ -40,6 +40,11 @@ app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to What to Watch API' });
 });
 
+// Health check endpoint for Docker
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
 // Error handling middleware
 app.use(errorHandler);
 
