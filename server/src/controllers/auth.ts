@@ -90,6 +90,9 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
 };
 
 export const refresh = async (req: Request, res: Response) => {
+  console.log("REFRESH", req.cookies);
+  console.log("JWT", req.cookies.jwt);
+
   if (req.cookies?.jwt) {
     const refreshToken = req.cookies.jwt;
 
@@ -111,4 +114,10 @@ export const refresh = async (req: Request, res: Response) => {
   } else {
     return res.status(401).json({ message: 'Unauthorized' });
   }
+};
+
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('jwt');
+  res.json({ message: 'User logged out successfully' });
 };
