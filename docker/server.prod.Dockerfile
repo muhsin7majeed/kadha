@@ -26,7 +26,8 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy built code
 COPY --from=builder /app/dist ./dist
 
-# Copy Prisma schema (needed for migrations) and generated client
+# Copy Prisma config, schema (needed for migrations) and generated client
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/src/prisma ./src/prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
