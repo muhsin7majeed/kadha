@@ -19,11 +19,16 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/generated ./generated
 COPY --from=builder /app/package*.json ./
 
 RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy built code
+COPY --from=builder /app/dist ./dist
+
+# Copy Prisma schema (needed for migrations) and generated client
+COPY --from=builder /app/src/prisma ./src/prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Don't run as root
 USER node

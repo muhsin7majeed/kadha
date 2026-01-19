@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '@/lib/prisma';
-import { MediaType } from '../generated/prisma/client';
+import { MediaType } from '@prisma/client';
 
 export const addToLiked = async (req: Request, res: Response) => {
   const { id, media_type, liked, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
