@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import userModel from '@/models/user';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { envConfig } from '@/config/env';
@@ -35,7 +35,7 @@ const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
 export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
   const { username, password } = req.body;
 
-  const user = await userModel.findOne({ username });
+  const user = await prisma.user.findUnique({ where: { username } });
 
   if (user) {
     return res.status(400).json({ fieldErrors: { username: 'Username already exists' } });
@@ -43,12 +43,14 @@ export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: 
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await userModel.create({
-    username,
-    password: hashedPassword,
+  const newUser = await prisma.user.create({
+    data: {
+      username,
+      password: hashedPassword,
+    },
   });
 
-  const { accessToken, refreshToken } = getTokens(newUser.username, newUser._id.toString());
+  const { accessToken, refreshToken } = getTokens(newUser.username, newUser.id);
 
   setRefreshTokenCookie(res, refreshToken);
 
@@ -56,14 +58,14 @@ export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: 
     message: 'User registered successfully',
     accessToken,
     refreshToken,
-    userId: newUser._id,
+    userId: newUser.id,
   });
 };
 
 export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
   const { username, password } = req.body;
 
-  const user = await userModel.findOne({ username });
+  const user = await prisma.user.findUnique({ where: { username } });
 
   if (!user) {
     return res.status(400).json({ message: 'Invalid username or password' });
@@ -75,7 +77,7 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
     return res.status(400).json({ message: 'Invalid username or password' });
   }
 
-  const { accessToken, refreshToken } = getTokens(user.username, user._id.toString());
+  const { accessToken, refreshToken } = getTokens(user.username, user.id);
 
   setRefreshTokenCookie(res, refreshToken);
 
@@ -83,7 +85,7 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
     message: 'User logged in successfully',
     accessToken,
     refreshToken,
-    userId: user._id,
+    userId: user.id,
   });
 };
 

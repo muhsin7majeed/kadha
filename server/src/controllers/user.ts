@@ -1,26 +1,34 @@
 import { Request, Response } from 'express';
-import UserModel from '@/models/user';
-import UserMediaSchema from '@/models/user-media';
+import { prisma } from '@/lib/prisma';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const user = await UserModel.findById(id);
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 
-  const userWithoutPassword = user?.toObject();
-
-  delete (userWithoutPassword as any)?.password;
-
-  res.json(userWithoutPassword);
+  res.json(user);
 };
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const watchlist = await UserMediaSchema.find({
-    userId: id,
-    watchlist: true,
-  }).sort({ updatedAt: -1 });
+  const watchlist = await prisma.userMedia.findMany({
+    where: {
+      userId: id,
+      watchlist: true,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  });
 
   res.json({
     data: watchlist,
@@ -30,10 +38,15 @@ export const getUserWatchlist = async (req: Request, res: Response) => {
 export const getUserLiked = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const liked = await UserMediaSchema.find({
-    userId: id,
-    liked: true,
-  }).sort({ updatedAt: -1 });
+  const liked = await prisma.userMedia.findMany({
+    where: {
+      userId: id,
+      liked: true,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  });
 
   res.json({
     data: liked,
@@ -43,10 +56,15 @@ export const getUserLiked = async (req: Request, res: Response) => {
 export const getUserWatched = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const watched = await UserMediaSchema.find({
-    userId: id,
-    watched: true,
-  }).sort({ updatedAt: -1 });
+  const watched = await prisma.userMedia.findMany({
+    where: {
+      userId: id,
+      watched: true,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+  });
 
   res.json({
     data: watched,
