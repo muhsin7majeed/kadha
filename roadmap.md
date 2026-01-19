@@ -1,69 +1,119 @@
-# 🎬 Movie App Roadmap
+# Movie App Roadmap
 
-## 📦 **Phase 1: Core Features & Setup**
-
-- [x] **API Integration**: Build endpoints for:
-  - [x] Trending movies
-  - [x] Popular movies
-  - [x] Upcoming movies
-  - [x] Movie details
-- [x] **Homepage**: Display movies using responsive carousels or grids.
-- [x] **Movie Details Page**:
-  - [x] Show title, cast, description, platform availability, and user actions.
+This project is a self-hostable, open source movie & TV media manager powered by TMDB.
+The goal is simple: track, discover, and organize what you watch without giving up control of your data.
 
 ---
 
-## ✅ **Phase 2: User Actions**
+## Phase 1: Core Features (Completed)
 
-- [x] **Watched Movies**:
-  - [x] API to mark movies as watched.
-  - [x] API to get watched movies.
-- [x] **Watchlist**:
-  - [x] Add/remove movies from a watchlist.
-- [x] **Likes & Dislikes**:
-  - [x] Implement APIs to like/dislike movies.
-  - [x] Track likes/dislikes in the database.
-- [ ] **Movie Platforms**:
-  - [ ] Integrate with **JustWatch API** to show platform availability.
-  - [ ] Display platform badges.
+### Discovery
 
----
+- [x] API integration with TMDB
+  - [x] Trending content
+  - [x] Popular content
+  - [x] Upcoming content
+  - [x] Movie & TV details
+- [x] Search movies and TV shows
+- [x] Filter by type (movie / TV / both)
+- [x] Homepage with responsive grids and carousels
 
-## 📁 **Phase 3: Collections**
+### Details Page
 
-- [ ] **Create & Manage Collections**:
-  - [ ] API to create collections with name, description, and movies.
-  - [ ] API to add/remove movies from collections.
-- [ ] **Sharing Collections**:
-  - [ ] Generate a **UUID** for public, shareable links (e.g., `/collection/:uuid`).
-  - [ ] Add a copy-to-clipboard button for easy sharing.
+- [x] Title, description, cast, metadata
+- [x] User actions (watchlist, liked, watched)
+- [ ] Platform availability (JustWatch integration)
+- [ ] Updated details page.
 
 ---
 
-## 💡 **Phase 4: Recommendations**
+## Phase 2: User Library (Completed)
 
-- [ ] **Basic Recommendation**:
-  - [ ] Suggest movies based on similar genres using TMDB's API.
-- [ ] **Advanced Recommendation (Future)**:
-  - [ ] Implement collaborative filtering using libraries like **Surprise** or **Scikit-learn**.
-  - [ ] Train using a matrix of user preferences.
+### Tracking
 
----
+- [x] Mark as watched
+- [x] Watchlist management
+- [x] Like / favorite items
+- [x] Persist user activity in database
 
-## 💕 **Phase 5: Tinder-like Swiping Feature**
+### Organization
 
-- [ ] **UI & Animation**:
-  - [ ] Build swipe UI using **Framer Motion**.
-- [ ] **Algorithm**:
-  - [ ] Recommend movies based on previous likes and dislikes.
-- [ ] **Feedback Loop**:
-  - [ ] Adjust recommendations based on swipe data.
+- [x] Separate movies and TV shows
+- [ ] Custom collections (themed lists, mood lists, etc.)
 
 ---
 
-## 🚀 **Additional Features (Future Ideas)**
+## Phase 3: Social & Privacy (In Progress)
 
-- [ ] **Movie Reviews & Comments**: Allow users to write reviews and rate movies.
-- [ ] **Friends & Social Features**: Users can follow others and view their collections.
-- [ ] **Notifications**: Notify users when a movie becomes available on a streaming platform.
-- [ ] **Dark Mode**: Provide a clean dark mode UI.
+### Social
+
+- [ ] Friends system
+- [ ] View friends’ activity and recommendations
+- [ ] Share collections with public links
+
+### Privacy
+
+- [ ] Per-list privacy (public / friends / private)
+- [ ] Private profiles
+- [ ] Full ghost mode (no public footprint)
+
+---
+
+## Phase 4: Data Ownership & Hosting
+
+- [ ] Self-hosting support (Docker-first)
+- [ ] Environment-based configuration
+- [ ] Import data (JSON)
+- [ ] Export all user data
+- [ ] Zero vendor lock-in guarantee
+
+---
+
+## Phase 5: Recommendations
+
+### Basic
+
+- [ ] Genre-based recommendations using TMDB
+- [ ] Similar-content suggestions
+
+### Advanced (Optional)
+
+- [ ] AI-powered recommendations
+- [ ] Bring-your-own API key or local AI
+- [ ] No server-side data training
+
+---
+
+## Phase 6: Insights & Stats
+
+- [ ] Watch history statistics
+- [ ] Time spent watching
+- [ ] Genre breakdowns
+- [ ] Viewing trends over time
+
+---
+
+## Phase 7: UI Experiments (Optional)
+
+- [ ] Swipe-based discovery (Tinder-like)
+- [ ] Framer Motion animations
+- [ ] Feedback-driven recommendation tuning
+
+---
+
+## Phase 8: Sustainability
+
+- [ ] Optional paid subscription for hosted users
+- [ ] Self-hosting remains free
+- [ ] No features locked behind payment
+
+---
+
+## Guiding Principles
+
+- User owns their data
+- Self-hosting is first-class
+- Privacy is opt-in, not an afterthought
+- Social features are optional
+- No dark patterns
+- No algorithm manipulation
