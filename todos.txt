@@ -1,20 +1,20 @@
 Todo list for What To Watch.
 
 
-1. Separate media types by Movie & TV for absolute control.
-2. Setup refresh token & auto reload.
+DONE 1. Separate media types by Movie & TV for absolute control.
+DONE 2. Setup refresh token & auto reload.
 3. Optimize client home page speed.
 4. Fix prop mutation in media action.
-5. Update all icons to Lu icon set.
-6. Add field validations on Signup & Signin.
-7. Cleanup and setup basic landing page.
+ONGOING 5. Update all icons to Lu icon set.
+DONE 6. Add field validations on Signup & Signin.
+DONE 7. Cleanup and setup basic landing page.
 8. Use redis for TheMovieDb caching to reduce external api calls.
 9. Cleanup media details page.
 10. Paginate watched, liked & watchlist.
 11. Remove media from watchlist after marking as watched.
 12. Movie recomendation feature?
-13. Check if docker setup is correct.
-14. Setup docker for prod deployment.
-15. Deploy with docker.
+DONE 13. Check if docker setup is correct.
+DONE 14. Setup docker for prod deployment.
+DONE 15. Deploy with docker.
 16. Better / consistent error & response handling on server.
 17. Error boundary on client.
