@@ -1,7 +1,7 @@
 import api from '@/lib/axiosInstance';
 import { Request, Response } from 'express';
 import { BaseResponse } from '@/types/common';
-import UserMediaSchema from '@/models/user-media';
+import { prisma } from '@/lib/prisma';
 import {
   MovieDBMovieResponse,
   MovieDBTvResponse,
@@ -19,9 +19,11 @@ const enrichMediaWithUserInteractions = async (
 ): Promise<TMDBMovieWithMeta[] | TMDBTvWithMeta[]> => {
   const mediaIds = media.map((m) => m.id);
 
-  const interactions = await UserMediaSchema.find({
-    userId,
-    media_id: { $in: mediaIds },
+  const interactions = await prisma.userMedia.findMany({
+    where: {
+      userId,
+      media_id: { in: mediaIds },
+    },
   });
 
   const map = new Map();
@@ -93,10 +95,12 @@ export const getMediaDetails = async (req: Request, res: Response<BaseResponse<T
 
   const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
 
-  const interactions = await UserMediaSchema.findOne({
-    userId: req.user.id,
-    mediaId: id,
-    mediaType,
+  const interactions = await prisma.userMedia.findFirst({
+    where: {
+      userId: req.user.id,
+      media_id: parseInt(id),
+      media_type: mediaType as 'movie' | 'tv',
+    },
   });
 
   const enriched = {

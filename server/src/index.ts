@@ -3,7 +3,6 @@ import 'express-async-errors';
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import { envConfig } from './config/env';
-import { connectDB } from './config/db';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import { errorHandler } from './middlewares/errorHandler';
@@ -26,9 +25,6 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Connect to MongoDB
-connectDB();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', authMiddleware, userRoutes);

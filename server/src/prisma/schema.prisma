@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum MediaType {
+  movie
+  tv
+}
+
+model User {
+  id         String      @id @default(uuid())
+  username   String      @unique
+  password   String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  user_media UserMedia[]
+
+  @@map("users")
+}
+
+model UserMedia {
+  id         String    @id @default(uuid())
+  userId     String
+  media_id   Int
+  media_type MediaType
+  liked      Boolean   @default(false)
+  watched    Boolean   @default(false)
+  watchlist  Boolean   @default(false)
+
+  // Cached media data
+  title        String?
+  poster_path  String?
+  vote_average Float?
+  vote_count   Int?
+  adult        Boolean?
+  genre_ids    String? // Stored as JSON string in SQLite
+  release_date String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, media_id, media_type])
+  @@index([userId])
+  @@index([media_id, media_type])
+  @@map("user_media")
+}

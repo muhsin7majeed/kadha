@@ -2,7 +2,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnvVars = ['MONGO_URI', 'JWT_REFRESH_SECRET', 'JWT_ACCESS_SECRET', 'TMDB_API_KEY', 'TMDB_BEARER_TOKEN'];
+const requiredEnvVars = [
+  'DATABASE_URL',
+  'JWT_REFRESH_SECRET',
+  'JWT_ACCESS_SECRET',
+  'TMDB_API_KEY',
+  'TMDB_BEARER_TOKEN',
+];
 
 requiredEnvVars.forEach((env) => {
   let ERRORED_ENV_VARS: string[] = [];
@@ -18,7 +24,6 @@ requiredEnvVars.forEach((env) => {
 
 export const envConfig = {
   port: Number(process.env.PORT) || 5000,
-  mongoUri: process.env.MONGO_URI || '',
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || '',
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || '',
   tmdbApiKey: process.env.TMDB_API_KEY || '',
