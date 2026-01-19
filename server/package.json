@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "A Node.js server for the What to Watch application",
   "main": "dist/index.js",
-  "type": "module",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon -r tsconfig-paths/register src/index.ts",
+    "dev": "nodemon --exec tsx src/index.ts",
     "build": "tsc && tsc-alias",
     "test": "jest",
     "format": "prettier --write ."
@@ -41,6 +40,7 @@
     "prisma": "^7.2.0",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.10",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.2"
   }
 }
