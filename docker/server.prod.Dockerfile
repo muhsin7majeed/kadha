@@ -30,6 +30,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src/prisma ./src/prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
+# Create db directory with correct permissions for node user
+RUN mkdir -p /app/db && chown -R node:node /app/db
+
 # Don't run as root
 USER node
 
