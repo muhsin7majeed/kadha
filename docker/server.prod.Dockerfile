@@ -20,6 +20,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/generated ./generated
 COPY --from=builder /app/package*.json ./
 
 RUN npm ci --omit=dev && npm cache clean --force
