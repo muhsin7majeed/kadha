@@ -11,9 +11,6 @@ import { authMiddleware } from './middlewares/auth';
 import userMediaRoutes from './routes/user-media';
 import cookieParser from 'cookie-parser';
 
-// Validate environment variables at runtime
-validateEnvVars();
-
 const app: Express = express();
 
 // CORS configuration - must specify origin (not wildcard) when using credentials
@@ -79,6 +76,9 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Error handling middleware
 app.use(errorHandler);
+
+// Validate environment variables before starting server
+validateEnvVars();
 
 // Start server
 app.listen(envConfig.port, '0.0.0.0', () => {
