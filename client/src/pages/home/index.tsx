@@ -1,6 +1,5 @@
 import { Box, Stack } from '@chakra-ui/react';
 
-import MediaTypeFilter from '@/components/media-type-filter';
 import { useMediaTypeValue } from '@/atoms/media-type';
 import TrendingMovies from './trending-movies';
 import TrendingTvs from './trending-tvs';
@@ -12,10 +11,7 @@ const Home = () => {
   return (
     <Box>
       <Stack gap={4}>
-        <Stack gap={4} direction={['column', 'row']} alignItems="center" justifyContent="space-between">
-          <MediaTypeFilter />
-          <SearchResults />
-        </Stack>
+        <SearchResults />
 
         {(mediaType === 'Movie' || mediaType === 'All') && <TrendingMovies />}
         {(mediaType === 'TV' || mediaType === 'All') && <TrendingTvs />}
