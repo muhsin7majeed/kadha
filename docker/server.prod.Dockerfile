@@ -8,7 +8,11 @@ RUN npm ci
 
 COPY server ./
 
-RUN npm run build
+# Generate Prisma client before building
+RUN npx prisma generate --schema=./src/prisma/schema.prisma || (echo "Prisma generate failed" && exit 1)
+
+# Build with verbose output
+RUN npm run build || (echo "Build failed with exit code $?" && exit 1)
 
 # Production image
 FROM node:20-alpine
