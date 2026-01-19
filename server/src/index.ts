@@ -2,7 +2,7 @@ import 'express-async-errors';
 
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import { envConfig } from './config/env';
+import { envConfig, validateEnvVars } from './config/env';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/user';
 import { errorHandler } from './middlewares/errorHandler';
@@ -10,6 +10,9 @@ import mediaRoutes from './routes/media';
 import { authMiddleware } from './middlewares/auth';
 import userMediaRoutes from './routes/user-media';
 import cookieParser from 'cookie-parser';
+
+// Validate environment variables at runtime
+validateEnvVars();
 
 const app: Express = express();
 

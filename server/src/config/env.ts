@@ -10,17 +10,20 @@ const requiredEnvVars = [
   'TMDB_BEARER_TOKEN',
 ];
 
-requiredEnvVars.forEach((env) => {
-  let ERRORED_ENV_VARS: string[] = [];
+// Validate environment variables at runtime
+export function validateEnvVars() {
+  const ERRORED_ENV_VARS: string[] = [];
 
-  if (!process.env[env]) {
-    ERRORED_ENV_VARS.push(env);
-  }
+  requiredEnvVars.forEach((env) => {
+    if (!process.env[env]) {
+      ERRORED_ENV_VARS.push(env);
+    }
+  });
 
   if (ERRORED_ENV_VARS.length > 0) {
     throw new Error(`Missing required environment variable: ${ERRORED_ENV_VARS.join(', ')}`);
   }
-});
+}
 
 export const envConfig = {
   port: Number(process.env.PORT) || 5000,
