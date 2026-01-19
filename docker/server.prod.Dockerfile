@@ -38,4 +38,5 @@ USER node
 
 EXPOSE 5000
 
-CMD ["node", "dist/index.js"]
+# Run migrations then start server
+CMD npx prisma migrate deploy --schema=./src/prisma/schema.prisma && node dist/index.js
