@@ -15,12 +15,13 @@ enum MediaType {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  username   String      @unique
-  password   String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  user_media UserMedia[]
+  id          String       @id @default(uuid())
+  username    String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user_media  UserMedia[]
+  collections Collection[]
 
   @@map("users")
 }
@@ -52,4 +53,51 @@ model UserMedia {
   @@index([userId])
   @@index([media_id, media_type])
   @@map("user_media")
+}
+
+enum CollectionPrivacy {
+  ONLY_ME
+  FRIENDS
+  EVERYONE
+}
+
+model Collection {
+  id          String            @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  privacy     CollectionPrivacy @default(ONLY_ME)
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+
+  user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items CollectionItem[]
+
+  @@index([userId])
+  @@map("collections")
+}
+
+model CollectionItem {
+  id           String    @id @default(uuid())
+  collectionId String
+  media_id     Int
+  media_type   MediaType
+
+  // Cached media data (same pattern as UserMedia)
+  title        String?
+  poster_path  String?
+  vote_average Float?
+  vote_count   Int?
+  adult        Boolean?
+  genre_ids    String? // Stored as JSON string in SQLite
+  release_date String?
+
+  created_at DateTime @default(now())
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, media_id, media_type]) // Prevent duplicates in same collection
+  @@index([collectionId])
+  @@index([media_id, media_type])
+  @@map("collection_items")
 }

@@ -10,6 +10,7 @@ import mediaRoutes from './routes/media';
 import { authMiddleware } from './middlewares/auth';
 import userMediaRoutes from './routes/user-media';
 import cookieParser from 'cookie-parser';
+import collectionRoutes from './routes/collection';
 
 const app: Express = express();
 
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', authMiddleware, userRoutes);
 app.use('/api/media', authMiddleware, mediaRoutes);
 app.use('/api/user-media', authMiddleware, userMediaRoutes);
+app.use('/api/collection', authMiddleware, collectionRoutes);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {
