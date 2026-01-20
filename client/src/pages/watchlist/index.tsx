@@ -1,33 +1,32 @@
-import { Box, Center, SimpleGrid, Spinner } from '@chakra-ui/react';
+import { LuBookmark } from 'react-icons/lu';
 import useWatchList from './apis/use-watch-list';
-import MediaCard from '@/components/media-card';
-import EmptyState from '@/components/info-states/empty-state';
-import ErrorState from '@/components/info-states/error-state';
-import PageHeader from '@/components/page-header';
+import MediaListPage from '@/components/media-list-page';
+import { Container } from '@chakra-ui/react';
 
 const Watchlist = () => {
   const { data: watchList, isLoading, isFetching, error, refetch } = useWatchList();
 
   return (
-    <Box>
-      <PageHeader isFetching={isFetching}>Watchlist</PageHeader>
-
-      {isLoading ? (
-        <Center>
-          <Spinner />
-        </Center>
-      ) : error ? (
-        <ErrorState title="Error" description="Failed to fetch watchlist" onRetry={refetch} />
-      ) : watchList?.length === 0 ? (
-        <EmptyState title="No watchlist found" description="Add movies to your watchlist to get started" />
-      ) : (
-        <SimpleGrid columns={[2, 4, 6]} gap={4}>
-          {watchList?.map((movie) => (
-            <MediaCard key={movie.id} media={movie} />
-          ))}
-        </SimpleGrid>
-      )}
-    </Box>
+    <Container maxW="6xl" py={{ base: 8, md: 12 }}>
+      <MediaListPage
+        title="Watchlist"
+        description="Movies and shows you're planning to watch. Your personal queue of entertainment waiting to be discovered."
+        data={watchList}
+        isLoading={isLoading}
+        isFetching={isFetching}
+        error={error}
+        refetch={refetch}
+        emptyState={{
+          title: 'Your watchlist is empty',
+          description:
+            "Start adding movies and shows you want to watch. They'll appear here so you never forget what's next!",
+          icon: <LuBookmark />,
+        }}
+        errorDescription="Failed to fetch watchlist"
+        loadingText="Loading your watchlist..."
+        spinnerColor="darkorange"
+      />
+    </Container>
   );
 };
 

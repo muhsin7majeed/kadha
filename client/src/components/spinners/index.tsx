@@ -1,9 +1,19 @@
-import { Box, Spinner } from '@chakra-ui/react';
+import { Box, BoxProps, Spinner } from '@chakra-ui/react';
 import { FaSyncAlt } from 'react-icons/fa';
 
-const SyncSpinner = ({ size = 24 }: { size?: number }) => {
+interface SyncSpinnerProps extends BoxProps {
+  size?: number;
+}
+
+const SyncSpinner: React.FC<SyncSpinnerProps> = ({ size = 18, ...props }) => {
   return (
-    <Box css={{ animation: 'spin 1s linear infinite' }} width="fit-content" height="fit-content" display="inline-block">
+    <Box
+      css={{ animation: 'spin 1s linear infinite' }}
+      width="fit-content"
+      height="fit-content"
+      display="inline-block"
+      {...props}
+    >
       <FaSyncAlt size={size} />
     </Box>
   );

@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 
 import { FullScreenSpinner } from './spinners';
 import { useAuthAtom } from '@/atoms/auth-atom';
+import { Container } from '@chakra-ui/react';
 
 const PrivateRoute = () => {
   const [auth] = useAuthAtom();
@@ -14,7 +15,11 @@ const PrivateRoute = () => {
     return <Navigate to="/auth/login" replace state={{ from: location.pathname }} />;
   }
 
-  return <Outlet />;
+  return (
+    <Container maxW="6xl">
+      <Outlet />
+    </Container>
+  );
 };
 
 export default PrivateRoute;

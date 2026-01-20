@@ -23,12 +23,12 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
 
   return (
     <WrapperElement
-      flex="0 0 200px"
       height="300px"
       borderRadius="lg"
       transition="transform 0.2s"
       position="relative"
       to={`/app/media/${media.media_type}/${media.id}`}
+      maxW="300px"
     >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}

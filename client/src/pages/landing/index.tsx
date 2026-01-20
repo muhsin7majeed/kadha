@@ -1,4 +1,3 @@
-import { useColorMode } from '@/components/ui/color-mode';
 import {
   Box,
   Button,
@@ -9,15 +8,15 @@ import {
   VStack,
   HStack,
   Icon,
-  IconButton,
   Card,
   Accordion,
   Link as ChakraLink,
   Badge,
   Flex,
 } from '@chakra-ui/react';
-import { LuMoon, LuSun, LuGithub, LuTv, LuGlobe } from 'react-icons/lu';
+import { LuGithub, LuTv, LuGlobe } from 'react-icons/lu';
 import { Link } from 'react-router';
+import Navbar from '@/components/navbar';
 import FAQ_ITEMS from './faq';
 import CURRENT_FEATURES from './current-features';
 import UPCOMING_FEATURES from './upcoming-features';
@@ -25,45 +24,9 @@ import UPCOMING_FEATURES from './upcoming-features';
 const GITHUB_URL = 'https://github.com/muhsin7majeed/what-to-watch-web';
 
 const Landing = () => {
-  const { toggleColorMode, colorMode } = useColorMode();
-
   return (
     <Box minH="100vh">
-      {/* Navbar */}
-      <Box as="nav" position="sticky" top={0} zIndex={10} bg="bg" borderBottomWidth="1px" borderColor="border">
-        <Container maxW="6xl" py={4}>
-          <Flex justify="space-between" align="center">
-            <HStack gap={2}>
-              <Icon fontSize="2xl" color="darkorange">
-                <LuTv />
-              </Icon>
-              <Heading size="lg">What to Watch</Heading>
-            </HStack>
-
-            <HStack gap={2}>
-              <IconButton variant="ghost" size="sm" onClick={() => toggleColorMode()}>
-                {colorMode === 'dark' ? <LuSun /> : <LuMoon />}
-              </IconButton>
-
-              <ChakraLink asChild>
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-                  <IconButton variant="ghost" size="sm">
-                    <LuGithub />
-                  </IconButton>
-                </a>
-              </ChakraLink>
-
-              <Button variant="ghost" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
-                <Link to="/auth/login">Login</Link>
-              </Button>
-
-              <Button colorPalette="darkorange" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
-                <Link to="/auth/register">Sign Up</Link>
-              </Button>
-            </HStack>
-          </Flex>
-        </Container>
-      </Box>
+      <Navbar />
 
       {/* Hero Section */}
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
