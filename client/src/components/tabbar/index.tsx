@@ -1,29 +1,32 @@
-import { AiFillCheckCircle, AiFillHeart } from 'react-icons/ai';
 import { Tabs } from '@chakra-ui/react';
-import { AiOutlineHome } from 'react-icons/ai';
 import { Link, useLocation } from 'react-router';
-import { TbListCheck } from 'react-icons/tb';
+import { LuBookmark, LuCheck, LuFolder, LuHeart, LuHouse } from 'react-icons/lu';
 
 const TABS = [
   {
     label: 'Home',
-    icon: <AiOutlineHome size={24} />,
+    icon: <LuHouse size={24} />,
     to: '/app',
   },
   {
     label: 'Watchlist',
-    icon: <TbListCheck size={24} />,
+    icon: <LuBookmark size={24} />,
     to: '/app/watchlist',
   },
   {
     label: 'Watched',
-    icon: <AiFillCheckCircle size={24} />,
+    icon: <LuCheck size={24} />,
     to: '/app/watched',
   },
   {
     label: 'Liked',
-    icon: <AiFillHeart size={24} />,
+    icon: <LuHeart size={24} />,
     to: '/app/liked',
+  },
+  {
+    label: 'Collections',
+    icon: <LuFolder size={24} />,
+    to: '/app/collections',
   },
 ];
 
@@ -45,6 +48,7 @@ const TabBar = () => {
                 asChild
                 borderLeftRadius={isFirst ? 'full' : 'none'}
                 borderRightRadius={isLast ? 'full' : 'none'}
+                title={tab.label}
               >
                 <Link to={tab.to}>{tab.icon}</Link>
               </Tabs.Trigger>

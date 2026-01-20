@@ -1,5 +1,10 @@
 import MEDIA from '@/constants/media';
 
+export interface GenericLabelValue<T = string> {
+  label: string;
+  value: T;
+}
+
 export interface LocationState {
   from?: {
     pathname: string;
