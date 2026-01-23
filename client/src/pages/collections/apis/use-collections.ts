@@ -1,17 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/axios-instance';
 import { Collection } from '@/types/collections';
-import { BaseResponse } from '@/types/common';
+import { BaseResponse, MediaType } from '@/types/common';
 
-const getCollections = async () => {
-  const response = await api.get<BaseResponse<Collection[]>>('/api/collection');
+interface GetCollectionsParams {
+  mediaId: number;
+  mediaType: MediaType;
+}
+
+const getCollections = async (params: GetCollectionsParams) => {
+  const response = await api.get<BaseResponse<Collection[]>>('/api/collection', { params });
   return response.data.data;
 };
 
-const useCollections = () => {
+const useCollections = (params: GetCollectionsParams) => {
   return useQuery({
     queryKey: ['collections'],
-    queryFn: () => getCollections(),
+    queryFn: () => getCollections(params),
   });
 };
 

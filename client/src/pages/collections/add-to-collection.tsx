@@ -1,7 +1,6 @@
 import PageHeader from '@/components/page-header';
-import SimpleCheckboxCardGroup from '@/components/simple-checkbox-card-group';
 import { UserMedia } from '@/types/user-media';
-import { Box, CloseButton, Flex, Group, IconButton, Text } from '@chakra-ui/react';
+import { Box, CloseButton, Flex, Group, IconButton, VStack } from '@chakra-ui/react';
 import useCollections from './apis/use-collections';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
@@ -10,16 +9,26 @@ import { useState } from 'react';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import CreateCollection from './create';
 import { LuPlus } from 'react-icons/lu';
+import CollectionItem from './collection-item';
 
 interface AddToCollectionProps {
   media: UserMedia;
   onClose: () => void;
 }
 
-const AddToCollection: React.FC<AddToCollectionProps> = ({ onClose }) => {
+const AddToCollection: React.FC<AddToCollectionProps> = ({ media, onClose }) => {
   const [showCreateCollectionDialog, setShowCreateCollectionDialog] = useState(false);
 
-  const { data: collections, isLoading, isFetching, error, refetch } = useCollections();
+  const {
+    data: collections,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useCollections({
+    mediaId: media.id,
+    mediaType: media.media_type,
+  });
 
   return (
     <Box>
@@ -72,18 +81,11 @@ const AddToCollection: React.FC<AddToCollectionProps> = ({ onClose }) => {
       ) : !collections || collections?.length === 0 ? (
         <EmptyState title="No collections" description="Create a new collection to add your media to" />
       ) : (
-        <SimpleCheckboxCardGroup
-          columns={1}
-          options={collections.map((collection) => ({
-            label: collection.name,
-            value: collection.id,
-            element: (
-              <Text fontSize="sm" color="gray.500" lineClamp={1}>
-                {collection.description ?? '--'}
-              </Text>
-            ),
-          }))}
-        />
+        <VStack gap="4" alignItems="stretch">
+          {collections.map((collection) => (
+            <CollectionItem key={collection.id} media={media} collection={collection} />
+          ))}
+        </VStack>
       )}
     </Box>
   );

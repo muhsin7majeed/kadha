@@ -13,7 +13,7 @@ const SimpleRadioGroup: React.FC<SimpleRadioGroupProps> = ({ options, label, ...
 
       <HStack gap="6">
         {options.map((option) => (
-          <RadioGroup.Item value={option.value}>
+          <RadioGroup.Item value={option.value} key={option.value}>
             <RadioGroup.ItemHiddenInput />
             <RadioGroup.ItemIndicator />
             <RadioGroup.ItemText>{option.label}</RadioGroup.ItemText>
