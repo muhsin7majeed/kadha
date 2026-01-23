@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 
-import { FullScreenSpinner } from './spinners';
+import FullScreenSpinner from './spinners/full-screen-spinner';
 import { useAuthAtom } from '@/atoms/auth-atom';
 import { Container } from '@chakra-ui/react';
 

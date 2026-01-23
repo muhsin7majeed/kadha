@@ -63,16 +63,20 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   return (
     <>
       <SimpleDialog
-        closeOnInteractOutside={false}
         open={showCreateCollectionDialog}
         onOpenChange={(e) => {
           setShowCreateCollectionDialog(e.open);
         }}
       >
-        <AddToCollection media={formatTMDBToUserMedia(media)} />
+        <AddToCollection
+          media={formatTMDBToUserMedia(media)}
+          onClose={() => {
+            setShowCreateCollectionDialog(false);
+          }}
+        />
       </SimpleDialog>
 
-      <VStack gap={1} backdropFilter="blur(10px)" p={1} borderRadius="full" onClick={(e) => e.preventDefault()}>
+      <VStack gap={1} backdropFilter="blur(10px)" p={1} borderRadius="full">
         <IconButton
           variant="subtle"
           borderRadius="full"

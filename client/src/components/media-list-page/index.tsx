@@ -2,7 +2,7 @@ import { Box, Center, Heading, SimpleGrid, Spinner, Text, VStack } from '@chakra
 import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import SyncSpinner from '@/components/spinners';
+import SyncSpinner from '@/components/spinners/sync-spinner';
 import { UserMedia } from '@/types/user-media';
 import { MovieWithMeta } from '@/types/media';
 import { TvWithMeta } from '@/types/media';

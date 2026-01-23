@@ -24,3 +24,9 @@ export interface MediaMeta {
   watched?: boolean;
   watchlist?: boolean;
 }
+
+export enum DataPrivacy {
+  Everyone = 'EVERYONE',
+  Friends = 'FRIENDS',
+  OnlyMe = 'ONLY_ME',
+}

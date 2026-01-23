@@ -13,6 +13,9 @@ const parseGenreIds = (genre_ids: string | null | undefined) => {
 
 const prisma = basePrisma.$extends({
   query: {
+    /**
+     * Extends the query method to parse the genre_ids field. Just a fancy way to parse the genre_ids field at root level.
+     */
     userMedia: {
       async findMany({ args, query }) {
         const result = await query(args);

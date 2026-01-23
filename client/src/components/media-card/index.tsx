@@ -6,30 +6,20 @@ import { formatDate } from '@/lib/date-fns';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
 import { UserMedia } from '@/types/user-media';
-import CustomLinkOverlay from '../custom-link-overlay';
+import NavLink from '../nav-link';
 
 interface MediaCardProps {
   media: MovieWithMeta | TvWithMeta | UserMedia;
-  isLink?: boolean;
 }
 
-const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
+const MediaCard = ({ media }: MediaCardProps) => {
   const genreMap = useGenreAtom();
-
-  const WrapperElement = isLink ? CustomLinkOverlay : Box;
 
   const title = 'title' in media ? media.title : media.name;
   const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
 
   return (
-    <WrapperElement
-      height="300px"
-      borderRadius="lg"
-      transition="transform 0.2s"
-      position="relative"
-      to={`/app/media/${media.media_type}/${media.id}`}
-      maxW="300px"
-    >
+    <Box height="300px" borderRadius="lg" transition="transform 0.2s" position="relative" maxW="300px">
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
         alt={`${title} poster`}
@@ -67,9 +57,9 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
         </Flex>
 
         <Box bg="blackAlpha.700" p={2} color="white" backdropFilter="blur(10px)" borderRadius="lg" w="100%">
-          <Text fontSize="md" fontWeight="bold" lineClamp={2}>
+          <NavLink to={`/app/media/${media.media_type}/${media.id}`} fontSize="md" fontWeight="bold" lineClamp={2}>
             {title} ({formatDate(releaseDate, 'YYYY')})
-          </Text>
+          </NavLink>
 
           <Flex gap={1} overflowX="auto" css={{ scrollbarWidth: 'none' }} my={1} maxW="200px" overflow="auto">
             {media.genre_ids.map((genre) => (
@@ -80,7 +70,7 @@ const MediaCard = ({ media, isLink = false }: MediaCardProps) => {
           </Flex>
         </Box>
       </VStack>
-    </WrapperElement>
+    </Box>
   );
 };
 

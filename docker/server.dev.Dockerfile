@@ -13,4 +13,5 @@ RUN npx prisma generate --schema=./src/prisma/schema.prisma
 
 EXPOSE 5000
 
-CMD ["npm", "run", "dev"]
+# Run migrations then start dev server
+CMD npx prisma migrate deploy --schema=./src/prisma/schema.prisma && npm run dev

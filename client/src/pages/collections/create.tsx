@@ -3,11 +3,13 @@ import SimpleRadioGroup from '@/components/simple-radio-group';
 import { Button, CloseButton, Field, Fieldset, Flex, Input, Textarea } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import useCreateCollection from './apis/use-create-collection';
+import { DataPrivacy } from '@/types/common';
+import { DATA_PRIVACY_OPTIONS } from '@/constants/common';
 
 export interface CollectionFormFields {
   name: string;
   description: string;
-  privacy: 'everyone' | 'friends' | 'only_me';
+  privacy: DataPrivacy;
 }
 
 interface CreateCollectionProps {
@@ -26,7 +28,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
     defaultValues: {
       name: '',
       description: '',
-      privacy: 'everyone',
+      privacy: DataPrivacy.Everyone,
     },
   });
 
@@ -84,7 +86,6 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
                   rows={4}
                   {...register('description', {
                     required: 'Description is required',
-                    minLength: { value: 6, message: 'Description must be at least 6 characters long' },
                   })}
                   placeholder="What is this collection about?"
                 />
@@ -95,15 +96,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
                 control={control}
                 name="privacy"
                 render={({ field }) => (
-                  <SimpleRadioGroup
-                    {...field}
-                    label="Who can see this collection?"
-                    options={[
-                      { label: 'Everyone', value: 'everyone' },
-                      { label: 'Friends', value: 'friends' },
-                      { label: 'Only Me', value: 'only_me' },
-                    ]}
-                  />
+                  <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
                 )}
               />
             </Fieldset.Content>

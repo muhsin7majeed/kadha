@@ -1,8 +1,17 @@
 import { prisma } from '@/lib/prisma';
 import { Request, Response } from 'express';
 
-export const getCollections = async (_req: Request, res: Response) => {
-  res.json({ data: [] });
+export const getCollections = async (req: Request, res: Response) => {
+  const { id } = req.user;
+
+
+  const collections = await prisma.collection.findMany({
+    where: {
+      userId: id,
+    },
+  });
+
+  res.json({ data: collections });
 };
 
 export const createCollection = async (req: Request, res: Response) => {

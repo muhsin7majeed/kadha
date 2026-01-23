@@ -1,5 +1,5 @@
 import { Flex, FlexProps, Heading } from '@chakra-ui/react';
-import SyncSpinner from './spinners';
+import SyncSpinner from './spinners/sync-spinner';
 
 interface PageHeaderProps extends FlexProps {
   isFetching?: boolean;
