@@ -58,7 +58,25 @@ export const createCollection = async (req: Request, res: Response) => {
 };
 
 export const getCollection = async (req: Request, res: Response) => {
-  res.json({ data: [] });
+  const { id: collectionId } = req.params;
+
+  const collection = await prisma.collection.findUnique({
+    where: {
+      id: collectionId,
+      userId: req.user.id,
+    },
+    include: {
+      items: true,
+    },
+  });
+
+  if (!collection) {
+    return res.status(404).json({ error: 'Collection not found' });
+  }
+
+  const { items, ...rest } = collection;
+
+  res.json({ data: { ...rest, media: items } });
 };
 
 export const updateCollection = async (req: Request, res: Response) => {

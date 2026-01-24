@@ -8,12 +8,12 @@ interface GetCollectionsParams {
   mediaType: MediaType;
 }
 
-const getCollections = async (params: GetCollectionsParams) => {
+const getCollections = async (params?: GetCollectionsParams) => {
   const response = await api.get<BaseResponse<Collection[]>>('/api/collection', { params });
   return response.data.data;
 };
 
-const useCollections = (params: GetCollectionsParams) => {
+const useCollections = (params?: GetCollectionsParams) => {
   return useQuery({
     queryKey: ['collections'],
     queryFn: () => getCollections(params),

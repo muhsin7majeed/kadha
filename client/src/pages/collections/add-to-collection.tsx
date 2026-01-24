@@ -9,7 +9,7 @@ import { useState } from 'react';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import CreateCollection from './create';
 import { LuPlus } from 'react-icons/lu';
-import CollectionItem from './collection-item';
+import CollectionCheckboxCard from './collection-checkbox-card';
 
 interface AddToCollectionProps {
   media: UserMedia;
@@ -83,7 +83,7 @@ const AddToCollection: React.FC<AddToCollectionProps> = ({ media, onClose }) => 
       ) : (
         <VStack gap="4" alignItems="stretch">
           {collections.map((collection) => (
-            <CollectionItem key={collection.id} media={media} collection={collection} />
+            <CollectionCheckboxCard key={collection.id} media={media} collection={collection} />
           ))}
         </VStack>
       )}
