@@ -19,7 +19,7 @@ export const getCollections = async (req: GetCollectionsRequest, res: Response) 
         ? {
             items: {
               where: {
-                media_id: Number(mediaId),
+                media_id: mediaId,
                 media_type: mediaType,
               },
               select: { id: true },

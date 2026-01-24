@@ -2,6 +2,7 @@ import { MediaMeta, MediaType } from './common';
 
 export interface UserMedia extends MediaMeta {
   id: number;
+  media_id: number;
   media_type: MediaType;
   title: string;
   poster_path: string;

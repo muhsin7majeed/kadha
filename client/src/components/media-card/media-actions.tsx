@@ -17,7 +17,7 @@ interface MediaActionsProps {
 }
 
 const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
-  const [showCreateCollectionDialog, setShowCreateCollectionDialog] = useState(false);
+  const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
 
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
   const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
@@ -57,21 +57,21 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   };
 
   const handleCollection = () => {
-    setShowCreateCollectionDialog(true);
+    setShowAddToCollectionDialog(true);
   };
 
   return (
     <>
       <SimpleDialog
-        open={showCreateCollectionDialog}
+        open={showAddToCollectionDialog}
         onOpenChange={(e) => {
-          setShowCreateCollectionDialog(e.open);
+          setShowAddToCollectionDialog(e.open);
         }}
       >
         <AddToCollection
           media={formatTMDBToUserMedia(media)}
           onClose={() => {
-            setShowCreateCollectionDialog(false);
+            setShowAddToCollectionDialog(false);
           }}
         />
       </SimpleDialog>

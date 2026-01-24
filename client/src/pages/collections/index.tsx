@@ -3,9 +3,10 @@ import useCollections from './apis/use-collections';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
-import { Accordion } from '@chakra-ui/react';
+import { Accordion, Flex } from '@chakra-ui/react';
 import CollectionItem from './collection-item';
 import { useState } from 'react';
+import CreateCollectionButton from './create-collection-button';
 
 const Collections = () => {
   const [openedCollections, setOpenedCollections] = useState<string[]>([]);
@@ -14,9 +15,13 @@ const Collections = () => {
 
   return (
     <>
-      <PageHeader isFetching={isFetching} mb="4">
-        Collections
-      </PageHeader>
+      <Flex justifyContent="space-between" alignItems="center" mb="4">
+        <PageHeader isFetching={isFetching} mb="4">
+          Collections
+        </PageHeader>
+
+        <CreateCollectionButton />
+      </Flex>
 
       {isLoading ? (
         <CommonSpinner />
