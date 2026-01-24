@@ -36,7 +36,7 @@ const MediaListPage = ({
   emptyState,
   errorDescription,
   loadingText,
-  spinnerColor = 'darkorange',
+  spinnerColor = 'orange',
 }: MediaListPageProps) => {
   return (
     <Box>

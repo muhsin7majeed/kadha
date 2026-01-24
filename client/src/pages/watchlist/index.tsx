@@ -24,7 +24,7 @@ const Watchlist = () => {
         }}
         errorDescription="Failed to fetch watchlist"
         loadingText="Loading your watchlist..."
-        spinnerColor="darkorange"
+        spinnerColor="orange"
       />
     </Container>
   );

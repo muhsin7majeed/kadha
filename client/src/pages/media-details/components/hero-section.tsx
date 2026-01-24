@@ -40,6 +40,8 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
             height="100%"
             objectFit="cover"
             filter="brightness(0.4)"
+            loading="lazy"
+            borderRadius="lg"
           />
         </Box>
       </Box>
@@ -65,6 +67,7 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
             objectFit="cover"
             borderRadius="xl"
             boxShadow="2xl"
+            loading="lazy"
           />
         </Box>
 
@@ -72,7 +75,7 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
         <VStack align={{ base: 'center', md: 'flex-start' }} gap={4} flex={1}>
           {/* Badges */}
           <HStack gap={2} flexWrap="wrap" justify={{ base: 'center', md: 'flex-start' }}>
-            <Badge colorPalette="darkorange" size="lg">
+            <Badge colorPalette="orange" size="lg">
               {isMovie ? 'Movie' : 'TV Series'}
             </Badge>
             <Badge colorPalette={data.adult ? 'red' : 'green'} size="lg">
@@ -140,7 +143,7 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
           <HStack gap={3} mt={2}>
             {data.homepage && (
               <Link asChild href={data.homepage} target="_blank" rel="noopener noreferrer">
-                <Button colorPalette="darkorange" size="md">
+                <Button colorPalette="orange" size="md">
                   <LuExternalLink />
                   Official Website
                 </Button>

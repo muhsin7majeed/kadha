@@ -139,7 +139,7 @@ const TvInfo = ({ data }: TvInfoProps) => {
 
             {/* Next Episode */}
             {data.next_episode_to_air && (
-              <Card.Root variant="outline" borderColor="darkorange/50">
+              <Card.Root variant="outline" borderColor="orange/50">
                 <Card.Body>
                   <VStack align="start" gap={3}>
                     <HStack justify="space-between" width="100%">

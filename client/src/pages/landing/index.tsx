@@ -31,12 +31,12 @@ const Landing = () => {
       {/* Hero Section */}
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
         <Container maxW="4xl" textAlign="center" position="relative" zIndex={1}>
-          <Badge colorPalette="darkorange" size="lg" mb={4}>
+          <Badge colorPalette="orange" size="lg" mb={4}>
             Open Source & Privacy-First
           </Badge>
           <Heading size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
             Your movies. Your data.{' '}
-            <Text as="span" color="darkorange">
+            <Text as="span" color="orange">
               Your rules.
             </Text>
           </Heading>
@@ -45,7 +45,7 @@ const Landing = () => {
             you've watched, save what you want to see, and actually own your data.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
-            <Button colorPalette="darkorange" size="lg" asChild>
+            <Button colorPalette="orange" size="lg" asChild>
               <Link to="/auth/register">Get Started - It's Free</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
@@ -77,8 +77,8 @@ const Landing = () => {
               <Card.Root key={feature.title} variant="outline">
                 <Card.Body>
                   <VStack align="start" gap={3}>
-                    <Box p={3} bg="darkorange/10" rounded="lg">
-                      <Icon fontSize="xl" color="darkorange">
+                    <Box p={3} bg="orange/10" rounded="lg">
+                      <Icon fontSize="xl" color="orange">
                         <feature.icon />
                       </Icon>
                     </Box>
@@ -133,11 +133,11 @@ const Landing = () => {
       {/* Self-Hosting Highlight */}
       <Box py={{ base: 16, md: 20 }}>
         <Container maxW="4xl">
-          <Card.Root variant="outline" borderColor="darkorange/30" bg="darkorange/5">
+          <Card.Root variant="outline" borderColor="orange/30" bg="orange/5">
             <Card.Body py={10}>
               <VStack gap={6} textAlign="center">
-                <Box p={4} bg="darkorange/10" rounded="full">
-                  <Icon fontSize="3xl" color="darkorange">
+                <Box p={4} bg="orange/10" rounded="full">
+                  <Icon fontSize="3xl" color="orange">
                     <LuGlobe />
                   </Icon>
                 </Box>
@@ -146,7 +146,7 @@ const Landing = () => {
                   Don't want your watch history on someone else's server? Fork the repo, deploy with Docker, and run
                   your own instance. Modify it however you want. It's MIT licensed - go wild.
                 </Text>
-                <Button variant="outline" colorPalette="darkorange" asChild>
+                <Button variant="outline" colorPalette="orange" asChild>
                   <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                     <LuGithub />
                     Check out the repo
@@ -197,7 +197,7 @@ const Landing = () => {
             be.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
-            <Button colorPalette="darkorange" size="lg" asChild>
+            <Button colorPalette="orange" size="lg" asChild>
               <Link to="/auth/register">Create Free Account</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
@@ -212,7 +212,7 @@ const Landing = () => {
         <Container maxW="6xl">
           <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" gap={4}>
             <HStack gap={2}>
-              <Icon fontSize="xl" color="darkorange">
+              <Icon fontSize="xl" color="orange">
                 <LuTv />
               </Icon>
               <Text fontWeight="semibold">What to Watch</Text>

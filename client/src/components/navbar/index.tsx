@@ -61,7 +61,7 @@ const Navbar = () => {
           <Flex justify="space-between" align="center">
             <HStack gap={2} asChild>
               <Link to={isAuthenticated ? '/home' : '/'}>
-                <Icon fontSize="2xl" color="darkorange">
+                <Icon fontSize="2xl" color="orange">
                   <LuTv />
                 </Icon>
                 <Heading size="lg">What to Watch</Heading>
@@ -113,7 +113,7 @@ const Navbar = () => {
                     <Link to="/auth/login">Login</Link>
                   </Button>
 
-                  <Button colorPalette="darkorange" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
+                  <Button colorPalette="orange" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
                     <Link to="/auth/register">Sign Up</Link>
                   </Button>
                 </>

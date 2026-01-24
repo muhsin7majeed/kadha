@@ -41,7 +41,7 @@ const SearchResults = () => {
           }}
           errorDescription="Failed to fetch search results"
           loadingText="Loading search results..."
-          spinnerColor="darkorange"
+          spinnerColor="orange"
         />
       )}
     </Box>
