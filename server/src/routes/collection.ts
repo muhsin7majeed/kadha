@@ -7,13 +7,13 @@ import {
   toggleCollectionItem,
 } from '@/controllers/collection';
 import { Router } from 'express';
-import { toggleCollectionSchema } from '@/schemas/collectionSchema';
+import { createCollectionSchema, getCollectionsSchema, toggleCollectionSchema } from '@/schemas/collectionSchema';
 import { validate } from '@/middlewares/validate';
 
 const router = Router();
 
-router.get('/', getCollections);
-router.post('/', createCollection);
+router.get('/', validate(getCollectionsSchema), getCollections);
+router.post('/', validate(createCollectionSchema), createCollection);
 router.get('/:id', getCollection);
 router.put('/:id', updateCollection);
 router.delete('/:id', deleteCollection);

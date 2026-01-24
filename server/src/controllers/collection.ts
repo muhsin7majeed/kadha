@@ -1,7 +1,11 @@
 import { prisma } from '@/lib/prisma';
+import { getCollectionsSchema } from '@/schemas/collectionSchema';
 import { Request, Response } from 'express';
+import z from 'zod';
 
-export const getCollections = async (req: Request, res: Response) => {
+type GetCollectionsRequest = Request<{}, {}, {}, z.infer<typeof getCollectionsSchema>>;
+
+export const getCollections = async (req: GetCollectionsRequest, res: Response) => {
   const { id } = req.user;
   const { mediaId, mediaType } = req.query;
 
@@ -16,7 +20,7 @@ export const getCollections = async (req: Request, res: Response) => {
             items: {
               where: {
                 media_id: Number(mediaId),
-                media_type: mediaType as 'movie' | 'tv',
+                media_type: mediaType,
               },
               select: { id: true },
               take: 1,
