@@ -1,4 +1,4 @@
-import { LuUsers, LuShield, LuLock, LuBrain, LuServer, LuDownload, LuChartBar, LuSparkles } from 'react-icons/lu';
+import { LuUsers, LuShield, LuLock, LuBrain, LuDownload, LuChartBar } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
   {
@@ -28,12 +28,6 @@ const UPCOMING_FEATURES = [
     badge: 'AI',
   },
   {
-    icon: LuServer,
-    title: 'Self-Hosting',
-    description: "Don't trust us? Host it yourself. Docker makes it easy. Your data, your server, your rules.",
-    badge: 'Core',
-  },
-  {
     icon: LuDownload,
     title: 'Import/Export',
     description: 'Take your data anywhere. No vendor lock-in, ever.',
@@ -44,12 +38,6 @@ const UPCOMING_FEATURES = [
     title: 'Watch Statistics',
     description: 'See your viewing habits. How many hours of your life went to TV? Find out (if you dare).',
     badge: 'Insights',
-  },
-  {
-    icon: LuSparkles,
-    title: 'Custom Collections',
-    description: 'Create themed lists. "Comfort Movies", "Date Night", "When I\'m Sick" — you name it.',
-    badge: 'Organization',
   },
 ];
 
