@@ -1,31 +1,31 @@
-import { Tabs } from '@chakra-ui/react';
+import { Icon, Tabs } from '@chakra-ui/react';
 import { Link, useLocation } from 'react-router';
 import { LuBookmark, LuCheck, LuFolder, LuHeart, LuHouse } from 'react-icons/lu';
 
 const TABS = [
   {
     label: 'Home',
-    icon: <LuHouse size={24} />,
+    icon: <LuHouse />,
     to: '/app',
   },
   {
     label: 'Watchlist',
-    icon: <LuBookmark size={24} />,
+    icon: <LuBookmark />,
     to: '/app/watchlist',
   },
   {
     label: 'Watched',
-    icon: <LuCheck size={24} />,
+    icon: <LuCheck />,
     to: '/app/watched',
   },
   {
     label: 'Liked',
-    icon: <LuHeart size={24} />,
+    icon: <LuHeart />,
     to: '/app/liked',
   },
   {
     label: 'Collections',
-    icon: <LuFolder size={24} />,
+    icon: <LuFolder />,
     to: '/app/collections',
   },
 ];
@@ -35,7 +35,7 @@ const TabBar = () => {
 
   return (
     <>
-      <Tabs.Root variant="enclosed" fitted defaultValue={activeTab} mx="auto" w="sm">
+      <Tabs.Root variant="enclosed" fitted defaultValue={activeTab} mx="auto" w="full">
         <Tabs.List borderRadius="full">
           {TABS.map((tab, index) => {
             const isFirst = index === 0;
@@ -50,7 +50,11 @@ const TabBar = () => {
                 borderRightRadius={isLast ? 'full' : 'none'}
                 title={tab.label}
               >
-                <Link to={tab.to}>{tab.icon}</Link>
+                <Link to={tab.to}>
+                  <Icon size="lg" color="orange.500">
+                    {tab.icon}
+                  </Icon>
+                </Link>
               </Tabs.Trigger>
             );
           })}

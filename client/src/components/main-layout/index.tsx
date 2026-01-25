@@ -19,11 +19,11 @@ const MainLayout = () => {
 
         <Box
           position="fixed"
-          bottom={4}
+          bottom={[2, 4]}
           left={0}
           right={0}
           zIndex={2}
-          p={[2, 4]}
+          p={2}
           backdropFilter="blur(10px)"
           rounded="full"
           width="fit-content"
