@@ -80,27 +80,42 @@ export const getCollection = async (req: Request, res: Response) => {
 };
 
 export const updateCollection = async (req: Request, res: Response) => {
-  res.json({ data: [] });
+  const { id: collectionId } = req.params;
+  const { name, description, privacy } = req.body;
+
+  const collection = await prisma.collection.update({
+    where: {
+      id: collectionId,
+      userId: req.user.id,
+    },
+    data: {
+      name,
+      description,
+      privacy,
+    },
+  });
+
+  res.json({ data: collection });
 };
 
 export const deleteCollection = async (req: Request, res: Response) => {
-  res.json({ data: [] });
+  const { id: collectionId } = req.params;
+
+  await prisma.collection.delete({
+    where: {
+      id: collectionId,
+      userId: req.user.id,
+    },
+  });
+
+  res.json({ message: 'Collection deleted successfully' });
 };
 
 export const toggleCollectionItem = async (req: Request, res: Response) => {
   const collectionId = req.params.id;
 
-  const {
-    id: media_id,
-    media_type,
-    title,
-    poster_path,
-    vote_average,
-    vote_count,
-    adult,
-    genre_ids,
-    release_date,
-  } = req.body;
+  const { media_id, media_type, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
+    req.body;
 
   // Verify the collection exists and belongs to the user
   const collection = await prisma.collection.findUnique({
