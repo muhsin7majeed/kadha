@@ -1,48 +1,13 @@
 import { Collection } from '@/types/collections';
-import {
-  AbsoluteCenter,
-  Accordion,
-  Box,
-  HStack,
-  IconButton,
-  Menu,
-  Portal,
-  Separator,
-  SimpleGrid,
-  Span,
-  Text,
-} from '@chakra-ui/react';
-import { LuEllipsis } from 'react-icons/lu';
+import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
 import useCollection from './apis/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
 import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
+import CollectionMenu from './collection-menu';
 
-// TODO: Move to a separate file
-const CollectionItemMenu = () => {
-  return (
-    <Menu.Root>
-      <Menu.Trigger asChild>
-        <IconButton variant="ghost" aria-label="Open Menu" title="Open Menu">
-          <LuEllipsis />
-        </IconButton>
-      </Menu.Trigger>
-
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content>
-            <Menu.Item value="edit">Edit</Menu.Item>
-            <Menu.Item value="delete" color="fg.error" _hover={{ bg: 'bg.error', color: 'fg.error' }}>
-              Delete
-            </Menu.Item>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
-  );
-};
 interface CollectionItemProps {
   collection: Collection;
   index: number;
@@ -77,7 +42,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
 
           <AbsoluteCenter axis="vertical" insetEnd="10">
             {isFetching && <SyncSpinner size="sm" me="2" />}
-            <CollectionItemMenu />
+            <CollectionMenu collection={collection} />
           </AbsoluteCenter>
         </Box>
 
@@ -116,6 +81,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                           adult: media.adult,
                           genre_ids: JSON.parse(media.genre_ids),
                           release_date: media.release_date,
+                          media_id: media.media_id,
                         }}
                       />
                     ))}

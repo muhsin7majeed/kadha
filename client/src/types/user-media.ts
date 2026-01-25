@@ -1,7 +1,13 @@
 import { MediaMeta, MediaType } from './common';
 
 export interface UserMedia extends MediaMeta {
-  id: number;
+  /**
+   * The ID of the user media table item in the database
+   */
+  id?: number;
+  /**
+   * Actual ID of the media in the TMDB database
+   */
   media_id: number;
   media_type: MediaType;
   title: string;

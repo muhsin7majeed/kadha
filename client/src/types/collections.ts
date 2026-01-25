@@ -29,3 +29,9 @@ interface CollectionMedia extends Omit<UserMedia, 'genre_ids'> {
 export interface CollectionDetails extends Omit<Collection, 'hasMedia'> {
   media: CollectionMedia[];
 }
+
+export interface CollectionFormFields {
+  name: string;
+  description: string;
+  privacy: DataPrivacy;
+}

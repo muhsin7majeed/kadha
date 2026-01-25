@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import { Button, ButtonProps, IconButtonProps } from '@chakra-ui/react';
-import CreateCollection from './create';
+import CreateCollection from './collection-menu/create-collection';
 
 interface CreateCollectionButtonProps {
   buttonElement?: React.ReactElement<ButtonProps | IconButtonProps>;

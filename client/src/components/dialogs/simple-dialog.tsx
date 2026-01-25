@@ -2,6 +2,7 @@ import { Dialog, DialogContentProps, DialogRootProps, Portal } from '@chakra-ui/
 
 interface SimpleDialogProps extends DialogRootProps {
   contentProps?: DialogContentProps;
+  closeButton?: boolean;
 }
 
 const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {

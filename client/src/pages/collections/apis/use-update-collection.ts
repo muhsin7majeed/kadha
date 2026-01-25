@@ -4,19 +4,25 @@ import { CollectionFormFields } from '../collection-menu/create-collection';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import { toaster } from '@/components/ui/toaster';
 
-const createCollection = async (payload: CollectionFormFields) => {
-  const response = await api.post('/api/collection', payload);
+interface UpdateCollectionPayload extends CollectionFormFields {
+  id: string;
+}
+
+const updateCollection = async (payload: UpdateCollectionPayload) => {
+  const { id, ...payloadWithoutId } = payload;
+
+  const response = await api.put(`/api/collection/${id}`, payloadWithoutId);
   return response.data;
 };
 
-const useCreateCollection = () => {
+const useUpdateCollection = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createCollection,
+    mutationFn: (payload: UpdateCollectionPayload) => updateCollection(payload),
     onError: useErrorHandler,
     onSuccess: () => {
       toaster.success({
-        title: 'Collection created successfully',
+        title: 'Collection updated successfully',
       });
 
       queryClient.invalidateQueries({ queryKey: ['collections'] });
@@ -24,4 +30,4 @@ const useCreateCollection = () => {
   });
 };
 
-export default useCreateCollection;
+export default useUpdateCollection;

@@ -5,7 +5,7 @@ const formatTMDBToUserMedia = (media: Movie | Tv) => {
   const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
 
   return {
-    id: media.id,
+    media_id: media.id,
     media_type: media.media_type!,
     title: title,
     poster_path: media.poster_path,

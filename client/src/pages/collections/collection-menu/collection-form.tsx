@@ -1,23 +1,21 @@
 import PageHeader from '@/components/page-header';
-import SimpleRadioGroup from '@/components/simple-radio-group';
-import { Button, CloseButton, Field, Fieldset, Flex, Input, Textarea } from '@chakra-ui/react';
+import { Button, CloseButton, Field, Fieldset, Input, Textarea, useDialogContext } from '@chakra-ui/react';
+import { CollectionFormFields } from '@/types/collections';
+import { Flex } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
-import useCreateCollection from './apis/use-create-collection';
-import { DataPrivacy } from '@/types/common';
+import SimpleRadioGroup from '@/components/simple-radio-group';
 import { DATA_PRIVACY_OPTIONS } from '@/constants/common';
 
-export interface CollectionFormFields {
-  name: string;
-  description: string;
-  privacy: DataPrivacy;
-}
-
-interface CreateCollectionProps {
+interface CollectionFormProps {
+  initialValues: CollectionFormFields;
+  onSubmit: (values: CollectionFormFields) => void;
+  isLoading: boolean;
+  title: string;
   onClose: () => void;
 }
 
-const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
-  const { mutateAsync: createCollection, isPending } = useCreateCollection();
+const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoading, onSubmit, title }) => {
+  const { setOpen: setDialogOpen } = useDialogContext();
 
   const {
     register,
@@ -25,32 +23,14 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
     formState: { errors },
     control,
   } = useForm<CollectionFormFields>({
-    defaultValues: {
-      name: '',
-      description: '',
-      privacy: DataPrivacy.Everyone,
-    },
+    defaultValues: initialValues,
   });
-
-  const onSubmit = async (values: CollectionFormFields) => {
-    if (isPending) return;
-
-    const payload = {
-      name: values.name,
-      description: values.description,
-      privacy: values.privacy,
-    };
-
-    await createCollection(payload);
-
-    onClose();
-  };
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex justify="space-between" align="center" mb={4}>
-          <PageHeader>Create Collection</PageHeader>
+          <PageHeader>{title}</PageHeader>
 
           <Flex gap={2} align="center">
             <Button
@@ -58,13 +38,18 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
               size="sm"
               variant="subtle"
               colorPalette="orange"
-              loading={isPending}
-              disabled={isPending}
+              loading={isLoading}
+              disabled={isLoading}
             >
               Save
             </Button>
 
-            <CloseButton onClick={onClose} />
+            <CloseButton
+              size="sm"
+              onClick={() => {
+                setDialogOpen(false);
+              }}
+            />
           </Flex>
         </Flex>
 
@@ -107,4 +92,4 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
   );
 };
 
-export default CreateCollection;
+export default CollectionForm;
