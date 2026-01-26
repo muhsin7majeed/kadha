@@ -3,14 +3,25 @@ import { prisma } from '@/lib/prisma';
 import { MediaType } from '@prisma/client';
 
 export const addToLiked = async (req: Request, res: Response) => {
-  const { id, media_type, liked, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
-    req.body;
+  const {
+    id,
+    media_id,
+    media_type,
+    liked,
+    title,
+    poster_path,
+    vote_average,
+    vote_count,
+    adult,
+    genre_ids,
+    release_date,
+  } = req.body;
 
   await prisma.userMedia.upsert({
     where: {
       userId_media_id_media_type: {
         userId: req.user.id,
-        media_id: id,
+        media_id: media_id,
         media_type: media_type as MediaType,
       },
     },
@@ -26,7 +37,7 @@ export const addToLiked = async (req: Request, res: Response) => {
     },
     create: {
       userId: req.user.id,
-      media_id: id,
+      media_id: media_id,
       media_type: media_type as MediaType,
       liked,
       title,
@@ -43,14 +54,25 @@ export const addToLiked = async (req: Request, res: Response) => {
 };
 
 export const addToWatched = async (req: Request, res: Response) => {
-  const { id, media_type, watched, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
-    req.body;
+  const {
+    id,
+    media_id,
+    media_type,
+    watched,
+    title,
+    poster_path,
+    vote_average,
+    vote_count,
+    adult,
+    genre_ids,
+    release_date,
+  } = req.body;
 
   await prisma.userMedia.upsert({
     where: {
       userId_media_id_media_type: {
         userId: req.user.id,
-        media_id: id,
+        media_id: media_id,
         media_type: media_type as MediaType,
       },
     },
@@ -67,7 +89,7 @@ export const addToWatched = async (req: Request, res: Response) => {
     },
     create: {
       userId: req.user.id,
-      media_id: id,
+      media_id: media_id,
       media_type: media_type as MediaType,
       watched,
       watchlist: false,
@@ -89,14 +111,25 @@ export const addToWatched = async (req: Request, res: Response) => {
 };
 
 export const addToWatchlist = async (req: Request, res: Response) => {
-  const { id, media_type, watchlist, title, poster_path, vote_average, vote_count, adult, genre_ids, release_date } =
-    req.body;
+  const {
+    id,
+    media_id,
+    media_type,
+    watchlist,
+    title,
+    poster_path,
+    vote_average,
+    vote_count,
+    adult,
+    genre_ids,
+    release_date,
+  } = req.body;
 
   await prisma.userMedia.upsert({
     where: {
       userId_media_id_media_type: {
         userId: req.user.id,
-        media_id: id,
+        media_id: media_id,
         media_type: media_type as MediaType,
       },
     },
@@ -112,7 +145,7 @@ export const addToWatchlist = async (req: Request, res: Response) => {
     },
     create: {
       userId: req.user.id,
-      media_id: id,
+      media_id: media_id,
       media_type: media_type as MediaType,
       watchlist,
       title,

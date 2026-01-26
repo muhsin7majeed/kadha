@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 const userMediaSchema = z.object({
-  id: z.number({ required_error: 'Media ID is required' }),
+  id: z.coerce.string().optional(),
+  media_id: z.number({ required_error: 'Media ID is required' }),
   media_type: z.enum(['movie', 'tv'], {
     required_error: 'Media type is required',
   }),

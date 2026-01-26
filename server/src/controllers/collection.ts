@@ -9,6 +9,8 @@ export const getCollections = async (req: GetCollectionsRequest, res: Response) 
   const { id } = req.user;
   const { mediaId, mediaType } = req.query;
 
+  console.log(mediaId, typeof mediaId);
+
   const collections = await prisma.collection.findMany({
     where: {
       userId: id,
@@ -19,7 +21,7 @@ export const getCollections = async (req: GetCollectionsRequest, res: Response) 
         ? {
             items: {
               where: {
-                media_id: mediaId,
+                media_id: parseInt(mediaId),
                 media_type: mediaType,
               },
               select: { id: true },

@@ -14,7 +14,7 @@ export const updateCollectionSchema = z.object({
 });
 
 export const toggleCollectionSchema = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   media_type: z.nativeEnum(MediaType),
   title: z.string().optional(),
   poster_path: z.string().nullable().optional(),
@@ -26,6 +26,6 @@ export const toggleCollectionSchema = z.object({
 });
 
 export const getCollectionsSchema = z.object({
-  mediaId: z.number().optional(),
+  mediaId: z.string().optional(),
   mediaType: z.nativeEnum(MediaType).optional(),
 });
