@@ -12,7 +12,7 @@ interface ProfileInputs {
 
 const UserProfile = () => {
   const { data: me, isLoading, isFetching, error, refetch } = useGetMe();
-  const { mutateAsync: updateMe, isLoading: isUpdatingMe, error: updateMeError } = useUpdateMe();
+  const { mutateAsync: updateMe, isPending: isUpdatingMe, error: updateMeError } = useUpdateMe();
 
   const {
     register,
@@ -34,7 +34,8 @@ const UserProfile = () => {
     await updateMe(payload);
   };
 
-  const apiFieldErrors = error?.response?.data?.fieldErrors;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const apiFieldErrors = (updateMeError as any)?.response?.data?.fieldErrors;
 
   return (
     <Box>
