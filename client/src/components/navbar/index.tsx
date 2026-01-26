@@ -21,6 +21,7 @@ import { useColorMode } from '@/components/ui/color-mode';
 import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { removeAccessToken } from '@/lib/token-manager';
 import useLogout from '@/pages/auth/apis/use-logout';
+import NavLink from '../nav-link';
 
 const GITHUB_URL = 'https://github.com/muhsin7majeed/what-to-watch-web';
 
@@ -95,6 +96,10 @@ const Navbar = () => {
                   <Portal>
                     <Menu.Positioner>
                       <Menu.Content>
+                        <Menu.Item value="profile" asChild>
+                          <NavLink to="/app/profile">{auth.user?.username}</NavLink>
+                        </Menu.Item>
+
                         <Menu.Item
                           value="logout"
                           onClick={handleLogout}

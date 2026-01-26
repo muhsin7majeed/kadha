@@ -16,6 +16,7 @@ import { useGetMe } from './pages/profile/apis/use-get-me';
 import { useEffect } from 'react';
 import { useSetAuthAtom } from './atoms/auth-atom';
 import Collections from './pages/collections';
+import UserProfile from './pages/profile';
 
 function App() {
   const setAuth = useSetAuthAtom();
@@ -57,6 +58,8 @@ function App() {
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />
+
+            <Route path="profile" element={<UserProfile />} />
           </Route>
         </Route>
 
