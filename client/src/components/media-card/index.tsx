@@ -57,7 +57,12 @@ const MediaCard = ({ media }: MediaCardProps) => {
         </Flex>
 
         <Box bg="blackAlpha.700" p={2} color="white" backdropFilter="blur(10px)" borderRadius="lg" w="100%">
-          <NavLink to={`/app/media/${media.media_type}/${media.id}`} fontSize="md" fontWeight="bold" lineClamp={2}>
+          <NavLink
+            to={`/app/media/${media.media_type}/${media.media_id}`}
+            fontSize="md"
+            fontWeight="bold"
+            lineClamp={2}
+          >
             {title} ({formatDate(releaseDate, 'YYYY')})
           </NavLink>
 

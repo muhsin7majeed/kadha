@@ -2,7 +2,7 @@ import { Box, Container, Skeleton, VStack } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
-import type { MovieDetails, TvDetails } from '@/types/media';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
 import useMediaDetails from './apis/use-media-details';
 import { toaster } from '@/components/ui/toaster';
 import HeroSection from './components/hero-section';
@@ -55,7 +55,7 @@ const MediaDetails = () => {
           <OverviewSection overview={data.overview} />
 
           {/* Media-specific Info */}
-          {isMovie ? <MovieInfo data={data as MovieDetails} /> : <TvInfo data={data as TvDetails} />}
+          {isMovie ? <MovieInfo data={data as MovieDetailsWithMeta} /> : <TvInfo data={data as TvDetailsWithMeta} />}
 
           {/* Production Info (shared between movie and TV) */}
           <ProductionInfo data={data} />

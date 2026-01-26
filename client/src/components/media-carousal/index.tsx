@@ -73,7 +73,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
       <Box ref={scrollContainerRef} overflowX="auto" scrollBehavior="smooth">
         <Flex gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.id} media={media} />
+            <MediaCard key={media.media_id} media={media} />
           ))}
         </Flex>
       </Box>

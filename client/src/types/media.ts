@@ -8,7 +8,7 @@ interface BaseMedia {
   adult: boolean;
   backdrop_path: string;
   genre_ids: number[];
-  id: number;
+  media_id: number;
   original_language: string;
   overview: string;
   popularity: number;
@@ -143,6 +143,10 @@ export interface TvDetails extends Omit<Tv, 'genre_ids'> {
   type: string;
   still_path: string;
 }
+
+// Details types with user interaction metadata
+export type MovieDetailsWithMeta = MovieDetails & MediaMeta;
+export type TvDetailsWithMeta = TvDetails & MediaMeta;
 
 interface MovieDBBaseResponse {
   page: number;

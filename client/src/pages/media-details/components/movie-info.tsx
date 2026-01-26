@@ -1,10 +1,10 @@
 import { Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuDollarSign, LuTrendingUp, LuFilm } from 'react-icons/lu';
-import type { MovieDetails } from '@/types/media';
+import type { MovieDetailsWithMeta } from '@/types/media';
 import InfoCard from './info-card';
 
 interface MovieInfoProps {
-  data: MovieDetails;
+  data: MovieDetailsWithMeta;
 }
 
 const formatCurrency = (value: number) => {

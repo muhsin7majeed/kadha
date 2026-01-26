@@ -1,18 +1,20 @@
 import { Badge, Box, Button, Flex, HStack, Image, Link, Text, VStack } from '@chakra-ui/react';
 import { LuExternalLink, LuStar, LuCalendar, LuClock } from 'react-icons/lu';
-import type { MovieDetails, TvDetails } from '@/types/media';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
 import { formatDate, minutesToHours } from '@/lib/date-fns';
 
 interface HeroSectionProps {
-  data: MovieDetails | TvDetails;
+  data: MovieDetailsWithMeta | TvDetailsWithMeta;
   mediaType: 'movie' | 'tv';
 }
 
 const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
   const isMovie = mediaType === 'movie';
-  const title = isMovie ? (data as MovieDetails).title : (data as TvDetails).name;
-  const releaseDate = isMovie ? (data as MovieDetails).release_date : (data as TvDetails).first_air_date;
-  const runtime = isMovie ? (data as MovieDetails).runtime : (data as TvDetails).episode_run_time?.[0];
+  const title = isMovie ? (data as MovieDetailsWithMeta).title : (data as TvDetailsWithMeta).name;
+  const releaseDate = isMovie
+    ? (data as MovieDetailsWithMeta).release_date
+    : (data as TvDetailsWithMeta).first_air_date;
+  const runtime = isMovie ? (data as MovieDetailsWithMeta).runtime : (data as TvDetailsWithMeta).episode_run_time?.[0];
 
   return (
     <Box position="relative">
@@ -149,10 +151,10 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
                 </Button>
               </Link>
             )}
-            {isMovie && (data as MovieDetails).imdb_id && (
+            {isMovie && (data as MovieDetailsWithMeta).imdb_id && (
               <Link
                 asChild
-                href={`https://www.imdb.com/title/${(data as MovieDetails).imdb_id}`}
+                href={`https://www.imdb.com/title/${(data as MovieDetailsWithMeta).imdb_id}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >

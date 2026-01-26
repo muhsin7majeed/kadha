@@ -1,11 +1,11 @@
 import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuCalendar, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
-import type { TvDetails } from '@/types/media';
+import type { TvDetailsWithMeta } from '@/types/media';
 import InfoCard from './info-card';
 import { formatDate } from '@/lib/date-fns';
 
 interface TvInfoProps {
-  data: TvDetails;
+  data: TvDetailsWithMeta;
 }
 
 const TvInfo = ({ data }: TvInfoProps) => {
