@@ -7,6 +7,6 @@ export interface User {
 }
 
 export interface AuthState {
-  user: User | null;
+  user: Omit<User, 'profilePrivacy'> | null;
   status: 'pending' | 'authenticated' | 'unauthenticated';
 }
