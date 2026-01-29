@@ -1,11 +1,11 @@
-import { Box, Center, Heading, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, Center, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
 import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import SyncSpinner from '@/components/spinners/sync-spinner';
 import { UserMedia } from '@/types/user-media';
 import { MovieWithMeta } from '@/types/media';
 import { TvWithMeta } from '@/types/media';
+import PageHeader from '../page-header';
 
 interface MediaListPageProps {
   title: string;
@@ -41,14 +41,9 @@ const MediaListPage = ({
   return (
     <Box>
       <Box mb={10}>
-        <Heading size={{ base: '2xl', md: '3xl' }}>
+        <PageHeader isFetching={isFetching} subHeader={description}>
           {title}
-          {isFetching && <SyncSpinner ml="1" />}
-        </Heading>
-
-        <Text fontSize="lg" color="fg.muted" maxW="2xl">
-          {description}
-        </Text>
+        </PageHeader>
       </Box>
 
       {isLoading ? (

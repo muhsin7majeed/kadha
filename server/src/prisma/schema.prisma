@@ -14,16 +14,78 @@ enum MediaType {
   tv
 }
 
+enum DataPrivacy {
+  ONLY_ME
+  FRIENDS
+  EVERYONE
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  BLOCKED
+}
+
+enum NotificationType {
+  FRIEND_REQUEST_RECEIVED
+  FRIEND_REQUEST_ACCEPTED
+}
+
 model User {
-  id          String       @id @default(uuid())
-  username    String       @unique
-  password    String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  user_media  UserMedia[]
-  collections Collection[]
+  id             String       @id @default(uuid())
+  username       String       @unique
+  profilePrivacy DataPrivacy  @default(EVERYONE)
+  password       String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user_media     UserMedia[]
+  collections    Collection[]
+
+  // Friend relationships
+  sentFriendRequests     Friendship[] @relation("SentFriendRequests")
+  receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
+
+  // Notifications
+  notifications      Notification[] @relation("UserNotifications")
+  actedNotifications Notification[] @relation("NotificationActor")
 
   @@map("users")
+}
+
+model Friendship {
+  id         String       @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     FriendStatus @default(PENDING)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  sender   User @relation("SentFriendRequests", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("ReceivedFriendRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId]) // Prevent duplicate friend requests
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([status])
+  @@map("friendships")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  userId      String
+  type        NotificationType
+  read        Boolean          @default(false)
+  actorId     String?
+  referenceId String? // friendshipId, collectionId, etc.
+  createdAt   DateTime         @default(now())
+
+  user  User  @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
 
 model UserMedia {
@@ -55,20 +117,14 @@ model UserMedia {
   @@map("user_media")
 }
 
-enum CollectionPrivacy {
-  ONLY_ME
-  FRIENDS
-  EVERYONE
-}
-
 model Collection {
-  id          String            @id @default(uuid())
+  id          String      @id @default(uuid())
   userId      String
   name        String
   description String?
-  privacy     CollectionPrivacy @default(ONLY_ME)
-  created_at  DateTime          @default(now())
-  updated_at  DateTime          @updatedAt
+  privacy     DataPrivacy @default(ONLY_ME)
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
 
   user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   items CollectionItem[]

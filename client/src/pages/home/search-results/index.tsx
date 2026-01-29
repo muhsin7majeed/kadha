@@ -1,15 +1,12 @@
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Separator } from '@chakra-ui/react';
 import { useState } from 'react';
 import SearchInput from '@/components/search-input';
-import useSearchMedia from './apis/use-search-media';
 import MediaTypeFilter from '@/components/media-type-filter';
-import MediaListPage from '@/components/media-list-page';
-import { LuSearch } from 'react-icons/lu';
+import UsersSearchResult from './users-search-result';
+import MediaSearchResults from './media-search-results';
 
 const SearchResults = () => {
   const [searchQuery, setSearchQUery] = useState('');
-
-  const { data: results, isLoading, isFetching, error, refetch } = useSearchMedia(searchQuery);
 
   return (
     <Box>
@@ -22,27 +19,23 @@ const SearchResults = () => {
       >
         <MediaTypeFilter />
 
-        <SearchInput onSearchChange={(query) => setSearchQUery(query)} w={['full', '80%', '50%']} />
+        <SearchInput
+          placeholder="Search for movies, tv shows and users"
+          onSearchChange={(query) => {
+            setSearchQUery(query);
+          }}
+          w={['full', '80%', '50%']}
+        />
       </Flex>
 
-      {Boolean(searchQuery) && (
-        <MediaListPage
-          title="Search Results"
-          description={`Found ${results?.length} results for "${searchQuery}"`}
-          data={results}
-          isLoading={isLoading}
-          isFetching={isFetching}
-          error={error}
-          refetch={refetch}
-          emptyState={{
-            title: 'No results found',
-            description: 'Try searching for a different movie or show.',
-            icon: <LuSearch />,
-          }}
-          errorDescription="Failed to fetch search results"
-          loadingText="Loading search results..."
-          spinnerColor="orange"
-        />
+      {searchQuery && (
+        <>
+          <UsersSearchResult searchQuery={searchQuery} />
+
+          <Separator my={8} />
+
+          <MediaSearchResults searchQuery={searchQuery} />
+        </>
       )}
     </Box>
   );

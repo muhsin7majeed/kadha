@@ -12,3 +12,8 @@ export enum DataPrivacy {
   Friends = 'FRIENDS',
   Everyone = 'EVERYONE',
 }
+
+export enum NotificationType {
+  FriendRequestReceived = 'FRIEND_REQUEST_RECEIVED',
+  FriendRequestAccepted = 'FRIEND_REQUEST_ACCEPTED',
+}

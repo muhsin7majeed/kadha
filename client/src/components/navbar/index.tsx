@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Avatar,
   Box,
   Button,
   CloseButton,
@@ -22,6 +21,7 @@ import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { removeAccessToken } from '@/lib/token-manager';
 import useLogout from '@/pages/auth/apis/use-logout';
 import NavLink from '../nav-link';
+import SimpleAvatar from '../simple-avatar';
 
 const GITHUB_URL = 'https://github.com/muhsin7majeed/what-to-watch-web';
 
@@ -86,10 +86,7 @@ const Navbar = () => {
                 <Menu.Root>
                   <Menu.Trigger asChild>
                     <Button variant="ghost" unstyled>
-                      <Avatar.Root>
-                        <Avatar.Fallback name={auth.user?.username || 'User'} />
-                        <Avatar.Image />
-                      </Avatar.Root>
+                      <SimpleAvatar fallbackName={auth.user?.username} />
                     </Button>
                   </Menu.Trigger>
 
