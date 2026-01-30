@@ -105,3 +105,79 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
 export const blockUser = async (req: Request, res: Response) => {};
 
 export const unblockUser = async (req: Request, res: Response) => {};
+
+type FriendshipType = 'friends' | 'sent' | 'received' | 'blocked';
+
+// Helper to transform friendship to user data
+const transformFriendshipToUser = (
+  friendship: {
+    senderId: string;
+    sender: { id: string; username: string };
+    receiver: { id: string; username: string };
+  },
+  currentUserId: string,
+) => {
+  const friend = friendship.senderId === currentUserId ? friendship.receiver : friendship.sender;
+  return {
+    id: friend.id,
+    username: friend.username,
+  };
+};
+
+export const getFriendships = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const type = (req.query.type as FriendshipType) || 'friends';
+
+  let whereClause: object;
+
+  switch (type) {
+    case 'friends':
+      // Accepted friendships where user is either sender or receiver
+      whereClause = {
+        OR: [{ senderId: currentUserId }, { receiverId: currentUserId }],
+        status: 'ACCEPTED',
+      };
+      break;
+    case 'sent':
+      // Pending requests sent by current user
+      whereClause = {
+        senderId: currentUserId,
+        status: 'PENDING',
+      };
+      break;
+    case 'received':
+      // Pending requests received by current user
+      whereClause = {
+        receiverId: currentUserId,
+        status: 'PENDING',
+      };
+      break;
+    case 'blocked':
+      // Users blocked by current user
+      whereClause = {
+        senderId: currentUserId,
+        status: 'BLOCKED',
+      };
+      break;
+    default:
+      return res.status(400).json({ message: 'Invalid friendship type' });
+  }
+
+  const friendships = await prisma.friendship.findMany({
+    where: whereClause,
+    include: {
+      sender: true,
+      receiver: true,
+    },
+  });
+
+  const users = friendships.map((friendship) => transformFriendshipToUser(friendship, currentUserId));
+
+  res.json({ data: users });
+};
+
+// Keep getFriends as an alias for backwards compatibility
+export const getFriends = async (req: Request, res: Response) => {
+  req.query.type = 'friends';
+  return getFriendships(req, res);
+};

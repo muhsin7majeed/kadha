@@ -3,10 +3,11 @@ import useNotifications from './apis/use-notifications';
 import EmptyState from '@/components/info-states/empty-state';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
-import { Box, Button, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 import { NotificationType } from '@/types/common';
 import SimpleAvatar from '@/components/simple-avatar';
 import { formatTimeAgo } from '@/lib/date-fns';
+import FriendshipActions from '../user/friendship/friendship-actions';
 
 const Notifications = () => {
   const { data, isLoading, isError, isFetching, refetch } = useNotifications();
@@ -27,33 +28,39 @@ const Notifications = () => {
         <>
           {data?.map((notification) => (
             <Box key={notification.id}>
-              {notification.type === NotificationType.FriendRequestReceived ? (
-                <Flex
-                  justifyContent="space-between"
-                  alignItems="center"
-                  gap={4}
-                  border="1px solid"
-                  borderColor="border.emphasized"
-                  borderRadius="lg"
-                  p={4}
-                  my={2}
-                >
-                  <SimpleAvatar fallbackName={notification.actor?.username} />
-                  <Box me="auto">
-                    <Text fontSize="sm" color="GrayText" mb={1}>
-                      {formatTimeAgo(notification.createdAt)}
-                    </Text>
-                    <Text>{notification.actor?.username} sent you a friend request</Text>
-                  </Box>
+              <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                gap={4}
+                border="1px solid"
+                borderColor="border.emphasized"
+                borderRadius="lg"
+                p={4}
+                my={2}
+              >
+                <SimpleAvatar fallbackName={notification.actor?.username} />
+                <Box me="auto">
+                  <Text fontSize="sm" color="GrayText" mb={1}>
+                    {formatTimeAgo(notification.createdAt)}
+                  </Text>
 
-                  <Button size="sm" colorPalette="green" variant="subtle">
-                    Accept
-                  </Button>
-                  <Button size="sm" colorPalette="red" variant="subtle">
-                    Reject
-                  </Button>
-                </Flex>
-              ) : null}
+                  <Text>
+                    {notification.type === NotificationType.FriendRequestReceived
+                      ? `${notification.actor?.username} sent you a friend request`
+                      : `${notification.actor?.username} accepted your friend request`}
+                  </Text>
+                </Box>
+
+                {notification.actor && (
+                  <FriendshipActions
+                    user={{
+                      id: notification.actor.id,
+                      friendshipStatus: notification.actor.friendshipStatus!,
+                      isRequestSender: notification.actor.isRequestSender!,
+                    }}
+                  />
+                )}
+              </Flex>
             </Box>
           ))}
         </>

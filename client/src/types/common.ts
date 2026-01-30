@@ -1,4 +1,5 @@
 import MEDIA from '@/constants/media';
+import { UserActor } from './user';
 
 export interface GenericLabelValue<T = string> {
   label: string;
@@ -51,8 +52,5 @@ export interface Notification {
   actorId: string;
   referenceId: string | null;
   createdAt: string;
-  actor?: {
-    id: string;
-    username: string;
-  };
+  actor?: UserActor;
 }

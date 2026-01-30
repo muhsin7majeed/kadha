@@ -18,6 +18,7 @@ import { useSetAuthAtom } from './atoms/auth-atom';
 import Collections from './pages/collections';
 import UserProfile from './pages/user/profile';
 import Notifications from './pages/notifications';
+import Friends from './pages/user/friendship/friends';
 
 function App() {
   const setAuth = useSetAuthAtom();
@@ -62,6 +63,7 @@ function App() {
 
             <Route path="profile" element={<UserProfile />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="friends/:tab?" element={<Friends />} />
           </Route>
         </Route>
 
