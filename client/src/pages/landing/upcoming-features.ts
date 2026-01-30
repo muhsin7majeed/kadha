@@ -1,4 +1,4 @@
-import { LuShield, LuBrain, LuDownload, LuChartBar } from 'react-icons/lu';
+import { LuShield, LuBrain, LuDownload, LuChartBar, LuUsers } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
   {
@@ -27,6 +27,12 @@ const UPCOMING_FEATURES = [
     title: 'Watch Statistics',
     description: 'See your viewing habits. How many hours of your life went to TV? Find out (if you dare).',
     badge: 'Insights',
+  },
+  {
+    icon: LuUsers,
+    title: 'View Friends Activity',
+    description: 'See what your friends are watching, share collections with them.',
+    badge: 'Social',
   },
 ];
 

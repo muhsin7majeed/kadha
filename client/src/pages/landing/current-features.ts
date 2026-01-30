@@ -51,7 +51,7 @@ const CURRENT_FEATURES = [
   {
     icon: LuUsers,
     title: 'Friends System',
-    description: "Connect with friends and see what they're watching. Share recommendations the old-fashioned way.",
+    description: 'Connect with friends.',
     badge: 'Social',
   },
   {

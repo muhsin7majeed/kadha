@@ -67,9 +67,6 @@ const Landing = () => {
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="green">Available Now</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>What you can do today</Heading>
-            <Text fontSize="lg" color="fg.muted" maxW="2xl">
-              No waitlist, no "coming soon" for basic features. This stuff works right now.
-            </Text>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
@@ -98,9 +95,6 @@ const Landing = () => {
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="orange">Coming Soon</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>What we're building</Heading>
-            <Text fontSize="lg" color="fg.muted" maxW="2xl">
-              We're not just another tracker. Here's what's cooking.
-            </Text>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
