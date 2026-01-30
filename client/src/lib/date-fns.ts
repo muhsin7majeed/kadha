@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 export const formatDate = (date: string | undefined, format: string = 'DD MMMM YYYY') => {
   if (!date) return 'N/A';
@@ -17,4 +20,8 @@ export const minutesToHours = (minutes: number) => {
   const mins = minutes % 60;
 
   return `${hours}h ${mins}m`;
+};
+
+export const formatTimeAgo = (date: string) => {
+  return dayjs(date).fromNow();
 };

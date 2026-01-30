@@ -11,6 +11,7 @@ import { authMiddleware } from './middlewares/auth';
 import userMediaRoutes from './routes/user-media';
 import cookieParser from 'cookie-parser';
 import collectionRoutes from './routes/collection';
+import friendshipRoutes from './routes/friendship';
 
 const app: Express = express();
 
@@ -32,6 +33,7 @@ app.use('/api/user', authMiddleware, userRoutes);
 app.use('/api/media', authMiddleware, mediaRoutes);
 app.use('/api/user-media', authMiddleware, userMediaRoutes);
 app.use('/api/collection', authMiddleware, collectionRoutes);
+app.use('/api/friendship', authMiddleware, friendshipRoutes);
 
 // Basic route
 app.get('/', (req: Request, res: Response) => {

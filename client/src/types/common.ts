@@ -30,3 +30,29 @@ export enum DataPrivacy {
   Friends = 'FRIENDS',
   OnlyMe = 'ONLY_ME',
 }
+
+export enum FriendStatus {
+  Pending = 'PENDING',
+  Accepted = 'ACCEPTED',
+  Rejected = 'REJECTED',
+  Blocked = 'BLOCKED',
+}
+
+export enum NotificationType {
+  FriendRequestReceived = 'FRIEND_REQUEST_RECEIVED',
+  FriendRequestAccepted = 'FRIEND_REQUEST_ACCEPTED',
+}
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  read: boolean;
+  actorId: string;
+  referenceId: string | null;
+  createdAt: string;
+  actor?: {
+    id: string;
+    username: string;
+  };
+}

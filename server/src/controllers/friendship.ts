@@ -6,7 +6,7 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
   const { receiverId } = req.body;
 
   if (senderId === receiverId) {
-    return res.status(400).json({ error: 'Cannot send friend request to yourself' });
+    return res.status(400).json({ message: 'Cannot send friend request to yourself' });
   }
 
   const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
@@ -25,19 +25,82 @@ export const sendFriendRequest = async (req: Request, res: Response) => {
   });
 
   if (existing) {
-    return res.status(400).json({ error: 'Friendship already exists', status: existing.status });
+    return res.status(400).json({
+      message: 'You are already friends or have already sent a friend request to this user',
+      status: existing.status,
+    });
   }
 
   const friendship = await prisma.friendship.create({
     data: { senderId, receiverId, status: 'PENDING' },
   });
 
+  await prisma.notification.create({
+    data: {
+      userId: receiverId,
+      type: 'FRIEND_REQUEST_RECEIVED',
+      actorId: senderId,
+    },
+  });
+
   return res.status(201).json(friendship);
 };
 
-export const acceptFriendRequest = async (req: Request, res: Response) => {};
+export const acceptFriendRequest = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const { senderId } = req.body;
 
-export const rejectFriendRequest = async (req: Request, res: Response) => {};
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      senderId,
+      receiverId: currentUserId,
+      status: 'PENDING',
+    },
+  });
+
+  if (!friendship) {
+    return res.status(404).json({ message: 'Friend request not found' });
+  }
+
+  const updatedFriendship = await prisma.friendship.update({
+    where: { id: friendship.id },
+    data: { status: 'ACCEPTED' },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: senderId,
+      type: 'FRIEND_REQUEST_ACCEPTED',
+      actorId: currentUserId,
+    },
+  });
+
+  return res.json(updatedFriendship);
+};
+
+export const rejectFriendRequest = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const { senderId } = req.body;
+
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      senderId,
+      receiverId: currentUserId,
+      status: 'PENDING',
+    },
+  });
+
+  if (!friendship) {
+    return res.status(404).json({ message: 'Friend request not found' });
+  }
+
+  const updatedFriendship = await prisma.friendship.update({
+    where: { id: friendship.id },
+    data: { status: 'REJECTED' },
+  });
+
+  return res.json(updatedFriendship);
+};
 
 export const blockUser = async (req: Request, res: Response) => {};
 

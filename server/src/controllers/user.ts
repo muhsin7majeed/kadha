@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@/lib/prisma';
 import { DataPrivacy } from '@/types/common';
+import { enrichUsersWithFriendship } from '@/lib/friendship-utils';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;
@@ -47,6 +48,7 @@ export const updateMe = async (req: Request, res: Response) => {
 
 export const searchUsers = async (req: Request, res: Response) => {
   const { query } = req.query;
+  const { id: currentUserId } = req.user;
 
   const users = await prisma.user.findMany({
     where: {
@@ -56,11 +58,32 @@ export const searchUsers = async (req: Request, res: Response) => {
       profilePrivacy: {
         in: [DataPrivacy.Friends, DataPrivacy.Everyone],
       },
+      // Exclude current user from search results
+      id: {
+        not: currentUserId,
+      },
+      // Exclude users who blocked the current user
+      NOT: {
+        sentFriendRequests: {
+          some: {
+            receiverId: currentUserId,
+            status: 'BLOCKED',
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+      profilePrivacy: true,
     },
   });
 
+  // Enrich users with friendship status using the shared helper
+  const usersWithStatus = await enrichUsersWithFriendship(currentUserId, users);
+
   res.json({
-    data: users,
+    data: usersWithStatus,
   });
 };
 

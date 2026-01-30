@@ -12,11 +12,12 @@ import Watchlist from './pages/watchlist';
 import Liked from './pages/liked';
 import Watched from './pages/watched';
 import PrivateRoute from './components/private-route';
-import { useGetMe } from './pages/profile/apis/use-get-me';
+import { useGetMe } from './pages/user/profile/apis/use-get-me';
 import { useEffect } from 'react';
 import { useSetAuthAtom } from './atoms/auth-atom';
 import Collections from './pages/collections';
-import UserProfile from './pages/profile';
+import UserProfile from './pages/user/profile';
+import Notifications from './pages/notifications';
 
 function App() {
   const setAuth = useSetAuthAtom();
@@ -60,6 +61,7 @@ function App() {
             <Route path="collections" element={<Collections />} />
 
             <Route path="profile" element={<UserProfile />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
         </Route>
 

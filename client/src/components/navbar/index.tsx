@@ -14,7 +14,7 @@ import {
   Menu,
   Portal,
 } from '@chakra-ui/react';
-import { LuGithub, LuMoon, LuSun, LuTv } from 'react-icons/lu';
+import { LuBell, LuGithub, LuMoon, LuSun, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { useColorMode } from '@/components/ui/color-mode';
 import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
@@ -83,32 +83,40 @@ const Navbar = () => {
               </ChakraLink>
 
               {isAuthenticated ? (
-                <Menu.Root>
-                  <Menu.Trigger asChild>
-                    <Button variant="ghost" unstyled>
-                      <SimpleAvatar fallbackName={auth.user?.username} />
-                    </Button>
-                  </Menu.Trigger>
+                <Flex gap={4}>
+                  <NavLink to="/app/notifications">
+                    <IconButton variant="ghost" size="sm">
+                      <LuBell />
+                    </IconButton>
+                  </NavLink>
 
-                  <Portal>
-                    <Menu.Positioner>
-                      <Menu.Content>
-                        <Menu.Item value="profile" asChild>
-                          <NavLink to="/app/profile">{auth.user?.username}</NavLink>
-                        </Menu.Item>
+                  <Menu.Root>
+                    <Menu.Trigger asChild>
+                      <Button variant="ghost" unstyled>
+                        <SimpleAvatar fallbackName={auth.user?.username} />
+                      </Button>
+                    </Menu.Trigger>
 
-                        <Menu.Item
-                          value="logout"
-                          onClick={handleLogout}
-                          color="fg.error"
-                          _hover={{ bg: 'bg.error', color: 'fg.error' }}
-                        >
-                          Logout
-                        </Menu.Item>
-                      </Menu.Content>
-                    </Menu.Positioner>
-                  </Portal>
-                </Menu.Root>
+                    <Portal>
+                      <Menu.Positioner>
+                        <Menu.Content>
+                          <Menu.Item value="profile" asChild>
+                            <NavLink to="/app/profile">{auth.user?.username}</NavLink>
+                          </Menu.Item>
+
+                          <Menu.Item
+                            value="logout"
+                            onClick={handleLogout}
+                            color="fg.error"
+                            _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                          >
+                            Logout
+                          </Menu.Item>
+                        </Menu.Content>
+                      </Menu.Positioner>
+                    </Portal>
+                  </Menu.Root>
+                </Flex>
               ) : (
                 <>
                   <Button variant="ghost" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
