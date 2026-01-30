@@ -37,6 +37,7 @@ const Notifications = () => {
                 borderRadius="lg"
                 p={4}
                 my={2}
+                flexWrap={'wrap'}
               >
                 <SimpleAvatar fallbackName={notification.actor?.username} />
                 <Box me="auto">
@@ -52,13 +53,15 @@ const Notifications = () => {
                 </Box>
 
                 {notification.actor && (
-                  <FriendshipActions
-                    user={{
-                      id: notification.actor.id,
-                      friendshipStatus: notification.actor.friendshipStatus!,
-                      isRequestSender: notification.actor.isRequestSender!,
-                    }}
-                  />
+                  <Box ms="auto">
+                    <FriendshipActions
+                      user={{
+                        id: notification.actor.id,
+                        friendshipStatus: notification.actor.friendshipStatus!,
+                        isRequestSender: notification.actor.isRequestSender!,
+                      }}
+                    />
+                  </Box>
                 )}
               </Flex>
             </Box>

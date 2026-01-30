@@ -1,4 +1,14 @@
-import { LuHeart, LuBookmark, LuCheck, LuClapperboard, LuFilter, LuSparkles, LuServer } from 'react-icons/lu';
+import {
+  LuHeart,
+  LuBookmark,
+  LuCheck,
+  LuClapperboard,
+  LuFilter,
+  LuSparkles,
+  LuServer,
+  LuUsers,
+  LuLock,
+} from 'react-icons/lu';
 
 const CURRENT_FEATURES = [
   {
@@ -37,6 +47,18 @@ const CURRENT_FEATURES = [
     title: 'Self-Hosting',
     description: "Don't trust us? Host it yourself. Docker makes it easy. Your data, your server, your rules.",
     badge: 'Core',
+  },
+  {
+    icon: LuUsers,
+    title: 'Friends System',
+    description: "Connect with friends and see what they're watching. Share recommendations the old-fashioned way.",
+    badge: 'Social',
+  },
+  {
+    icon: LuLock,
+    title: 'Profile Privacy',
+    description: 'Go full ghost mode with a private profile, or let the world see your taste.',
+    badge: 'Privacy',
   },
 ];
 

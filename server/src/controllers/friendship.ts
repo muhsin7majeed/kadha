@@ -102,9 +102,59 @@ export const rejectFriendRequest = async (req: Request, res: Response) => {
   return res.json(updatedFriendship);
 };
 
+export const unfriend = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const { userId } = req.body;
+
+  if (currentUserId === userId) {
+    return res.status(400).json({ message: 'Invalid operation' });
+  }
+
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      OR: [
+        { senderId: currentUserId, receiverId: userId },
+        { senderId: userId, receiverId: currentUserId },
+      ],
+      status: 'ACCEPTED',
+    },
+  });
+
+  if (!friendship) {
+    return res.status(404).json({ message: 'Friendship not found' });
+  }
+
+  await prisma.friendship.delete({
+    where: { id: friendship.id },
+  });
+
+  return res.json({ message: 'Friend removed successfully' });
+};
+
 export const blockUser = async (req: Request, res: Response) => {};
 
-export const unblockUser = async (req: Request, res: Response) => {};
+export const unblockUser = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const { userId } = req.body;
+
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      senderId: currentUserId,
+      receiverId: userId,
+      status: 'BLOCKED',
+    },
+  });
+
+  if (!friendship) {
+    return res.status(404).json({ message: 'Blocked user not found' });
+  }
+
+  await prisma.friendship.delete({
+    where: { id: friendship.id },
+  });
+
+  return res.json({ message: 'User unblocked successfully' });
+};
 
 type FriendshipType = 'friends' | 'sent' | 'received' | 'blocked';
 
@@ -174,10 +224,4 @@ export const getFriendships = async (req: Request, res: Response) => {
   const users = friendships.map((friendship) => transformFriendshipToUser(friendship, currentUserId));
 
   res.json({ data: users });
-};
-
-// Keep getFriends as an alias for backwards compatibility
-export const getFriends = async (req: Request, res: Response) => {
-  req.query.type = 'friends';
-  return getFriendships(req, res);
 };

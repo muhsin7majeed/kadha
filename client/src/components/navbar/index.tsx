@@ -21,7 +21,7 @@ const Navbar = () => {
         <Container maxW="6xl" py={4}>
           <Flex justify="space-between" align="center">
             <HStack gap={2} asChild>
-              <Link to={isAuthenticated ? '/home' : '/'}>
+              <Link to={isAuthenticated ? '/app' : '/'}>
                 <Icon fontSize="2xl" color="orange">
                   <LuTv />
                 </Icon>

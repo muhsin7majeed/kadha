@@ -19,6 +19,7 @@ import Collections from './pages/collections';
 import UserProfile from './pages/user/profile';
 import Notifications from './pages/notifications';
 import Friends from './pages/user/friendship/friends';
+import FriendshipList from './pages/user/friendship/friends/friendship-list';
 
 function App() {
   const setAuth = useSetAuthAtom();
@@ -63,7 +64,49 @@ function App() {
 
             <Route path="profile" element={<UserProfile />} />
             <Route path="notifications" element={<Notifications />} />
-            <Route path="friends/:tab?" element={<Friends />} />
+            <Route path="friends" element={<Friends />}>
+              <Route index element={<Navigate to="friends" replace />} />
+              <Route
+                path="friends"
+                element={
+                  <FriendshipList
+                    type="friends"
+                    emptyTitle="No friends yet"
+                    emptyDescription="Your friends will appear here"
+                  />
+                }
+              />
+              <Route
+                path="sent"
+                element={
+                  <FriendshipList
+                    type="sent"
+                    emptyTitle="No sent requests"
+                    emptyDescription="Friend requests you've sent will appear here"
+                  />
+                }
+              />
+              <Route
+                path="received"
+                element={
+                  <FriendshipList
+                    type="received"
+                    emptyTitle="No pending requests"
+                    emptyDescription="Friend requests you've received will appear here"
+                  />
+                }
+              />
+              <Route
+                path="blocked"
+                element={
+                  <FriendshipList
+                    type="blocked"
+                    emptyTitle="No blocked users"
+                    emptyDescription="Users you've blocked will appear here"
+                  />
+                }
+              />
+            </Route>
           </Route>
         </Route>
 
