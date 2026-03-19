@@ -15,4 +15,8 @@ router.get('/watched', authMiddleware, getUserWatched);
 router.get('/search', authMiddleware, searchUsers);
 router.get('/notifications', authMiddleware, getNotifications);
 
+router.get('/:username/watchlist', authMiddleware, getUserWatchlist);
+router.get('/:username/liked', authMiddleware, getUserLiked);
+router.get('/:username/watched', authMiddleware, getUserWatched);
+
 export default router;

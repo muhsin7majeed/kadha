@@ -1,10 +1,12 @@
 import PageHeader from '@/components/page-header';
-import SimpleTabs, { FriendshipTabItem, FriendshipTabValue } from '@/components/simple-tabs';
+import SimpleTabs, { TabItem } from '@/components/simple-tabs';
 import { LuUsers, LuSend, LuInbox, LuBan } from 'react-icons/lu';
 import { useNavigate, useLocation, Outlet } from 'react-router';
 import { Box } from '@chakra-ui/react';
 
-const tabs: FriendshipTabItem[] = [
+export type FriendshipTabValue = 'friends' | 'sent' | 'received' | 'blocked';
+
+const tabs: TabItem[] = [
   {
     value: 'friends',
     label: 'Friends',

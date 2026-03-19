@@ -8,14 +8,27 @@ import useUpdateMe from './apis/use-update-me';
 import SimpleRadioGroup from '@/components/simple-radio-group';
 import { DATA_PRIVACY_OPTIONS } from '@/constants/common';
 import { DataPrivacy } from '@/types/common';
+import { useParams } from 'react-router';
+import { useAuthAtom } from '@/atoms/auth-atom';
+import OtherUserData from './other-user-data';
+import capitalize from '@/utils/capitalize-string';
 
 interface ProfileInputs {
   username: string;
   profilePrivacy: DataPrivacy;
 }
 
+type URLParams = {
+  username?: string;
+};
+
 const UserProfile = () => {
-  const { data: me, isLoading, isFetching, error, refetch } = useGetMe();
+  const { username } = useParams<URLParams>();
+  const [auth] = useAuthAtom();
+
+  const isMyProfile = username ? username.toLocaleLowerCase() === auth.user?.username?.toLocaleLowerCase() : true;
+
+  const { data: me, isLoading, isFetching, error, refetch } = useGetMe({ enabled: isMyProfile });
   const { mutateAsync: updateMe, isPending: isUpdatingMe, error: updateMeError } = useUpdateMe();
 
   const {
@@ -47,53 +60,57 @@ const UserProfile = () => {
   return (
     <Box>
       <PageHeader isFetching={isFetching} mb="4">
-        My Profile
+        {isMyProfile ? 'My' : `${capitalize(username!)}'s`} Profile
       </PageHeader>
 
-      {isLoading ? (
-        <CommonSpinner />
-      ) : error ? (
-        <ErrorState title="Error" description="Error fetching user profile" onRetry={refetch} />
-      ) : (
-        <Box>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Fieldset.Root size="lg" maxW="md">
-              <Fieldset.Content>
-                <Field.Root invalid={!!errors.username || !!apiFieldErrors?.username}>
-                  <Field.Label>Username</Field.Label>
-                  <Input
-                    type="text"
-                    {...register('username', { required: 'Username is required' })}
-                    placeholder="Username"
-                  />
-                  <Field.ErrorText>{errors.username?.message || apiFieldErrors?.username}</Field.ErrorText>
-                </Field.Root>
-              </Fieldset.Content>
-            </Fieldset.Root>
+      <Box>
+        {isMyProfile ? (
+          isLoading ? (
+            <CommonSpinner />
+          ) : error ? (
+            <ErrorState title="Error" description="Error fetching user profile" onRetry={refetch} />
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Fieldset.Root size="lg" maxW="md">
+                <Fieldset.Content>
+                  <Field.Root invalid={!!errors.username || !!apiFieldErrors?.username}>
+                    <Field.Label>Username</Field.Label>
+                    <Input
+                      type="text"
+                      {...register('username', { required: 'Username is required' })}
+                      placeholder="Username"
+                    />
+                    <Field.ErrorText>{errors.username?.message || apiFieldErrors?.username}</Field.ErrorText>
+                  </Field.Root>
+                </Fieldset.Content>
+              </Fieldset.Root>
 
-            <Controller
-              control={control}
-              name="profilePrivacy"
-              render={({ field }) => {
-                return (
-                  <Fieldset.Root size="lg" maxW="md" my="4">
-                    <Fieldset.Content>
-                      <Field.Root>
-                        <Field.Label>Who can see your profile?</Field.Label>
-                        <SimpleRadioGroup options={DATA_PRIVACY_OPTIONS} {...field} />
-                      </Field.Root>
-                    </Fieldset.Content>
-                  </Fieldset.Root>
-                );
-              }}
-            />
+              <Controller
+                control={control}
+                name="profilePrivacy"
+                render={({ field }) => {
+                  return (
+                    <Fieldset.Root size="lg" maxW="md" my="4">
+                      <Fieldset.Content>
+                        <Field.Root>
+                          <Field.Label>Who can see your profile?</Field.Label>
+                          <SimpleRadioGroup options={DATA_PRIVACY_OPTIONS} {...field} />
+                        </Field.Root>
+                      </Fieldset.Content>
+                    </Fieldset.Root>
+                  );
+                }}
+              />
 
-            <Button type="submit" variant="surface" loading={isUpdatingMe} disabled={isUpdatingMe}>
-              Update Profile
-            </Button>
-          </form>
-        </Box>
-      )}
+              <Button type="submit" variant="surface" loading={isUpdatingMe} disabled={isUpdatingMe}>
+                Update Profile
+              </Button>
+            </form>
+          )
+        ) : (
+          <OtherUserData username={username!} />
+        )}
+      </Box>
     </Box>
   );
 };

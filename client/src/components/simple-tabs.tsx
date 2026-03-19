@@ -1,24 +1,24 @@
 import { Box, Tabs } from '@chakra-ui/react';
 import { ReactNode } from 'react';
+import NavLink from './nav-link';
 
-export type FriendshipTabValue = 'friends' | 'sent' | 'received' | 'blocked';
-
-export interface FriendshipTabItem {
-  value: FriendshipTabValue;
+export interface TabItem<T = string> {
+  value: T;
   label: string;
   icon?: ReactNode;
   content?: ReactNode;
 }
 
 interface SimpleTabsProps {
-  tabs: FriendshipTabItem[];
+  tabs: TabItem[];
   defaultValue?: string;
   value?: string;
   onValueChange?: (value: string) => void;
   children?: ReactNode;
+  triggerType?: 'link';
 }
 
-const SimpleTabs: React.FC<SimpleTabsProps> = ({ tabs, defaultValue, value, onValueChange, children }) => {
+const SimpleTabs: React.FC<SimpleTabsProps> = ({ tabs, defaultValue, value, onValueChange, children, triggerType }) => {
   const handleValueChange = (details: { value: string }) => {
     onValueChange?.(details.value);
   };
@@ -28,7 +28,12 @@ const SimpleTabs: React.FC<SimpleTabsProps> = ({ tabs, defaultValue, value, onVa
       <Box overflowX="auto">
         <Tabs.List minW="fit-content" whiteSpace="nowrap">
           {tabs.map((tab) => (
-            <Tabs.Trigger key={tab.value} value={tab.value}>
+            <Tabs.Trigger
+              key={tab.value}
+              value={tab.value}
+              as={triggerType === 'link' ? NavLink : undefined}
+              outline={triggerType === 'link' ? 'none' : undefined}
+            >
               {tab.icon}
               {tab.label}
             </Tabs.Trigger>
@@ -36,13 +41,12 @@ const SimpleTabs: React.FC<SimpleTabsProps> = ({ tabs, defaultValue, value, onVa
         </Tabs.List>
       </Box>
 
-      {children ?? (
+      {children ??
         tabs.map((tab) => (
           <Tabs.Content key={tab.value} value={tab.value}>
             {tab.content}
           </Tabs.Content>
-        ))
-      )}
+        ))}
     </Tabs.Root>
   );
 };

@@ -88,6 +88,7 @@ export const searchUsers = async (req: Request, res: Response) => {
 };
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
+  console.log(req.params);
   const { id } = req.user;
 
   const watchlist = await prisma.userMedia.findMany({

@@ -62,7 +62,18 @@ function App() {
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />
 
-            <Route path="profile" element={<UserProfile />} />
+            <Route path="profile">
+              <Route index element={<UserProfile />} />
+
+              <Route path=":username" element={<UserProfile />}>
+                <Route index element={<Navigate to="watched" replace />} />
+                <Route path="watched" element={<h1>Watched</h1>} />
+                <Route path="liked" element={<h1>Liked</h1>} />
+                <Route path="watchlist" element={<h1>Watchlist</h1>} />
+                <Route path="collections" element={<h1>Collections</h1>} />
+              </Route>
+            </Route>
+
             <Route path="notifications" element={<Notifications />} />
             <Route path="friends" element={<Friends />}>
               <Route index element={<Navigate to="friends" replace />} />

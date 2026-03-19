@@ -8,11 +8,16 @@ export const getMe = async (): Promise<User> => {
   return response.data as User;
 };
 
-export const useGetMe = () => {
+interface UseGetMeProps {
+  enabled?: boolean;
+}
+
+export const useGetMe = ({ enabled }: UseGetMeProps = {}) => {
   return useQuery({
     queryKey: ['me'],
     staleTime: Infinity,
     queryFn: () => getMe(),
+    enabled,
     retry: false,
   });
 };
