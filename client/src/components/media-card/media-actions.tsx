@@ -63,6 +63,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   return (
     <>
       <SimpleDialog
+        motionPreset="slide-in-top"
         open={showAddToCollectionDialog}
         onOpenChange={(e) => {
           setShowAddToCollectionDialog(e.open);
@@ -107,13 +108,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </IconButton>
 
-        <IconButton
-          variant="subtle"
-          borderRadius="full"
-          colorPalette="orange"
-          onClick={handleCollection}
-          loading={isAddingToWatchList}
-        >
+        <IconButton variant="subtle" borderRadius="full" colorPalette="orange" onClick={handleCollection}>
           <LuPlus />
         </IconButton>
       </VStack>

@@ -16,7 +16,7 @@ const Collections = () => {
   return (
     <>
       <Flex justifyContent="space-between" alignItems="center" mb="4">
-        <PageHeader isFetching={isFetching} mb="4">
+        <PageHeader isFetching={isFetching} mb="0">
           Collections
         </PageHeader>
 
@@ -31,7 +31,7 @@ const Collections = () => {
         <EmptyState title="No collections" description="No collections found" />
       ) : (
         <>
-          {/* 
+          {/*
               TODO: This seems to be re-rendering entire accoridans on each item open/close
               Need a better solution. Might have to resort to regular cards view.
               Each card item add-t-watch-list action is also re-rendering the entire accordian for some reason.

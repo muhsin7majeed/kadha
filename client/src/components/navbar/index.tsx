@@ -22,10 +22,12 @@ const Navbar = () => {
           <Flex justify="space-between" align="center">
             <HStack gap={2} asChild>
               <Link to={isAuthenticated ? '/app' : '/'}>
-                <Icon fontSize="2xl" color="orange">
+                <Icon fontSize={['sm', '2xl']} color="orange">
                   <LuTv />
                 </Icon>
-                <Heading size="lg">What to Watch</Heading>
+                <Heading size={['sm', 'lg']} textOverflow="ellipsis">
+                  What to Watch
+                </Heading>
               </Link>
             </HStack>
 

@@ -16,6 +16,10 @@ export interface BaseResponse<T> {
   data: T;
 }
 
+export interface BaseInfoResponse {
+  message: string;
+}
+
 export type MediaTypeFilter = (typeof MEDIA.MEDIA_TYPE_FILTER)[keyof typeof MEDIA.MEDIA_TYPE_FILTER];
 
 export type MediaType = 'movie' | 'tv';

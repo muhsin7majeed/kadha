@@ -29,7 +29,9 @@ const AddToCollection: React.FC<AddToCollectionProps> = ({ media, onClose }) => 
   return (
     <Box>
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
-        <PageHeader isFetching={isFetching}>Add to Collection</PageHeader>
+        <PageHeader isFetching={isFetching} mb="0">
+          Add to Collection
+        </PageHeader>
 
         <Group>
           <CreateCollectionButton

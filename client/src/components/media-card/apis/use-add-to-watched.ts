@@ -4,6 +4,8 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { toaster } from '@/components/ui/toaster';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
+import { BaseInfoResponse } from '@/types/common';
+import { capitalize } from '@/utils/capitalize';
 
 const addToWatched = async (payload: MovieWithMeta | TvWithMeta) => {
   const response = await api.post(`/api/user-media/watched`, payload);
@@ -11,12 +13,12 @@ const addToWatched = async (payload: MovieWithMeta | TvWithMeta) => {
 };
 
 const useAddToWatched = () => {
-  return useMutation<unknown, Error, MovieWithMeta | TvWithMeta>({
+  return useMutation<BaseInfoResponse, Error, MovieWithMeta | TvWithMeta>({
     mutationFn: (payload: MovieWithMeta | TvWithMeta) => addToWatched(payload),
     onError: useErrorHandler,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toaster.success({
-        title: 'Added to watched',
+        title: capitalize(data.message),
       });
     },
   });
