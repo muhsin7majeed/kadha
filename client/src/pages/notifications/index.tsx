@@ -5,9 +5,9 @@ import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { NotificationType } from '@/types/common';
-import SimpleAvatar from '@/components/simple-avatar';
 import { formatTimeAgo } from '@/lib/date-fns';
 import FriendshipActions from '../user/friendship/friendship-actions';
+import UserLink from '@/components/user-link';
 
 const Notifications = () => {
   const { data, isLoading, isError, isFetching, refetch } = useNotifications();
@@ -39,16 +39,17 @@ const Notifications = () => {
                 my={2}
                 flexWrap={'wrap'}
               >
-                <SimpleAvatar fallbackName={notification.actor?.username} />
                 <Box me="auto">
                   <Text fontSize="sm" color="GrayText" mb={1}>
                     {formatTimeAgo(notification.createdAt)}
                   </Text>
 
-                  <Text>
+                  {notification.actor?.username && <UserLink username={notification.actor?.username} />}
+
+                  <Text my="2">
                     {notification.type === NotificationType.FriendRequestReceived
-                      ? `${notification.actor?.username} sent you a friend request`
-                      : `${notification.actor?.username} accepted your friend request`}
+                      ? `Sent you a friend request`
+                      : `Accepted your friend request`}
                   </Text>
                 </Box>
 

@@ -39,7 +39,7 @@ The goal is simple: track, discover, and organize what you watch without giving 
 ### Organization
 
 - [x] Separate movies and TV shows
-- [ ] Custom collections (themed lists, mood lists, etc.)
+- [x] Custom collections (themed lists, mood lists, etc.)
 
 ---
 

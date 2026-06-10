@@ -30,7 +30,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Flex justify="space-between" align="center" mb={4}>
-          <PageHeader>{title}</PageHeader>
+          <PageHeader mb="0">{title}</PageHeader>
 
           <Flex gap={2} align="center">
             <Button

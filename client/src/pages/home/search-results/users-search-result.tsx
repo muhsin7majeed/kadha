@@ -1,12 +1,12 @@
 import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import CommonSpinner from '@/components/spinners/common-spinner';
-import { Box, Card, HStack, Text } from '@chakra-ui/react';
+import { Box, Card, HStack } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import { Flex } from '@chakra-ui/react';
 import useSearchUsers from './apis/use-search-users';
-import SimpleAvatar from '@/components/simple-avatar';
 import FriendshipActions from '@/pages/user/friendship/friendship-actions';
+import UserLink from '@/components/user-link';
 
 interface UsersSearchResultProps {
   searchQuery: string;
@@ -40,12 +40,8 @@ const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) =>
               <Card.Root key={user.id}>
                 <Card.Body>
                   <HStack gap="3">
-                    <SimpleAvatar fallbackName={user.username} />
-
                     <Flex justifyContent="space-between" alignItems="center" width="100%">
-                      <Text fontWeight="semibold" textStyle="sm">
-                        @{user.username}
-                      </Text>
+                      <UserLink username={user.username} />
 
                       <FriendshipActions
                         user={{

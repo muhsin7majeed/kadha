@@ -2,13 +2,13 @@ import CommonSpinner from '@/components/spinners/common-spinner';
 import useFriendships, { FriendshipType } from '../apis/use-friends';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
-import { Box, Button, Card, HStack, Text } from '@chakra-ui/react';
-import SimpleAvatar from '@/components/simple-avatar';
+import { Box, Button, Card, HStack } from '@chakra-ui/react';
 import useUnfriend from '../apis/use-unfriend';
 import useUnblock from '../apis/use-unblock';
 import { LuUserMinus, LuShieldOff, LuCheck, LuX } from 'react-icons/lu';
 import useAcceptFriendRequest from '../apis/use-accept-friend-request';
 import useRejectFriendRequest from '../apis/use-reject-friend-request';
+import UserLink from '@/components/user-link';
 
 interface FriendshipListProps {
   type: FriendshipType;
@@ -61,10 +61,7 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
       {users.map((user) => (
         <Card.Root key={user.id} p={4}>
           <Box display="flex" alignItems="center" justifyContent="space-between" gap={3}>
-            <Box display="flex" alignItems="center" gap={3}>
-              <SimpleAvatar fallbackName={user.username} />
-              <Text fontWeight="medium">{user.username}</Text>
-            </Box>
+            <UserLink username={user.username} />
 
             {type === 'received' && (
               <HStack gap="2">
