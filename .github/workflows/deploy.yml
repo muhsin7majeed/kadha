@@ -38,6 +38,8 @@ jobs:
       - name: Build client
         working-directory: client
         env:
+          VITE_APP_NAME: ${{ vars.VITE_APP_NAME || 'Kadha' }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL || 'https://kadha.org' }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build
 
@@ -133,7 +135,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "docker-compose.prod.yml"
-          target: "~/apps/what-to-watch/"
+          target: "~/apps/kadha/"
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -145,7 +147,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           envs: IMAGE
           script: |
-            cd ~/apps/what-to-watch
+            cd ~/apps/kadha
 
             # Pull latest image (package must be public, or use PAT for private)
             docker pull $IMAGE

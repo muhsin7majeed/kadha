@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { getAppVersion } from '../lib/app-info';
 
 dotenv.config();
 
@@ -27,6 +28,9 @@ export function validateEnvVars() {
 
 export const envConfig = {
   port: Number(process.env.PORT) || 5000,
+  appName: process.env.APP_NAME || 'Kadha',
+  appUrl: process.env.APP_URL || 'https://kadha.org',
+  version: getAppVersion(),
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || '',
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || '',
   tmdbApiKey: process.env.TMDB_API_KEY || '',

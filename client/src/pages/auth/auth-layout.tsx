@@ -1,5 +1,6 @@
 import { Box, Text } from '@chakra-ui/react';
 import { Outlet } from 'react-router';
+import { APP_CONFIG } from '@/config/app-config';
 
 const AuthLayout = () => {
   return (
@@ -15,7 +16,7 @@ const AuthLayout = () => {
       p={4}
     >
       <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-        What To Watch
+        {APP_CONFIG.appName}
       </Text>
 
       <Outlet />

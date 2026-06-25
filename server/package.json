@@ -1,7 +1,7 @@
 {
-  "name": "what-to-watch-server",
-  "version": "1.0.0",
-  "description": "A Node.js server for the What to Watch application",
+  "name": "kadha-server",
+  "version": "0.1.0",
+  "description": "A Node.js server for the Kadha application",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
