@@ -17,11 +17,10 @@ import {
 import { LuGithub, LuTv, LuGlobe } from 'react-icons/lu';
 import { Link } from 'react-router';
 import Navbar from '@/components/navbar';
+import { APP_CONFIG } from '@/config/app-config';
 import FAQ_ITEMS from './faq';
 import CURRENT_FEATURES from './current-features';
 import UPCOMING_FEATURES from './upcoming-features';
-
-const GITHUB_URL = 'https://github.com/muhsin7majeed/what-to-watch-web';
 
 const Landing = () => {
   return (
@@ -49,7 +48,7 @@ const Landing = () => {
               <Link to="/auth/register">Get Started - It's Free</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+              <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                 <LuGithub />
                 View on GitHub
               </a>
@@ -141,7 +140,7 @@ const Landing = () => {
                   your own instance. Modify it however you want. It's MIT licensed - go wild.
                 </Text>
                 <Button variant="outline" colorPalette="orange" asChild>
-                  <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                  <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                     <LuGithub />
                     Check out the repo
                   </a>
@@ -209,7 +208,7 @@ const Landing = () => {
               <Icon fontSize="xl" color="orange">
                 <LuTv />
               </Icon>
-              <Text fontWeight="semibold">What to Watch</Text>
+              <Text fontWeight="semibold">{APP_CONFIG.appName}</Text>
             </HStack>
 
             <Text color="fg.muted" fontSize="sm">
@@ -218,7 +217,7 @@ const Landing = () => {
 
             <HStack gap={4}>
               <ChakraLink asChild>
-                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                   <HStack gap={1} color="fg.muted" _hover={{ color: 'fg' }}>
                     <LuGithub />
                     <Text fontSize="sm">GitHub</Text>

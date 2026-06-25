@@ -1,6 +1,6 @@
-# What to Watch Server
+# Kadha Server
 
-A Node.js server for the What to Watch application.
+A Node.js server for the Kadha application.
 
 ## Prerequisites
 

@@ -1,4 +1,4 @@
-Todo list for What To Watch.
+Todo list for Kadha.
 
 
 DONE 1. Separate media types by Movie & TV for absolute control.

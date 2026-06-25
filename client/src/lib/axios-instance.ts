@@ -1,9 +1,10 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { getAccessToken, removeAccessToken, setAccessToken } from './token-manager';
 import refresh from '@/pages/auth/apis/use-refresh';
+import { APP_CONFIG } from '@/config/app-config';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: APP_CONFIG.apiUrl,
   withCredentials: true,
 });
 
