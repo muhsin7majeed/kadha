@@ -10,7 +10,7 @@ import collectionRoutes from './routes/collection';
 import friendshipRoutes from './routes/friendship';
 import mediaRoutes from './routes/media';
 import userRoutes from './routes/user';
-import userMediaRoutes from './routes/user-media';
+import userMediaRoutes from './features/user-media/user-media.routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { authMiddleware } from './middlewares/auth';
 

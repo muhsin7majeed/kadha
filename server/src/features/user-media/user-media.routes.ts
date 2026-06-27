@@ -1,7 +1,8 @@
-import { addToLiked, addToWatched, addToWatchlist } from '@/controllers/user-media';
 import { Router } from 'express';
+
 import { validate } from '@/middlewares/validate';
-import userMediaSchema from '@/schemas/userMediaSchema';
+import { addToLiked, addToWatched, addToWatchlist } from './user-media.controller';
+import { userMediaSchema } from './user-media.schema';
 
 const router = Router();
 
