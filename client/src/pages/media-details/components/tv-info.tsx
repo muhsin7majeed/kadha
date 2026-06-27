@@ -2,7 +2,7 @@ import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } fr
 import { LuCalendar, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
 import type { TvDetailsWithMeta } from '@/types/media';
 import InfoCard from './info-card';
-import { formatDate } from '@/lib/date-fns';
+import { formatDate } from '@/utils/date';
 
 interface TvInfoProps {
   data: TvDetailsWithMeta;
