@@ -3,8 +3,9 @@ import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { LocationState } from '@/types/common';
-import AuthForm, { RegisterInputs } from './auth-form';
-import useRegister from './apis/use-register';
+import AuthForm from './auth-form';
+import useRegister from '@/features/auth/api/use-register';
+import { RegisterInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
 import { useSetAuthAtom } from '@/atoms/auth-atom';
 

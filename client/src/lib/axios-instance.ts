@@ -1,6 +1,6 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
 import { getAccessToken, removeAccessToken, setAccessToken } from './token-manager';
-import refresh from '@/pages/auth/apis/use-refresh';
+import refresh from '@/features/auth/api/use-refresh';
 import { APP_CONFIG } from '@/config/app-config';
 
 const api = axios.create({
