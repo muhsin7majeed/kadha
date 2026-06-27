@@ -23,7 +23,7 @@ The goal is simple: track, discover, and organize what you watch without giving 
 - [x] Title, description, cast, metadata
 - [x] User actions (watchlist, liked, watched)
 - [ ] Platform availability (JustWatch integration)
-- [ ] Updated details page.
+- [x] Updated details page.
 
 ---
 
@@ -47,13 +47,13 @@ The goal is simple: track, discover, and organize what you watch without giving 
 
 ### Social
 
-- [ ] Friends system
+- [x] Friends system
 - [ ] View friends’ activity and recommendations
 - [ ] Share collections with public links
 
 ### Privacy
 
-- [ ] Per-list privacy (public / friends / private)
+- [x] Per-list privacy (public / friends / private)
 - [ ] Private profiles
 - [ ] Full ghost mode (no public footprint)
 
@@ -61,8 +61,8 @@ The goal is simple: track, discover, and organize what you watch without giving 
 
 ## Phase 4: Data Ownership & Hosting
 
-- [ ] Self-hosting support (Docker-first)
-- [ ] Environment-based configuration
+- [x] Self-hosting support (Docker-first)
+- [x] Environment-based configuration
 - [ ] Import data (JSON)
 - [ ] Export all user data
 - [ ] Zero vendor lock-in guarantee
