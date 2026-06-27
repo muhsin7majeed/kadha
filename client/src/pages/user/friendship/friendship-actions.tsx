@@ -1,6 +1,6 @@
-import useAcceptFriendRequest from './apis/use-accept-friend-request';
-import useSendFriendRequest from './apis/use-send-friend-request';
-import useRejectFriendRequest from './apis/use-reject-friend-request';
+import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-request';
+import useSendFriendRequest from '@/features/friendship/api/use-send-friend-request';
+import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
 import { FriendStatus } from '@/types/common';
 import { Button, HStack } from '@chakra-ui/react';
 import { LuCheck, LuClock, LuUserPlus, LuX } from 'react-icons/lu';

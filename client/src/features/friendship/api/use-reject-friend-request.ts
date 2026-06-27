@@ -1,7 +1,7 @@
-import { useMutation } from '@tanstack/react-query';
-import api from '@/lib/axios-instance';
 import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import api from '@/lib/axios-instance';
+import { useMutation } from '@tanstack/react-query';
 
 const rejectFriendRequest = async (senderId: string) => {
   const response = await api.post(`/api/friendship/reject-friend-request`, { senderId });
