@@ -1,5 +1,4 @@
 import MEDIA from '@/constants/media';
-import { UserActor } from './user';
 
 export interface GenericLabelValue<T = string> {
   label: string;
@@ -41,20 +40,4 @@ export enum FriendStatus {
   Accepted = 'ACCEPTED',
   Rejected = 'REJECTED',
   Blocked = 'BLOCKED',
-}
-
-export enum NotificationType {
-  FriendRequestReceived = 'FRIEND_REQUEST_RECEIVED',
-  FriendRequestAccepted = 'FRIEND_REQUEST_ACCEPTED',
-}
-
-export interface Notification {
-  id: string;
-  userId: string;
-  type: NotificationType;
-  read: boolean;
-  actorId: string;
-  referenceId: string | null;
-  createdAt: string;
-  actor?: UserActor;
 }

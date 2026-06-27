@@ -1,7 +1,8 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse, Notification } from '@/types/common';
+import { BaseResponse } from '@/types/common';
 import { useQuery } from '@tanstack/react-query';
+import { Notification } from '../notifications.types';
 
 const getNotifications = async () => {
   const response = await api.get<BaseResponse<Notification[]>>('/api/user/notifications');

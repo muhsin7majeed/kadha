@@ -11,11 +11,6 @@ export interface UserSearchResult extends UserActor {
   username: string;
 }
 
-export interface AuthState {
-  user: Omit<User, 'profilePrivacy'> | null;
-  status: 'pending' | 'authenticated' | 'unauthenticated';
-}
-
 /**
  * User actor is a user that is related to the current user.
  * It can be a friend, a request sender, a request receiver, or a blocked user.
