@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Collection } from '@/types/collections';
+import { Collection } from '@/features/collections/collections.types';
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
 import { IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuEllipsis } from 'react-icons/lu';

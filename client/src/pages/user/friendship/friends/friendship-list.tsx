@@ -27,22 +27,18 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
 
   const handleAcceptFriendRequest = async (userId: string) => {
     await acceptFriendRequest(userId);
-    refetch();
   };
 
   const handleRejectFriendRequest = async (userId: string) => {
     await rejectFriendRequest(userId);
-    refetch();
   };
 
   const handleUnfriend = async (userId: string) => {
     await unfriend(userId);
-    refetch();
   };
 
   const handleUnblock = async (userId: string) => {
     await unblock(userId);
-    refetch();
   };
 
   if (isLoading) {

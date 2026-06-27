@@ -26,8 +26,3 @@ export interface UserActor {
   friendshipStatus: FriendStatus;
   isRequestSender: boolean;
 }
-
-export interface Friend {
-  id: string;
-  username: string;
-}

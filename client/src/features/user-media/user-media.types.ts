@@ -1,4 +1,4 @@
-import { MediaMeta, MediaType } from './common';
+import { MediaMeta, MediaType } from '@/types/common';
 
 export interface UserMedia extends MediaMeta {
   /**

@@ -1,5 +1,5 @@
 import CollectionForm from './collection-form';
-import { Collection, CollectionFormFields } from '@/types/collections';
+import { Collection, CollectionFormFields } from '@/features/collections/collections.types';
 import useUpdateCollection from '@/features/collections/api/use-update-collection';
 
 interface UpdateCollectionProps {

@@ -1,5 +1,5 @@
 import PageHeader from '@/components/page-header';
-import { UserMedia } from '@/types/user-media';
+import { UserMedia } from '@/features/user-media/user-media.types';
 import { Box, CloseButton, Flex, Group, IconButton, VStack } from '@chakra-ui/react';
 import useCollections from '@/features/collections/api/use-collections';
 import CommonSpinner from '@/components/spinners/common-spinner';

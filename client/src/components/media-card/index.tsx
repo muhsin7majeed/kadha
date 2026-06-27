@@ -5,7 +5,7 @@ import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import { formatDate } from '@/utils/date';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
-import { UserMedia } from '@/types/user-media';
+import { UserMedia } from '@/features/user-media/user-media.types';
 import NavLink from '../nav-link';
 
 interface MediaCardProps {

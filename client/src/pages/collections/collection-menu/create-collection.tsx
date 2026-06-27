@@ -1,6 +1,6 @@
 import useCreateCollection from '@/features/collections/api/use-create-collection';
 import { DataPrivacy } from '@/types/common';
-import { CollectionFormFields } from '@/types/collections';
+import { CollectionFormFields } from '@/features/collections/collections.types';
 import CollectionForm from './collection-form';
 
 interface CreateCollectionProps {

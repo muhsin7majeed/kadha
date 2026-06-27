@@ -1,7 +1,7 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
-import { UserMedia } from '@/types/user-media';
+import { UserMedia } from '@/features/user-media/user-media.types';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchLiked = async () => {
