@@ -1,7 +1,7 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
-import { MovieWithMeta } from '@/types/media';
+import { MovieWithMeta } from '@/features/media/media.types';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchTrendingMovies = async () => {

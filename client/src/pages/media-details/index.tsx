@@ -2,7 +2,7 @@ import { Box, Container, Skeleton, VStack } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
-import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import useMediaDetails from '@/features/media/api/use-media-details';
 import { toaster } from '@/components/ui/toaster';
 import HeroSection from './components/hero-section';

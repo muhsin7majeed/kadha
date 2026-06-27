@@ -2,7 +2,7 @@ import { VStack } from '@chakra-ui/react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuPlus } from 'react-icons/lu';
 import { LuHeart } from 'react-icons/lu';
 import { IconButton } from '@chakra-ui/react';
-import { MovieWithMeta, TvWithMeta } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';

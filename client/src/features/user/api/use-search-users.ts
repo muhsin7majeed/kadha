@@ -1,7 +1,7 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
-import { UserSearchResult } from '@/types/user';
+import { UserSearchResult } from '@/features/user/user.types';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchSearchUsers = async (query: string) => {

@@ -144,7 +144,6 @@ export interface TvDetails extends Omit<Tv, 'genre_ids'> {
   still_path: string;
 }
 
-// Details types with user interaction metadata
 export type MovieDetailsWithMeta = MovieDetails & MediaMeta;
 export type TvDetailsWithMeta = TvDetails & MediaMeta;
 
@@ -153,6 +152,7 @@ interface MovieDBBaseResponse {
   total_pages: number;
   total_results: number;
 }
+
 export interface MovieDBMovieResponse extends MovieDBBaseResponse {
   results: Movie[];
 }

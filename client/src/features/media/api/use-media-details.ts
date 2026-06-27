@@ -1,7 +1,7 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse, MediaType } from '@/types/common';
-import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchMediaDetails = async (mediaType: MediaType, id: string) => {

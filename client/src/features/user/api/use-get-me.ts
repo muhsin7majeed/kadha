@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { User } from '@/types/user';
+import { User } from '@/features/user/user.types';
 
 export const getMe = async (): Promise<User> => {
   const response = await api.get('/api/user/me');

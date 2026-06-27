@@ -1,4 +1,4 @@
-import { Movie, Tv } from '@/types/media';
+import { Movie, Tv } from '@/features/media/media.types';
 
 const formatTMDBToUserMedia = (media: Movie | Tv) => {
   const title = 'title' in media ? media.title : media.name;

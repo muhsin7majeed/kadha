@@ -1,4 +1,4 @@
-import { DataPrivacy, FriendStatus } from './common';
+import { DataPrivacy, FriendStatus } from '@/types/common';
 
 export interface User {
   id: string;

@@ -4,7 +4,7 @@ import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './media-carousal-skeleton';
-import { MovieWithMeta, TvWithMeta } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import PageHeader from '../page-header';
 
 interface MediaCarousalProps {

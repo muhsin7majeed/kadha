@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Notification } from '../notifications.types';
 
 const getNotifications = async () => {
-  const response = await api.get<BaseResponse<Notification[]>>('/api/user/notifications');
+  const response = await api.get<BaseResponse<Notification[]>>('/api/notifications');
   return response.data?.data;
 };
 

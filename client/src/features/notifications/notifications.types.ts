@@ -1,4 +1,4 @@
-import { UserActor } from '@/types/user';
+import { UserActor } from '@/features/user/user.types';
 
 export enum NotificationType {
   FriendRequestReceived = 'FRIEND_REQUEST_RECEIVED',
