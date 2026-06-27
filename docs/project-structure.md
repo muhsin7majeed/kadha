@@ -30,7 +30,20 @@ server/src/features/media/
   media.types.ts
 ```
 
-### Phase 3: Client Feature Modules
+### Phase 3: Client App Boundaries
+
+- Keep client entry files focused on wiring providers and app-level behavior.
+- Keep route declarations in a dedicated app route module.
+- Keep route-level screens in `client/src/pages`.
+
+Target shape:
+
+```text
+client/src/app/
+  routes.tsx
+```
+
+### Phase 4: Client Feature Modules
 
 - Keep route-level screens in `client/src/pages`.
 - Move reusable feature logic into `client/src/features`.
@@ -46,7 +59,7 @@ client/src/features/user-media/
   types.ts
 ```
 
-### Phase 4: Shared Contracts
+### Phase 5: Shared Contracts
 
 - Introduce shared request and response contracts once API shapes stabilize.
 - Prefer shared Zod schemas or a small contracts package over manually duplicated client/server types.
@@ -60,7 +73,7 @@ packages/contracts/
   collections.ts
 ```
 
-### Phase 5: Automated Enforcement
+### Phase 6: Automated Enforcement
 
 - Add lint rules for import boundaries after feature modules exist.
 - Add CI checks for build, lint, and tests across client and server.
@@ -73,6 +86,7 @@ packages/contracts/
 - New server feature code belongs in `server/src/features/<feature-name>`.
 - New server business logic should live in feature services, not controllers.
 - New server controllers should stay focused on HTTP request and response handling.
+- New client route declarations belong in `client/src/app/routes.tsx`.
 - New client API hooks should prefer feature folders over generic component folders.
 - Shared UI-only components can remain in `client/src/components`.
 - Query keys should be centralized or colocated consistently by feature, not mixed inline.
