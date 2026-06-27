@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const userMediaSchema = z.object({
+export const userMediaSchema = z.object({
   id: z.coerce.string().optional(),
   media_id: z.number({ required_error: 'Media ID is required' }),
   media_type: z.enum(['movie', 'tv'], {
@@ -20,4 +20,4 @@ const userMediaSchema = z.object({
   release_date: z.string({ required_error: 'Release date is required' }),
 });
 
-export default userMediaSchema;
+export type UserMediaPayload = z.infer<typeof userMediaSchema>;
