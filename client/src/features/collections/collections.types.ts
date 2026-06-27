@@ -1,5 +1,5 @@
-import { DataPrivacy } from './common';
-import { UserMedia } from './user-media';
+import { UserMedia } from '@/features/user-media/user-media.types';
+import { DataPrivacy } from '@/types/common';
 
 export interface Collection {
   id: string;

@@ -49,9 +49,6 @@ const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) =>
                           friendshipStatus: user.friendshipStatus!,
                           isRequestSender: user.isRequestSender!,
                         }}
-                        onSuccess={() => {
-                          refetchUsers();
-                        }}
                       />
                     </Flex>
                   </HStack>

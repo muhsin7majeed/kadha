@@ -1,7 +1,7 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { AddToCollectionPayload } from '@/types/collections';
+import { AddToCollectionPayload } from '@/features/collections/collections.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const addToCollection = async (payload: AddToCollectionPayload) => {

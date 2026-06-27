@@ -13,10 +13,9 @@ interface FriendshipActionsUser {
 
 interface FriendshipActionsProps {
   user: FriendshipActionsUser;
-  onSuccess?: () => void;
 }
 
-const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user, onSuccess }) => {
+const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
   const { mutateAsync: sendFriendRequest, isPending: isSendingFriendRequest } = useSendFriendRequest();
   const { mutateAsync: acceptFriendRequest, isPending: isAcceptingFriendRequest } = useAcceptFriendRequest();
   const { mutateAsync: rejectFriendRequest, isPending: isRejectingFriendRequest } = useRejectFriendRequest();
@@ -25,24 +24,18 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user, onSuccess }
     if (isSendingFriendRequest) return;
 
     await sendFriendRequest(userId);
-
-    onSuccess?.();
   };
 
   const handleAcceptFriendRequest = async (senderId: string) => {
     if (isAcceptingFriendRequest) return;
 
     await acceptFriendRequest(senderId);
-
-    onSuccess?.();
   };
 
   const handleRejectFriendRequest = async (senderId: string) => {
     if (isRejectingFriendRequest) return;
 
     await rejectFriendRequest(senderId);
-
-    onSuccess?.();
   };
 
   const renderFriendshipActions = (user: FriendshipActionsUser) => {

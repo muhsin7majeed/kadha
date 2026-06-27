@@ -1,7 +1,7 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
-import { CollectionDetails } from '@/types/collections';
+import { CollectionDetails } from '@/features/collections/collections.types';
 import { useQuery } from '@tanstack/react-query';
 
 interface GetCollectionParams {

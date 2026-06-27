@@ -1,4 +1,4 @@
-import { Collection } from '@/types/collections';
+import { Collection } from '@/features/collections/collections.types';
 import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
 import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';

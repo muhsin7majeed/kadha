@@ -1,6 +1,6 @@
 import PageHeader from '@/components/page-header';
 import { Button, CloseButton, Field, Fieldset, Input, Textarea, useDialogContext } from '@chakra-ui/react';
-import { CollectionFormFields } from '@/types/collections';
+import { CollectionFormFields } from '@/features/collections/collections.types';
 import { Flex } from '@chakra-ui/react';
 import { Controller, useForm } from 'react-hook-form';
 import SimpleRadioGroup from '@/components/simple-radio-group';

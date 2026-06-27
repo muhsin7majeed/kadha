@@ -2,7 +2,7 @@ import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { CollectionFormFields } from '@/types/collections';
+import { CollectionFormFields } from '@/features/collections/collections.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const createCollection = async (payload: CollectionFormFields) => {
