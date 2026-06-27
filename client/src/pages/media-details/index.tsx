@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
-import useMediaDetails from './apis/use-media-details';
+import useMediaDetails from '@/features/media/api/use-media-details';
 import { toaster } from '@/components/ui/toaster';
 import HeroSection from './components/hero-section';
 import OverviewSection from './components/overview-section';

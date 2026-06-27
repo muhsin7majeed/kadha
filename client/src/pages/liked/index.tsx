@@ -1,5 +1,5 @@
 import { LuHeart } from 'react-icons/lu';
-import useLiked from './apis/use-liked';
+import useLiked from '@/features/user-media/api/use-liked';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
 

@@ -1,5 +1,5 @@
 import PageHeader from '@/components/page-header';
-import useNotifications from './apis/use-notifications';
+import useNotifications from '@/features/notifications/api/use-notifications';
 import EmptyState from '@/components/info-states/empty-state';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
