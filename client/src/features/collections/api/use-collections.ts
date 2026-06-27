@@ -1,4 +1,5 @@
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse, MediaType } from '@/types/common';
 import { Collection } from '@/types/collections';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +16,7 @@ const getCollections = async (params?: GetCollectionsParams) => {
 
 const useCollections = (params?: GetCollectionsParams) => {
   return useQuery({
-    queryKey: ['collections'],
+    queryKey: queryKeys.collectionsList(params),
     queryFn: () => getCollections(params),
   });
 };

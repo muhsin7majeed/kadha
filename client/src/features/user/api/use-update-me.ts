@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 
 interface UpdateMePayload {
   username: string;
@@ -27,7 +28,7 @@ const useUpdateMe = () => {
     mutationFn: (data: UpdateMePayload) => updateMe(data),
     onError: useErrorHandler,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.me });
 
       toaster.success({
         title: 'Username updated successfully',

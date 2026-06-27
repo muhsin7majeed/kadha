@@ -1,6 +1,7 @@
 import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { CollectionFormFields } from '@/types/collections';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -19,7 +20,7 @@ const useCreateCollection = () => {
         title: 'Collection created successfully',
       });
 
-      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
     },
   });
 };
