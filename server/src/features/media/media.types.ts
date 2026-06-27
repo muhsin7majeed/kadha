@@ -140,6 +140,7 @@ interface MovieDBBaseResponse {
   total_pages: number;
   total_results: number;
 }
+
 export interface MovieDBMovieResponse extends MovieDBBaseResponse {
   results: TMDBMovie[];
 }
@@ -151,3 +152,21 @@ export interface MovieDBTvResponse extends MovieDBBaseResponse {
 export interface MovieDBGenreResponse {
   genres: TMDBGenre[];
 }
+
+export interface MediaMeta {
+  liked?: boolean;
+  watched?: boolean;
+  watchlist?: boolean;
+}
+
+export type TMDBMovieWithMediaId = Omit<TMDBMovie, 'id'> & { media_id: number };
+export type TMDBTvWithMediaId = Omit<TMDBTv, 'id'> & { media_id: number };
+
+export type TMDBMovieWithMeta = TMDBMovieWithMediaId & MediaMeta;
+export type TMDBTvWithMeta = TMDBTvWithMediaId & MediaMeta;
+
+export type TMDBMovieDetailsWithMediaId = Omit<TMDBMovieDetails, 'id'> & { media_id: number };
+export type TMDBTvDetailsWithMediaId = Omit<TMDBTvDetails, 'id'> & { media_id: number };
+
+export type TMDBMovieDetailsWithMeta = TMDBMovieDetailsWithMediaId & MediaMeta;
+export type TMDBTvDetailsWithMeta = TMDBTvDetailsWithMediaId & MediaMeta;

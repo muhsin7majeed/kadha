@@ -8,7 +8,7 @@ import { envConfig } from './config/env';
 import authRoutes from './routes/auth';
 import collectionRoutes from './routes/collection';
 import friendshipRoutes from './routes/friendship';
-import mediaRoutes from './routes/media';
+import mediaRoutes from './features/media/media.routes';
 import userRoutes from './routes/user';
 import userMediaRoutes from './features/user-media/user-media.routes';
 import { errorHandler } from './middlewares/errorHandler';

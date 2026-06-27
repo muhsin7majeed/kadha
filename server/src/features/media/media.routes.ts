@@ -1,15 +1,16 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+
 import {
   getGenre,
+  getMediaDetails,
   getPopularMovies,
   getPopularTvs,
   getTopRatedMovies,
   getTopRatedTvs,
   getTrendingMovies,
   getTrendingTvs,
-  getMediaDetails,
   searchMedia,
-} from '@/controllers/media';
+} from './media.controller';
 
 const router = Router();
 
