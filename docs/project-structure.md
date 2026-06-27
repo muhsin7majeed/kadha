@@ -88,14 +88,37 @@ packages/contracts/
 - New server controllers should stay focused on HTTP request and response handling.
 - New client route declarations belong in `client/src/app/routes.tsx`.
 - New client API hooks should prefer feature folders over generic component folders.
+- New client API hooks belong in `client/src/features/<feature-name>/api`, not `client/src/pages/**/apis`.
 - Shared UI-only components can remain in `client/src/components`.
 - Query keys should be centralized or colocated consistently by feature, not mixed inline.
 
 ## Enforcement Plan
 
-Start with documentation and review discipline, then add automation once the folder boundaries are stable:
+Start with documentation and review discipline, then add automation once the folder boundaries are stable.
 
-1. Add root workspace scripts for `build`, `lint`, `format`, and eventually `test`.
-2. Add CI jobs that run those scripts for every pull request.
-3. Add import-boundary lint rules after `client/src/features` and `server/src/features` are established.
-4. Add tests around the service layer before major controller refactors.
+Root scripts are provided as a convenience command layer only. They do not use npm workspaces, and they do not replace the existing `client/package-lock.json` or `server/package-lock.json` install model used by Docker and GitHub Actions.
+
+Available root commands:
+
+```bash
+npm run check:structure
+npm run client:build
+npm run server:build
+npm run build
+npm run check
+```
+
+`npm run check:structure` blocks these legacy locations:
+
+```text
+client/src/pages/**/apis/*
+server/src/controllers/*
+server/src/routes/*
+server/src/schemas/*
+```
+
+Next enforcement steps:
+
+1. Add CI jobs that run root `npm run check` once both client and server builds are expected for every pull request.
+2. Add import-boundary lint rules after lint is clean enough to be a reliable gate.
+3. Add tests around the service layer before major behavioral refactors.
