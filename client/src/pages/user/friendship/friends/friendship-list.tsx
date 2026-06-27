@@ -1,14 +1,15 @@
 import CommonSpinner from '@/components/spinners/common-spinner';
-import useFriendships, { FriendshipType } from '../apis/use-friends';
+import useFriendships from '@/features/friendship/api/use-friends';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
 import { Box, Button, Card, HStack } from '@chakra-ui/react';
-import useUnfriend from '../apis/use-unfriend';
-import useUnblock from '../apis/use-unblock';
+import useUnfriend from '@/features/friendship/api/use-unfriend';
+import useUnblock from '@/features/friendship/api/use-unblock';
 import { LuUserMinus, LuShieldOff, LuCheck, LuX } from 'react-icons/lu';
-import useAcceptFriendRequest from '../apis/use-accept-friend-request';
-import useRejectFriendRequest from '../apis/use-reject-friend-request';
+import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-request';
+import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
 import UserLink from '@/components/user-link';
+import { FriendshipType } from '@/features/friendship/friendship.types';
 
 interface FriendshipListProps {
   type: FriendshipType;
