@@ -1,10 +1,10 @@
-import { useGetMe } from './apis/use-get-me';
+import { useGetMe } from '@/features/user/api/use-get-me';
 import { Box, Button, Field, Fieldset, Input } from '@chakra-ui/react';
 import PageHeader from '@/components/page-header';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import useUpdateMe from './apis/use-update-me';
+import useUpdateMe from '@/features/user/api/use-update-me';
 import SimpleRadioGroup from '@/components/simple-radio-group';
 import { DATA_PRIVACY_OPTIONS } from '@/constants/common';
 import { DataPrivacy } from '@/types/common';

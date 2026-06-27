@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useSetAuthAtom } from '@/atoms/auth-atom';
 import { AppRoutes } from '@/app/routes';
-import { useGetMe } from '@/pages/user/profile/apis/use-get-me';
+import { useGetMe } from '@/features/user/api/use-get-me';
 
 function App() {
   const setAuth = useSetAuthAtom();

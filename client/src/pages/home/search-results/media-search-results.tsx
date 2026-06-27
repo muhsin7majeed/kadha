@@ -1,6 +1,6 @@
 import MediaListPage from '@/components/media-list-page';
 import { LuSearch } from 'react-icons/lu';
-import useSearchMedia from './apis/use-search-media';
+import useSearchMedia from '@/features/media/api/use-search-media';
 
 interface MediaSearchResultsProps {
   searchQuery: string;

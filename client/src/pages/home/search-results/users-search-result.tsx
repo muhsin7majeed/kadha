@@ -4,7 +4,7 @@ import CommonSpinner from '@/components/spinners/common-spinner';
 import { Box, Card, HStack } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import { Flex } from '@chakra-ui/react';
-import useSearchUsers from './apis/use-search-users';
+import useSearchUsers from '@/features/user/api/use-search-users';
 import FriendshipActions from '@/pages/user/friendship/friendship-actions';
 import UserLink from '@/components/user-link';
 
