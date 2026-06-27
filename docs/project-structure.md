@@ -70,7 +70,9 @@ packages/contracts/
 
 - New server process wiring belongs in `server/src/index.ts`.
 - New Express app middleware and route mounting belongs in `server/src/app.ts`.
-- New server business logic should avoid growing controllers when a service/helper is a clearer home.
+- New server feature code belongs in `server/src/features/<feature-name>`.
+- New server business logic should live in feature services, not controllers.
+- New server controllers should stay focused on HTTP request and response handling.
 - New client API hooks should prefer feature folders over generic component folders.
 - Shared UI-only components can remain in `client/src/components`.
 - Query keys should be centralized or colocated consistently by feature, not mixed inline.

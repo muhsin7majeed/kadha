@@ -1,14 +1,15 @@
-import {
-  getCollections,
-  createCollection,
-  getCollection,
-  updateCollection,
-  deleteCollection,
-  toggleCollectionItem,
-} from '@/controllers/collection';
 import { Router } from 'express';
-import { createCollectionSchema, getCollectionsSchema, toggleCollectionSchema } from '@/schemas/collectionSchema';
+
 import { validate } from '@/middlewares/validate';
+import {
+  createCollection,
+  deleteCollection,
+  getCollection,
+  getCollections,
+  toggleCollectionItem,
+  updateCollection,
+} from './collection.controller';
+import { createCollectionSchema, getCollectionsSchema, toggleCollectionSchema } from './collection.schema';
 
 const router = Router();
 

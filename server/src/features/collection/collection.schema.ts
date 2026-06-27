@@ -29,3 +29,9 @@ export const getCollectionsSchema = z.object({
   mediaId: z.string().optional(),
   mediaType: z.nativeEnum(MediaType).optional(),
 });
+
+export type GetCollectionsQuery = z.infer<typeof getCollectionsSchema>;
+export type CollectionPayload = z.infer<typeof createCollectionSchema>;
+export type ToggleCollectionPayload = z.infer<typeof toggleCollectionSchema> & {
+  media_id: number;
+};
