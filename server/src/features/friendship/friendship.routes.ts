@@ -1,3 +1,6 @@
+import { Router } from 'express';
+
+import { authMiddleware } from '@/middlewares/auth';
 import {
   acceptFriendRequest,
   blockUser,
@@ -6,9 +9,7 @@ import {
   sendFriendRequest,
   unblockUser,
   unfriend,
-} from '@/controllers/friendship';
-import { authMiddleware } from '@/middlewares/auth';
-import { Router } from 'express';
+} from './friendship.controller';
 
 const router = Router();
 

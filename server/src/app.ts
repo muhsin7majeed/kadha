@@ -5,11 +5,11 @@ import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 
 import { envConfig } from './config/env';
-import authRoutes from './routes/auth';
-import collectionRoutes from './routes/collection';
-import friendshipRoutes from './routes/friendship';
+import authRoutes from './features/auth/auth.routes';
+import collectionRoutes from './features/collection/collection.routes';
+import friendshipRoutes from './features/friendship/friendship.routes';
 import mediaRoutes from './features/media/media.routes';
-import userRoutes from './routes/user';
+import userRoutes from './features/user/user.routes';
 import userMediaRoutes from './features/user-media/user-media.routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { authMiddleware } from './middlewares/auth';

@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { getMe, getUserWatchlist, getUserLiked, getUserWatched, updateMe, searchUsers } from '@/controllers/user';
+
 import { authMiddleware } from '@/middlewares/auth';
-import { getNotifications } from '@/controllers/notification';
+import { getNotifications } from '@/features/notification/notification.controller';
+import { getMe, getUserLiked, getUserWatched, getUserWatchlist, searchUsers, updateMe } from './user.controller';
 
 const router = Router();
 
