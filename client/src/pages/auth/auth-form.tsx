@@ -1,15 +1,7 @@
 import { Button, Field, Fieldset, Input } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { LuArrowRight, LuLogIn } from 'react-icons/lu';
-
-export interface LoginInputs {
-  username: string;
-  password: string;
-}
-
-export interface RegisterInputs extends LoginInputs {
-  confirmPassword: string;
-}
+import { LoginInputs, RegisterInputs } from '@/features/auth/auth.types';
 
 interface AuthFormProps {
   apiFieldErrors?: Record<'username', string>;

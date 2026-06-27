@@ -1,15 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { useErrorHandler } from '@/hooks/use-error-handler';
-import { LoginInputs } from '@/pages/auth/auth-form';
 import api from '@/lib/axios-instance';
-
-export interface LoginResponse {
-  message: string;
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-}
+import { LoginInputs, LoginResponse } from '../auth.types';
 
 const login = async (data: LoginInputs) => {
   const response = await api.post<LoginResponse>('/api/auth/login', data);

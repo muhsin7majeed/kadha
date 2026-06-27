@@ -1,7 +1,7 @@
 import { Button, Menu, Portal } from '@chakra-ui/react';
 import SimpleAvatar from '../simple-avatar';
 import { NavLink } from 'react-router';
-import useLogout from '@/pages/auth/apis/use-logout';
+import useLogout from '@/features/auth/api/use-logout';
 import { removeAccessToken } from '@/lib/token-manager';
 import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { useState } from 'react';

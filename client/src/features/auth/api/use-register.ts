@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { useErrorHandler } from '@/hooks/use-error-handler';
-import { RegisterInputs } from '@/pages/auth/auth-form';
 import api from '@/lib/axios-instance';
-import { LoginResponse } from './use-login';
+import { LoginResponse, RegisterInputs } from '../auth.types';
 
 const register = async (data: RegisterInputs) => {
   const response = await api.post<LoginResponse>('/api/auth/register', data);
