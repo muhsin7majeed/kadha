@@ -29,9 +29,6 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
     const payload = getUserMediaPayload(media, 'watchlist');
 
     await addToWatchList(payload);
-
-    // TODO: Check if mutation will cause issue
-    media.watchlist = !media.watchlist;
   };
 
   const handleWatched = async () => {
@@ -40,9 +37,6 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
     const payload = getUserMediaPayload(media, 'watched');
 
     await addToWatched(payload);
-
-    // TODO: Check if mutation will cause issue
-    media.watched = !media.watched;
   };
 
   const handleLike = async () => {
@@ -51,9 +45,6 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
     const payload = getUserMediaPayload(media, 'liked');
 
     await addToLiked(payload);
-
-    // TODO: Check if mutation will cause issue
-    media.liked = !media.liked;
   };
 
   const handleCollection = () => {

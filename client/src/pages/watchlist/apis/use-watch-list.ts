@@ -2,6 +2,7 @@ import api from '@/lib/axios-instance';
 import { useQuery } from '@tanstack/react-query';
 import { UserMedia } from '@/types/user-media';
 import { BaseResponse } from '@/types/common';
+import { queryKeys } from '@/lib/query-keys';
 
 const fetchWatchList = async () => {
   const response = await api.get<BaseResponse<UserMedia[]>>('/api/user/watchlist');
@@ -10,7 +11,7 @@ const fetchWatchList = async () => {
 
 const useWatchList = () => {
   return useQuery({
-    queryKey: ['watch-list'],
+    queryKey: queryKeys.watchList,
     queryFn: () => fetchWatchList(),
   });
 };
