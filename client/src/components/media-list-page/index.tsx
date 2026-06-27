@@ -3,8 +3,8 @@ import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import { UserMedia } from '@/features/user-media/user-media.types';
-import { MovieWithMeta } from '@/types/media';
-import { TvWithMeta } from '@/types/media';
+import { MovieWithMeta } from '@/features/media/media.types';
+import { TvWithMeta } from '@/features/media/media.types';
 import PageHeader from '../page-header';
 
 interface MediaListPageProps {

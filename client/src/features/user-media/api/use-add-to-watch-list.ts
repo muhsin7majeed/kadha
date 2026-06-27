@@ -4,7 +4,7 @@ import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { BaseInfoResponse } from '@/types/common';
-import { MovieWithMeta, TvWithMeta } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import { capitalize } from '@/utils/capitalize';
 import { invalidateMediaActionQueries } from './invalidate-media-action-queries';
 

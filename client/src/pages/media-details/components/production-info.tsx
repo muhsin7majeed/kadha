@@ -1,6 +1,6 @@
 import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuBuilding2, LuGlobe, LuLanguages } from 'react-icons/lu';
-import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 
 interface ProductionInfoProps {
   data: MovieDetailsWithMeta | TvDetailsWithMeta;

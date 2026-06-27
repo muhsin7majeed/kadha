@@ -1,6 +1,6 @@
 import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuCalendar, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
-import type { TvDetailsWithMeta } from '@/types/media';
+import type { TvDetailsWithMeta } from '@/features/media/media.types';
 import InfoCard from './info-card';
 import { formatDate } from '@/utils/date';
 

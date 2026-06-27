@@ -1,4 +1,4 @@
-import { MovieWithMeta, TvWithMeta } from '@/types/media';
+import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 
 const getUserMediaPayload = (
   media: MovieWithMeta | TvWithMeta,
