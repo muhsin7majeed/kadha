@@ -6,7 +6,7 @@ import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
 import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
-import CollectionMenu from './collection-menu';
+import CollectionMenu from '@/features/collections/components/collection-menu';
 
 interface CollectionItemProps {
   collection: Collection;

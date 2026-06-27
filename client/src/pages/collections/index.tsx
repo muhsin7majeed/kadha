@@ -6,7 +6,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import { Accordion, Flex } from '@chakra-ui/react';
 import CollectionItem from './collection-item';
 import { useState } from 'react';
-import CreateCollectionButton from './create-collection-button';
+import CreateCollectionButton from '@/features/collections/components/create-collection-button';
 
 const Collections = () => {
   const [openedCollections, setOpenedCollections] = useState<string[]>([]);
