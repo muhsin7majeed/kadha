@@ -1,4 +1,5 @@
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
 import { UserSearchResult } from '@/types/user';
 import { useQuery } from '@tanstack/react-query';
@@ -13,7 +14,7 @@ const fetchSearchUsers = async (query: string) => {
 
 const useSearchUsers = (query: string) => {
   return useQuery({
-    queryKey: ['search-users', query],
+    queryKey: queryKeys.searchUsersByQuery(query),
     queryFn: () => fetchSearchUsers(query),
     enabled: !!query,
   });

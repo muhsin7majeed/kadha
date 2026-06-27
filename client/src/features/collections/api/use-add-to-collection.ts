@@ -1,5 +1,6 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { AddToCollectionPayload } from '@/types/collections';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -14,7 +15,7 @@ const useAddToCollection = () => {
     mutationFn: addToCollection,
     onError: useErrorHandler,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['collections'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
     },
   });
 };

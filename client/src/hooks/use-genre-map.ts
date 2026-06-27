@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { genreMapAtom } from '@/atoms/genre-atom';
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
 
 const fetchGenres = async () => {
@@ -14,7 +15,7 @@ export const useGenreMap = () => {
   const setGenreMap = useSetAtom(genreMapAtom);
 
   return useQuery({
-    queryKey: ['genreMap'],
+    queryKey: queryKeys.genreMap,
     queryFn: fetchGenres,
     staleTime: Infinity,
     select: (data: Record<number, string>) => {

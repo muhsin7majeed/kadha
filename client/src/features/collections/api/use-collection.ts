@@ -1,4 +1,5 @@
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse } from '@/types/common';
 import { CollectionDetails } from '@/types/collections';
 import { useQuery } from '@tanstack/react-query';
@@ -18,7 +19,7 @@ interface UseCollectionParams extends GetCollectionParams {
 
 const useCollection = (params?: UseCollectionParams) => {
   return useQuery({
-    queryKey: ['collection', params?.collectionId],
+    queryKey: queryKeys.collectionById(params?.collectionId),
     queryFn: () => getCollection(params),
     enabled: params?.enabled,
   });

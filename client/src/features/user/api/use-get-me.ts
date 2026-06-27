@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { User } from '@/types/user';
 
 export const getMe = async (): Promise<User> => {
@@ -14,7 +15,7 @@ interface UseGetMeProps {
 
 export const useGetMe = ({ enabled }: UseGetMeProps = {}) => {
   return useQuery({
-    queryKey: ['me'],
+    queryKey: queryKeys.me,
     staleTime: Infinity,
     queryFn: () => getMe(),
     enabled,
