@@ -3,7 +3,7 @@ import { Box, Container } from '@chakra-ui/react';
 
 import TabBar from '../tabbar';
 import Navbar from '../navbar';
-import { useGenreMap } from '@/hooks/use-genre-map';
+import { useGenreMap } from '@/features/media/api/use-genre-map';
 
 const MainLayout = () => {
   useGenreMap();
