@@ -28,5 +28,39 @@ export default defineConfig(({ mode }) => {
       host: true, // Needed for Docker
       strictPort: true, // Fail if port is in use
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return;
+
+            if (id.includes('/@chakra-ui/') || id.includes('/@emotion/')) {
+              return 'vendor-chakra';
+            }
+
+            if (id.includes('/react-icons/')) {
+              return 'vendor-icons';
+            }
+
+            if (
+              id.includes('/react/') ||
+              id.includes('/react-dom/') ||
+              id.includes('/react-router/') ||
+              id.includes('/react-hook-form/')
+            ) {
+              return 'vendor-react';
+            }
+
+            if (id.includes('/@tanstack/react-query/')) {
+              return 'vendor-query';
+            }
+
+            if (id.includes('/axios/') || id.includes('/dayjs/') || id.includes('/jotai/')) {
+              return 'vendor-utils';
+            }
+          },
+        },
+      },
+    },
   };
 });

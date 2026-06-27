@@ -56,7 +56,7 @@ client/src/features/user-media/
   api/
   components/
   hooks/
-  types.ts
+  user-media.types.ts
 ```
 
 ### Phase 5: Shared Contracts
@@ -87,9 +87,14 @@ packages/contracts/
 - New server business logic should live in feature services, not controllers.
 - New server controllers should stay focused on HTTP request and response handling.
 - New client route declarations belong in `client/src/app/routes.tsx`.
+- Route-level screens should be lazy-loaded from `client/src/app/routes.tsx` when practical to keep production chunks small.
 - New client API hooks should prefer feature folders over generic component folders.
 - New client API hooks belong in `client/src/features/<feature-name>/api`, not `client/src/pages/**/apis`.
+- Feature-owned client types belong near the feature, using `client/src/features/<feature-name>/<feature-name>.types.ts`.
+- Feature-owned client utilities and hooks belong near the feature, not in generic `client/src/utils` or `client/src/hooks`.
 - Shared UI-only components can remain in `client/src/components`.
+- Shared generic utilities can remain in `client/src/utils`.
+- Shared generic hooks can remain in `client/src/hooks`.
 - Query keys should be centralized or colocated consistently by feature, not mixed inline.
 
 ## Enforcement Plan
