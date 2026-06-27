@@ -1,8 +1,8 @@
 import api from '@/lib/axios-instance';
-import { useQuery } from '@tanstack/react-query';
-import { TvWithMeta } from '@/types/media';
-import { BaseResponse } from '@/types/common';
 import { queryKeys } from '@/lib/query-keys';
+import { BaseResponse } from '@/types/common';
+import { TvWithMeta } from '@/types/media';
+import { useQuery } from '@tanstack/react-query';
 
 const fetchTopRatedTvs = async () => {
   const response = await api.get<BaseResponse<TvWithMeta[]>>('/api/media/top-rated-tvs');
@@ -12,7 +12,7 @@ const fetchTopRatedTvs = async () => {
 const useTopRatedTvs = () => {
   return useQuery({
     queryKey: queryKeys.topRatedTvs,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
     queryFn: () => fetchTopRatedTvs(),
   });
 };
