@@ -3,10 +3,10 @@ import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuPlus } from 'react-icons/
 import { LuHeart } from 'react-icons/lu';
 import { IconButton } from '@chakra-ui/react';
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
-import useAddToWatchList from './apis/use-add-to-watch-list';
-import useAddToWatched from './apis/use-add-to-watched';
-import useAddToLiked from './apis/use-add-to-liked';
-import getUserMediaPayload from './get-user-media-payload';
+import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
+import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
+import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
+import getUserMediaPayload from '@/features/user-media/utils/get-user-media-payload';
 import { useState } from 'react';
 import SimpleDialog from '../dialogs/simple-dialog';
 import AddToCollection from '@/pages/collections/add-to-collection';

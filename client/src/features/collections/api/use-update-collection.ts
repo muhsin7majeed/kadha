@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import api from '@/lib/axios-instance';
-import { CollectionFormFields } from '../collection-menu/create-collection';
-import { useErrorHandler } from '@/hooks/use-error-handler';
 import { toaster } from '@/components/ui/toaster';
+import { useErrorHandler } from '@/hooks/use-error-handler';
+import api from '@/lib/axios-instance';
+import { CollectionFormFields } from '@/types/collections';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UpdateCollectionPayload extends CollectionFormFields {
   id: string;

@@ -1,5 +1,5 @@
 import PageHeader from '@/components/page-header';
-import useCollections from './apis/use-collections';
+import useCollections from '@/features/collections/api/use-collections';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';

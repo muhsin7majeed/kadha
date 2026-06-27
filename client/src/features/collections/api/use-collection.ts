@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/axios-instance';
-import { CollectionDetails } from '@/types/collections';
 import { BaseResponse } from '@/types/common';
+import { CollectionDetails } from '@/types/collections';
+import { useQuery } from '@tanstack/react-query';
 
 interface GetCollectionParams {
   collectionId: string;

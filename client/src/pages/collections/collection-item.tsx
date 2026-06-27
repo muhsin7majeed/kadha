@@ -1,6 +1,6 @@
 import { Collection } from '@/types/collections';
 import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
-import useCollection from './apis/use-collection';
+import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
