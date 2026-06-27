@@ -2,6 +2,7 @@ import api from '@/lib/axios-instance';
 import { useQuery } from '@tanstack/react-query';
 import { MovieWithMeta } from '@/types/media';
 import { BaseResponse } from '@/types/common';
+import { queryKeys } from '@/lib/query-keys';
 
 const fetchPopularMovies = async () => {
   const response = await api.get<BaseResponse<MovieWithMeta[]>>('/api/media/popular-movies');
@@ -10,7 +11,7 @@ const fetchPopularMovies = async () => {
 
 const usePopularMovies = () => {
   return useQuery({
-    queryKey: ['popular-movies'],
+    queryKey: queryKeys.popularMovies,
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: () => fetchPopularMovies(),
   });

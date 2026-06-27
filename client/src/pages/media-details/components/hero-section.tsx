@@ -32,7 +32,7 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
             right: 0,
             height: '70%',
             background: 'linear-gradient(to bottom, transparent 0%, var(--chakra-colors-bg) 100%)',
-            zIndex: 1,
+            zIndex: 0,
           }}
         >
           <Image
