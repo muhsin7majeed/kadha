@@ -1,5 +1,5 @@
 import { LuCheck } from 'react-icons/lu';
-import useWatched from './apis/use-watched';
+import useWatched from '@/features/user-media/api/use-watched';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
 

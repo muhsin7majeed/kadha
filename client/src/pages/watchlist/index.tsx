@@ -1,5 +1,5 @@
 import { LuBookmark } from 'react-icons/lu';
-import useWatchList from './apis/use-watch-list';
+import useWatchList from '@/features/user-media/api/use-watch-list';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
 

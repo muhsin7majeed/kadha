@@ -1,9 +1,8 @@
 import api from '@/lib/axios-instance';
-import { useQuery } from '@tanstack/react-query';
-import { MediaType } from '@/types/common';
-import { BaseResponse } from '@/types/common';
-import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
 import { queryKeys } from '@/lib/query-keys';
+import { BaseResponse, MediaType } from '@/types/common';
+import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
+import { useQuery } from '@tanstack/react-query';
 
 const fetchMediaDetails = async (mediaType: MediaType, id: string) => {
   const response = await api.get<BaseResponse<MovieDetailsWithMeta | TvDetailsWithMeta>>(
@@ -15,7 +14,7 @@ const fetchMediaDetails = async (mediaType: MediaType, id: string) => {
 const useMediaDetails = (mediaType: MediaType, id: string) => {
   return useQuery({
     queryKey: queryKeys.mediaDetailsById(mediaType, id),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
     queryFn: () => fetchMediaDetails(mediaType, id),
     enabled: !!mediaType && !!id,
   });

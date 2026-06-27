@@ -1,4 +1,4 @@
-import useNotifications from '@/pages/notifications/apis/use-notifications';
+import useNotifications from '@/features/notifications/api/use-notifications';
 import NavLink from './nav-link';
 import { Flex, IconButton } from '@chakra-ui/react';
 import { LuBell } from 'react-icons/lu';
