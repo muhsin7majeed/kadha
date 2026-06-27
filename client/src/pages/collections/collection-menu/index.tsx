@@ -3,7 +3,7 @@ import { Collection } from '@/types/collections';
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
 import { IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuEllipsis } from 'react-icons/lu';
-import useDeleteCollection from '../apis/use-delete-collection';
+import useDeleteCollection from '@/features/collections/api/use-delete-collection';
 import UpdateCollection from './update-collection';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 

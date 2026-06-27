@@ -1,26 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
-import { toaster } from '@/components/ui/toaster';
-import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import { BaseInfoResponse } from '@/types/common';
+import { MovieWithMeta, TvWithMeta } from '@/types/media';
 import { capitalize } from '@/utils/capitalize';
 import { invalidateMediaActionQueries } from './invalidate-media-action-queries';
 
-const addToWatched = async (payload: MovieWithMeta | TvWithMeta) => {
-  const response = await api.post(`/api/user-media/watched`, payload);
+const addToWatchList = async (payload: MovieWithMeta | TvWithMeta) => {
+  const response = await api.post(`/api/user-media/watchlist`, payload);
   return response.data;
 };
 
-const useAddToWatched = () => {
+const useAddToWatchList = () => {
   const queryClient = useQueryClient();
 
   return useMutation<BaseInfoResponse, Error, MovieWithMeta | TvWithMeta>({
-    mutationFn: (payload: MovieWithMeta | TvWithMeta) => addToWatched(payload),
+    mutationFn: (payload: MovieWithMeta | TvWithMeta) => addToWatchList(payload),
     onError: useErrorHandler,
     onSuccess: (data) => {
-      invalidateMediaActionQueries(queryClient, 'watched');
+      invalidateMediaActionQueries(queryClient, 'watchlist');
 
       toaster.success({
         title: capitalize(data.message),
@@ -29,4 +29,4 @@ const useAddToWatched = () => {
   });
 };
 
-export default useAddToWatched;
+export default useAddToWatchList;

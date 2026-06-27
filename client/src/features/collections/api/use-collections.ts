@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/axios-instance';
-import { Collection } from '@/types/collections';
 import { BaseResponse, MediaType } from '@/types/common';
+import { Collection } from '@/types/collections';
+import { useQuery } from '@tanstack/react-query';
 
 interface GetCollectionsParams {
   mediaId: number;

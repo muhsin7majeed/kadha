@@ -1,7 +1,7 @@
 import SimpleCheckboxCard from '@/components/simple-checkbox-card';
 import { AddToCollectionPayload, Collection } from '@/types/collections';
 import { UserMedia } from '@/types/user-media';
-import useAddToCollection from './apis/use-add-to-collection';
+import useAddToCollection from '@/features/collections/api/use-add-to-collection';
 
 interface CollectionCheckboxCardProps {
   media: UserMedia;

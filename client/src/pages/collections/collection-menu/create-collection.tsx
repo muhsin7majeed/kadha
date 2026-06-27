@@ -1,12 +1,7 @@
-import useCreateCollection from '../apis/use-create-collection';
+import useCreateCollection from '@/features/collections/api/use-create-collection';
 import { DataPrivacy } from '@/types/common';
+import { CollectionFormFields } from '@/types/collections';
 import CollectionForm from './collection-form';
-
-export interface CollectionFormFields {
-  name: string;
-  description: string;
-  privacy: DataPrivacy;
-}
 
 interface CreateCollectionProps {
   onClose: () => void;
