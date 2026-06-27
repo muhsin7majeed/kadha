@@ -17,3 +17,11 @@ export interface LoginResponse {
 export interface RefreshResponse {
   accessToken: string;
 }
+
+export interface AuthState {
+  user: {
+    id: string;
+    username: string;
+  } | null;
+  status: 'pending' | 'authenticated' | 'unauthenticated';
+}

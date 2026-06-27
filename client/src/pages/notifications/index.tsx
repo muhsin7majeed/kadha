@@ -4,7 +4,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
 import { Box, Flex, Text } from '@chakra-ui/react';
-import { NotificationType } from '@/types/common';
+import { NotificationType } from '@/features/notifications/notifications.types';
 import { formatTimeAgo } from '@/utils/date';
 import FriendshipActions from '../user/friendship/friendship-actions';
 import UserLink from '@/components/user-link';

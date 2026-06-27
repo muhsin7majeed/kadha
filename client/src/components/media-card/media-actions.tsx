@@ -10,7 +10,7 @@ import getUserMediaPayload from '@/features/user-media/utils/get-user-media-payl
 import { useState } from 'react';
 import SimpleDialog from '../dialogs/simple-dialog';
 import AddToCollection from '@/pages/collections/add-to-collection';
-import formatTMDBToUserMedia from '@/utils/formatTMDBToUserMedia';
+import formatTMDBToUserMedia from '@/features/user-media/utils/format-tmdb-to-user-media';
 
 interface MediaActionsProps {
   media: MovieWithMeta | TvWithMeta;
