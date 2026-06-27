@@ -11,7 +11,7 @@ import { DataPrivacy } from '@/types/common';
 import { useParams } from 'react-router';
 import { useAuthAtom } from '@/atoms/auth-atom';
 import OtherUserData from './other-user-data';
-import capitalize from '@/utils/capitalize-string';
+import { capitalize } from '@/utils/capitalize';
 
 interface ProfileInputs {
   username: string;

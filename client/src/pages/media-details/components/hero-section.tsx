@@ -1,7 +1,7 @@
 import { Badge, Box, Button, Flex, HStack, Image, Link, Text, VStack } from '@chakra-ui/react';
 import { LuExternalLink, LuStar, LuCalendar, LuClock } from 'react-icons/lu';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/types/media';
-import { formatDate, minutesToHours } from '@/lib/date-fns';
+import { formatDate, minutesToHours } from '@/utils/date';
 
 interface HeroSectionProps {
   data: MovieDetailsWithMeta | TvDetailsWithMeta;

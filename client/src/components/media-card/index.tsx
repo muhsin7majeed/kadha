@@ -2,7 +2,7 @@ import { useGenreAtom } from '@/atoms/genre-atom';
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 
 import { MovieWithMeta, TvWithMeta } from '@/types/media';
-import { formatDate } from '@/lib/date-fns';
+import { formatDate } from '@/utils/date';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
 import { UserMedia } from '@/types/user-media';
