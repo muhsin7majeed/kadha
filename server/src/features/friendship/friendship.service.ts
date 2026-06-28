@@ -1,3 +1,4 @@
+import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
 
 type FriendshipType = 'friends' | 'sent' | 'received' | 'blocked';
@@ -84,6 +85,10 @@ export async function blockFriend(currentUserId: string, userId: string) {
   if (existing) {
     if (existing.senderId === currentUserId && existing.status === 'BLOCKED') {
       return { status: 200, body: existing };
+    }
+
+    if (existing.receiverId === currentUserId && existing.status === 'BLOCKED') {
+      return { status: 403, body: { message: 'Cannot block user' } };
     }
 
     await prisma.friendship.delete({ where: { id: existing.id } });
@@ -233,7 +238,7 @@ const transformFriendshipToUser = (
   };
 };
 
-export async function getFriendshipUsers(currentUserId: string, type: FriendshipType) {
+export async function getFriendshipUsers(currentUserId: string, type: FriendshipType, page: number, limit: number) {
   let whereClause: object;
 
   switch (type) {
@@ -265,15 +270,27 @@ export async function getFriendshipUsers(currentUserId: string, type: Friendship
       return null;
   }
 
-  const friendships = await prisma.friendship.findMany({
-    where: whereClause,
-    include: {
-      sender: true,
-      receiver: true,
-    },
-  });
+  const skip = (page - 1) * limit;
+  const [friendships, total] = await prisma.$transaction([
+    prisma.friendship.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: {
+        sender: true,
+        receiver: true,
+      },
+    }),
+    prisma.friendship.count({ where: whereClause }),
+  ]);
 
-  return friendships.map((friendship) => transformFriendshipToUser(friendship, currentUserId));
+  return {
+    data: friendships.map((friendship) => transformFriendshipToUser(friendship, currentUserId)),
+    pagination: createPaginationMeta(page, limit, total),
+  };
 }
 
 export type { FriendshipType };

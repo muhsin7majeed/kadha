@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { getPaginationParams } from '@/lib/pagination';
 import {
   acceptRequest,
   blockFriend,
@@ -62,11 +63,12 @@ export const unblockUser = async (req: Request, res: Response) => {
 export const getFriendships = async (req: Request, res: Response) => {
   const { id: currentUserId } = req.user;
   const type = (req.query.type as FriendshipType) || 'friends';
-  const data = await getFriendshipUsers(currentUserId, type);
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await getFriendshipUsers(currentUserId, type, page, limit);
 
   if (!data) {
     return res.status(400).json({ message: 'Invalid friendship type' });
   }
 
-  res.json({ data });
+  res.json(data);
 };

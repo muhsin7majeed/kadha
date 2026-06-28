@@ -1,27 +1,26 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse } from '@/types/common';
+import { PaginatedResponse, ResourceAccessResponse } from '@/types/common';
 import { UserMedia } from '@/features/user-media/user-media.types';
 import { useQuery } from '@tanstack/react-query';
 
-export interface UserMediaAccessResponse {
-  data: UserMedia[];
-  canView?: boolean;
-  lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY';
-}
+export type UserMediaAccessResponse = ResourceAccessResponse<UserMedia[]> & Partial<PaginatedResponse<UserMedia[]>>;
 
-const fetchWatched = async (username?: string): Promise<UserMediaAccessResponse> => {
-  const response = await api.get<UserMediaAccessResponse | BaseResponse<UserMedia[]>>(
+const fetchWatched = async (username?: string, page = 1): Promise<UserMediaAccessResponse> => {
+  const response = await api.get<UserMediaAccessResponse>(
     username ? `/api/users/${username}/watched` : '/api/user/watched',
+    { params: { page } },
   );
 
-  return 'canView' in response.data ? response.data : { data: response.data.data, canView: true };
+  return response.data;
 };
 
-const useWatched = (username?: string, options: { enabled?: boolean } = {}) => {
+const useWatched = (username?: string, options: { enabled?: boolean; page?: number } = {}) => {
+  const page = options.page ?? 1;
+
   return useQuery({
-    queryKey: username ? queryKeys.userWatched(username) : queryKeys.watched,
-    queryFn: () => fetchWatched(username),
+    queryKey: username ? queryKeys.userWatched(username, page) : [...queryKeys.watched, page],
+    queryFn: () => fetchWatched(username, page),
     enabled: options.enabled ?? true,
   });
 };

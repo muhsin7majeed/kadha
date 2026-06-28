@@ -1,23 +1,24 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse } from '@/types/common';
-import { UserMedia } from '@/features/user-media/user-media.types';
 import { useQuery } from '@tanstack/react-query';
 
 import { UserMediaAccessResponse } from './use-watched';
 
-const fetchWatchList = async (username?: string): Promise<UserMediaAccessResponse> => {
-  const response = await api.get<UserMediaAccessResponse | BaseResponse<UserMedia[]>>(
+const fetchWatchList = async (username?: string, page = 1): Promise<UserMediaAccessResponse> => {
+  const response = await api.get<UserMediaAccessResponse>(
     username ? `/api/users/${username}/watchlist` : '/api/user/watchlist',
+    { params: { page } },
   );
 
-  return 'canView' in response.data ? response.data : { data: response.data.data, canView: true };
+  return response.data;
 };
 
-const useWatchList = (username?: string, options: { enabled?: boolean } = {}) => {
+const useWatchList = (username?: string, options: { enabled?: boolean; page?: number } = {}) => {
+  const page = options.page ?? 1;
+
   return useQuery({
-    queryKey: username ? queryKeys.userWatchList(username) : queryKeys.watchList,
-    queryFn: () => fetchWatchList(username),
+    queryKey: username ? queryKeys.userWatchList(username, page) : [...queryKeys.watchList, page],
+    queryFn: () => fetchWatchList(username, page),
     enabled: options.enabled ?? true,
   });
 };

@@ -6,6 +6,7 @@ import useWatchList from '@/features/user-media/api/use-watch-list';
 import { Box, Text } from '@chakra-ui/react';
 import { LuBookmark, LuCheck, LuHeart } from 'react-icons/lu';
 import { useParams } from 'react-router';
+import { useEffect, useState } from 'react';
 
 type MediaTabType = 'watched' | 'liked' | 'watchlist';
 
@@ -48,17 +49,22 @@ const meta = {
 
 const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
   const { username = '' } = useParams();
-  const watched = useWatched(username, { enabled: type === 'watched' });
-  const liked = useLiked(username, { enabled: type === 'liked' });
-  const watchlist = useWatchList(username, { enabled: type === 'watchlist' });
+  const [page, setPage] = useState(1);
+  const watched = useWatched(username, { enabled: type === 'watched', page });
+  const liked = useLiked(username, { enabled: type === 'liked', page });
+  const watchlist = useWatchList(username, { enabled: type === 'watchlist', page });
   const query = type === 'watched' ? watched : type === 'liked' ? liked : watchlist;
   const tabMeta = meta[type];
 
-  if (query.data?.canView === false) {
+  useEffect(() => {
+    setPage(1);
+  }, [type, username]);
+
+  if (query.data?.access.canView === false) {
     return (
       <Box py="10">
         <EmptyState
-          title={query.data.lockedReason === 'FRIENDS_ONLY' ? 'Friends only' : 'Private'}
+          title={query.data.access.lockedReason === 'FRIENDS_ONLY' ? 'Friends only' : 'Private'}
           description="This activity is not visible to you."
         />
       </Box>
@@ -84,6 +90,8 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
         errorDescription={tabMeta.errorDescription}
         loadingText={tabMeta.loadingText}
         spinnerColor={tabMeta.spinnerColor}
+        pagination={query.data?.pagination}
+        onPageChange={setPage}
       />
     </Box>
   );

@@ -2,9 +2,11 @@ import { LuHeart } from 'react-icons/lu';
 import useLiked from '@/features/user-media/api/use-liked';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
+import { useState } from 'react';
 
 const Liked = () => {
-  const { data: liked, isLoading, isFetching, error, refetch } = useLiked();
+  const [page, setPage] = useState(1);
+  const { data: liked, isLoading, isFetching, error, refetch } = useLiked(undefined, { page });
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }}>
@@ -24,6 +26,8 @@ const Liked = () => {
         errorDescription="Failed to fetch liked"
         loadingText="Loading your favorites..."
         spinnerColor="red.500"
+        pagination={liked?.pagination}
+        onPageChange={setPage}
       />
     </Container>
   );

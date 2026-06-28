@@ -7,23 +7,34 @@ import { Flex } from '@chakra-ui/react';
 import useSearchUsers from '@/features/user/api/use-search-users';
 import FriendshipActions from '@/pages/user/friendship/friendship-actions';
 import UserLink from '@/components/user-link';
+import PaginationControls from '@/components/pagination-controls';
+import { useEffect, useState } from 'react';
 
 interface UsersSearchResultProps {
   searchQuery: string;
 }
 
 const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) => {
+  const [page, setPage] = useState(1);
   const {
-    data: users,
+    data: usersResponse,
     isLoading: isLoadingUsers,
     isFetching: isFetchingUsers,
     error: errorUsers,
     refetch: refetchUsers,
-  } = useSearchUsers(searchQuery);
+  } = useSearchUsers(searchQuery, page);
+  const users = usersResponse?.data;
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
 
   return (
     <>
-      <PageHeader isFetching={isFetchingUsers} subHeader={`Found ${users?.length} results for "${searchQuery}"`}>
+      <PageHeader
+        isFetching={isFetchingUsers}
+        subHeader={`Found ${usersResponse?.pagination.total ?? 0} results for "${searchQuery}"`}
+      >
         Users
       </PageHeader>
 
@@ -56,6 +67,11 @@ const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) =>
               </Card.Root>
             );
           })}
+          <PaginationControls
+            pagination={usersResponse?.pagination}
+            isDisabled={isFetchingUsers}
+            onPageChange={setPage}
+          />
         </Box>
       )}
     </>
