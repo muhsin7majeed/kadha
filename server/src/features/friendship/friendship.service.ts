@@ -1,5 +1,12 @@
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
+import { NotificationType } from '@/types/common';
+import {
+  createNotification,
+  notificationDedupeKeys,
+  resolveNotificationsBetweenUsers,
+  resolveNotificationsByEntity,
+} from '../notification/notification.service';
 
 type FriendshipType = 'friends' | 'sent' | 'received' | 'blocked';
 
@@ -23,6 +30,8 @@ export async function sendRequest(senderId: string, receiverId: string) {
     },
   });
 
+  let rejectedFriendshipId: string | null = null;
+
   if (existing) {
     if (existing.status === 'BLOCKED') {
       return {
@@ -32,7 +41,7 @@ export async function sendRequest(senderId: string, receiverId: string) {
     }
 
     if (existing.status === 'REJECTED') {
-      await prisma.friendship.delete({ where: { id: existing.id } });
+      rejectedFriendshipId = existing.id;
     } else {
       return {
         status: 400,
@@ -44,16 +53,33 @@ export async function sendRequest(senderId: string, receiverId: string) {
     }
   }
 
-  const friendship = await prisma.friendship.create({
-    data: { senderId, receiverId, status: 'PENDING' },
-  });
+  const friendship = await prisma.$transaction(async (tx) => {
+    if (rejectedFriendshipId) {
+      await tx.friendship.delete({ where: { id: rejectedFriendshipId } });
+      await resolveNotificationsBetweenUsers(senderId, receiverId, tx);
+    }
 
-  await prisma.notification.create({
-    data: {
-      userId: receiverId,
-      type: 'FRIEND_REQUEST_RECEIVED',
-      actorId: senderId,
-    },
+    const createdFriendship = await tx.friendship.create({
+      data: { senderId, receiverId, status: 'PENDING' },
+    });
+
+    await createNotification(
+      {
+        userId: receiverId,
+        type: NotificationType.FriendRequestReceived,
+        actorId: senderId,
+        entityType: 'friendship',
+        entityId: createdFriendship.id,
+        dedupeKey: notificationDedupeKeys.friendship(
+          NotificationType.FriendRequestReceived,
+          createdFriendship.id,
+          senderId,
+        ),
+      },
+      tx,
+    );
+
+    return createdFriendship;
   });
 
   return { status: 201, body: friendship };
@@ -90,25 +116,24 @@ export async function blockFriend(currentUserId: string, userId: string) {
     if (existing.receiverId === currentUserId && existing.status === 'BLOCKED') {
       return { status: 403, body: { message: 'Cannot block user' } };
     }
-
-    await prisma.friendship.delete({ where: { id: existing.id } });
   }
 
-  const blocked = await prisma.friendship.create({
-    data: {
-      senderId: currentUserId,
-      receiverId: userId,
-      status: 'BLOCKED',
-    },
-  });
+  const blocked = await prisma.$transaction(async (tx) => {
+    if (existing) {
+      await tx.friendship.delete({ where: { id: existing.id } });
+    }
 
-  await prisma.notification.deleteMany({
-    where: {
-      OR: [
-        { userId: currentUserId, actorId: userId },
-        { userId, actorId: currentUserId },
-      ],
-    },
+    const blockedFriendship = await tx.friendship.create({
+      data: {
+        senderId: currentUserId,
+        receiverId: userId,
+        status: 'BLOCKED',
+      },
+    });
+
+    await resolveNotificationsBetweenUsers(currentUserId, userId, tx);
+
+    return blockedFriendship;
   });
 
   return { status: 200, body: blocked };
@@ -140,17 +165,31 @@ export async function acceptRequest(currentUserId: string, senderId: string) {
     return { status: 404, body: { message: 'Friend request not found' } };
   }
 
-  const updatedFriendship = await prisma.friendship.update({
-    where: { id: friendship.id },
-    data: { status: 'ACCEPTED' },
-  });
+  const updatedFriendship = await prisma.$transaction(async (tx) => {
+    const acceptedFriendship = await tx.friendship.update({
+      where: { id: friendship.id },
+      data: { status: 'ACCEPTED' },
+    });
 
-  await prisma.notification.create({
-    data: {
-      userId: senderId,
-      type: 'FRIEND_REQUEST_ACCEPTED',
-      actorId: currentUserId,
-    },
+    await resolveNotificationsByEntity('friendship', friendship.id, tx);
+
+    await createNotification(
+      {
+        userId: senderId,
+        type: NotificationType.FriendRequestAccepted,
+        actorId: currentUserId,
+        entityType: 'friendship',
+        entityId: friendship.id,
+        dedupeKey: notificationDedupeKeys.friendship(
+          NotificationType.FriendRequestAccepted,
+          friendship.id,
+          currentUserId,
+        ),
+      },
+      tx,
+    );
+
+    return acceptedFriendship;
   });
 
   return { status: 200, body: updatedFriendship };
@@ -169,9 +208,15 @@ export async function rejectRequest(currentUserId: string, senderId: string) {
     return { status: 404, body: { message: 'Friend request not found' } };
   }
 
-  const updatedFriendship = await prisma.friendship.update({
-    where: { id: friendship.id },
-    data: { status: 'REJECTED' },
+  const updatedFriendship = await prisma.$transaction(async (tx) => {
+    const rejectedFriendship = await tx.friendship.update({
+      where: { id: friendship.id },
+      data: { status: 'REJECTED' },
+    });
+
+    await resolveNotificationsByEntity('friendship', friendship.id, tx);
+
+    return rejectedFriendship;
   });
 
   return { status: 200, body: updatedFriendship };
@@ -196,8 +241,12 @@ export async function removeFriend(currentUserId: string, userId: string) {
     return { status: 404, body: { message: 'Friendship not found' } };
   }
 
-  await prisma.friendship.delete({
-    where: { id: friendship.id },
+  await prisma.$transaction(async (tx) => {
+    await tx.friendship.delete({
+      where: { id: friendship.id },
+    });
+
+    await resolveNotificationsBetweenUsers(currentUserId, userId, tx);
   });
 
   return { status: 200, body: { message: 'Friend removed successfully' } };

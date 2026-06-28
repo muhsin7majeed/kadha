@@ -10,8 +10,18 @@ export interface Notification {
   userId: string;
   type: NotificationType;
   read: boolean;
-  actorId: string;
+  actorId: string | null;
   referenceId: string | null;
+  entityType: string | null;
+  entityId: string | null;
+  metadata: string | null;
+  readAt: string | null;
+  resolvedAt: string | null;
   createdAt: string;
+  updatedAt: string;
   actor?: UserActor;
+}
+
+export interface UnreadNotificationsCount {
+  count: number;
 }

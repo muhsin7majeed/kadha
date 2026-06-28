@@ -1,32 +1,39 @@
-import useNotifications from '@/features/notifications/api/use-notifications';
+import useUnreadNotificationsCount from '@/features/notifications/api/use-unread-notifications-count';
 import NavLink from './nav-link';
 import { Flex, IconButton } from '@chakra-ui/react';
 import { LuBell } from 'react-icons/lu';
 
 const NotificationButton = () => {
-  const { data: notifications, isLoading: isLoadingNotifications } = useNotifications();
+  const { data, isLoading } = useUnreadNotificationsCount();
 
-  const unreadNotificationsCount = notifications?.filter((notification) => !notification.read).length;
+  const unreadNotificationsCount = data?.count ?? 0;
 
   return (
     <>
       <NavLink to="/app/notifications" position="relative">
-        <IconButton variant="ghost" size="lg" loading={isLoadingNotifications}>
+        <IconButton aria-label="Notifications" variant="ghost" size="lg" loading={isLoading}>
           <LuBell />
         </IconButton>
 
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          position="absolute"
-          top={-1}
-          right={-1}
-          borderRadius="full"
-          color="orange"
-          fontSize="xs"
-        >
-          {unreadNotificationsCount && unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
-        </Flex>
+        {unreadNotificationsCount > 0 && (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            position="absolute"
+            top={-1}
+            right={-1}
+            minW="5"
+            h="5"
+            px="1"
+            borderRadius="full"
+            bg="orange.solid"
+            color="orange.contrast"
+            fontSize="2xs"
+            fontWeight="semibold"
+          >
+            {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+          </Flex>
+        )}
       </NavLink>
     </>
   );

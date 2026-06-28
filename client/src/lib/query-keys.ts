@@ -9,6 +9,8 @@ export const queryKeys = {
   genreMap: ['genreMap'] as const,
   me: ['me'] as const,
   notifications: ['notifications'] as const,
+  notificationsPage: (page = 1) => ['notifications', page] as const,
+  unreadNotificationsCount: ['notifications', 'unread-count'] as const,
   collections: ['collections'] as const,
   collectionsList: (params?: CollectionsParams) => ['collections', params] as const,
   collection: ['collection'] as const,
