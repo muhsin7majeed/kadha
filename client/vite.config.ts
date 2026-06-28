@@ -34,21 +34,20 @@ export default defineConfig(({ mode }) => {
           manualChunks(id) {
             if (!id.includes('node_modules')) return;
 
-            if (id.includes('/@chakra-ui/') || id.includes('/@emotion/')) {
-              return 'vendor-chakra';
-            }
-
-            if (id.includes('/react-icons/')) {
-              return 'vendor-icons';
-            }
-
             if (
               id.includes('/react/') ||
               id.includes('/react-dom/') ||
               id.includes('/react-router/') ||
-              id.includes('/react-hook-form/')
+              id.includes('/react-hook-form/') ||
+              id.includes('/@chakra-ui/') ||
+              id.includes('/@emotion/') ||
+              id.includes('/next-themes/')
             ) {
-              return 'vendor-react';
+              return 'vendor-ui';
+            }
+
+            if (id.includes('/react-icons/')) {
+              return 'vendor-icons';
             }
 
             if (id.includes('/@tanstack/react-query/')) {
