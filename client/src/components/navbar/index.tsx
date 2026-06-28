@@ -1,19 +1,9 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Heading,
-  HStack,
-  Icon,
-  IconButton,
-  Link as ChakraLink,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Container, Flex, Heading, HStack, Icon, IconButton, Link as ChakraLink } from '@chakra-ui/react';
 import { LuGithub, LuMoon, LuSun, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { useAuthAtom } from '@/atoms/auth-atom';
 import { APP_CONFIG } from '@/config/app-config';
+import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import GlobalSearchDialog from '@/features/search/global-search-dialog';
 
 import NotificationButton from '../notification-button';
@@ -43,9 +33,7 @@ const Navbar = () => {
             </HStack>
 
             <HStack gap={2}>
-              <Text color="fg.muted" fontSize="xs" lineHeight="1" whiteSpace="nowrap">
-                v{APP_CONFIG.version}
-              </Text>
+              <ChangelogDialog version={APP_CONFIG.version} />
 
               <IconButton variant="ghost" size="sm" onClick={() => toggleColorMode()}>
                 {colorMode === 'dark' ? <LuSun /> : <LuMoon />}
