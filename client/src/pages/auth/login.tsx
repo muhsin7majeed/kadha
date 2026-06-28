@@ -7,11 +7,13 @@ import AuthForm from './auth-form';
 import { LoginInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
 import { useSetAuthAtom } from '@/atoms/auth-atom';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useSetAuthAtom();
+  const queryClient = useQueryClient();
 
   const { mutate, isPending } = useLogin();
 
@@ -21,6 +23,7 @@ const Login = () => {
     mutate(payload, {
       onSuccess: (data) => {
         setAccessToken(data.accessToken);
+        queryClient.clear();
         setAuth({
           user: {
             id: data.userId,

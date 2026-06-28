@@ -27,6 +27,8 @@ const privacyFieldByFlag = {
   watchlist: 'watchlistPrivacy',
 } as const satisfies Record<UserMediaFlag, 'watchedPrivacy' | 'likedPrivacy' | 'watchlistPrivacy'>;
 
+const usernameAlreadyExists = { fieldErrors: { username: 'Username already exists' } };
+
 export async function getCurrentUser(id: string) {
   return prisma.user.findUnique({
     where: { id },
@@ -51,29 +53,47 @@ export async function updateCurrentUser(
   likedPrivacy: DataPrivacy,
   watchlistPrivacy: DataPrivacy,
 ) {
-  const user = await prisma.user.findUnique({ where: { username } });
-
-  if (user && user.id !== id) {
-    return { fieldErrors: { username: 'Username already exists' } };
-  }
-
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy },
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      username,
+      id: {
+        not: id,
+      },
+    },
+    select: {
+      id: true,
+    },
   });
 
-  return {
-    data: {
-      id: updatedUser.id,
-      username: updatedUser.username,
-      profilePrivacy: updatedUser.profilePrivacy,
-      watchedPrivacy: updatedUser.watchedPrivacy,
-      likedPrivacy: updatedUser.likedPrivacy,
-      watchlistPrivacy: updatedUser.watchlistPrivacy,
-      createdAt: updatedUser.createdAt,
-      updatedAt: updatedUser.updatedAt,
-    },
-  };
+  if (existingUser) {
+    return usernameAlreadyExists;
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy },
+    });
+
+    return {
+      data: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        profilePrivacy: updatedUser.profilePrivacy,
+        watchedPrivacy: updatedUser.watchedPrivacy,
+        likedPrivacy: updatedUser.likedPrivacy,
+        watchlistPrivacy: updatedUser.watchlistPrivacy,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
+      },
+    };
+  } catch (error) {
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
+      return usernameAlreadyExists;
+    }
+
+    throw error;
+  }
 }
 
 export async function searchUsersByUsername(currentUserId: string, query: string, page: number, limit: number) {

@@ -12,6 +12,14 @@ const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
   });
 };
 
+const clearRefreshTokenCookie = (res: Response) => {
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+};
+
 export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
   const result = await registerUser(req.body);
 
@@ -61,6 +69,6 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  res.clearCookie('jwt');
+  clearRefreshTokenCookie(res);
   res.json({ message: 'User logged out successfully' });
 };

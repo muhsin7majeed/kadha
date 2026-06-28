@@ -8,11 +8,13 @@ import useRegister from '@/features/auth/api/use-register';
 import { RegisterInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
 import { useSetAuthAtom } from '@/atoms/auth-atom';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useSetAuthAtom();
+  const queryClient = useQueryClient();
 
   const from = (location.state as LocationState)?.from || '/app';
 
@@ -22,6 +24,7 @@ const Register = () => {
     mutate(payload, {
       onSuccess: (data) => {
         setAccessToken(data.accessToken);
+        queryClient.clear();
         setAuth({
           user: {
             id: data.userId,
