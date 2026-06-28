@@ -1,12 +1,12 @@
 interface TMDBBaseMedia {
   adult: boolean;
-  backdrop_path: string;
+  backdrop_path: string | null;
   genre_ids: number[];
   id: number;
   original_language: string;
   overview: string;
   popularity: number;
-  poster_path: string;
+  poster_path: string | null;
   vote_average: number;
   vote_count: number;
 }
@@ -26,6 +26,12 @@ export interface TMDBTv extends TMDBBaseMedia {
   name: string;
   origin_country?: string[];
 }
+
+export type MediaType = 'movie' | 'tv';
+
+export type NormalizedTMDBMovie = TMDBMovie & { media_type: 'movie' };
+export type NormalizedTMDBTv = TMDBTv & { media_type: 'tv' };
+export type NormalizedTMDBMedia = NormalizedTMDBMovie | NormalizedTMDBTv;
 
 export interface TMDBGenre {
   id: number;
@@ -132,7 +138,7 @@ export interface TMDBTvDetails extends Omit<TMDBTv, 'genre_ids'> {
   status: string;
   tagline: string | null;
   type: string;
-  still_path: string;
+  still_path: string | null;
 }
 
 interface MovieDBBaseResponse {
@@ -159,14 +165,14 @@ export interface MediaMeta {
   watchlist?: boolean;
 }
 
-export type TMDBMovieWithMediaId = Omit<TMDBMovie, 'id'> & { media_id: number };
-export type TMDBTvWithMediaId = Omit<TMDBTv, 'id'> & { media_id: number };
+export type TMDBMovieWithMediaId = Omit<NormalizedTMDBMovie, 'id'> & { media_id: number };
+export type TMDBTvWithMediaId = Omit<NormalizedTMDBTv, 'id'> & { media_id: number };
 
 export type TMDBMovieWithMeta = TMDBMovieWithMediaId & MediaMeta;
 export type TMDBTvWithMeta = TMDBTvWithMediaId & MediaMeta;
 
-export type TMDBMovieDetailsWithMediaId = Omit<TMDBMovieDetails, 'id'> & { media_id: number };
-export type TMDBTvDetailsWithMediaId = Omit<TMDBTvDetails, 'id'> & { media_id: number };
+export type TMDBMovieDetailsWithMediaId = Omit<TMDBMovieDetails, 'id'> & { media_id: number; media_type: 'movie' };
+export type TMDBTvDetailsWithMediaId = Omit<TMDBTvDetails, 'id'> & { media_id: number; media_type: 'tv' };
 
 export type TMDBMovieDetailsWithMeta = TMDBMovieDetailsWithMediaId & MediaMeta;
 export type TMDBTvDetailsWithMeta = TMDBTvDetailsWithMediaId & MediaMeta;

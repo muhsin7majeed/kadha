@@ -11,10 +11,12 @@ export interface UserMedia extends MediaMeta {
   media_id: number;
   media_type: MediaType;
   title: string;
-  poster_path: string;
+  poster_path: string | null;
   vote_average: number;
   vote_count: number;
   adult: boolean;
   genre_ids: number[];
   release_date: string;
 }
+
+export type UserMediaPayload = Omit<UserMedia, 'id'>;

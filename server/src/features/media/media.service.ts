@@ -2,6 +2,10 @@ import { prisma } from '@/lib/prisma';
 import { createPaginationMeta } from '@/lib/pagination';
 
 import {
+  MediaType,
+  NormalizedTMDBMedia,
+  NormalizedTMDBMovie,
+  NormalizedTMDBTv,
   TMDBMovie,
   TMDBMovieDetailsWithMeta,
   TMDBMovieWithMeta,
@@ -19,38 +23,79 @@ import {
   fetchTrendingMovies,
   fetchTrendingTvs,
   fetchTvGenres,
-  searchMediaByQuery,
+  searchMoviesByQuery,
+  searchTvsByQuery,
 } from './tmdb.client';
 
-type TMDBMedia = TMDBMovie | TMDBTv;
+const isMediaType = (value: string): value is MediaType => value === 'movie' || value === 'tv';
+
+const parseMediaId = (value: string) => {
+  const id = Number(value);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    throw {
+      status: 400,
+      message: 'Media ID must be a positive integer',
+    };
+  }
+
+  return id;
+};
+
+const assertMediaType = (value: string): MediaType => {
+  if (!isMediaType(value)) {
+    throw {
+      status: 400,
+      message: 'Media type must be either movie or tv',
+    };
+  }
+
+  return value;
+};
+
+const normalizeMovie = (media: TMDBMovie): NormalizedTMDBMovie => ({
+  ...media,
+  media_type: 'movie',
+});
+
+const normalizeTv = (media: TMDBTv): NormalizedTMDBTv => ({
+  ...media,
+  media_type: 'tv',
+});
+
+const interactionKey = (mediaType: MediaType, mediaId: number) => `${mediaType}:${mediaId}`;
 
 const enrichMediaWithUserInteractions = async (
-  media: TMDBMedia[],
+  media: NormalizedTMDBMedia[],
   userId: string,
 ): Promise<TMDBMovieWithMeta[] | TMDBTvWithMeta[]> => {
   const mediaIds = media.map((m) => m.id);
+  const mediaTypes = [...new Set(media.map((m) => m.media_type))];
 
   const interactions = await prisma.userMedia.findMany({
     where: {
       userId,
       media_id: { in: mediaIds },
+      media_type: { in: mediaTypes },
     },
   });
 
-  const map = new Map();
+  const map = new Map<string, (typeof interactions)[number]>();
 
   interactions.forEach((i) => {
-    map.set(i.media_id, i);
+    map.set(interactionKey(i.media_type, i.media_id), i);
   });
 
   const enriched = media.map((m) => {
     const { id, ...rest } = m;
+    const interaction = map.get(interactionKey(m.media_type, id));
+
     return {
       ...rest,
       media_id: id,
-      liked: map.get(id)?.liked ?? false,
-      watched: map.get(id)?.watched ?? false,
-      watchlist: map.get(id)?.watchlist ?? false,
+      liked: interaction?.liked ?? false,
+      watched: interaction?.watched ?? false,
+      watchlist: interaction?.watchlist ?? false,
     };
   });
 
@@ -59,50 +104,53 @@ const enrichMediaWithUserInteractions = async (
 
 export async function getTrendingMovies(userId: string) {
   const response = await fetchTrendingMovies();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBMovieWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
 }
 
 export async function getTrendingTvs(userId: string) {
   const response = await fetchTrendingTvs();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBTvWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
 }
 
 export async function getPopularMovies(userId: string) {
   const response = await fetchPopularMovies();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBMovieWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
 }
 
 export async function getPopularTvs(userId: string) {
   const response = await fetchPopularTvs();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBTvWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
 }
 
 export async function getTopRatedMovies(userId: string) {
   const response = await fetchTopRatedMovies();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBMovieWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
 }
 
 export async function getTopRatedTvs(userId: string) {
   const response = await fetchTopRatedTvs();
-  return enrichMediaWithUserInteractions(response.data.results, userId) as Promise<TMDBTvWithMeta[]>;
+  return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
 }
 
 export async function getMediaDetails(userId: string, mediaType: string, id: string) {
-  const response = await fetchMediaDetails(mediaType, id);
+  const validMediaType = assertMediaType(mediaType);
+  const mediaId = parseMediaId(id);
+  const response = await fetchMediaDetails(validMediaType, mediaId);
 
   const interactions = await prisma.userMedia.findFirst({
     where: {
       userId,
-      media_id: parseInt(id),
-      media_type: mediaType as 'movie' | 'tv',
+      media_id: mediaId,
+      media_type: validMediaType,
     },
   });
 
-  const { id: mediaId, ...rest } = response.data;
+  const { id: responseMediaId, ...rest } = response;
 
   return {
     ...rest,
-    media_id: mediaId,
+    media_id: responseMediaId,
+    media_type: validMediaType,
     liked: interactions?.liked ?? false,
     watched: interactions?.watched ?? false,
     watchlist: interactions?.watchlist ?? false,
@@ -115,11 +163,11 @@ export async function getGenres() {
 
   const combinedGenreHashMap: Record<number, string> = {};
 
-  movieGenre.data.genres.forEach((genre: { id: number; name: string }) => {
+  movieGenre.genres.forEach((genre: { id: number; name: string }) => {
     combinedGenreHashMap[genre.id] = genre.name;
   });
 
-  tvGenre.data.genres.forEach((genre: { id: number; name: string }) => {
+  tvGenre.genres.forEach((genre: { id: number; name: string }) => {
     combinedGenreHashMap[genre.id] = genre.name;
   });
 
@@ -127,18 +175,31 @@ export async function getGenres() {
 }
 
 export async function searchMedia(userId: string, query: string, page: number) {
-  const response = await searchMediaByQuery(query, page);
+  const normalizedQuery = query.trim();
 
-  const justMoviesAndTvs = response.data.results.filter(
-    (result) => result.media_type === 'movie' || result.media_type === 'tv',
-  );
+  if (!normalizedQuery) {
+    return {
+      data: [],
+      pagination: createPaginationMeta(1, 20, 0),
+    };
+  }
 
-  const data = (await enrichMediaWithUserInteractions(justMoviesAndTvs as TMDBMedia[], userId)) as
+  const [movieResponse, tvResponse] = await Promise.all([
+    searchMoviesByQuery(normalizedQuery, page),
+    searchTvsByQuery(normalizedQuery, page),
+  ]);
+
+  const normalizedMedia = [
+    ...movieResponse.results.map(normalizeMovie),
+    ...tvResponse.results.map(normalizeTv),
+  ].sort((a, b) => b.popularity - a.popularity);
+
+  const data = (await enrichMediaWithUserInteractions(normalizedMedia, userId)) as
     | TMDBMovieWithMeta[]
     | TMDBTvWithMeta[];
 
   return {
     data,
-    pagination: createPaginationMeta(response.data.page, 20, response.data.total_results),
+    pagination: createPaginationMeta(page, 40, movieResponse.total_results + tvResponse.total_results),
   };
 }

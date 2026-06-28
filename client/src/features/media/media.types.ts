@@ -6,19 +6,19 @@ interface MediaMeta {
 
 interface BaseMedia {
   adult: boolean;
-  backdrop_path: string;
+  backdrop_path: string | null;
   genre_ids: number[];
   media_id: number;
   original_language: string;
   overview: string;
   popularity: number;
-  poster_path: string;
+  poster_path: string | null;
   vote_average: number;
   vote_count: number;
 }
 
 export interface Movie extends BaseMedia {
-  media_type?: 'movie';
+  media_type: 'movie';
   original_title: string;
   release_date: string;
   title: string;
@@ -29,7 +29,7 @@ export type MovieWithMeta = Movie & MediaMeta;
 export type TvWithMeta = Tv & MediaMeta;
 
 export interface Tv extends BaseMedia {
-  media_type?: 'tv';
+  media_type: 'tv';
   original_name: string;
   first_air_date: string;
   name: string;
@@ -141,7 +141,7 @@ export interface TvDetails extends Omit<Tv, 'genre_ids'> {
   status: string;
   tagline: string | null;
   type: string;
-  still_path: string;
+  still_path: string | null;
 }
 
 export type MovieDetailsWithMeta = MovieDetails & MediaMeta;
