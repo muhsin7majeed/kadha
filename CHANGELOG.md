@@ -4,6 +4,11 @@ This changelog was created on 2026-06-28 from commits after `5d14425`, the 2026-
 
 ## Feature Changes
 
+### In-App Changelog
+
+- Added a clickable version number in the navbar so users can open the changelog from inside the app.
+- Added an end-user changelog view that summarizes feature changes first, followed by engineering notes for maintainers.
+
 ### Social Privacy
 
 - Added profile privacy controls so users can choose who can view their media activity.
