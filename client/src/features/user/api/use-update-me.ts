@@ -7,11 +7,19 @@ import { queryKeys } from '@/lib/query-keys';
 
 interface UpdateMePayload {
   username: string;
+  profilePrivacy: string;
+  watchedPrivacy: string;
+  likedPrivacy: string;
+  watchlistPrivacy: string;
 }
 
 interface UpdateMeResponse {
   id: string;
   username: string;
+  profilePrivacy: string;
+  watchedPrivacy: string;
+  likedPrivacy: string;
+  watchlistPrivacy: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,7 +39,7 @@ const useUpdateMe = () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.me });
 
       toaster.success({
-        title: 'Username updated successfully',
+        title: 'Profile updated successfully',
       });
     },
   });

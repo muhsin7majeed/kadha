@@ -1,9 +1,36 @@
 import { prisma } from '@/lib/prisma';
 
+export type ViewerFriendshipStatus =
+  | 'NONE'
+  | 'PENDING_SENT'
+  | 'PENDING_RECEIVED'
+  | 'ACCEPTED'
+  | 'BLOCKED_BY_ME'
+  | 'BLOCKED_ME';
+
 export interface FriendshipInfo {
-  friendshipStatus: string | null;
+  friendshipStatus: ViewerFriendshipStatus;
   isRequestSender: boolean;
 }
+
+const toViewerFriendshipStatus = (
+  status: string,
+  isCurrentUserSender: boolean,
+): ViewerFriendshipStatus => {
+  if (status === 'PENDING') {
+    return isCurrentUserSender ? 'PENDING_SENT' : 'PENDING_RECEIVED';
+  }
+
+  if (status === 'ACCEPTED') {
+    return 'ACCEPTED';
+  }
+
+  if (status === 'BLOCKED') {
+    return isCurrentUserSender ? 'BLOCKED_BY_ME' : 'BLOCKED_ME';
+  }
+
+  return 'NONE';
+};
 
 /**
  * Get friendship status between the current user and a list of other users.
@@ -43,7 +70,7 @@ export const getFriendshipStatusMap = async (
     const otherUserId = isCurrentUserSender ? friendship.receiverId : friendship.senderId;
 
     statusMap.set(otherUserId, {
-      friendshipStatus: friendship.status,
+      friendshipStatus: toViewerFriendshipStatus(friendship.status, isCurrentUserSender),
       isRequestSender: isCurrentUserSender,
     });
   }
@@ -60,7 +87,7 @@ export const enrichUserWithFriendship = <T extends { id: string }>(
   statusMap: Map<string, FriendshipInfo>,
 ): T & FriendshipInfo => {
   const friendshipInfo = statusMap.get(user.id) || {
-    friendshipStatus: null,
+    friendshipStatus: 'NONE' as ViewerFriendshipStatus,
     isRequestSender: false,
   };
 
@@ -82,4 +109,31 @@ export const enrichUsersWithFriendship = async <T extends { id: string }>(
   const statusMap = await getFriendshipStatusMap(currentUserId, userIds);
 
   return users.map((user) => enrichUserWithFriendship(user, statusMap));
+};
+
+export const getViewerRelationship = async (
+  viewerId: string,
+  ownerId: string,
+): Promise<FriendshipInfo> => {
+  if (viewerId === ownerId) {
+    return { friendshipStatus: 'ACCEPTED', isRequestSender: false };
+  }
+
+  const statusMap = await getFriendshipStatusMap(viewerId, [ownerId]);
+
+  return (
+    statusMap.get(ownerId) || {
+      friendshipStatus: 'NONE',
+      isRequestSender: false,
+    }
+  );
+};
+
+export const areUsersFriends = async (viewerId: string, ownerId: string) => {
+  if (viewerId === ownerId) {
+    return true;
+  }
+
+  const relationship = await getViewerRelationship(viewerId, ownerId);
+  return relationship.friendshipStatus === 'ACCEPTED';
 };

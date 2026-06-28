@@ -18,6 +18,8 @@ const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
 const UserProfile = lazy(() => import('@/pages/user/profile'));
+const OtherUserCollectionsTab = lazy(() => import('@/pages/user/profile/other-user-data/collections-tab'));
+const OtherUserMediaTab = lazy(() => import('@/pages/user/profile/other-user-data/media-tab'));
 const Watched = lazy(() => import('@/pages/watched'));
 const Watchlist = lazy(() => import('@/pages/watchlist'));
 
@@ -48,10 +50,10 @@ export function AppRoutes() {
 
               <Route path=":username" element={<UserProfile />}>
                 <Route index element={<Navigate to="watched" replace />} />
-                <Route path="watched" element={<h1>Watched</h1>} />
-                <Route path="liked" element={<h1>Liked</h1>} />
-                <Route path="watchlist" element={<h1>Watchlist</h1>} />
-                <Route path="collections" element={<h1>Collections</h1>} />
+                <Route path="watched" element={<OtherUserMediaTab type="watched" />} />
+                <Route path="liked" element={<OtherUserMediaTab type="liked" />} />
+                <Route path="watchlist" element={<OtherUserMediaTab type="watchlist" />} />
+                <Route path="collections" element={<OtherUserCollectionsTab />} />
               </Route>
             </Route>
 

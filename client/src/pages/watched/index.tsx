@@ -11,7 +11,7 @@ const Watched = () => {
       <MediaListPage
         title="Watched"
         description="Your viewing history. All the movies and shows you've completed watching, all in one place."
-        data={watched}
+        data={watched?.data}
         isLoading={isLoading}
         isFetching={isFetching}
         error={error}

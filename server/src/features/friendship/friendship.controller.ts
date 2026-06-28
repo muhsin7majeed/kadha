@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import {
   acceptRequest,
+  blockFriend,
   FriendshipType,
   getFriendshipUsers,
   rejectRequest,
@@ -42,7 +43,13 @@ export const unfriend = async (req: Request, res: Response) => {
   return res.status(result.status).json(result.body);
 };
 
-export const blockUser = async (req: Request, res: Response) => {};
+export const blockUser = async (req: Request, res: Response) => {
+  const { id: currentUserId } = req.user;
+  const { userId } = req.body;
+  const result = await blockFriend(currentUserId, userId);
+
+  return res.status(result.status).json(result.body);
+};
 
 export const unblockUser = async (req: Request, res: Response) => {
   const { id: currentUserId } = req.user;

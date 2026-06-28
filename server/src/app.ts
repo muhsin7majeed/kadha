@@ -31,6 +31,7 @@ export function createApp(): Express {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/user', authMiddleware, userRoutes);
+  app.use('/api/users', authMiddleware, userRoutes);
   app.use('/api/media', authMiddleware, mediaRoutes);
   app.use('/api/user-media', authMiddleware, userMediaRoutes);
   app.use('/api/collection', authMiddleware, collectionRoutes);
