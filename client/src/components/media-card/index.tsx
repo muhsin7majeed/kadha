@@ -10,9 +10,10 @@ import NavLink from '../nav-link';
 
 interface MediaCardProps {
   media: MovieWithMeta | TvWithMeta | UserMedia;
+  onNavigate?: () => void;
 }
 
-const MediaCard = ({ media }: MediaCardProps) => {
+const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   const title = 'title' in media ? media.title : media.name;
@@ -62,6 +63,7 @@ const MediaCard = ({ media }: MediaCardProps) => {
             fontSize="md"
             fontWeight="bold"
             lineClamp={2}
+            onClick={onNavigate}
           >
             {title} ({formatDate(releaseDate, 'YYYY')})
           </NavLink>

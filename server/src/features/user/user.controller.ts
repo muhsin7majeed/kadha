@@ -44,7 +44,7 @@ export const searchUsers = async (req: Request, res: Response) => {
   const { query } = req.query;
   const { id: currentUserId } = req.user;
   const { page, limit } = getPaginationParams(req.query);
-  const data = await searchUsersByUsername(currentUserId, query as string, page, limit);
+  const data = await searchUsersByUsername(currentUserId, typeof query === 'string' ? query : '', page, limit);
 
   res.json(data);
 };

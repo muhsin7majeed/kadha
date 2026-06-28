@@ -23,8 +23,7 @@ import {
   fetchTrendingMovies,
   fetchTrendingTvs,
   fetchTvGenres,
-  searchMoviesByQuery,
-  searchTvsByQuery,
+  searchMediaByType,
 } from './tmdb.client';
 
 const isMediaType = (value: string): value is MediaType => value === 'movie' || value === 'tv';
@@ -174,7 +173,8 @@ export async function getGenres() {
   return combinedGenreHashMap;
 }
 
-export async function searchMedia(userId: string, query: string, page: number) {
+export async function searchMedia(userId: string, mediaType: string, query: string, page: number) {
+  const validMediaType = assertMediaType(mediaType);
   const normalizedQuery = query.trim();
 
   if (!normalizedQuery) {
@@ -184,22 +184,25 @@ export async function searchMedia(userId: string, query: string, page: number) {
     };
   }
 
-  const [movieResponse, tvResponse] = await Promise.all([
-    searchMoviesByQuery(normalizedQuery, page),
-    searchTvsByQuery(normalizedQuery, page),
-  ]);
+  if (validMediaType === 'movie') {
+    const response = await searchMediaByType('movie', normalizedQuery, page);
+    const data = (await enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId)) as
+      | TMDBMovieWithMeta[]
+      | TMDBTvWithMeta[];
 
-  const normalizedMedia = [
-    ...movieResponse.results.map(normalizeMovie),
-    ...tvResponse.results.map(normalizeTv),
-  ].sort((a, b) => b.popularity - a.popularity);
+    return {
+      data,
+      pagination: createPaginationMeta(page, 20, response.total_results),
+    };
+  }
 
-  const data = (await enrichMediaWithUserInteractions(normalizedMedia, userId)) as
+  const response = await searchMediaByType('tv', normalizedQuery, page);
+  const data = (await enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId)) as
     | TMDBMovieWithMeta[]
     | TMDBTvWithMeta[];
 
   return {
     data,
-    pagination: createPaginationMeta(page, 40, movieResponse.total_results + tvResponse.total_results),
+    pagination: createPaginationMeta(page, 20, response.total_results),
   };
 }

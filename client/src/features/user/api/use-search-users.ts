@@ -13,11 +13,11 @@ const fetchSearchUsers = async (query: string, page: number) => {
   return response.data;
 };
 
-const useSearchUsers = (query: string, page = 1) => {
+const useSearchUsers = (query: string, page = 1, enabled = true) => {
   return useQuery({
     queryKey: queryKeys.searchUsersByQuery(query, page),
     queryFn: () => fetchSearchUsers(query, page),
-    enabled: !!query,
+    enabled: enabled && !!query,
   });
 };
 

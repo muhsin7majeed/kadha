@@ -2,12 +2,7 @@ import { Request, Response } from 'express';
 
 import { BaseResponse, PaginatedResponse } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
-import {
-  TMDBMovieDetailsWithMeta,
-  TMDBMovieWithMeta,
-  TMDBTvDetailsWithMeta,
-  TMDBTvWithMeta,
-} from './media.types';
+import { TMDBMovieDetailsWithMeta, TMDBMovieWithMeta, TMDBTvDetailsWithMeta, TMDBTvWithMeta } from './media.types';
 import * as mediaService from './media.service';
 
 export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<TMDBMovieWithMeta[]>>) => {
@@ -66,9 +61,9 @@ export const searchMedia = async (
   req: Request,
   res: Response<PaginatedResponse<TMDBMovieWithMeta[] | TMDBTvWithMeta[]>>,
 ) => {
-  const { query } = req.params;
+  const { mediaType, query } = req.params;
   const { page } = getPaginationParams(req.query);
-  const data = await mediaService.searchMedia(req.user.id, query, page);
+  const data = await mediaService.searchMedia(req.user.id, mediaType, query, page);
 
   res.json(data);
 };

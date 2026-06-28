@@ -97,9 +97,18 @@ export async function updateCurrentUser(
 }
 
 export async function searchUsersByUsername(currentUserId: string, query: string, page: number, limit: number) {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
+    return {
+      data: [],
+      pagination: createPaginationMeta(1, limit, 0),
+    };
+  }
+
   const where = {
     username: {
-      contains: query,
+      contains: normalizedQuery,
     },
     id: {
       not: currentUserId,

@@ -152,3 +152,9 @@ export async function searchTvsByQuery(query: string, page: number) {
     return response.data;
   });
 }
+
+export function searchMediaByType(mediaType: 'movie', query: string, page: number): Promise<MovieDBMovieResponse>;
+export function searchMediaByType(mediaType: 'tv', query: string, page: number): Promise<MovieDBTvResponse>;
+export function searchMediaByType(mediaType: 'movie' | 'tv', query: string, page: number) {
+  return mediaType === 'movie' ? searchMoviesByQuery(query, page) : searchTvsByQuery(query, page);
+}

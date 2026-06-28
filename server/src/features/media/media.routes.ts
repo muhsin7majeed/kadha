@@ -25,7 +25,7 @@ router.get('/popular-tvs', getPopularTvs);
 
 router.get('/genres', getGenre);
 
-router.get('/search/:query', searchMedia);
+router.get('/search/:mediaType/:query', searchMedia);
 
 router.get('/:mediaType/:id', getMediaDetails);
 
