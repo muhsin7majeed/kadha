@@ -14,5 +14,5 @@ RUN npx prisma generate --schema=./src/prisma/schema.prisma
 
 EXPOSE 5000
 
-# Run migrations then start dev server
-CMD npx prisma migrate deploy --schema=./src/prisma/schema.prisma && npm run dev
+# Regenerate Prisma Client because the source tree is mounted in dev while node_modules is a persistent volume.
+CMD npx prisma generate --schema=./src/prisma/schema.prisma && npx prisma migrate deploy --schema=./src/prisma/schema.prisma && npm run dev

@@ -1,7 +1,16 @@
 import { Request, Response } from 'express';
 
 import { DataPrivacy } from '@/types/common';
-import { getCurrentUser, getUserMediaByFlag, searchUsersByUsername, updateCurrentUser } from './user.service';
+import {
+  getCurrentUser,
+  getUserCollectionsByUsername,
+  getUserMediaByFlag,
+  getUserMediaByUsername,
+  getUserProfileByUsername,
+  searchUsersByUsername,
+  updateCurrentUser,
+} from './user.service';
+import { UpdateMePayload } from './user.schema';
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = req.user;
@@ -12,8 +21,15 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   const { id } = req.user;
-  const { username, profilePrivacy } = req.body;
-  const result = await updateCurrentUser(id, username, profilePrivacy as DataPrivacy);
+  const { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy } = req.body as UpdateMePayload;
+  const result = await updateCurrentUser(
+    id,
+    username,
+    profilePrivacy as DataPrivacy,
+    (watchedPrivacy || DataPrivacy.Friends) as DataPrivacy,
+    (likedPrivacy || DataPrivacy.Friends) as DataPrivacy,
+    (watchlistPrivacy || DataPrivacy.OnlyMe) as DataPrivacy,
+  );
 
   if ('fieldErrors' in result) {
     return res.status(400).json({ fieldErrors: result.fieldErrors });
@@ -31,7 +47,6 @@ export const searchUsers = async (req: Request, res: Response) => {
 };
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
-  console.log(req.params);
   const { id } = req.user;
   const data = await getUserMediaByFlag(id, 'watchlist');
 
@@ -43,6 +58,76 @@ export const getUserLiked = async (req: Request, res: Response) => {
   const data = await getUserMediaByFlag(id, 'liked');
 
   res.json({ data });
+};
+
+export const getUserProfile = async (req: Request, res: Response) => {
+  const result = await getUserProfileByUsername(req.user.id, req.params.username);
+
+  if (!result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if ('blocked' in result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  res.json(result);
+};
+
+export const getUserWatchedByUsername = async (req: Request, res: Response) => {
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watched');
+
+  if (!result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if ('blocked' in result) {
+    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+  }
+
+  res.json(result);
+};
+
+export const getUserLikedByUsername = async (req: Request, res: Response) => {
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'liked');
+
+  if (!result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if ('blocked' in result) {
+    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+  }
+
+  res.json(result);
+};
+
+export const getUserWatchlistByUsername = async (req: Request, res: Response) => {
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watchlist');
+
+  if (!result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if ('blocked' in result) {
+    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+  }
+
+  res.json(result);
+};
+
+export const getUserCollectionsByUsernameController = async (req: Request, res: Response) => {
+  const result = await getUserCollectionsByUsername(req.user.id, req.params.username);
+
+  if (!result) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if ('blocked' in result) {
+    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+  }
+
+  res.json(result);
 };
 
 export const getUserWatched = async (req: Request, res: Response) => {

@@ -4,11 +4,15 @@ export interface User {
   id: string;
   username: string;
   profilePrivacy: DataPrivacy;
+  watchedPrivacy: DataPrivacy;
+  likedPrivacy: DataPrivacy;
+  watchlistPrivacy: DataPrivacy;
 }
 
 export interface UserSearchResult extends UserActor {
   id: string;
   username: string;
+  profilePrivacy: DataPrivacy;
 }
 
 /**
@@ -20,4 +24,16 @@ export interface UserActor {
   username: string;
   friendshipStatus: FriendStatus;
   isRequestSender: boolean;
+}
+
+export interface UserProfileResponse extends UserActor {
+  profilePrivacy: DataPrivacy;
+  canViewProfile: boolean;
+  lockedReason?: 'FRIENDS_ONLY' | 'PRIVATE';
+  sections: {
+    watched: boolean;
+    liked: boolean;
+    watchlist: boolean;
+    collections: boolean;
+  };
 }

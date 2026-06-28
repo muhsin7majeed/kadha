@@ -11,7 +11,7 @@ const SimpleRadioGroup: React.FC<SimpleRadioGroupProps> = ({ options, label, ...
     <RadioGroup.Root {...props}>
       {label && <Text mb={2}>{label}</Text>}
 
-      <HStack gap="6">
+      <HStack gap="6" flexWrap="wrap">
         {options.map((option) => (
           <RadioGroup.Item value={option.value} key={option.value}>
             <RadioGroup.ItemHiddenInput />

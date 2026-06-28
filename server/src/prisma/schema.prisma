@@ -33,14 +33,17 @@ enum NotificationType {
 }
 
 model User {
-  id             String       @id @default(uuid())
-  username       String       @unique
-  profilePrivacy DataPrivacy  @default(EVERYONE)
-  password       String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  user_media     UserMedia[]
-  collections    Collection[]
+  id               String       @id @default(uuid())
+  username         String       @unique
+  profilePrivacy   DataPrivacy  @default(EVERYONE)
+  watchedPrivacy   DataPrivacy  @default(FRIENDS)
+  likedPrivacy     DataPrivacy  @default(FRIENDS)
+  watchlistPrivacy DataPrivacy  @default(ONLY_ME)
+  password         String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  user_media       UserMedia[]
+  collections      Collection[]
 
   // Friend relationships
   sentFriendRequests     Friendship[] @relation("SentFriendRequests")
@@ -67,6 +70,8 @@ model Friendship {
   @@unique([senderId, receiverId]) // Prevent duplicate friend requests
   @@index([senderId])
   @@index([receiverId])
+  @@index([senderId, status])
+  @@index([receiverId, status])
   @@index([status])
   @@map("friendships")
 }
@@ -113,6 +118,9 @@ model UserMedia {
 
   @@unique([userId, media_id, media_type])
   @@index([userId])
+  @@index([userId, watched])
+  @@index([userId, liked])
+  @@index([userId, watchlist])
   @@index([media_id, media_type])
   @@map("user_media")
 }

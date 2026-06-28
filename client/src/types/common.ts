@@ -36,8 +36,10 @@ export enum DataPrivacy {
 }
 
 export enum FriendStatus {
-  Pending = 'PENDING',
+  None = 'NONE',
+  PendingSent = 'PENDING_SENT',
+  PendingReceived = 'PENDING_RECEIVED',
   Accepted = 'ACCEPTED',
-  Rejected = 'REJECTED',
-  Blocked = 'BLOCKED',
+  BlockedByMe = 'BLOCKED_BY_ME',
+  BlockedMe = 'BLOCKED_ME',
 }

@@ -4,15 +4,21 @@ import { BaseResponse } from '@/types/common';
 import { UserMedia } from '@/features/user-media/user-media.types';
 import { useQuery } from '@tanstack/react-query';
 
-const fetchLiked = async () => {
-  const response = await api.get<BaseResponse<UserMedia[]>>('/api/user/liked');
-  return response.data.data;
+import { UserMediaAccessResponse } from './use-watched';
+
+const fetchLiked = async (username?: string): Promise<UserMediaAccessResponse> => {
+  const response = await api.get<UserMediaAccessResponse | BaseResponse<UserMedia[]>>(
+    username ? `/api/users/${username}/liked` : '/api/user/liked',
+  );
+
+  return 'canView' in response.data ? response.data : { data: response.data.data, canView: true };
 };
 
-const useLiked = () => {
+const useLiked = (username?: string, options: { enabled?: boolean } = {}) => {
   return useQuery({
-    queryKey: queryKeys.liked,
-    queryFn: () => fetchLiked(),
+    queryKey: username ? queryKeys.userLiked(username) : queryKeys.liked,
+    queryFn: () => fetchLiked(username),
+    enabled: options.enabled ?? true,
   });
 };
 

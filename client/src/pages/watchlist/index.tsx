@@ -11,7 +11,7 @@ const Watchlist = () => {
       <MediaListPage
         title="Watchlist"
         description="Movies and shows you're planning to watch. Your personal queue of entertainment waiting to be discovered."
-        data={watchList}
+        data={watchList?.data}
         isLoading={isLoading}
         isFetching={isFetching}
         error={error}

@@ -11,7 +11,7 @@ const Liked = () => {
       <MediaListPage
         title="Liked"
         description="Your favorite movies and shows. The ones that left a lasting impression and deserve a special place."
-        data={liked}
+        data={liked?.data}
         isLoading={isLoading}
         isFetching={isFetching}
         error={error}
