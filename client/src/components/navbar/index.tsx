@@ -14,6 +14,7 @@ import { LuGithub, LuMoon, LuSun, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { useAuthAtom } from '@/atoms/auth-atom';
 import { APP_CONFIG } from '@/config/app-config';
+import GlobalSearchDialog from '@/features/search/global-search-dialog';
 
 import NotificationButton from '../notification-button';
 import ProfileMenu from './profile-menu';
@@ -60,6 +61,8 @@ const Navbar = () => {
 
               {isAuthenticated ? (
                 <Flex gap={4}>
+                  <GlobalSearchDialog />
+
                   <NotificationButton />
 
                   <ProfileMenu />

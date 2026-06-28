@@ -30,7 +30,8 @@ export const queryKeys = {
   mediaDetails: ['media-details'] as const,
   mediaDetailsById: (mediaType: MediaType, id: string) => ['media-details', mediaType, id] as const,
   searchMedia: ['search-media'] as const,
-  searchMediaByQuery: (query: string, page = 1) => ['search-media', query, page] as const,
+  searchMediaByQuery: (mediaType: MediaType, query: string, page = 1) =>
+    ['search-media', mediaType, query, page] as const,
   trendingMovies: ['trending-movies'] as const,
   trendingTvs: ['trending-tvs'] as const,
   topRatedMovies: ['top-rated-movies'] as const,

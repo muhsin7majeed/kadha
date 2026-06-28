@@ -12,7 +12,7 @@ import PaginationControls from '../pagination-controls';
 interface MediaListPageProps {
   title: string;
   description: string;
-  data: UserMedia[] | MovieWithMeta[] | TvWithMeta[] | undefined;
+  data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
