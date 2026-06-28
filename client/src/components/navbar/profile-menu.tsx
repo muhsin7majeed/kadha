@@ -7,6 +7,7 @@ import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { useState } from 'react';
 import ConfirmationDialog from '../dialogs/confirmation-dialog';
 import { LuLogOut, LuUser, LuUsers } from 'react-icons/lu';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ProfileMenu = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
@@ -14,17 +15,21 @@ const ProfileMenu = () => {
   const [auth] = useAuthAtom();
 
   const setAuth = useSetAuthAtom();
+  const queryClient = useQueryClient();
   const { mutateAsync: logoutMutation } = useLogout();
 
   const logout = async () => {
-    await logoutMutation();
+    try {
+      await logoutMutation();
+    } finally {
+      removeAccessToken();
+      queryClient.clear();
 
-    removeAccessToken();
-
-    setAuth({
-      user: null,
-      status: 'unauthenticated',
-    });
+      setAuth({
+        user: null,
+        status: 'unauthenticated',
+      });
+    }
   };
 
   const handleLogout = () => {
