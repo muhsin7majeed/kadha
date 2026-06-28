@@ -71,6 +71,8 @@ server/src/features/media/
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.
 - Keep query keys centralized or colocated consistently by feature; do not mix inline patterns.
+- Use configured import aliases instead of relative parent-path imports in client code. Use `@/*` for `client/src/*`.
+- Do not import files outside the client package directly from client source. If client code needs repository-root content, generate or copy a client-owned artifact.
 
 ## Configuration Notes
 
@@ -82,5 +84,9 @@ server/src/features/media/
 
 ## Documentation
 
+- Before making changes, read `CHANGELOG.md` when it exists so you understand the latest user-facing and engineering changes.
+- Update `CHANGELOG.md` for user-visible feature changes, engineering-significant changes, dependency or deployment changes, database migrations, and behavior fixes that end users or maintainers should know about.
+- When `CHANGELOG.md` changes, run `cd client && npm run sync:changelog` so the in-app changelog stays current.
+- Keep the top changelog section focused on end-user feature changes, then include engineering notes below it.
 - Keep `README.md` aligned with setup, deployment, and operations changes.
 - Keep `docs/project-structure.md` aligned when changing architectural boundaries or placement rules.

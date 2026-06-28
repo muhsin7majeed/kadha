@@ -7,6 +7,7 @@ COPY client/package*.json ./
 RUN npm ci
 
 COPY client ./
+COPY CHANGELOG.md ./CHANGELOG.md
 
 ARG VITE_APP_NAME=Kadha
 ARG VITE_APP_URL=https://kadha.org

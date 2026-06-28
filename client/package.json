@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "sync:changelog": "node scripts/generate-changelog.mjs",
+    "predev": "npm run sync:changelog",
     "dev": "vite --host 0.0.0.0",
+    "prebuild": "npm run sync:changelog",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
