@@ -83,13 +83,22 @@ model Notification {
   read        Boolean          @default(false)
   actorId     String?
   referenceId String? // friendshipId, collectionId, etc.
+  entityType  String?
+  entityId    String?
+  dedupeKey   String?
+  metadata    String?
+  readAt      DateTime?
+  resolvedAt  DateTime?
   createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
   user  User  @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
   actor User? @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
 
+  @@unique([userId, dedupeKey])
   @@index([userId, read])
   @@index([userId, createdAt])
+  @@index([entityType, entityId])
   @@map("notifications")
 }
 

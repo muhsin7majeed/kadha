@@ -1,18 +1,21 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse } from '@/types/common';
+import { PaginatedResponse } from '@/types/common';
 import { useQuery } from '@tanstack/react-query';
 import { Notification } from '../notifications.types';
 
-const getNotifications = async () => {
-  const response = await api.get<BaseResponse<Notification[]>>('/api/notifications');
-  return response.data?.data;
+const getNotifications = async (page: number) => {
+  const response = await api.get<PaginatedResponse<Notification[]>>('/api/notifications', {
+    params: { page },
+  });
+
+  return response.data;
 };
 
-const useNotifications = () => {
+const useNotifications = (page = 1) => {
   return useQuery({
-    queryKey: queryKeys.notifications,
-    queryFn: getNotifications,
+    queryKey: queryKeys.notificationsPage(page),
+    queryFn: () => getNotifications(page),
   });
 };
 
