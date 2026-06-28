@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 
 import { DataPrivacy } from '@/types/common';
+import { getPaginationParams } from '@/lib/pagination';
 import {
   getCurrentUser,
+  getCurrentUserMediaByFlag,
   getUserCollectionsByUsername,
-  getUserMediaByFlag,
   getUserMediaByUsername,
   getUserProfileByUsername,
+  lockedResource,
   searchUsersByUsername,
   updateCurrentUser,
 } from './user.service';
@@ -41,23 +43,26 @@ export const updateMe = async (req: Request, res: Response) => {
 export const searchUsers = async (req: Request, res: Response) => {
   const { query } = req.query;
   const { id: currentUserId } = req.user;
-  const data = await searchUsersByUsername(currentUserId, query as string);
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await searchUsersByUsername(currentUserId, query as string, page, limit);
 
-  res.json({ data });
+  res.json(data);
 };
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
   const { id } = req.user;
-  const data = await getUserMediaByFlag(id, 'watchlist');
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await getCurrentUserMediaByFlag(id, 'watchlist', page, limit);
 
-  res.json({ data });
+  res.json(data);
 };
 
 export const getUserLiked = async (req: Request, res: Response) => {
   const { id } = req.user;
-  const data = await getUserMediaByFlag(id, 'liked');
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await getCurrentUserMediaByFlag(id, 'liked', page, limit);
 
-  res.json({ data });
+  res.json(data);
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
@@ -75,42 +80,45 @@ export const getUserProfile = async (req: Request, res: Response) => {
 };
 
 export const getUserWatchedByUsername = async (req: Request, res: Response) => {
-  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watched');
+  const { page, limit } = getPaginationParams(req.query);
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watched', page, limit);
 
   if (!result) {
     return res.status(404).json({ message: 'User not found' });
   }
 
   if ('blocked' in result) {
-    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+    return res.status(403).json(lockedResource('PRIVATE'));
   }
 
   res.json(result);
 };
 
 export const getUserLikedByUsername = async (req: Request, res: Response) => {
-  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'liked');
+  const { page, limit } = getPaginationParams(req.query);
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'liked', page, limit);
 
   if (!result) {
     return res.status(404).json({ message: 'User not found' });
   }
 
   if ('blocked' in result) {
-    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+    return res.status(403).json(lockedResource('PRIVATE'));
   }
 
   res.json(result);
 };
 
 export const getUserWatchlistByUsername = async (req: Request, res: Response) => {
-  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watchlist');
+  const { page, limit } = getPaginationParams(req.query);
+  const result = await getUserMediaByUsername(req.user.id, req.params.username, 'watchlist', page, limit);
 
   if (!result) {
     return res.status(404).json({ message: 'User not found' });
   }
 
   if ('blocked' in result) {
-    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+    return res.status(403).json(lockedResource('PRIVATE'));
   }
 
   res.json(result);
@@ -124,7 +132,7 @@ export const getUserCollectionsByUsernameController = async (req: Request, res: 
   }
 
   if ('blocked' in result) {
-    return res.status(403).json({ data: [], canView: false, lockedReason: 'PRIVATE' });
+    return res.status(403).json(lockedResource('PRIVATE'));
   }
 
   res.json(result);
@@ -132,7 +140,8 @@ export const getUserCollectionsByUsernameController = async (req: Request, res: 
 
 export const getUserWatched = async (req: Request, res: Response) => {
   const { id } = req.user;
-  const data = await getUserMediaByFlag(id, 'watched');
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await getCurrentUserMediaByFlag(id, 'watched', page, limit);
 
-  res.json({ data });
+  res.json(data);
 };

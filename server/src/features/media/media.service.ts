@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { createPaginationMeta } from '@/lib/pagination';
 
 import {
   TMDBMovie,
@@ -125,14 +126,19 @@ export async function getGenres() {
   return combinedGenreHashMap;
 }
 
-export async function searchMedia(userId: string, query: string) {
-  const response = await searchMediaByQuery(query);
+export async function searchMedia(userId: string, query: string, page: number) {
+  const response = await searchMediaByQuery(query, page);
 
   const justMoviesAndTvs = response.data.results.filter(
     (result) => result.media_type === 'movie' || result.media_type === 'tv',
   );
 
-  return enrichMediaWithUserInteractions(justMoviesAndTvs as TMDBMedia[], userId) as Promise<
-    TMDBMovieWithMeta[] | TMDBTvWithMeta[]
-  >;
+  const data = (await enrichMediaWithUserInteractions(justMoviesAndTvs as TMDBMedia[], userId)) as
+    | TMDBMovieWithMeta[]
+    | TMDBTvWithMeta[];
+
+  return {
+    data,
+    pagination: createPaginationMeta(response.data.page, 20, response.data.total_results),
+  };
 }

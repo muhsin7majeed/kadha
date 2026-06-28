@@ -1,21 +1,22 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse } from '@/types/common';
+import { PaginatedResponse } from '@/types/common';
 import { UserSearchResult } from '@/features/user/user.types';
 import { useQuery } from '@tanstack/react-query';
 
-const fetchSearchUsers = async (query: string) => {
+const fetchSearchUsers = async (query: string, page: number) => {
   const params = new URLSearchParams();
   params.set('query', query);
+  params.set('page', String(page));
 
-  const response = await api.get<BaseResponse<UserSearchResult[]>>(`/api/user/search/`, { params });
-  return response.data?.data;
+  const response = await api.get<PaginatedResponse<UserSearchResult[]>>(`/api/user/search/`, { params });
+  return response.data;
 };
 
-const useSearchUsers = (query: string) => {
+const useSearchUsers = (query: string, page = 1) => {
   return useQuery({
-    queryKey: queryKeys.searchUsersByQuery(query),
-    queryFn: () => fetchSearchUsers(query),
+    queryKey: queryKeys.searchUsersByQuery(query, page),
+    queryFn: () => fetchSearchUsers(query, page),
     enabled: !!query,
   });
 };

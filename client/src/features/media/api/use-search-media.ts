@@ -1,18 +1,20 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
-import { BaseResponse } from '@/types/common';
+import { PaginatedResponse } from '@/types/common';
 import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import { useQuery } from '@tanstack/react-query';
 
-const fetchSearchMedia = async (query: string) => {
-  const response = await api.get<BaseResponse<MovieWithMeta[] | TvWithMeta[]>>(`/api/media/search/${query}`);
-  return response.data.data;
+const fetchSearchMedia = async (query: string, page: number) => {
+  const response = await api.get<PaginatedResponse<MovieWithMeta[] | TvWithMeta[]>>(`/api/media/search/${query}`, {
+    params: { page },
+  });
+  return response.data;
 };
 
-const useSearchMedia = (query: string) => {
+const useSearchMedia = (query: string, page = 1) => {
   return useQuery({
-    queryKey: queryKeys.searchMediaByQuery(query),
-    queryFn: () => fetchSearchMedia(query),
+    queryKey: queryKeys.searchMediaByQuery(query, page),
+    queryFn: () => fetchSearchMedia(query, page),
     enabled: !!query,
   });
 };

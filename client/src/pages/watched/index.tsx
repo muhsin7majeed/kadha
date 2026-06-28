@@ -2,9 +2,11 @@ import { LuCheck } from 'react-icons/lu';
 import useWatched from '@/features/user-media/api/use-watched';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
+import { useState } from 'react';
 
 const Watched = () => {
-  const { data: watched, isLoading, isFetching, error, refetch } = useWatched();
+  const [page, setPage] = useState(1);
+  const { data: watched, isLoading, isFetching, error, refetch } = useWatched(undefined, { page });
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }}>
@@ -25,6 +27,8 @@ const Watched = () => {
         errorDescription="Failed to fetch watched"
         loadingText="Loading your watch history..."
         spinnerColor="green.500"
+        pagination={watched?.pagination}
+        onPageChange={setPage}
       />
     </Container>
   );

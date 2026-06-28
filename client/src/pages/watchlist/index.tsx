@@ -2,9 +2,11 @@ import { LuBookmark } from 'react-icons/lu';
 import useWatchList from '@/features/user-media/api/use-watch-list';
 import MediaListPage from '@/components/media-list-page';
 import { Container } from '@chakra-ui/react';
+import { useState } from 'react';
 
 const Watchlist = () => {
-  const { data: watchList, isLoading, isFetching, error, refetch } = useWatchList();
+  const [page, setPage] = useState(1);
+  const { data: watchList, isLoading, isFetching, error, refetch } = useWatchList(undefined, { page });
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }}>
@@ -25,6 +27,8 @@ const Watchlist = () => {
         errorDescription="Failed to fetch watchlist"
         loadingText="Loading your watchlist..."
         spinnerColor="orange"
+        pagination={watchList?.pagination}
+        onPageChange={setPage}
       />
     </Container>
   );

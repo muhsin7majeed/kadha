@@ -56,10 +56,10 @@ const UserProfile = () => {
           <Stack gap="5">
             <OtherUserProfileHeader profile={profile} />
 
-            {profile.canViewProfile ? (
+            {profile.access.canView ? (
               <OtherUserData username={username!} profile={profile} />
             ) : (
-              <LockedProfileState lockedReason={profile.lockedReason} />
+              <LockedProfileState lockedReason={profile.access.lockedReason} />
             )}
           </Stack>
         ) : (

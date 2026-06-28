@@ -10,6 +10,8 @@ import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-
 import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
 import UserLink from '@/components/user-link';
 import { FriendshipType } from '@/features/friendship/friendship.types';
+import PaginationControls from '@/components/pagination-controls';
+import { useEffect, useState } from 'react';
 
 interface FriendshipListProps {
   type: FriendshipType;
@@ -18,7 +20,9 @@ interface FriendshipListProps {
 }
 
 const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, emptyDescription }) => {
-  const { data: users, isLoading, error, refetch } = useFriendships(type);
+  const [page, setPage] = useState(1);
+  const { data: usersResponse, isLoading, isFetching, error, refetch } = useFriendships(type, page);
+  const users = usersResponse?.data;
 
   const { mutateAsync: unfriend, isPending: isUnfriending } = useUnfriend();
   const { mutateAsync: unblock, isPending: isUnblocking } = useUnblock();
@@ -40,6 +44,10 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
   const handleUnblock = async (userId: string) => {
     await unblock(userId);
   };
+
+  useEffect(() => {
+    setPage(1);
+  }, [type]);
 
   if (isLoading) {
     return <CommonSpinner />;
@@ -113,6 +121,7 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
           </Box>
         </Card.Root>
       ))}
+      <PaginationControls pagination={usersResponse?.pagination} isDisabled={isFetching} onPageChange={setPage} />
     </Box>
   );
 };

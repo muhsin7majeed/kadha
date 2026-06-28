@@ -49,8 +49,8 @@ Profile access:
 
 Locked profile responses include:
 
-- `canViewProfile: false`
-- `lockedReason: "FRIENDS_ONLY" | "PRIVATE"`
+- `access.canView: false`
+- `access.lockedReason: "FRIENDS_ONLY" | "PRIVATE"`
 
 ## Activity Privacy
 
@@ -68,8 +68,10 @@ Denied activity responses return an empty data set plus access metadata:
 ```ts
 {
   data: [],
-  canView: false,
-  lockedReason: "PRIVATE" | "FRIENDS_ONLY"
+  access: {
+    canView: false,
+    lockedReason: "PRIVATE" | "FRIENDS_ONLY"
+  }
 }
 ```
 
@@ -78,7 +80,9 @@ Allowed activity responses include:
 ```ts
 {
   data: [...],
-  canView: true
+  access: {
+    canView: true
+  }
 }
 ```
 

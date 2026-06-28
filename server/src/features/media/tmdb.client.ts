@@ -44,6 +44,12 @@ export async function fetchTvGenres() {
   return api.get<MovieDBGenreResponse>('/genre/tv/list');
 }
 
-export async function searchMediaByQuery(query: string) {
-  return api.get<MovieDBMovieResponse | MovieDBTvResponse>(`/search/multi?query=${query}&include_adult=true`);
+export async function searchMediaByQuery(query: string, page: number) {
+  return api.get<MovieDBMovieResponse | MovieDBTvResponse>('/search/multi', {
+    params: {
+      query,
+      page,
+      include_adult: true,
+    },
+  });
 }

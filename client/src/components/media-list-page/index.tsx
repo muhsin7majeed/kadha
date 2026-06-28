@@ -5,7 +5,9 @@ import ErrorState from '@/components/info-states/error-state';
 import { UserMedia } from '@/features/user-media/user-media.types';
 import { MovieWithMeta } from '@/features/media/media.types';
 import { TvWithMeta } from '@/features/media/media.types';
+import { PaginationMeta } from '@/types/common';
 import PageHeader from '../page-header';
+import PaginationControls from '../pagination-controls';
 
 interface MediaListPageProps {
   title: string;
@@ -23,6 +25,8 @@ interface MediaListPageProps {
   errorDescription: string;
   loadingText: string;
   spinnerColor?: string;
+  pagination?: PaginationMeta;
+  onPageChange?: (page: number) => void;
 }
 
 const MediaListPage = ({
@@ -37,6 +41,8 @@ const MediaListPage = ({
   errorDescription,
   loadingText,
   spinnerColor = 'orange',
+  pagination,
+  onPageChange,
 }: MediaListPageProps) => {
   return (
     <Box>
@@ -62,11 +68,16 @@ const MediaListPage = ({
           <EmptyState title={emptyState.title} description={emptyState.description} icon={emptyState.icon} />
         </Box>
       ) : (
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
-          {data?.map((media) => (
-            <MediaCard key={media.media_id} media={media} />
-          ))}
-        </SimpleGrid>
+        <>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
+            {data?.map((media) => (
+              <MediaCard key={media.media_id} media={media} />
+            ))}
+          </SimpleGrid>
+          {onPageChange && (
+            <PaginationControls pagination={pagination} isDisabled={isFetching} onPageChange={onPageChange} />
+          )}
+        </>
       )}
     </Box>
   );

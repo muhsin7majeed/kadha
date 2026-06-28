@@ -1,4 +1,4 @@
-import { DataPrivacy, FriendStatus } from '@/types/common';
+import { DataPrivacy, FriendStatus, ResourceAccess } from '@/types/common';
 
 export interface User {
   id: string;
@@ -28,8 +28,7 @@ export interface UserActor {
 
 export interface UserProfileResponse extends UserActor {
   profilePrivacy: DataPrivacy;
-  canViewProfile: boolean;
-  lockedReason?: 'FRIENDS_ONLY' | 'PRIVATE';
+  access: ResourceAccess;
   sections: {
     watched: boolean;
     liked: boolean;
