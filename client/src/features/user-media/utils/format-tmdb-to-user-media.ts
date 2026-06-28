@@ -1,12 +1,13 @@
 import { Movie, Tv } from '@/features/media/media.types';
+import { UserMediaPayload } from '../user-media.types';
 
-const formatTMDBToUserMedia = (media: Movie | Tv) => {
+const formatTMDBToUserMedia = (media: Movie | Tv): UserMediaPayload => {
   const title = 'title' in media ? media.title : media.name;
   const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
 
   return {
     media_id: media.media_id,
-    media_type: media.media_type!,
+    media_type: media.media_type,
     title: title,
     poster_path: media.poster_path,
     vote_average: media.vote_average,

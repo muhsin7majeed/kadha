@@ -19,4 +19,31 @@ api.interceptors.request.use(
   },
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  (error: any) => {
+    const status = error.response?.status;
+    const upstreamMessage = error.response?.data?.status_message;
+
+    if (status) {
+      return Promise.reject({
+        status,
+        message: upstreamMessage || 'TMDB request failed',
+      });
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      return Promise.reject({
+        status: 504,
+        message: 'TMDB request timed out',
+      });
+    }
+
+    return Promise.reject({
+      status: 502,
+      message: 'Unable to reach TMDB',
+    });
+  },
+);
+
 export default api;

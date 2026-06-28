@@ -5,9 +5,12 @@ import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import { useQuery } from '@tanstack/react-query';
 
 const fetchSearchMedia = async (query: string, page: number) => {
-  const response = await api.get<PaginatedResponse<MovieWithMeta[] | TvWithMeta[]>>(`/api/media/search/${query}`, {
-    params: { page },
-  });
+  const response = await api.get<PaginatedResponse<MovieWithMeta[] | TvWithMeta[]>>(
+    `/api/media/search/${encodeURIComponent(query)}`,
+    {
+      params: { page },
+    },
+  );
   return response.data;
 };
 
