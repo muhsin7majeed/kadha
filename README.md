@@ -281,6 +281,20 @@ Run migrations manually:
 docker compose -f docker-compose.prod.yml exec server npx prisma migrate deploy
 ```
 
+### Admin Setup
+
+Promote an existing user to admin in local Docker Compose:
+
+```bash
+docker compose exec server npm run admin:promote -- --username <username>
+```
+
+Promote an existing user to admin in production Docker Compose:
+
+```bash
+docker compose -f docker-compose.prod.yml exec server npm run admin:promote -- --username <username>
+```
+
 ### Common Commands
 
 ```bash
