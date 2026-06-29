@@ -21,6 +21,10 @@ CREATE TABLE "media_snapshots" (
     "lastSyncedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Create the unique key before backfill so INSERT OR IGNORE can skip media that
+-- already came from another saved source.
+CREATE UNIQUE INDEX "media_snapshots_media_id_media_type_key" ON "media_snapshots"("media_id", "media_type");
+
 -- Backfill snapshots from saved user media.
 INSERT OR IGNORE INTO "media_snapshots" (
     "id",
@@ -84,7 +88,6 @@ FROM "collection_items"
 GROUP BY "media_id", "media_type";
 
 -- Create media snapshot indexes before rebuilding foreign-key consumers.
-CREATE UNIQUE INDEX "media_snapshots_media_id_media_type_key" ON "media_snapshots"("media_id", "media_type");
 CREATE INDEX "media_snapshots_media_type_idx" ON "media_snapshots"("media_type");
 CREATE INDEX "media_snapshots_media_type_popularity_idx" ON "media_snapshots"("media_type", "popularity");
 
