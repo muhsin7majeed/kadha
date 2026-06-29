@@ -7,6 +7,7 @@ import './index.css';
 import App from './app.tsx';
 import { Toaster } from './components/ui/toaster.tsx';
 import { Provider } from './components/ui/provider.tsx';
+import AppErrorBoundary from './components/error-boundary.tsx';
 
 const queryClient = new QueryClient();
 
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')!).render(
       <Provider>
         <BrowserRouter>
           <Toaster />
-          <App />
+          <AppErrorBoundary>
+            <App />
+          </AppErrorBoundary>
         </BrowserRouter>
       </Provider>
     </QueryClientProvider>
