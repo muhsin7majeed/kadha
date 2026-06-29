@@ -18,6 +18,7 @@
 
 - Added backend admin role support and read-only admin APIs for overview metrics and user account summaries.
 - Added a server command for promoting an existing user account to admin.
+- Added admin-only frontend routes for viewing dashboard metrics, searching users, and opening read-only user summaries.
 
 ### Engineering Changes
 

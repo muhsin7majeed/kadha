@@ -66,6 +66,11 @@ export enum DataPrivacy {
   OnlyMe = 'ONLY_ME',
 }
 
+export enum UserRole {
+  User = 'USER',
+  Admin = 'ADMIN',
+}
+
 export enum FriendStatus {
   None = 'NONE',
   PendingSent = 'PENDING_SENT',

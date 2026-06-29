@@ -6,17 +6,19 @@ import { removeAccessToken } from '@/lib/token-manager';
 import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { useState } from 'react';
 import ConfirmationDialog from '../dialogs/confirmation-dialog';
-import { LuBell, LuLogOut, LuUser, LuUsers } from 'react-icons/lu';
+import { LuBell, LuLayoutDashboard, LuLogOut, LuUser, LuUsers } from 'react-icons/lu';
 import { useQueryClient } from '@tanstack/react-query';
 import { APP_CONFIG } from '@/config/app-config';
 import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import UtilityMenuItems, { MenuSectionSeparator } from './utility-menu-items';
+import { UserRole } from '@/types/common';
 
 const ProfileMenu = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
 
   const [auth] = useAuthAtom();
+  const isAdmin = auth.user?.role === UserRole.Admin;
 
   const setAuth = useSetAuthAtom();
   const queryClient = useQueryClient();
@@ -87,6 +89,14 @@ const ProfileMenu = () => {
                   <LuBell /> Notifications
                 </NavLink>
               </Menu.Item>
+
+              {isAdmin && (
+                <Menu.Item value="admin" asChild>
+                  <NavLink to="/app/admin">
+                    <LuLayoutDashboard /> Admin
+                  </NavLink>
+                </Menu.Item>
+              )}
 
               <MenuSectionSeparator />
 
