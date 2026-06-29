@@ -5,6 +5,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 
 import { getHealth, getRoot } from './app.controller';
+import activityRoutes from './features/activity/activity.routes';
 import authRoutes from './features/auth/auth.routes';
 import collectionRoutes from './features/collection/collection.routes';
 import friendshipRoutes from './features/friendship/friendship.routes';
@@ -31,6 +32,7 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/user/activity', authMiddleware, activityRoutes);
   app.use('/api/user', authMiddleware, userRoutes);
   app.use('/api/users', authMiddleware, userRoutes);
   app.use('/api/media', authMiddleware, mediaRoutes);

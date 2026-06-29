@@ -1,6 +1,6 @@
 import { Icon, Tabs } from '@chakra-ui/react';
 import { Link, useLocation } from 'react-router';
-import { LuBookmark, LuCheck, LuFolder, LuHeart, LuHouse } from 'react-icons/lu';
+import { LuActivity, LuBookmark, LuCheck, LuFolder, LuHeart, LuHouse } from 'react-icons/lu';
 
 const TABS = [
   {
@@ -12,6 +12,11 @@ const TABS = [
     label: 'Watchlist',
     icon: <LuBookmark />,
     to: '/app/watchlist',
+  },
+  {
+    label: 'Activity',
+    icon: <LuActivity />,
+    to: '/app/activity',
   },
   {
     label: 'Watched',

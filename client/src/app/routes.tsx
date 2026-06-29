@@ -6,6 +6,7 @@ import PrivateRoute from '@/components/private-route';
 import PublicRoute from '@/components/public-route';
 
 const MainLayout = lazy(() => import('@/components/main-layout'));
+const Activity = lazy(() => import('@/pages/activity'));
 const AuthLayout = lazy(() => import('@/pages/auth/auth-layout'));
 const Login = lazy(() => import('@/pages/auth/login'));
 const Register = lazy(() => import('@/pages/auth/register'));
@@ -39,6 +40,7 @@ export function AppRoutes() {
         <Route element={<PrivateRoute />}>
           <Route path="app" element={<MainLayout />}>
             <Route index element={<Home />} />
+            <Route path="activity" element={<Activity />} />
             <Route path="watched" element={<Watched />} />
             <Route path="watchlist" element={<Watchlist />} />
             <Route path="liked" element={<Liked />} />

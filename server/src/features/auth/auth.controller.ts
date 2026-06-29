@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
 import { LoginAndRegisterBody } from './auth.schema';
-import { loginUser, refreshAccessToken, registerUser } from './auth.service';
+import { loginUser, recordLogoutActivity, refreshAccessToken, registerUser } from './auth.service';
 
 const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
   res.cookie('jwt', refreshToken, {
@@ -70,6 +70,7 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
+  await recordLogoutActivity(req.cookies?.jwt);
   clearRefreshTokenCookie(res);
   sendMessage(res, 'User logged out successfully');
 };
