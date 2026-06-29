@@ -1,45 +1,56 @@
 # Kadha Changelog
 
-This changelog was created on 2026-06-28 from commits after `5d14425`, the 2026-06-25 commit that renamed the app to Kadha and added the navbar/API version display.
+## v0.1.1
 
-## Feature Changes
+### Feature Changes
 
-### In-App Changelog
+#### Navigation
+
+- Simplified the navbar so mobile screens keep direct access to search, notifications, profile, and sign up without horizontal scrolling.
+- Moved lower-frequency utility actions like theme, changelog, and GitHub into compact menus.
+
+## v0.1.0
+
+This release includes changes created from commits after `5d14425`, the 2026-06-25 commit that renamed the app to Kadha and added the navbar/API version display.
+
+### Feature Changes
+
+#### In-App Changelog
 
 - Added a clickable version number in the navbar so users can open the changelog from inside the app.
 - Added an end-user changelog view that summarizes feature changes first, followed by engineering notes for maintainers.
 
-### Social Privacy
+#### Social Privacy
 
 - Added profile privacy controls so users can choose who can view their media activity.
 - Added locked profile states when another user's content is not visible to the viewer.
 - Added profile tabs for another user's watched, liked, watchlist, and collections views when access is allowed.
 - Added blocking support to the friendship flow.
 
-### Social And Search Pagination
+#### Social And Search Pagination
 
 - Added pagination controls to watched, liked, watchlist, profile media, friends, collections, and search result views.
 - Improved large-list browsing so social and search pages load smaller result sets instead of trying to render everything at once.
 
-### Notifications
+#### Notifications
 
 - Reworked notifications to support unread counts, individual read state, and marking all notifications as read.
 - Improved friendship notification creation so requests and social actions produce clearer notification records.
 
-### Media Data
+#### Media Data
 
 - Improved TMDB data handling for movie and TV search/details responses.
 - Improved how media payloads are normalized before saving liked, watched, and watchlist items.
 - Fixed media action refresh behavior so changes to liked, watched, and watchlist state update related views consistently.
 
-### Authentication
+#### Authentication
 
 - Fixed stale authentication state when switching accounts.
 - Improved user lookup behavior during login/register flows so account changes resolve to the correct current user.
 
-## Engineering Changes
+### Engineering Changes
 
-### App Structure
+#### App Structure
 
 - Moved server code toward feature-owned routes, controllers, services, schemas, and types.
 - Moved client API hooks and feature-owned types into `client/src/features`.
@@ -47,17 +58,17 @@ This changelog was created on 2026-06-28 from commits after `5d14425`, the 2026-
 - Moved collection UI into the collections feature.
 - Centralized and tightened React Query key usage.
 
-### Performance And Build
+#### Performance And Build
 
 - Split major frontend vendor chunks for UI, icons, query, and utility dependencies.
 - Fixed the previous UI vendor chunk split issue.
 
-### Database And Migrations
+#### Database And Migrations
 
 - Added migrations for user content privacy, social query indexes, and the notification rework.
 - Fixed the SQLite notification migration so existing SQLite deployments can migrate cleanly.
 
-### Documentation And Process
+#### Documentation And Process
 
 - Added project structure documentation and aligned it with the current client/server boundaries.
 - Added social privacy documentation.

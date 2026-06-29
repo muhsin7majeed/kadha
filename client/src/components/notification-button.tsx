@@ -11,7 +11,7 @@ const NotificationButton = () => {
   return (
     <>
       <NavLink to="/app/notifications" position="relative">
-        <IconButton aria-label="Notifications" variant="ghost" size="lg" loading={isLoading}>
+        <IconButton aria-label="Notifications" variant="ghost" size="sm" loading={isLoading}>
           <LuBell />
         </IconButton>
 
