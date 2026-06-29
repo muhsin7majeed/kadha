@@ -9,6 +9,7 @@ import { RegisterInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
 import { useSetAuthAtom } from '@/atoms/auth-atom';
 import { useQueryClient } from '@tanstack/react-query';
+import { getApiFieldError } from '@/hooks/use-error-handler';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Register = () => {
   const from = (location.state as LocationState)?.from || '/app';
 
   const { mutate, error, isPending } = useRegister();
+  const usernameApiError = getApiFieldError(error, 'username');
 
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
@@ -43,8 +45,7 @@ const Register = () => {
       <AuthForm
         onSubmit={onSubmit}
         type="register"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        apiFieldErrors={(error as any)?.response?.data?.fieldErrors}
+        apiFieldErrors={usernameApiError ? { username: usernameApiError } : undefined}
         isLoading={isPending}
       />
 

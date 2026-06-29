@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
@@ -22,11 +22,11 @@ const ScrollButton = ({ direction, onClick }: { direction: 'left' | 'right'; onC
     <IconButton
       aria-label={`Scroll ${direction}`}
       onClick={onClick}
-      bg="blackAlpha.600"
-      color="white"
-      _hover={{ bg: 'blackAlpha.800' }}
+      colorPalette="orange"
+      variant="subtle"
+      borderRadius="full"
     >
-      {direction === 'left' ? <FaAngleLeft /> : <FaAngleRight />}
+      {direction === 'left' ? <LuChevronLeft /> : <LuChevronRight />}
     </IconButton>
   );
 };

@@ -1,5 +1,5 @@
 import { EmptyState as ChakraEmptyState, VStack } from '@chakra-ui/react';
-import { FaRegFolderOpen } from 'react-icons/fa';
+import { LuFolderOpen } from 'react-icons/lu';
 
 interface EmptyStateProps {
   title: string;
@@ -7,7 +7,7 @@ interface EmptyStateProps {
   icon?: React.ReactNode;
 }
 
-const EmptyState = ({ title, description, icon = <FaRegFolderOpen /> }: EmptyStateProps) => {
+const EmptyState = ({ title, description, icon = <LuFolderOpen /> }: EmptyStateProps) => {
   return (
     <ChakraEmptyState.Root>
       <ChakraEmptyState.Content>

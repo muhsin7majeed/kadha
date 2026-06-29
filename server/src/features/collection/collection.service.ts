@@ -4,8 +4,6 @@ import { CollectionPayload, GetCollectionsQuery, ToggleCollectionPayload } from 
 export async function getUserCollections(userId: string, query: GetCollectionsQuery) {
   const { mediaId, mediaType } = query;
 
-  console.log(mediaId, typeof mediaId);
-
   const collections = await prisma.collection.findMany({
     where: {
       userId,
