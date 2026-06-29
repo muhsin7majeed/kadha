@@ -5,7 +5,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { BaseInfoResponse } from '@/types/common';
 import { capitalize } from '@/utils/capitalize';
-import { invalidateMediaActionQueries } from './invalidate-media-action-queries';
+import { updateMediaActionCache } from './update-media-action-cache';
 import { UserMediaPayload } from '../user-media.types';
 
 const addToWatchList = async (payload: UserMediaPayload) => {
@@ -19,8 +19,8 @@ const useAddToWatchList = () => {
   return useMutation<BaseInfoResponse, Error, UserMediaPayload>({
     mutationFn: (payload: UserMediaPayload) => addToWatchList(payload),
     onError: useErrorHandler,
-    onSuccess: (data) => {
-      invalidateMediaActionQueries(queryClient, 'watchlist');
+    onSuccess: (data, payload) => {
+      updateMediaActionCache(queryClient, 'watchlist', payload);
 
       toaster.success({
         title: capitalize(data.message),
