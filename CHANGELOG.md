@@ -8,19 +8,14 @@
 
 - Improved light mode readability by using a white title overlay on media cards.
 
-## v0.1.1
-
-### Feature Changes
-
-#### Navigation
-
-- Simplified the navbar so mobile screens keep direct access to search, notifications, profile, and sign up without horizontal scrolling.
-- Moved lower-frequency utility actions like theme, changelog, and GitHub into compact menus.
-
 #### Search
 
 - Improved the global search dialog so it prompts for a search before showing result filters.
 - Kept the global search input and filters visible while scrolling through dialog results.
+
+#### In-App Changelog
+
+- Improved the changelog dialog layout and heading formatting.
 
 ### Engineering Changes
 
@@ -30,9 +25,23 @@
 - Reused the shared search input in the global search dialog instead of maintaining duplicate input behavior.
 - Reused the shared simple dialog wrapper for the global search dialog.
 
+#### In-App Changelog
+
+- Reused the shared simple dialog wrapper for the changelog dialog.
+- Replaced the custom changelog line parser with a Markdown renderer.
+
 #### Documentation And Process
 
 - Added guidance to check for existing UI components before creating new client components.
+
+## v0.1.1
+
+### Feature Changes
+
+#### Navigation
+
+- Simplified the navbar so mobile screens keep direct access to search, notifications, profile, and sign up without horizontal scrolling.
+- Moved lower-frequency utility actions like theme, changelog, and GitHub into compact menus.
 
 ## v0.1.0
 
