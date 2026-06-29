@@ -5,7 +5,7 @@ DONE 1. Separate media types by Movie & TV for absolute control.
 DONE 2. Setup refresh token & auto reload.
 3. Optimize client home page speed.
 DONE 4. Fix prop mutation in media action.
-ONGOING 5. Update all icons to Lu icon set.
+DONE 5. Update all icons to Lu icon set.
 DONE 6. Add field validations on Signup & Signin.
 DONE 7. Cleanup and setup basic landing page.
 8. Use redis for TheMovieDb caching to reduce external api calls.

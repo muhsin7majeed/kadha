@@ -32,7 +32,7 @@ const updateMe = async (data: UpdateMePayload) => {
 const useUpdateMe = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<UpdateMeResponse, Error, UpdateMePayload>({
+  return useMutation<UpdateMeResponse, unknown, UpdateMePayload>({
     mutationFn: (data: UpdateMePayload) => updateMe(data),
     onError: useErrorHandler,
     onSuccess: () => {

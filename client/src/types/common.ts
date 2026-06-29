@@ -43,6 +43,13 @@ export interface BaseInfoResponse {
   message: string;
 }
 
+export type ApiFieldErrors = string[] | Record<string, string | undefined>;
+
+export interface ApiErrorResponse {
+  fieldErrors?: ApiFieldErrors;
+  message?: string;
+}
+
 export type MediaTypeFilter = (typeof MEDIA.MEDIA_TYPE_FILTER)[keyof typeof MEDIA.MEDIA_TYPE_FILTER];
 
 export type MediaType = 'movie' | 'tv';

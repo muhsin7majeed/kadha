@@ -10,7 +10,7 @@ const login = async (data: LoginInputs) => {
 };
 
 const useLogin = () => {
-  return useMutation<LoginResponse, Error, LoginInputs>({
+  return useMutation<LoginResponse, unknown, LoginInputs>({
     mutationFn: (data: LoginInputs) => login(data),
     onError: useErrorHandler,
   });

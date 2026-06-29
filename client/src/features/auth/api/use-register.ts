@@ -10,7 +10,7 @@ const register = async (data: RegisterInputs) => {
 };
 
 const useRegister = () => {
-  return useMutation<LoginResponse, Error, RegisterInputs>({
+  return useMutation<LoginResponse, unknown, RegisterInputs>({
     mutationFn: (data: RegisterInputs) => register(data),
     onError: useErrorHandler,
   });

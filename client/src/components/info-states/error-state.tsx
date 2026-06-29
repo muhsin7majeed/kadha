@@ -1,5 +1,5 @@
 import { Button, EmptyState, VStack } from '@chakra-ui/react';
-import { BiSolidError } from 'react-icons/bi';
+import { LuCircleAlert } from 'react-icons/lu';
 
 interface ErrorStateProps {
   title: string;
@@ -8,7 +8,7 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-const ErrorState = ({ title, description, icon = <BiSolidError />, onRetry }: ErrorStateProps) => {
+const ErrorState = ({ title, description, icon = <LuCircleAlert />, onRetry }: ErrorStateProps) => {
   return (
     <EmptyState.Root>
       <EmptyState.Content>

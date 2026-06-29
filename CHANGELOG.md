@@ -23,6 +23,11 @@
 
 ### Engineering Changes
 
+#### Cleanup
+
+- Replaced the remaining non-Lucide client icons with `Lu` icon variants.
+- Removed a stray collection service debug log and tightened client API error typing.
+
 #### Search
 
 - Refactored the global search dialog into focused feature-owned components.

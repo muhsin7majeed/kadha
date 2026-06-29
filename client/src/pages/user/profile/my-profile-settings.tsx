@@ -7,6 +7,7 @@ import { DATA_PRIVACY_OPTIONS, PROFILE_PRIVACY_OPTIONS } from '@/constants/commo
 import { User } from '@/features/user/user.types';
 import useUpdateMe from '@/features/user/api/use-update-me';
 import { DataPrivacy } from '@/types/common';
+import { getApiFieldError } from '@/hooks/use-error-handler';
 
 interface ProfileInputs {
   username: string;
@@ -55,18 +56,17 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
     await updateMe(data);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const apiFieldErrors = (updateMeError as any)?.response?.data?.fieldErrors;
+  const usernameApiError = getApiFieldError(updateMeError, 'username');
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="5" maxW="2xl">
         <Fieldset.Root size="lg">
           <Fieldset.Content>
-            <Field.Root invalid={!!errors.username || !!apiFieldErrors?.username}>
+            <Field.Root invalid={!!errors.username || !!usernameApiError}>
               <Field.Label>Username</Field.Label>
               <Input type="text" {...register('username', { required: 'Username is required' })} />
-              <Field.ErrorText>{errors.username?.message || apiFieldErrors?.username}</Field.ErrorText>
+              <Field.ErrorText>{errors.username?.message || usernameApiError}</Field.ErrorText>
             </Field.Root>
           </Fieldset.Content>
         </Fieldset.Root>

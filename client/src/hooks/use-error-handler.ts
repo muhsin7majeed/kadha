@@ -1,25 +1,53 @@
 import { toaster } from '@/components/ui/toaster';
-import type { AxiosError } from 'axios';
+import { ApiErrorResponse, ApiFieldErrors } from '@/types/common';
+import { isAxiosError } from 'axios';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useErrorHandler = (error: AxiosError<{ fieldErrors?: string[]; message?: string }> | any) => {
-  if (Object.prototype.hasOwnProperty.call(error?.response?.data, 'fieldErrors')) {
-    const combinedErrors: string[] = [];
-
-    Object(error?.response?.data?.fieldErrors).forEach((error: string) => {
-      combinedErrors.push(error);
-    });
-
-    toaster.error({
-      title: combinedErrors.join(', '),
-    });
-
-    return;
+export const getApiFieldErrors = (error: unknown): ApiFieldErrors | undefined => {
+  if (!isAxiosError<ApiErrorResponse>(error)) {
+    return undefined;
   }
 
-  if (error) {
+  return error.response?.data.fieldErrors;
+};
+
+export const getApiFieldError = (error: unknown, field: string) => {
+  const fieldErrors = getApiFieldErrors(error);
+
+  if (!fieldErrors || Array.isArray(fieldErrors)) {
+    return undefined;
+  }
+
+  return fieldErrors[field];
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (!isAxiosError<ApiErrorResponse>(error)) {
+    return undefined;
+  }
+
+  return error.response?.data.message;
+};
+
+export const useErrorHandler = (error: unknown) => {
+  const fieldErrors = getApiFieldErrors(error);
+
+  if (fieldErrors) {
+    const combinedErrors = Array.isArray(fieldErrors) ? fieldErrors : Object.values(fieldErrors).filter(Boolean);
+
+    if (combinedErrors.length) {
+      toaster.error({
+        title: combinedErrors.join(', '),
+      });
+
+      return;
+    }
+  }
+
+  const message = getErrorMessage(error);
+
+  if (message) {
     toaster.error({
-      title: error.response?.data.message,
+      title: message,
     });
   } else {
     toaster.error({
