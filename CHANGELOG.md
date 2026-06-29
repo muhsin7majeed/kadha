@@ -17,6 +17,7 @@
 #### Admin Dashboard
 
 - Added backend admin role support and read-only admin APIs for overview metrics and user account summaries.
+- Added a server command for promoting an existing user account to admin.
 
 ### Engineering Changes
 
