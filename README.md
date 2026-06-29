@@ -118,6 +118,13 @@ npx prisma migrate deploy --schema=./src/prisma/schema.prisma
 npm start
 ```
 
+Promote an existing user to admin:
+
+```bash
+cd server
+npm run admin:promote -- --username <username>
+```
+
 ## Self-Hosting
 
 ### 1. Server Setup
