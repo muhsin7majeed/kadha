@@ -5,6 +5,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 
 import { getHealth, getRoot } from './app.controller';
+import adminRoutes from './features/admin/admin.routes';
 import activityRoutes from './features/activity/activity.routes';
 import authRoutes from './features/auth/auth.routes';
 import collectionRoutes from './features/collection/collection.routes';
@@ -16,6 +17,7 @@ import userMediaRoutes from './features/user-media/user-media.routes';
 import { notFoundHandler } from './lib/http';
 import { errorHandler } from './middlewares/errorHandler';
 import { authMiddleware } from './middlewares/auth';
+import { requireAdmin } from './middlewares/requireAdmin';
 
 export function createApp(): Express {
   const app: Express = express();
@@ -32,6 +34,7 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/admin', authMiddleware, requireAdmin, adminRoutes);
   app.use('/api/user/activity', authMiddleware, activityRoutes);
   app.use('/api/user', authMiddleware, userRoutes);
   app.use('/api/users', authMiddleware, userRoutes);

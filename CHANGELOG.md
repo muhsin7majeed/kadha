@@ -14,7 +14,15 @@
 - Added a private activity timeline where signed-in users can review their media, collection, and profile-setting actions.
 - Included account creation, sign-in, and sign-out events in the private activity timeline.
 
+#### Admin Dashboard
+
+- Added backend admin role support and read-only admin APIs for overview metrics and user account summaries.
+
 ### Engineering Changes
+
+#### Admin Foundation
+
+- Added a dedicated admin server feature, database-backed admin authorization middleware, and a user role field for future admin tooling.
 
 #### Activity Tracking
 
