@@ -57,7 +57,14 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
           <MediaActions media={media as MovieWithMeta | TvWithMeta} />
         </Flex>
 
-        <Box bg="blackAlpha.700" p={2} color="white" backdropFilter="blur(10px)" borderRadius="lg" w="100%">
+        <Box
+          bg={{ _light: 'white', _dark: 'blackAlpha.700' }}
+          p={2}
+          color={{ _light: 'gray.950', _dark: 'white' }}
+          backdropFilter="blur(10px)"
+          borderRadius="lg"
+          w="100%"
+        >
           <NavLink
             to={`/app/media/${media.media_type}/${media.media_id}`}
             fontSize="md"
