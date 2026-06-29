@@ -67,6 +67,7 @@ server/src/features/media/
 - New client API hooks belong in `client/src/features/<feature-name>/api`, not under page folders.
 - Feature-owned client types belong near the feature, such as `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned utilities and hooks should live near the feature instead of generic `client/src/utils` or `client/src/hooks`.
+- Before creating a new shared or feature UI component, search for an existing component that already covers the behavior and reuse or extend it when practical.
 - Shared UI-only components can remain in `client/src/components`.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.
@@ -90,3 +91,18 @@ server/src/features/media/
 - Keep the top changelog section focused on end-user feature changes, then include engineering notes below it.
 - Keep `README.md` aligned with setup, deployment, and operations changes.
 - Keep `docs/project-structure.md` aligned when changing architectural boundaries or placement rules.
+
+## Release And Changelog Workflow
+
+- During normal feature work, add changelog entries under `## Unreleased`.
+- Do not create a new version section for every feature commit.
+- When `Unreleased` contains enough user-visible or maintainer-significant changes to justify a release, tell the user before starting additional unrelated changes and recommend cutting a release first.
+- A release is usually appropriate when `Unreleased` includes shipped user-facing features, behavior fixes, migrations, deployment/runtime changes, or several related engineering changes that should be grouped for operators.
+- When cutting a release:
+  - Rename `## Unreleased` to `## vX.Y.Z`.
+  - Bump `client/package.json`, `client/package-lock.json`, `server/package.json`, and `server/package-lock.json` together unless the project intentionally moves to independent package releases.
+  - Keep client and server fallback version strings aligned.
+  - Run `cd client && npm run sync:changelog`.
+  - Run the relevant build, lint, or test commands.
+  - Commit the version and changelog updates as a release commit, such as `Release vX.Y.Z`.
+- After a release, create a fresh empty `## Unreleased` section for future changes.
