@@ -17,12 +17,19 @@ export const toggleCollectionSchema = z.object({
   id: z.number().optional(),
   media_type: z.nativeEnum(MediaType),
   title: z.string().optional(),
+  original_title: z.string().nullable().optional(),
+  overview: z.string().nullable().optional(),
   poster_path: z.string().nullable().optional(),
+  backdrop_path: z.string().nullable().optional(),
   vote_average: z.number().optional(),
   vote_count: z.number().optional(),
+  popularity: z.number().nullable().optional(),
   adult: z.boolean().optional(),
   genre_ids: z.array(z.number()).optional(),
   release_date: z.string().optional(),
+  original_language: z.string().nullable().optional(),
+  runtime: z.number().nullable().optional(),
+  status: z.string().nullable().optional(),
 });
 
 export const getCollectionsSchema = z.object({

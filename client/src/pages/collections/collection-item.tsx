@@ -8,6 +8,17 @@ import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
 
+const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
+  if (Array.isArray(genreIds)) return genreIds;
+  if (!genreIds) return [];
+
+  try {
+    return JSON.parse(genreIds);
+  } catch {
+    return [];
+  }
+};
+
 interface CollectionItemProps {
   collection: Collection;
   index: number;
@@ -79,7 +90,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                           vote_average: media.vote_average,
                           vote_count: media.vote_count,
                           adult: media.adult,
-                          genre_ids: JSON.parse(media.genre_ids),
+                          genre_ids: parseGenreIds(media.genre_ids),
                           release_date: media.release_date,
                           media_id: media.media_id,
                         }}

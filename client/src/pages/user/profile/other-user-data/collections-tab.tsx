@@ -6,7 +6,8 @@ import useUserCollections from '@/features/collections/api/use-user-collections'
 import { Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
 import { useParams } from 'react-router';
 
-const parseGenreIds = (genreIds: string | null | undefined) => {
+const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
+  if (Array.isArray(genreIds)) return genreIds;
   if (!genreIds) return [];
 
   try {

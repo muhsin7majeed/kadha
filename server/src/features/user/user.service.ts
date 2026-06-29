@@ -1,6 +1,7 @@
 import { UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
+import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
 import { enrichUsersWithFriendship, getViewerRelationship } from '@/lib/friendship-utils';
 import { createPaginationMeta } from '@/lib/pagination';
@@ -275,14 +276,17 @@ export async function getUserMediaByFlag(id: string, flag: UserMediaFlag, page: 
       skip,
       take: limit,
       orderBy: {
-        updatedAt: 'desc',
+        [`${flag}At`]: 'desc',
+      },
+      include: {
+        media: true,
       },
     }),
     prisma.userMedia.count({ where }),
   ]);
 
   return {
-    data,
+    data: data.map(flattenMediaSnapshot),
     pagination: createPaginationMeta(page, limit, total),
   };
 }
@@ -366,7 +370,11 @@ export async function getUserCollectionsByUsername(viewerId: string, username: s
           }),
     },
     include: {
-      items: true,
+      items: {
+        include: {
+          media: true,
+        },
+      },
     },
     orderBy: {
       updated_at: 'desc',
@@ -376,7 +384,7 @@ export async function getUserCollectionsByUsername(viewerId: string, username: s
   return viewableResource(
     collections.map(({ items, ...collection }) => ({
       ...collection,
-      media: items,
+      media: items.map(flattenMediaSnapshot),
     })),
   );
 }

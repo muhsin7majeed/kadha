@@ -1,6 +1,7 @@
 import { UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
+import { flattenMediaSnapshot, upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
 import { prisma } from '@/lib/prisma';
 import { CollectionPayload, GetCollectionsQuery, ToggleCollectionPayload } from './collection.schema';
 
@@ -73,7 +74,11 @@ export async function getUserCollection(userId: string, collectionId: string) {
       userId,
     },
     include: {
-      items: true,
+      items: {
+        include: {
+          media: true,
+        },
+      },
     },
   });
 
@@ -83,7 +88,7 @@ export async function getUserCollection(userId: string, collectionId: string) {
 
   const { items, ...rest } = collection;
 
-  return { ...rest, media: items };
+  return { ...rest, media: items.map(flattenMediaSnapshot) };
 }
 
 export async function updateUserCollection(userId: string, collectionId: string, payload: CollectionPayload) {
@@ -185,20 +190,24 @@ export async function toggleUserCollectionItem(userId: string, collectionId: str
 
   if (existingItem) {
     await prisma.$transaction(async (tx) => {
-      await tx.collectionItem.delete({
+      const removedItem = await tx.collectionItem.delete({
         where: { id: existingItem.id },
+        include: {
+          media: true,
+        },
       });
+      const removedMedia = flattenMediaSnapshot(removedItem);
 
       await createUserActivity(
         {
           userId,
           type: UserActivityType.COLLECTION_ITEM_REMOVED,
-          media_id: existingItem.media_id,
-          media_type: existingItem.media_type,
+          media_id: removedItem.media_id,
+          media_type: removedItem.media_type,
           collectionId,
           metadata: {
-            title: existingItem.title,
-            poster_path: existingItem.poster_path,
+            title: removedMedia.title,
+            poster_path: removedMedia.poster_path,
             collectionName: collection.name,
           },
         },
@@ -210,20 +219,19 @@ export async function toggleUserCollectionItem(userId: string, collectionId: str
   }
 
   const collectionItem = await prisma.$transaction(async (tx) => {
+    await upsertMediaSnapshot(payload, tx);
+
     const createdItem = await tx.collectionItem.create({
       data: {
         collectionId,
         media_id: payload.media_id,
         media_type: payload.media_type,
-        title: payload.title,
-        poster_path: payload.poster_path,
-        vote_average: payload.vote_average,
-        vote_count: payload.vote_count,
-        adult: payload.adult,
-        genre_ids: payload.genre_ids ? JSON.stringify(payload.genre_ids) : null,
-        release_date: payload.release_date,
+      },
+      include: {
+        media: true,
       },
     });
+    const createdMedia = flattenMediaSnapshot(createdItem);
 
     await createUserActivity(
       {
@@ -233,15 +241,15 @@ export async function toggleUserCollectionItem(userId: string, collectionId: str
         media_type: createdItem.media_type,
         collectionId,
         metadata: {
-          title: createdItem.title,
-          poster_path: createdItem.poster_path,
+          title: createdMedia.title,
+          poster_path: createdMedia.poster_path,
           collectionName: collection.name,
         },
       },
       tx,
     );
 
-    return createdItem;
+    return createdMedia;
   });
 
   return { data: collectionItem, added: true };
