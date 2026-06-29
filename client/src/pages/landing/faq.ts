@@ -12,7 +12,7 @@ const FAQ_ITEMS = [
   {
     question: 'Can I self-host this?',
     answer:
-      "Absolutely! That's kind of the point. Fork the repo, spin up a Docker container, and you're good to go. Full control, full privacy.",
+      "Absolutely! That's kind of the point. Fork the repo, deploy with Docker, and you're good to go. Full control, full privacy.",
   },
   {
     question: 'How is this different from Letterboxd/Trakt?',
@@ -22,7 +22,7 @@ const FAQ_ITEMS = [
   {
     question: 'Is my data safe?',
     answer:
-      "On the hosted version, we store only what's necessary and don't share it with anyone. But if you're extra cautious, self-host it. Your server, your data.",
+      "Kadha stores only what the app needs for your account and media lists. You can also self-host it so your watch history stays on your own server.",
   },
   {
     question: 'Can I contribute to the project?',
