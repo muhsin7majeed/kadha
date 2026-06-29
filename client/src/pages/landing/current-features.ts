@@ -1,13 +1,15 @@
 import {
-  LuHeart,
   LuBookmark,
+  LuBell,
   LuCheck,
   LuClapperboard,
   LuFilter,
+  LuHeart,
+  LuLock,
+  LuSearch,
   LuSparkles,
   LuServer,
   LuUsers,
-  LuLock,
 } from 'react-icons/lu';
 
 const CURRENT_FEATURES = [
@@ -28,19 +30,33 @@ const CURRENT_FEATURES = [
   },
   {
     icon: LuFilter,
-    title: 'Filter by Type',
-    description: 'Movies, TV shows, or both. You decide what shows up.',
+    title: 'Movie and TV Control',
+    description: 'Browse movies and TV shows separately so each media type gets the right details and actions.',
+    badge: 'Discovery',
   },
   {
     icon: LuClapperboard,
     title: 'Trending Content',
-    description: "See what's popular right now. Stay in the loop without the algorithm manipulation.",
+    description: "See what's popular right now, including dedicated movie and TV discovery sections.",
+    badge: 'Discovery',
+  },
+  {
+    icon: LuSearch,
+    title: 'Global Search',
+    description: 'Search movies, TV shows, and users from one dialog with paginated results.',
+    badge: 'Discovery',
   },
   {
     icon: LuSparkles,
     title: 'Custom Collections',
-    description: 'Create themed lists. "Comfort Movies", "Date Night", "When I\'m Sick" — you name it.',
+    description: 'Create themed lists like "Comfort Movies", "Date Night", or anything else you want to organize.',
     badge: 'Organization',
+  },
+  {
+    icon: LuBell,
+    title: 'Notifications',
+    description: 'Track friendship requests and social updates with unread counts and mark-as-read controls.',
+    badge: 'Social',
   },
   {
     icon: LuServer,
@@ -51,13 +67,13 @@ const CURRENT_FEATURES = [
   {
     icon: LuUsers,
     title: 'Friends System',
-    description: 'Connect with friends.',
+    description: 'Find users, send friend requests, accept or reject requests, and block accounts when needed.',
     badge: 'Social',
   },
   {
     icon: LuLock,
-    title: 'Profile Privacy',
-    description: 'Go full ghost mode with a private profile, or let the world see your taste.',
+    title: 'Privacy Controls',
+    description: 'Control who can see your profile, watched list, liked list, watchlist, and collections.',
     badge: 'Privacy',
   },
 ];

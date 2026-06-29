@@ -4,6 +4,10 @@
 
 ### Feature Changes
 
+#### Landing Page
+
+- Updated the landing page feature lists to reflect current privacy, social, search, notification, and upcoming roadmap status.
+
 #### Error Handling
 
 - Added a client error boundary with a recovery screen for unexpected app crashes.

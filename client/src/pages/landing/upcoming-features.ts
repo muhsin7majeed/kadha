@@ -1,14 +1,12 @@
-import { LuShield, LuBrain, LuDownload, LuChartBar, LuUsers } from 'react-icons/lu';
+import { LuBrain, LuChartBar, LuDownload, LuLink, LuMapPin, LuSparkles, LuUsers } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
   {
-    icon: LuShield,
-    title: 'Privacy Controls',
-    description:
-      'Control who sees what. Set your watchlist, liked, and watched lists to private, friends-only, or public.',
-    badge: 'Privacy',
+    icon: LuSparkles,
+    title: 'TMDB Recommendations',
+    description: 'Find similar movies and shows from TMDB based on what you already like or watched.',
+    badge: 'Recommendations',
   },
-
   {
     icon: LuBrain,
     title: 'AI Recommendations',
@@ -17,9 +15,21 @@ const UPCOMING_FEATURES = [
     badge: 'AI',
   },
   {
+    icon: LuUsers,
+    title: 'Friends Activity',
+    description: 'See what friends are watching and discover recommendations from people you trust.',
+    badge: 'Social',
+  },
+  {
+    icon: LuLink,
+    title: 'Public Collection Links',
+    description: 'Share selected collections with public links while keeping private lists private.',
+    badge: 'Sharing',
+  },
+  {
     icon: LuDownload,
     title: 'Import/Export',
-    description: 'Take your data anywhere. No vendor lock-in, ever.',
+    description: 'Bring data in, export everything out, and avoid vendor lock-in.',
     badge: 'Data',
   },
   {
@@ -29,10 +39,10 @@ const UPCOMING_FEATURES = [
     badge: 'Insights',
   },
   {
-    icon: LuUsers,
-    title: 'View Friends Activity',
-    description: 'See what your friends are watching, share collections with them.',
-    badge: 'Social',
+    icon: LuMapPin,
+    title: 'Platform Availability',
+    description: 'Show where a movie or show is available to stream when provider data is wired in.',
+    badge: 'Discovery',
   },
 ];
 

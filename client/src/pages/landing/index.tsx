@@ -78,7 +78,14 @@ const Landing = () => {
                         <feature.icon />
                       </Icon>
                     </Box>
-                    <Heading size="md">{feature.title}</Heading>
+                    <HStack flexWrap="wrap">
+                      <Heading size="md">{feature.title}</Heading>
+                      {'badge' in feature && feature.badge && (
+                        <Badge size="sm" colorPalette="gray">
+                          {feature.badge}
+                        </Badge>
+                      )}
+                    </HStack>
                     <Text color="fg.muted">{feature.description}</Text>
                   </VStack>
                 </Card.Body>
@@ -107,7 +114,7 @@ const Landing = () => {
                       </Icon>
                     </Box>
                     <VStack align="start" gap={2}>
-                      <HStack>
+                      <HStack flexWrap="wrap">
                         <Heading size="md">{feature.title}</Heading>
                         <Badge size="sm" colorPalette="gray">
                           {feature.badge}
