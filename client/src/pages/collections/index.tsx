@@ -15,8 +15,12 @@ const Collections = () => {
 
   return (
     <>
-      <Flex justifyContent="space-between" alignItems="center" mb="4">
-        <PageHeader isFetching={isFetching} mb="0">
+      <Flex justifyContent="space-between" alignItems="flex-start" direction={{ base: 'column', sm: 'row' }} gap="3" mb="4">
+        <PageHeader
+          isFetching={isFetching}
+          mb="0"
+          subHeader="Create custom groups for movies and shows you want to organize together."
+        >
           Collections
         </PageHeader>
 

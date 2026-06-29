@@ -4,6 +4,11 @@
 
 ### Feature Changes
 
+#### Navigation
+
+- Made the app tab bar horizontally scroll when its tabs overflow on narrow screens.
+- Added descriptive helper text to the collections page header.
+
 #### Activity Timeline
 
 - Added a private activity timeline where signed-in users can review their media, collection, and profile-setting actions.
