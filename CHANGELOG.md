@@ -15,6 +15,11 @@
 
 - Added an append-only user activity model and migration so timeline events are recorded separately from current media and collection state.
 
+#### Media Storage
+
+- Normalized saved TMDB media data into a shared media snapshot table for watched, liked, watchlist, and collection items.
+- Added action timestamps for liked, watched, and watchlist state so future recommendations and stats can use more precise history.
+
 ## v0.1.2
 
 ### Feature Changes
