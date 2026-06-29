@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.2
+
 ### Feature Changes
 
 #### Landing Page
