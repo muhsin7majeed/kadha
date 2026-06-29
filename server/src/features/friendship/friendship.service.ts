@@ -18,7 +18,7 @@ export async function sendRequest(senderId: string, receiverId: string) {
   const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
 
   if (!receiver) {
-    return { status: 404, body: { error: 'User not found' } };
+    return { status: 404, body: { message: 'User not found' } };
   }
 
   const existing = await prisma.friendship.findFirst({

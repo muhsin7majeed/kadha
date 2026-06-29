@@ -1,4 +1,5 @@
 import { envConfig } from '@/config/env';
+import { unauthorized } from '@/lib/http';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -7,9 +8,14 @@ type AccessTokenPayload = jwt.JwtPayload & {
   username: string;
 };
 
+export interface AuthenticatedUser {
+  id: string;
+  username: string;
+}
+
 declare module 'express' {
   interface Request {
-    user?: any;
+    user?: AuthenticatedUser;
   }
 }
 
@@ -18,14 +24,14 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
   // Check if Authorization header exists and follows Bearer token format
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return next(unauthorized());
   }
 
   // Extract token from "Bearer <token>" format (standard RFC 6750)
   const token = authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return next(unauthorized());
   }
 
   try {
@@ -35,7 +41,15 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
       username: decoded.username,
     };
     next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Unauthorized' });
+  } catch {
+    return next(unauthorized());
   }
+};
+
+export const requireAuthUser = (req: Request) => {
+  if (!req.user) {
+    throw unauthorized();
+  }
+
+  return req.user;
 };

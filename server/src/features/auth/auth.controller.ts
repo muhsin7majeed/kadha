@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
 import { LoginAndRegisterBody } from './auth.schema';
 import { loginUser, refreshAccessToken, registerUser } from './auth.service';
 
@@ -24,12 +25,12 @@ export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: 
   const result = await registerUser(req.body);
 
   if ('fieldErrors' in result) {
-    return res.status(400).json({ fieldErrors: result.fieldErrors });
+    throw badRequest('Validation failed', result.fieldErrors);
   }
 
   setRefreshTokenCookie(res, result.refreshToken);
 
-  res.json({
+  sendResponse(res, {
     message: 'User registered successfully',
     accessToken: result.accessToken,
     refreshToken: result.refreshToken,
@@ -41,12 +42,12 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
   const result = await loginUser(req.body);
 
   if (!result) {
-    return res.status(400).json({ message: 'Invalid username or password' });
+    throw badRequest('Invalid username or password');
   }
 
   setRefreshTokenCookie(res, result.refreshToken);
 
-  res.json({
+  sendResponse(res, {
     message: 'User logged in successfully',
     accessToken: result.accessToken,
     refreshToken: result.refreshToken,
@@ -56,19 +57,19 @@ export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Res
 
 export const refresh = async (req: Request, res: Response) => {
   if (!req.cookies?.jwt) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    throw unauthorized();
   }
 
   try {
     const accessToken = refreshAccessToken(req.cookies.jwt);
 
-    return res.json({ accessToken });
+    return sendResponse(res, { accessToken });
   } catch {
-    return res.status(401).json({ message: 'Unauthorized' });
+    throw unauthorized();
   }
 };
 
 export const logout = async (req: Request, res: Response) => {
   clearRefreshTokenCookie(res);
-  res.json({ message: 'User logged out successfully' });
+  sendMessage(res, 'User logged out successfully');
 };

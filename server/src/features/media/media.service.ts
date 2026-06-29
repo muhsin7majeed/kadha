@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { createPaginationMeta } from '@/lib/pagination';
+import { badRequest } from '@/lib/http';
 
 import {
   MediaType,
@@ -32,10 +33,7 @@ const parseMediaId = (value: string) => {
   const id = Number(value);
 
   if (!Number.isInteger(id) || id <= 0) {
-    throw {
-      status: 400,
-      message: 'Media ID must be a positive integer',
-    };
+    throw badRequest('Media ID must be a positive integer');
   }
 
   return id;
@@ -43,10 +41,7 @@ const parseMediaId = (value: string) => {
 
 const assertMediaType = (value: string): MediaType => {
   if (!isMediaType(value)) {
-    throw {
-      status: 400,
-      message: 'Media type must be either movie or tv',
-    };
+    throw badRequest('Media type must be either movie or tv');
   }
 
   return value;

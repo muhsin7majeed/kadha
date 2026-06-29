@@ -16,5 +16,5 @@ DONE 11. Remove media from watchlist after marking as watched.
 DONE 13. Check if docker setup is correct.
 DONE 14. Setup docker for prod deployment.
 DONE 15. Deploy with docker.
-16. Better / consistent error & response handling on server.
+DONE 16. Better / consistent error & response handling on server.
 DONE 17. Error boundary on client.

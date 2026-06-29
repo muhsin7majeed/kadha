@@ -1,46 +1,48 @@
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodIssue } from 'zod';
+import { badRequest, FieldErrors } from '@/lib/http';
 
-export const validate = (schema: ZodSchema<any>) => (req: Request, res: Response, next: NextFunction) => {
-  const result = schema.safeParse(req.body);
+type RequestSource = 'body' | 'query' | 'params';
 
-  if (!result.success) {
-    /**
-     * Doing all this because zod returns a lot of nested errors
-     * and I want to return a flat array of errors for frontend to handle
-     *
-     * Example:
-     * {
-     *  username: ["Username is required"],
-     *  password: ["Password is required", "Password must be at least 6 characters long"]
-     * }
-     *
-     * This will be returned to frontend as:
-     * {
-     *  fieldErrors: ["Username is required", "Password is required", "Password must be at least 6 characters long"]
-     * }
-     */
+const getFieldErrors = (schema: ZodSchema<unknown>, value: unknown) => {
+  const result = schema.safeParse(value);
 
-    const formattedErrors: any = result.error.format();
-    const errorMessages: string[] = [];
-
-    for (const key in formattedErrors) {
-      if (key !== '_errors') {
-        const fieldErrors = formattedErrors[key]?._errors;
-
-        if (fieldErrors) {
-          errorMessages.push(...fieldErrors);
-        }
-      }
-    }
-
-    // If no field-specific errors, check for general form errors
-    if (formattedErrors._errors?.length) {
-      errorMessages.push(...formattedErrors._errors);
-    }
-
-    return res.status(400).json({ fieldErrors: errorMessages });
+  if (result.success) {
+    return null;
   }
 
-  next();
+  const fieldErrors: FieldErrors = {};
+  const formErrors: string[] = [];
+
+  result.error.issues.forEach((issue: ZodIssue) => {
+    const field = issue.path[0];
+
+    if (typeof field === 'string' || typeof field === 'number') {
+      fieldErrors[String(field)] = issue.message;
+      return;
+    }
+
+    formErrors.push(issue.message);
+  });
+
+  return {
+    fieldErrors,
+    formErrors,
+  };
 };
+
+export const validate =
+  (schema: ZodSchema<unknown>, source: RequestSource = 'body') =>
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = getFieldErrors(schema, req[source]);
+
+    if (!errors) {
+      return next();
+    }
+
+    if (Object.keys(errors.fieldErrors).length > 0) {
+      return next(badRequest('Validation failed', errors.fieldErrors));
+    }
+
+    return next(badRequest(errors.formErrors[0] ?? 'Validation failed'));
+  };
