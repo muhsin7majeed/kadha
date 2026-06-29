@@ -50,9 +50,15 @@ enum UserActivityType {
   PROFILE_UPDATED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id               String       @id @default(uuid())
   username         String       @unique
+  role             UserRole     @default(USER)
   profilePrivacy   DataPrivacy  @default(EVERYONE)
   watchedPrivacy   DataPrivacy  @default(FRIENDS)
   likedPrivacy     DataPrivacy  @default(FRIENDS)

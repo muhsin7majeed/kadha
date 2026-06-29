@@ -39,6 +39,7 @@ export async function getCurrentUser(id: string) {
     select: {
       id: true,
       username: true,
+      role: true,
       profilePrivacy: true,
       watchedPrivacy: true,
       likedPrivacy: true,
