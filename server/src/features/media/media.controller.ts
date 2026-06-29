@@ -1,44 +1,46 @@
 import { Request, Response } from 'express';
 
+import { sendData, sendResponse } from '@/lib/http';
+import { requireAuthUser } from '@/middlewares/auth';
 import { BaseResponse, PaginatedResponse } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { TMDBMovieDetailsWithMeta, TMDBMovieWithMeta, TMDBTvDetailsWithMeta, TMDBTvWithMeta } from './media.types';
 import * as mediaService from './media.service';
 
 export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<TMDBMovieWithMeta[]>>) => {
-  const data = await mediaService.getTrendingMovies(req.user.id);
+  const data = await mediaService.getTrendingMovies(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getTrendingTvs = async (req: Request, res: Response<BaseResponse<TMDBTvWithMeta[]>>) => {
-  const data = await mediaService.getTrendingTvs(req.user.id);
+  const data = await mediaService.getTrendingTvs(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getPopularMovies = async (req: Request, res: Response<BaseResponse<TMDBMovieWithMeta[]>>) => {
-  const data = await mediaService.getPopularMovies(req.user.id);
+  const data = await mediaService.getPopularMovies(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getPopularTvs = async (req: Request, res: Response<BaseResponse<TMDBTvWithMeta[]>>) => {
-  const data = await mediaService.getPopularTvs(req.user.id);
+  const data = await mediaService.getPopularTvs(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getTopRatedMovies = async (req: Request, res: Response<BaseResponse<TMDBMovieWithMeta[]>>) => {
-  const data = await mediaService.getTopRatedMovies(req.user.id);
+  const data = await mediaService.getTopRatedMovies(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getTopRatedTvs = async (req: Request, res: Response<BaseResponse<TMDBTvWithMeta[]>>) => {
-  const data = await mediaService.getTopRatedTvs(req.user.id);
+  const data = await mediaService.getTopRatedTvs(requireAuthUser(req).id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getMediaDetails = async (
@@ -46,15 +48,15 @@ export const getMediaDetails = async (
   res: Response<BaseResponse<TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta>>,
 ) => {
   const { mediaType, id } = req.params;
-  const data = await mediaService.getMediaDetails(req.user.id, mediaType, id);
+  const data = await mediaService.getMediaDetails(requireAuthUser(req).id, mediaType, id);
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const getGenre = async (req: Request, res: Response<BaseResponse<Record<number, string>>>) => {
   const data = await mediaService.getGenres();
 
-  res.json({ data });
+  sendData(res, data);
 };
 
 export const searchMedia = async (
@@ -63,7 +65,7 @@ export const searchMedia = async (
 ) => {
   const { mediaType, query } = req.params;
   const { page } = getPaginationParams(req.query);
-  const data = await mediaService.searchMedia(req.user.id, mediaType, query, page);
+  const data = await mediaService.searchMedia(requireAuthUser(req).id, mediaType, query, page);
 
-  res.json(data);
+  sendResponse(res, data);
 };

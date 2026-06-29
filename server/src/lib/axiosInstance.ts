@@ -1,5 +1,20 @@
 import { envConfig } from '@/config/env';
+import { AppError } from '@/lib/http';
 import axios from 'axios';
+
+interface TmdbAxiosError {
+  response?: {
+    status?: number;
+    data?: {
+      status_message?: string;
+    };
+  };
+  code?: string;
+}
+
+const isTmdbAxiosError = (error: unknown): error is TmdbAxiosError => {
+  return typeof error === 'object' && error !== null;
+};
 
 const api = axios.create({
   baseURL: 'https://api.themoviedb.org/3',
@@ -7,42 +22,38 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(
-  (config: Axios.AxiosXHRConfig<any>) => {
+  (config) => {
     const bearerToken = envConfig.tmdbBearerToken;
 
-    config && config.headers && (config.headers.Authorization = `Bearer ${bearerToken}`);
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${bearerToken}`;
 
     return config;
   },
-  (error: any) => {
+  (error: unknown) => {
     return Promise.reject(error);
   },
 );
 
 api.interceptors.response.use(
   (response) => response,
-  (error: any) => {
+  (error: unknown) => {
+    if (!isTmdbAxiosError(error)) {
+      return Promise.reject(new AppError('TMDB request failed', { statusCode: 502 }));
+    }
+
     const status = error.response?.status;
     const upstreamMessage = error.response?.data?.status_message;
 
     if (status) {
-      return Promise.reject({
-        status,
-        message: upstreamMessage || 'TMDB request failed',
-      });
+      return Promise.reject(new AppError(upstreamMessage || 'TMDB request failed', { statusCode: status }));
     }
 
     if (error.code === 'ECONNABORTED') {
-      return Promise.reject({
-        status: 504,
-        message: 'TMDB request timed out',
-      });
+      return Promise.reject(new AppError('TMDB request timed out', { statusCode: 504 }));
     }
 
-    return Promise.reject({
-      status: 502,
-      message: 'Unable to reach TMDB',
-    });
+    return Promise.reject(new AppError('Unable to reach TMDB', { statusCode: 502 }));
   },
 );
 

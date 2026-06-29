@@ -12,6 +12,7 @@ import mediaRoutes from './features/media/media.routes';
 import notificationRoutes from './features/notification/notification.routes';
 import userRoutes from './features/user/user.routes';
 import userMediaRoutes from './features/user-media/user-media.routes';
+import { notFoundHandler } from './lib/http';
 import { errorHandler } from './middlewares/errorHandler';
 import { authMiddleware } from './middlewares/auth';
 
@@ -41,6 +42,7 @@ export function createApp(): Express {
   app.get('/', getRoot);
   app.get('/health', getHealth);
 
+  app.use('/api', notFoundHandler);
   app.use(errorHandler);
 
   return app;

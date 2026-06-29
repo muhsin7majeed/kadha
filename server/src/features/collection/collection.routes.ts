@@ -9,14 +9,19 @@ import {
   toggleCollectionItem,
   updateCollection,
 } from './collection.controller';
-import { createCollectionSchema, getCollectionsSchema, toggleCollectionSchema } from './collection.schema';
+import {
+  createCollectionSchema,
+  getCollectionsSchema,
+  toggleCollectionSchema,
+  updateCollectionSchema,
+} from './collection.schema';
 
 const router = Router();
 
-router.get('/', validate(getCollectionsSchema), getCollections);
+router.get('/', validate(getCollectionsSchema, 'query'), getCollections);
 router.post('/', validate(createCollectionSchema), createCollection);
 router.get('/:id', getCollection);
-router.put('/:id', validate(createCollectionSchema), updateCollection);
+router.put('/:id', validate(updateCollectionSchema), updateCollection);
 router.delete('/:id', deleteCollection);
 
 router.post('/:id/items', validate(toggleCollectionSchema), toggleCollectionItem);

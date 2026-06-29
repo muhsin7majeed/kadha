@@ -27,6 +27,11 @@
 
 ### Engineering Changes
 
+#### Server Responses
+
+- Standardized server response helpers, validation errors, auth errors, and unexpected error handling.
+- Normalized server error payloads to use `message` and field-level validation errors consistently.
+
 #### Cleanup
 
 - Replaced the remaining non-Lucide client icons with `Lu` icon variants.
