@@ -2,11 +2,15 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 
 import FullScreenSpinner from '@/components/spinners/full-screen-spinner';
+import AdminRoute from '@/components/admin-route';
 import PrivateRoute from '@/components/private-route';
 import PublicRoute from '@/components/public-route';
 
 const MainLayout = lazy(() => import('@/components/main-layout'));
 const Activity = lazy(() => import('@/pages/activity'));
+const AdminOverview = lazy(() => import('@/pages/admin'));
+const AdminUserDetail = lazy(() => import('@/pages/admin/users/user-detail'));
+const AdminUsers = lazy(() => import('@/pages/admin/users'));
 const AuthLayout = lazy(() => import('@/pages/auth/auth-layout'));
 const Login = lazy(() => import('@/pages/auth/login'));
 const Register = lazy(() => import('@/pages/auth/register'));
@@ -60,6 +64,13 @@ export function AppRoutes() {
             </Route>
 
             <Route path="notifications" element={<Notifications />} />
+
+            <Route element={<AdminRoute />}>
+              <Route path="admin" element={<AdminOverview />} />
+              <Route path="admin/users" element={<AdminUsers />} />
+              <Route path="admin/users/:id" element={<AdminUserDetail />} />
+            </Route>
+
             <Route path="friends" element={<Friends />}>
               <Route index element={<Navigate to="friends" replace />} />
               <Route

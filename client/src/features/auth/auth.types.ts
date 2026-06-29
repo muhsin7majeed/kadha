@@ -1,3 +1,7 @@
+import { User } from '@/features/user/user.types';
+
+type AuthUser = Pick<User, 'id' | 'username'> & Partial<Omit<User, 'id' | 'username'>>;
+
 export interface LoginInputs {
   username: string;
   password: string;
@@ -19,9 +23,6 @@ export interface RefreshResponse {
 }
 
 export interface AuthState {
-  user: {
-    id: string;
-    username: string;
-  } | null;
+  user: AuthUser | null;
   status: 'pending' | 'authenticated' | 'unauthenticated';
 }

@@ -1,8 +1,9 @@
-import { DataPrivacy, FriendStatus, ResourceAccess } from '@/types/common';
+import { DataPrivacy, FriendStatus, ResourceAccess, UserRole } from '@/types/common';
 
 export interface User {
   id: string;
   username: string;
+  role: UserRole;
   profilePrivacy: DataPrivacy;
   watchedPrivacy: DataPrivacy;
   likedPrivacy: DataPrivacy;
