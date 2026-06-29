@@ -1,3 +1,6 @@
+import { UserActivityType } from '@prisma/client';
+
+import { createUserActivity } from '@/features/activity/activity.service';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
 import { enrichUsersWithFriendship, getViewerRelationship } from '@/lib/friendship-utils';
 import { createPaginationMeta } from '@/lib/pagination';
@@ -53,6 +56,17 @@ export async function updateCurrentUser(
   likedPrivacy: DataPrivacy,
   watchlistPrivacy: DataPrivacy,
 ) {
+  const currentUser = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      username: true,
+      profilePrivacy: true,
+      watchedPrivacy: true,
+      likedPrivacy: true,
+      watchlistPrivacy: true,
+    },
+  });
+
   const existingUser = await prisma.user.findFirst({
     where: {
       username,
@@ -70,9 +84,33 @@ export async function updateCurrentUser(
   }
 
   try {
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy },
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id },
+        data: { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy },
+      });
+
+      if (
+        currentUser &&
+        (currentUser.username !== user.username ||
+          currentUser.profilePrivacy !== user.profilePrivacy ||
+          currentUser.watchedPrivacy !== user.watchedPrivacy ||
+          currentUser.likedPrivacy !== user.likedPrivacy ||
+          currentUser.watchlistPrivacy !== user.watchlistPrivacy)
+      ) {
+        await createUserActivity(
+          {
+            userId: id,
+            type: UserActivityType.PROFILE_UPDATED,
+            metadata: {
+              title: user.username,
+            },
+          },
+          tx,
+        );
+      }
+
+      return user;
     });
 
     return {

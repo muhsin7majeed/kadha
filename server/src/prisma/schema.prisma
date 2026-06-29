@@ -32,6 +32,24 @@ enum NotificationType {
   FRIEND_REQUEST_ACCEPTED
 }
 
+enum UserActivityType {
+  ACCOUNT_CREATED
+  ACCOUNT_LOGGED_IN
+  ACCOUNT_LOGGED_OUT
+  MEDIA_LIKED
+  MEDIA_UNLIKED
+  MEDIA_WATCHED
+  MEDIA_UNWATCHED
+  MEDIA_WATCHLISTED
+  MEDIA_REMOVED_FROM_WATCHLIST
+  COLLECTION_CREATED
+  COLLECTION_UPDATED
+  COLLECTION_DELETED
+  COLLECTION_ITEM_ADDED
+  COLLECTION_ITEM_REMOVED
+  PROFILE_UPDATED
+}
+
 model User {
   id               String       @id @default(uuid())
   username         String       @unique
@@ -52,6 +70,7 @@ model User {
   // Notifications
   notifications      Notification[] @relation("UserNotifications")
   actedNotifications Notification[] @relation("NotificationActor")
+  activities          UserActivity[]
 
   @@map("users")
 }
@@ -132,6 +151,25 @@ model UserMedia {
   @@index([userId, watchlist])
   @@index([media_id, media_type])
   @@map("user_media")
+}
+
+model UserActivity {
+  id           String           @id @default(uuid())
+  userId       String
+  type         UserActivityType
+  media_id     Int?
+  media_type   MediaType?
+  collectionId String?
+  metadata     String?
+  createdAt    DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([media_id, media_type])
+  @@index([collectionId])
+  @@map("user_activities")
 }
 
 model Collection {

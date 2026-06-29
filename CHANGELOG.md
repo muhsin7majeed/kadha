@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Activity Timeline
+
+- Added a private activity timeline where signed-in users can review their media, collection, and profile-setting actions.
+- Included account creation, sign-in, and sign-out events in the private activity timeline.
+
+### Engineering Changes
+
+#### Activity Tracking
+
+- Added an append-only user activity model and migration so timeline events are recorded separately from current media and collection state.
+
 ## v0.1.2
 
 ### Feature Changes

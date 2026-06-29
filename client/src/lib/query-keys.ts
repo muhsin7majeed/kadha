@@ -11,6 +11,8 @@ export const queryKeys = {
   notifications: ['notifications'] as const,
   notificationsPage: (page = 1) => ['notifications', page] as const,
   unreadNotificationsCount: ['notifications', 'unread-count'] as const,
+  activity: ['activity'] as const,
+  activityPage: (page = 1) => ['activity', page] as const,
   collections: ['collections'] as const,
   collectionsList: (params?: CollectionsParams) => ['collections', params] as const,
   collection: ['collection'] as const,
