@@ -106,6 +106,7 @@ The goal is simple: track, discover, and organize what you watch without giving 
 - [ ] Optional paid subscription for hosted users
 - [ ] Self-hosting remains free
 - [ ] No features locked behind payment
+- [ ] Unify release/version management with one canonical app version source and an automated release script
 
 ---
 
