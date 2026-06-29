@@ -8,6 +8,10 @@
 
 - Improved light mode readability by using a white title overlay on media cards.
 
+#### Media Actions
+
+- Updated media action state changes to refresh cached client data directly instead of refetching TMDB-backed media queries.
+
 #### Search
 
 - Improved the global search dialog so it prompts for a search before showing result filters.
