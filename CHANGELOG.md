@@ -4,6 +4,10 @@
 
 ### Feature Changes
 
+#### Error Handling
+
+- Added a client error boundary with a recovery screen for unexpected app crashes.
+
 #### Media Cards
 
 - Improved light mode readability by using a white title overlay on media cards.
