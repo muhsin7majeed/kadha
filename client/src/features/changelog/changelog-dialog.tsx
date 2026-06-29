@@ -1,10 +1,14 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { Box, Button, CloseButton, Dialog, Heading, Portal, Stack, Text } from '@chakra-ui/react';
 
 import { changelogMarkdown } from '@/generated/changelog';
 
 interface ChangelogDialogProps {
   version: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  trigger?: (props: { label: string; onOpen: () => void }) => ReactNode;
 }
 
 const headingSizes = {
@@ -56,8 +60,11 @@ function renderMarkdownLine(line: string, index: number) {
   );
 }
 
-const ChangelogDialog = ({ version }: ChangelogDialogProps) => {
-  const [open, setOpen] = useState(false);
+const ChangelogDialog = ({ version, open, onOpenChange, trigger }: ChangelogDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const label = `View changelog for Kadha version ${version}`;
+  const dialogOpen = open ?? internalOpen;
+  const setDialogOpen = onOpenChange ?? setInternalOpen;
 
   const renderedLines = changelogMarkdown
     .split('\n')
@@ -67,21 +74,32 @@ const ChangelogDialog = ({ version }: ChangelogDialogProps) => {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="xs"
-        px={2}
-        color="fg.muted"
-        lineHeight="1"
-        whiteSpace="nowrap"
-        onClick={() => setOpen(true)}
-        aria-label={`View changelog for Kadha version ${version}`}
-        title="View changelog"
-      >
-        v{version}
-      </Button>
+      {trigger ? (
+        trigger({ label, onOpen: () => setDialogOpen(true) })
+      ) : open === undefined ? (
+        <Button
+          variant="ghost"
+          size="xs"
+          px={2}
+          color="fg.muted"
+          lineHeight="1"
+          whiteSpace="nowrap"
+          onClick={() => setDialogOpen(true)}
+          aria-label={label}
+          title="View changelog"
+        >
+          v{version}
+        </Button>
+      ) : (
+        null
+      )}
 
-      <Dialog.Root open={open} onOpenChange={(details) => setOpen(details.open)} size="lg" scrollBehavior="inside">
+      <Dialog.Root
+        open={dialogOpen}
+        onOpenChange={(details) => setDialogOpen(details.open)}
+        size="lg"
+        scrollBehavior="inside"
+      >
         <Portal>
           <Dialog.Backdrop />
           <Dialog.Positioner>

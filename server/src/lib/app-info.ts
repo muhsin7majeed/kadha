@@ -10,8 +10,8 @@ export function getAppVersion() {
     const packageJsonPath = path.join(process.cwd(), 'package.json');
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')) as PackageJson;
 
-    return packageJson.version || '0.1.0';
+    return packageJson.version || '0.1.1';
   } catch {
-    return '0.1.0';
+    return '0.1.1';
   }
 }
