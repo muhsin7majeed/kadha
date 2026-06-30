@@ -9,6 +9,12 @@
 - Made the app tab bar horizontally scroll when its tabs overflow on narrow screens.
 - Added descriptive helper text to the collections page header.
 
+#### Collection Collaboration
+
+- Added the private sharing foundation for collections, including viewer/editor access roles, invitations, and shared collection list filters.
+- Added collection invite notification actions so recipients can accept or reject shared collection access.
+- Updated collection cards and details to show owner, current role, item counts, and member counts for shared collections.
+
 #### Activity Timeline
 
 - Added a private activity timeline where signed-in users can review their media, collection, and profile-setting actions.
@@ -29,6 +35,10 @@
 #### Activity Tracking
 
 - Added an append-only user activity model and migration so timeline events are recorded separately from current media and collection state.
+
+#### Collection Collaboration
+
+- Added collection member and invitation database tables, collection item attribution, and backend authorization checks for shared collection access.
 
 #### Media Storage
 

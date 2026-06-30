@@ -12,6 +12,31 @@ import useMarkNotificationRead from '@/features/notifications/api/use-mark-notif
 import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-all-notifications-read';
 import PaginationControls from '@/components/pagination-controls';
 import { useState } from 'react';
+import useRespondToCollectionInvite from '@/features/collections/api/use-respond-to-collection-invite';
+
+interface CollectionInviteMetadata {
+  collectionName?: string;
+  role?: 'viewer' | 'editor';
+}
+
+const parseCollectionInviteMetadata = (metadata: string | null): CollectionInviteMetadata => {
+  if (!metadata) return {};
+
+  try {
+    const parsed = JSON.parse(metadata) as unknown;
+
+    if (!parsed || typeof parsed !== 'object') return {};
+
+    const data = parsed as Record<string, unknown>;
+
+    return {
+      collectionName: typeof data.collectionName === 'string' ? data.collectionName : undefined,
+      role: data.role === 'viewer' || data.role === 'editor' ? data.role : undefined,
+    };
+  } catch {
+    return {};
+  }
+};
 
 const getNotificationMessage = (notification: Notification) => {
   switch (notification.type) {
@@ -19,6 +44,11 @@ const getNotificationMessage = (notification: Notification) => {
       return 'Sent you a friend request';
     case NotificationType.FriendRequestAccepted:
       return 'Accepted your friend request';
+    case NotificationType.CollectionInvite: {
+      const metadata = parseCollectionInviteMetadata(notification.metadata);
+      const action = metadata.role === 'editor' ? 'collaborate on' : 'view';
+      return metadata.collectionName ? `Invited you to ${action} ${metadata.collectionName}` : 'Invited you to a collection';
+    }
     default:
       return 'Sent you a notification';
   }
@@ -29,6 +59,7 @@ const Notifications = () => {
   const { data, isLoading, isError, isFetching, refetch } = useNotifications(page);
   const markNotificationRead = useMarkNotificationRead();
   const markAllNotificationsRead = useMarkAllNotificationsRead();
+  const respondToCollectionInvite = useRespondToCollectionInvite();
   const notifications = data?.data ?? [];
   const hasUnreadNotifications = notifications.some((notification) => !notification.read);
 
@@ -93,7 +124,32 @@ const Notifications = () => {
                     </Button>
                   )}
 
-                  {notification.actor && (
+                  {notification.type === NotificationType.CollectionInvite && notification.entityId && (
+                    <>
+                      <Button
+                        size="sm"
+                        colorPalette="orange"
+                        loading={respondToCollectionInvite.isPending}
+                        onClick={() =>
+                          respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'accept' })
+                        }
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        loading={respondToCollectionInvite.isPending}
+                        onClick={() =>
+                          respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'reject' })
+                        }
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  )}
+
+                  {notification.actor && notification.type !== NotificationType.CollectionInvite && (
                     <FriendshipActions
                       user={{
                         id: notification.actor.id,

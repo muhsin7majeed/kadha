@@ -30,6 +30,7 @@ enum FriendStatus {
 enum NotificationType {
   FRIEND_REQUEST_RECEIVED
   FRIEND_REQUEST_ACCEPTED
+  COLLECTION_INVITE
 }
 
 enum UserActivityType {
@@ -55,6 +56,18 @@ enum UserRole {
   ADMIN
 }
 
+enum CollectionMemberRole {
+  VIEWER
+  EDITOR
+}
+
+enum CollectionInviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVOKED
+}
+
 model User {
   id               String       @id @default(uuid())
   username         String       @unique
@@ -77,6 +90,9 @@ model User {
   notifications      Notification[] @relation("UserNotifications")
   actedNotifications Notification[] @relation("NotificationActor")
   activities         UserActivity[]
+  collectionMemberships CollectionMember[] @relation("CollectionMemberUser")
+  sentCollectionInvites CollectionInvite[] @relation("CollectionInviteInviter")
+  receivedCollectionInvites CollectionInvite[] @relation("CollectionInviteInvitee")
 
   @@map("users")
 }
@@ -217,6 +233,8 @@ model Collection {
 
   user  User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   items CollectionItem[]
+  members CollectionMember[]
+  invites CollectionInvite[]
 
   @@index([userId])
   @@map("collections")
@@ -227,6 +245,7 @@ model CollectionItem {
   collectionId String
   media_id     Int
   media_type   MediaType
+  addedByUserId String?
 
   created_at DateTime @default(now())
 
@@ -237,4 +256,43 @@ model CollectionItem {
   @@index([collectionId])
   @@index([media_id, media_type])
   @@map("collection_items")
+}
+
+model CollectionMember {
+  id           String               @id @default(uuid())
+  collectionId String
+  userId       String
+  role         CollectionMemberRole
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  user       User       @relation("CollectionMemberUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, userId])
+  @@index([userId])
+  @@index([collectionId, role])
+  @@map("collection_members")
+}
+
+model CollectionInvite {
+  id           String                 @id @default(uuid())
+  collectionId String
+  inviterId    String
+  inviteeId    String
+  role         CollectionMemberRole
+  status       CollectionInviteStatus @default(PENDING)
+  respondedAt  DateTime?
+  revokedAt    DateTime?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  inviter    User       @relation("CollectionInviteInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee    User       @relation("CollectionInviteInvitee", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId, inviteeId, status])
+  @@index([inviteeId, status])
+  @@index([collectionId, status])
+  @@map("collection_invites")
 }

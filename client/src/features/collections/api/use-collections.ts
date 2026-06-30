@@ -1,12 +1,13 @@
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { BaseResponse, MediaType } from '@/types/common';
-import { Collection } from '@/features/collections/collections.types';
+import { Collection, CollectionScope } from '@/features/collections/collections.types';
 import { useQuery } from '@tanstack/react-query';
 
 interface GetCollectionsParams {
-  mediaId: number;
-  mediaType: MediaType;
+  mediaId?: number;
+  mediaType?: MediaType;
+  scope?: CollectionScope;
 }
 
 const getCollections = async (params?: GetCollectionsParams) => {

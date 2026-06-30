@@ -3,6 +3,7 @@ import { UserActor } from '@/features/user/user.types';
 export enum NotificationType {
   FriendRequestReceived = 'FRIEND_REQUEST_RECEIVED',
   FriendRequestAccepted = 'FRIEND_REQUEST_ACCEPTED',
+  CollectionInvite = 'COLLECTION_INVITE',
 }
 
 export interface Notification {
