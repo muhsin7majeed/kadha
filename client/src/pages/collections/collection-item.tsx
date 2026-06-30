@@ -1,5 +1,5 @@
 import { Collection } from '@/features/collections/collections.types';
-import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
+import { AbsoluteCenter, Accordion, Badge, Box, HStack, Separator, SimpleGrid, Span, Stack, Text } from '@chakra-ui/react';
 import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
@@ -17,6 +17,12 @@ const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
   } catch {
     return [];
   }
+};
+
+const formatRole = (role?: string) => {
+  if (!role) return null;
+
+  return role.charAt(0).toUpperCase() + role.slice(1);
 };
 
 interface CollectionItemProps {
@@ -46,14 +52,38 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
       >
         <Box position="relative">
           <Accordion.ItemTrigger>
-            <Span flex="1">{collection.name}</Span>
+            <Span flex="1">
+              <Stack gap="1">
+                <HStack gap="2" flexWrap="wrap">
+                  <Text as="span" fontWeight="medium">
+                    {collection.name}
+                  </Text>
+
+                  {collection.access?.relationship === 'member' && (
+                    <Badge size="sm" colorPalette={collection.access.role === 'editor' ? 'green' : 'gray'}>
+                      {formatRole(collection.access.role)}
+                    </Badge>
+                  )}
+                </HStack>
+
+                <HStack gap="2" color="fg.muted" fontSize="sm" flexWrap="wrap">
+                  {collection.access?.relationship === 'member' && collection.owner && (
+                    <Text as="span">Owner: {collection.owner.username}</Text>
+                  )}
+                  {typeof collection.itemCount === 'number' && <Text as="span">{collection.itemCount} items</Text>}
+                  {typeof collection.memberCount === 'number' && (
+                    <Text as="span">{collection.memberCount} members</Text>
+                  )}
+                </HStack>
+              </Stack>
+            </Span>
 
             <Accordion.ItemIndicator />
           </Accordion.ItemTrigger>
 
           <AbsoluteCenter axis="vertical" insetEnd="10">
             {isFetching && <SyncSpinner size="sm" me="2" />}
-            <CollectionMenu collection={collection} />
+            {collection.access?.canManageSharing !== false && <CollectionMenu collection={collection} />}
           </AbsoluteCenter>
         </Box>
 
@@ -65,9 +95,26 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
               <ErrorState title="Error" description="Error fetching collection" onRetry={refetch} />
             ) : collectionData ? (
               <Box>
-                <Text color="fg.muted" fontSize="sm" mb="4">
-                  {collectionData.description}
-                </Text>
+                <Stack gap="2" mb="4">
+                  {collectionData.description && (
+                    <Text color="fg.muted" fontSize="sm">
+                      {collectionData.description}
+                    </Text>
+                  )}
+
+                  <HStack gap="2" flexWrap="wrap">
+                    {collectionData.owner && <Badge variant="surface">Owner: {collectionData.owner.username}</Badge>}
+                    <Badge variant="surface">Role: {formatRole(collectionData.access.role)}</Badge>
+                    {collectionData.members.slice(0, 4).map((member) => (
+                      <Badge key={member.id} variant="outline">
+                        {member.user.username}
+                      </Badge>
+                    ))}
+                    {collectionData.members.length > 4 && (
+                      <Badge variant="outline">+{collectionData.members.length - 4}</Badge>
+                    )}
+                  </HStack>
+                </Stack>
 
                 <HStack my="4">
                   <Separator flex="1" />

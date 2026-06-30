@@ -1,6 +1,8 @@
 import { DataPrivacy, MediaType } from '@/types/common';
 import { z } from 'zod';
 
+export const collectionMemberRoleSchema = z.enum(['viewer', 'editor']);
+
 export const createCollectionSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
@@ -35,10 +37,26 @@ export const toggleCollectionSchema = z.object({
 export const getCollectionsSchema = z.object({
   mediaId: z.string().optional(),
   mediaType: z.nativeEnum(MediaType).optional(),
+  scope: z.enum(['all', 'mine', 'shared']).default('all'),
+});
+
+export const searchCollectionInviteUsersSchema = z.object({
+  q: z.string().default(''),
+});
+
+export const createCollectionInviteSchema = z.object({
+  inviteeId: z.string().uuid(),
+  role: collectionMemberRoleSchema,
+});
+
+export const respondToCollectionInviteSchema = z.object({
+  action: z.enum(['accept', 'reject']),
 });
 
 export type GetCollectionsQuery = z.infer<typeof getCollectionsSchema>;
 export type CollectionPayload = z.infer<typeof createCollectionSchema>;
+export type CreateCollectionInvitePayload = z.infer<typeof createCollectionInviteSchema>;
+export type RespondToCollectionInvitePayload = z.infer<typeof respondToCollectionInviteSchema>;
 export type ToggleCollectionPayload = z.infer<typeof toggleCollectionSchema> & {
   media_id: number;
 };

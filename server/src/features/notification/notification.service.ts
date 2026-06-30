@@ -5,7 +5,7 @@ import { NotificationType } from '@/types/common';
 
 type NotificationDelegate = Pick<typeof prisma, 'notification'>;
 
-type NotificationEntityType = 'friendship';
+type NotificationEntityType = 'friendship' | 'collection_invite';
 
 interface CreateNotificationPayload {
   userId: string;
@@ -24,8 +24,11 @@ const buildFriendshipDedupeKey = (type: NotificationType, friendshipId: string, 
   return ['friendship', friendshipId, type, actorId].filter(Boolean).join(':');
 };
 
+const buildCollectionInviteDedupeKey = (inviteId: string) => ['collection-invite', inviteId].join(':');
+
 export const notificationDedupeKeys = {
   friendship: buildFriendshipDedupeKey,
+  collectionInvite: buildCollectionInviteDedupeKey,
 };
 
 export async function createNotification(payload: CreateNotificationPayload, db: NotificationDelegate = prisma) {

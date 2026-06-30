@@ -18,6 +18,7 @@
 
 ## Local Development
 
+- Use Docker Compose for local dev servers instead of running client or server dev scripts directly.
 - Root Docker command: `docker compose up --build`
 - Client app: `http://localhost:3000`
 - API server: `http://localhost:5000`

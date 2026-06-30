@@ -1,8 +1,9 @@
 import { MediaType } from '@/types/common';
 
 interface CollectionsParams {
-  mediaId: number;
-  mediaType: MediaType;
+  mediaId?: number;
+  mediaType?: MediaType;
+  scope?: 'all' | 'mine' | 'shared';
 }
 
 export const queryKeys = {

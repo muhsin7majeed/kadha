@@ -7,11 +7,20 @@ import { Accordion, Flex } from '@chakra-ui/react';
 import CollectionItem from './collection-item';
 import { useState } from 'react';
 import CreateCollectionButton from '@/features/collections/components/create-collection-button';
+import SimpleTabs from '@/components/simple-tabs';
+import { CollectionScope } from '@/features/collections/collections.types';
 
 const Collections = () => {
   const [openedCollections, setOpenedCollections] = useState<string[]>([]);
+  const [scope, setScope] = useState<CollectionScope>('all');
 
-  const { data: collections, isLoading, isFetching, error, refetch } = useCollections();
+  const { data: collections, isLoading, isFetching, error, refetch } = useCollections({ scope });
+
+  const emptyStateByScope: Record<CollectionScope, { title: string; description: string }> = {
+    all: { title: 'No collections', description: 'No collections found' },
+    mine: { title: 'No collections', description: 'No collections found' },
+    shared: { title: 'No shared collections yet', description: 'No shared collections found' },
+  };
 
   return (
     <>
@@ -27,39 +36,45 @@ const Collections = () => {
         <CreateCollectionButton />
       </Flex>
 
+      <SimpleTabs
+        tabs={[
+          { value: 'all', label: 'All' },
+          { value: 'mine', label: 'Mine' },
+          { value: 'shared', label: 'Shared' },
+        ]}
+        value={scope}
+        onValueChange={(value) => {
+          setScope(value as CollectionScope);
+          setOpenedCollections([]);
+        }}
+      />
+
       {isLoading ? (
         <CommonSpinner />
       ) : error ? (
         <ErrorState title="Error" description="Error fetching collections" onRetry={refetch} />
       ) : collections?.length === 0 ? (
-        <EmptyState title="No collections" description="No collections found" />
+        <EmptyState title={emptyStateByScope[scope].title} description={emptyStateByScope[scope].description} />
       ) : (
-        <>
-          {/*
-              TODO: This seems to be re-rendering entire accoridans on each item open/close
-              Need a better solution. Might have to resort to regular cards view.
-              Each card item add-t-watch-list action is also re-rendering the entire accordian for some reason.
-        */}
-          <Accordion.Root
-            spaceY="6"
-            variant="plain"
-            collapsible
-            size="lg"
-            value={openedCollections}
-            onValueChange={(e) => {
-              setOpenedCollections(e.value);
-            }}
-          >
-            {collections?.map((collection, index) => (
-              <CollectionItem
-                key={collection.id}
-                collection={collection}
-                index={index}
-                isOpened={openedCollections.includes(collection.id)}
-              />
-            ))}
-          </Accordion.Root>
-        </>
+        <Accordion.Root
+          spaceY="6"
+          variant="plain"
+          collapsible
+          size="lg"
+          value={openedCollections}
+          onValueChange={(e) => {
+            setOpenedCollections(e.value);
+          }}
+        >
+          {collections?.map((collection, index) => (
+            <CollectionItem
+              key={collection.id}
+              collection={collection}
+              index={index}
+              isOpened={openedCollections.includes(collection.id)}
+            />
+          ))}
+        </Accordion.Root>
       )}
     </>
   );
