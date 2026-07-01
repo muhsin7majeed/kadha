@@ -22,6 +22,10 @@ export const queryKeys = {
   collectionsList: (params?: CollectionsParams) => ['collections', params] as const,
   collection: ['collection'] as const,
   collectionById: (id?: string) => ['collection', id] as const,
+  collectionInvites: (collectionId?: string) => ['collection', collectionId, 'invites'] as const,
+  collectionInviteUsers: (collectionId?: string) => ['collection', collectionId, 'invite-users'] as const,
+  collectionInviteUserSearch: (collectionId: string, query: string) =>
+    ['collection', collectionId, 'invite-users', query] as const,
   friendships: ['friendships'] as const,
   friendshipsByType: (type: string, page = 1) => ['friendships', type, page] as const,
   searchUsers: ['search-users'] as const,

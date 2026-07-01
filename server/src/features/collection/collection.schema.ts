@@ -53,10 +53,15 @@ export const respondToCollectionInviteSchema = z.object({
   action: z.enum(['accept', 'reject']),
 });
 
+export const updateCollectionMemberSchema = z.object({
+  role: collectionMemberRoleSchema,
+});
+
 export type GetCollectionsQuery = z.infer<typeof getCollectionsSchema>;
 export type CollectionPayload = z.infer<typeof createCollectionSchema>;
 export type CreateCollectionInvitePayload = z.infer<typeof createCollectionInviteSchema>;
 export type RespondToCollectionInvitePayload = z.infer<typeof respondToCollectionInviteSchema>;
+export type UpdateCollectionMemberPayload = z.infer<typeof updateCollectionMemberSchema>;
 export type ToggleCollectionPayload = z.infer<typeof toggleCollectionSchema> & {
   media_id: number;
 };

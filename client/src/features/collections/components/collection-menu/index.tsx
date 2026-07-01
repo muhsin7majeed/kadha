@@ -6,6 +6,7 @@ import { LuEllipsis } from 'react-icons/lu';
 import useDeleteCollection from '@/features/collections/api/use-delete-collection';
 import UpdateCollection from './update-collection';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
+import CollectionSharingDialog from './collection-sharing-dialog';
 
 interface CollectionMenuProps {
   collection: Collection;
@@ -14,6 +15,7 @@ interface CollectionMenuProps {
 const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   const { mutateAsync: deleteCollection, isPending: isDeletingCollection } = useDeleteCollection();
 
@@ -53,6 +55,18 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
         />
       </SimpleDialog>
 
+      <SimpleDialog
+        open={isShareDialogOpen}
+        title="Share Collection"
+        closeButton
+        contentProps={{ maxW: { base: 'calc(100vw - 2rem)', md: '3xl' } }}
+        onOpenChange={(e) => {
+          setIsShareDialogOpen(e.open);
+        }}
+      >
+        <CollectionSharingDialog collection={collection} open={isShareDialogOpen} />
+      </SimpleDialog>
+
       <Menu.Root>
         <Menu.Trigger asChild>
           <IconButton variant="ghost" aria-label="Open Menu" title="Open Menu">
@@ -63,6 +77,15 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
         <Portal>
           <Menu.Positioner>
             <Menu.Content>
+              <Menu.Item
+                value="share"
+                onClick={() => {
+                  setIsShareDialogOpen(true);
+                }}
+              >
+                Share
+              </Menu.Item>
+
               <Menu.Item
                 value="edit"
                 onClick={() => {

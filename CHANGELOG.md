@@ -12,7 +12,9 @@
 #### Collection Collaboration
 
 - Added the private sharing foundation for collections, including viewer/editor access roles, invitations, and shared collection list filters.
+- Added owner share management for inviting users, revoking pending invitations, changing member roles, and removing members.
 - Added collection invite notification actions so recipients can accept or reject shared collection access.
+- Added a leave action for members of shared collections.
 - Updated collection cards and details to show owner, current role, item counts, and member counts for shared collections.
 
 #### Activity Timeline
@@ -39,6 +41,7 @@
 #### Collection Collaboration
 
 - Added collection member and invitation database tables, collection item attribution, and backend authorization checks for shared collection access.
+- Added backend collection sharing management APIs for invite revocation, role changes, member removal, and leaving shared collections.
 
 #### Media Storage
 

@@ -1,4 +1,4 @@
-import { CollectionInviteStatus, CollectionMemberRole, Prisma, UserActivityType } from '@prisma/client';
+import { CollectionInviteStatus, CollectionMemberRole, FriendStatus, Prisma, UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot, upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
@@ -16,6 +16,7 @@ import {
   GetCollectionsQuery,
   RespondToCollectionInvitePayload,
   ToggleCollectionPayload,
+  UpdateCollectionMemberPayload,
 } from './collection.schema';
 
 type CollectionAccess =
@@ -193,6 +194,42 @@ const requireCollectionOwner = async (userId: string, collectionId: string) => {
   }
 
   return collection;
+};
+
+const blockedRelationshipWhere = (currentUserId: string) => [
+  {
+    sentFriendRequests: {
+      some: {
+        receiverId: currentUserId,
+        status: FriendStatus.BLOCKED,
+      },
+    },
+  },
+  {
+    receivedFriendRequests: {
+      some: {
+        senderId: currentUserId,
+        status: FriendStatus.BLOCKED,
+      },
+    },
+  },
+];
+
+const hasBlockedRelationship = async (firstUserId: string, secondUserId: string) => {
+  const friendship = await prisma.friendship.findFirst({
+    where: {
+      status: FriendStatus.BLOCKED,
+      OR: [
+        { senderId: firstUserId, receiverId: secondUserId },
+        { senderId: secondUserId, receiverId: firstUserId },
+      ],
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return friendship !== null;
 };
 
 export async function getUserCollections(userId: string, query: GetCollectionsQuery) {
@@ -488,6 +525,7 @@ export async function searchUsersForCollectionInvite(ownerId: string, collection
       username: {
         contains: normalizedQuery,
       },
+      NOT: blockedRelationshipWhere(ownerId),
     },
     select: selectUserSummary,
     orderBy: {
@@ -549,6 +587,10 @@ export async function createCollectionInvite(
   });
 
   if (!invitee) {
+    throw notFound('User not found');
+  }
+
+  if (await hasBlockedRelationship(ownerId, payload.inviteeId)) {
     throw notFound('User not found');
   }
 
@@ -619,6 +661,169 @@ export async function createCollectionInvite(
       role: roleToApi(invite.role),
     };
   });
+}
+
+export async function listCollectionInvites(ownerId: string, collectionId: string) {
+  await requireCollectionOwner(ownerId, collectionId);
+
+  const invites = await prisma.collectionInvite.findMany({
+    where: {
+      collectionId,
+      status: CollectionInviteStatus.PENDING,
+    },
+    include: {
+      invitee: {
+        select: selectUserSummary,
+      },
+      inviter: {
+        select: selectUserSummary,
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return invites.map((invite) => ({
+    ...invite,
+    role: roleToApi(invite.role),
+    status: invite.status.toLowerCase(),
+  }));
+}
+
+export async function revokeCollectionInvite(ownerId: string, collectionId: string, inviteId: string) {
+  await requireCollectionOwner(ownerId, collectionId);
+
+  const invite = await prisma.collectionInvite.findFirst({
+    where: {
+      id: inviteId,
+      collectionId,
+      status: CollectionInviteStatus.PENDING,
+    },
+  });
+
+  if (!invite) {
+    throw notFound('Invitation not found');
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const revokedInvite = await tx.collectionInvite.update({
+      where: { id: invite.id },
+      data: {
+        status: CollectionInviteStatus.REVOKED,
+        revokedAt: new Date(),
+      },
+    });
+
+    await resolveNotificationsByEntity('collection_invite', invite.id, tx);
+
+    return {
+      ...revokedInvite,
+      role: roleToApi(revokedInvite.role),
+      status: revokedInvite.status.toLowerCase(),
+    };
+  });
+}
+
+export async function updateCollectionMember(
+  ownerId: string,
+  collectionId: string,
+  memberId: string,
+  payload: UpdateCollectionMemberPayload,
+) {
+  await requireCollectionOwner(ownerId, collectionId);
+
+  const member = await prisma.collectionMember.findFirst({
+    where: {
+      id: memberId,
+      collectionId,
+    },
+  });
+
+  if (!member) {
+    throw notFound('Member not found');
+  }
+
+  const updatedMember = await prisma.collectionMember.update({
+    where: { id: member.id },
+    data: {
+      role: roleFromApi(payload.role),
+    },
+    include: {
+      user: {
+        select: selectUserSummary,
+      },
+    },
+  });
+
+  return {
+    ...updatedMember,
+    role: roleToApi(updatedMember.role),
+  };
+}
+
+export async function removeCollectionMember(ownerId: string, collectionId: string, memberId: string) {
+  await requireCollectionOwner(ownerId, collectionId);
+
+  const member = await prisma.collectionMember.findFirst({
+    where: {
+      id: memberId,
+      collectionId,
+    },
+  });
+
+  if (!member) {
+    throw notFound('Member not found');
+  }
+
+  await prisma.collectionMember.delete({
+    where: {
+      id: member.id,
+    },
+  });
+
+  return member;
+}
+
+export async function leaveSharedCollection(userId: string, collectionId: string) {
+  const collection = await prisma.collection.findUnique({
+    where: {
+      id: collectionId,
+    },
+    select: {
+      id: true,
+      userId: true,
+    },
+  });
+
+  if (!collection) {
+    throw notFound('Collection not found');
+  }
+
+  if (collection.userId === userId) {
+    throw badRequest('Owners cannot leave their own collection');
+  }
+
+  const member = await prisma.collectionMember.findUnique({
+    where: {
+      collectionId_userId: {
+        collectionId,
+        userId,
+      },
+    },
+  });
+
+  if (!member) {
+    throw notFound('Membership not found');
+  }
+
+  await prisma.collectionMember.delete({
+    where: {
+      id: member.id,
+    },
+  });
+
+  return member;
 }
 
 export async function respondToCollectionInvite(userId: string, inviteId: string, payload: RespondToCollectionInvitePayload) {

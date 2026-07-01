@@ -1,5 +1,17 @@
 import { Collection } from '@/features/collections/collections.types';
-import { AbsoluteCenter, Accordion, Badge, Box, HStack, Separator, SimpleGrid, Span, Stack, Text } from '@chakra-ui/react';
+import {
+  AbsoluteCenter,
+  Accordion,
+  Badge,
+  Box,
+  Button,
+  HStack,
+  Separator,
+  SimpleGrid,
+  Span,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
@@ -7,6 +19,9 @@ import EmptyState from '@/components/info-states/empty-state';
 import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
+import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
+import useLeaveCollection from '@/features/collections/api/use-leave-collection';
+import { useState } from 'react';
 
 const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
   if (Array.isArray(genreIds)) return genreIds;
@@ -32,6 +47,7 @@ interface CollectionItemProps {
 }
 
 const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOpened }) => {
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const {
     data: collectionData,
     isLoading,
@@ -39,9 +55,27 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
     error,
     refetch,
   } = useCollection({ collectionId: collection.id, enabled: isOpened });
+  const leaveCollection = useLeaveCollection();
+
+  const handleLeaveCollection = async () => {
+    await leaveCollection.mutateAsync(collection.id);
+    setIsLeaveDialogOpen(false);
+  };
 
   return (
     <>
+      <ConfirmationDialog
+        isOpen={isLeaveDialogOpen}
+        onOpenChange={setIsLeaveDialogOpen}
+        title="Leave Collection"
+        description="Are you sure you want to leave this shared collection?"
+        onConfirm={handleLeaveCollection}
+        confirmButtonProps={{
+          colorPalette: 'red',
+          loading: leaveCollection.isPending,
+        }}
+      />
+
       <Accordion.Item
         key={index}
         value={collection.id}
@@ -112,6 +146,11 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                     ))}
                     {collectionData.members.length > 4 && (
                       <Badge variant="outline">+{collectionData.members.length - 4}</Badge>
+                    )}
+                    {collectionData.access.relationship === 'member' && (
+                      <Button size="xs" variant="outline" colorPalette="red" onClick={() => setIsLeaveDialogOpen(true)}>
+                        Leave
+                      </Button>
                     )}
                   </HStack>
                 </Stack>
