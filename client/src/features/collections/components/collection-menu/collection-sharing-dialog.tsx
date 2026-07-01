@@ -134,7 +134,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
 
                     <Button
                       size="sm"
-                      colorPalette="orange"
+                      colorPalette="brand"
                       disabled={user.state !== 'available'}
                       loading={createInvite.isPending}
                       onClick={() => handleInvite(user)}

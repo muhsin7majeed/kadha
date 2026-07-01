@@ -120,7 +120,7 @@ const activityCopyByType: Record<UserActivityType, ActivityCopy> = {
     label: 'Profile updated',
     detail: 'Updated account settings',
     icon: <LuSettings />,
-    colorPalette: 'orange',
+    colorPalette: 'brand',
   },
 };
 

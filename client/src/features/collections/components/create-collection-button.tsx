@@ -11,7 +11,7 @@ const CreateCollectionButton: React.FC<CreateCollectionButtonProps> = ({ buttonE
   const [showCreateCollectionDialog, setShowCreateCollectionDialog] = useState(false);
 
   const ButtonElement = buttonElement || (
-    <Button colorPalette="orange" variant="subtle" size="sm">
+    <Button colorPalette="brand" variant="subtle" size="sm">
       Create Collection
     </Button>
   );

@@ -69,8 +69,8 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
               <Card.Body>
                 <VStack align="start" gap={2}>
                   <HStack>
-                    <Box p={2} bg="orange/10" borderRadius="md">
-                      <LuFilm color="var(--chakra-colors-orange-400)" />
+                    <Box p={2} bg="brand.subtle" borderRadius="md">
+                      <LuFilm color="var(--chakra-colors-brand-fg)" />
                     </Box>
                     <Heading size="md">{data.belongs_to_collection.name}</Heading>
                   </HStack>

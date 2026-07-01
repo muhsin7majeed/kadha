@@ -39,7 +39,7 @@ const AddToCollection: React.FC<AddToCollectionProps> = ({ media, onClose }) => 
               <IconButton
                 variant="subtle"
                 borderRadius="full"
-                colorPalette="orange"
+                colorPalette="brand"
                 aria-label="Create Collection"
                 title="Create Collection"
                 size="sm"

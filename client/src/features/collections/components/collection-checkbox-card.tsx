@@ -41,7 +41,7 @@ const CollectionCheckboxCard: React.FC<CollectionCheckboxCardProps> = ({ media, 
         onCheckedChange={handleCollectionSelection}
         checked={collection.hasMedia}
         variant={collection.hasMedia ? 'surface' : 'outline'}
-        colorPalette={'orange'}
+        colorPalette="brand"
       />
     </>
   );

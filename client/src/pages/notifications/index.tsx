@@ -96,9 +96,9 @@ const Notifications = () => {
                 alignItems={{ base: 'flex-start', md: 'center' }}
                 gap={4}
                 border="1px solid"
-                borderColor={notification.read ? 'border.subtle' : 'orange.muted'}
+                borderColor={notification.read ? 'border.subtle' : 'brand.muted'}
                 borderRadius="lg"
-                bg={notification.read ? 'transparent' : 'orange.subtle'}
+                bg={notification.read ? 'transparent' : 'brand.subtle'}
                 p={4}
                 direction={{ base: 'column', md: 'row' }}
               >
@@ -128,7 +128,7 @@ const Notifications = () => {
                     <>
                       <Button
                         size="sm"
-                        colorPalette="orange"
+                        colorPalette="brand"
                         loading={respondToCollectionInvite.isPending}
                         onClick={() =>
                           respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'accept' })

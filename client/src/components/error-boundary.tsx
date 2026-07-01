@@ -59,7 +59,7 @@ const ErrorFallback = ({ onReset }: { onReset: () => void }) => {
           </VStack>
 
           <HStack gap={3} flexWrap="wrap" justify="center">
-            <Button colorPalette="orange" onClick={() => window.location.reload()}>
+            <Button colorPalette="brand" onClick={() => window.location.reload()}>
               <LuRefreshCw />
               Reload
             </Button>

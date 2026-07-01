@@ -22,7 +22,7 @@ const ScrollButton = ({ direction, onClick }: { direction: 'left' | 'right'; onC
     <IconButton
       aria-label={`Scroll ${direction}`}
       onClick={onClick}
-      colorPalette="orange"
+      colorPalette="brand"
       variant="subtle"
       borderRadius="full"
     >

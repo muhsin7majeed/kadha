@@ -30,12 +30,12 @@ const Landing = () => {
       {/* Hero Section */}
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
         <Container maxW="4xl" textAlign="center" position="relative" zIndex={1}>
-          <Badge colorPalette="orange" size="lg" mb={4}>
+          <Badge colorPalette="brand" size="lg" mb={4}>
             Open Source & Privacy-First
           </Badge>
           <Heading size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
             Your movies. Your data.{' '}
-            <Text as="span" color="orange">
+            <Text as="span" color="brand.fg">
               Your rules.
             </Text>
           </Heading>
@@ -44,7 +44,7 @@ const Landing = () => {
             you've watched, save what you want to see, and actually own your data.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
-            <Button colorPalette="orange" size="lg" asChild>
+            <Button colorPalette="brand" size="lg" asChild>
               <Link to="/auth/register">Get Started - It's Free</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
@@ -73,8 +73,8 @@ const Landing = () => {
               <Card.Root key={feature.title} variant="outline">
                 <Card.Body>
                   <VStack align="start" gap={3}>
-                    <Box p={3} bg="orange/10" rounded="lg">
-                      <Icon fontSize="xl" color="orange">
+                    <Box p={3} bg="brand.subtle" rounded="lg">
+                      <Icon fontSize="xl" color="brand.fg">
                         <feature.icon />
                       </Icon>
                     </Box>
@@ -99,7 +99,7 @@ const Landing = () => {
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="6xl">
           <VStack gap={4} mb={12} textAlign="center">
-            <Badge colorPalette="orange">Coming Soon</Badge>
+            <Badge colorPalette="brand">Coming Soon</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>What we're building</Heading>
           </VStack>
 
@@ -108,8 +108,8 @@ const Landing = () => {
               <Card.Root key={feature.title} variant="outline">
                 <Card.Body>
                   <HStack align="start" gap={4}>
-                    <Box p={3} bg="orange.500/10" rounded="lg" flexShrink={0}>
-                      <Icon fontSize="xl" color="orange.500">
+                    <Box p={3} bg="brand.subtle" rounded="lg" flexShrink={0}>
+                      <Icon fontSize="xl" color="brand.solid">
                         <feature.icon />
                       </Icon>
                     </Box>
@@ -133,11 +133,11 @@ const Landing = () => {
       {/* Self-Hosting Highlight */}
       <Box py={{ base: 16, md: 20 }}>
         <Container maxW="4xl">
-          <Card.Root variant="outline" borderColor="orange/30" bg="orange/5">
+          <Card.Root variant="outline" borderColor="brand.muted" bg="brand.subtle">
             <Card.Body py={10}>
               <VStack gap={6} textAlign="center">
-                <Box p={4} bg="orange/10" rounded="full">
-                  <Icon fontSize="3xl" color="orange">
+                <Box p={4} bg="brand.subtle" rounded="full">
+                  <Icon fontSize="3xl" color="brand.fg">
                     <LuGlobe />
                   </Icon>
                 </Box>
@@ -146,7 +146,7 @@ const Landing = () => {
                   Don't want your watch history on someone else's server? Fork the repo, deploy with Docker, and run
                   your own instance. Modify it however you want. It's MIT licensed - go wild.
                 </Text>
-                <Button variant="outline" colorPalette="orange" asChild>
+                <Button variant="outline" colorPalette="brand" asChild>
                   <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                     <LuGithub />
                     Check out the repo
@@ -197,7 +197,7 @@ const Landing = () => {
             be.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
-            <Button colorPalette="orange" size="lg" asChild>
+            <Button colorPalette="brand" size="lg" asChild>
               <Link to="/auth/register">Create Free Account</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
@@ -212,7 +212,7 @@ const Landing = () => {
         <Container maxW="6xl">
           <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" gap={4}>
             <HStack gap={2}>
-              <Icon fontSize="xl" color="orange">
+              <Icon fontSize="xl" color="brand.fg">
                 <LuTv />
               </Icon>
               <Text fontWeight="semibold">{APP_CONFIG.appName}</Text>

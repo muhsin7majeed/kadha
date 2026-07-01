@@ -43,7 +43,7 @@ const meta = {
     errorDescription: 'Failed to fetch watchlist',
     loadingText: 'Loading watchlist...',
     icon: <LuBookmark />,
-    spinnerColor: 'orange',
+    spinnerColor: 'brand.solid',
   },
 };
 

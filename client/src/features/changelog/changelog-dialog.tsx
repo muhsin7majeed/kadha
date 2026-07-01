@@ -56,7 +56,7 @@ const markdownComponents: Components = {
     </Box>
   ),
   a: ({ children, href }) => (
-    <Link href={href} color="orange.fg" textDecoration="underline" textUnderlineOffset="3px">
+    <Link href={href} color="brand.fg" textDecoration="underline" textUnderlineOffset="3px">
       {children}
     </Link>
   ),

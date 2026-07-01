@@ -34,7 +34,7 @@ const MediaSearchResults: React.FC<MediaSearchResultsProps> = ({ searchQuery, me
         }}
         errorDescription="Failed to fetch movies and tv shows"
         loadingText="Loading movies and tv shows..."
-        spinnerColor="orange"
+        spinnerColor="brand.solid"
         pagination={results?.pagination}
         onPageChange={setPage}
       />
