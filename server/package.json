@@ -1,6 +1,6 @@
 {
   "name": "kadha-server",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A Node.js server for the Kadha application",
   "main": "dist/index.js",
   "scripts": {
