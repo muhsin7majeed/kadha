@@ -7,6 +7,7 @@ import {
   notificationDedupeKeys,
   resolveNotificationsByEntity,
 } from '@/features/notification/notification.service';
+import { enrichUserWithFriendship, getFriendshipStatusMap } from '@/lib/friendship-utils';
 import { badRequest, forbidden, notFound } from '@/lib/http';
 import { prisma } from '@/lib/prisma';
 import { NotificationType } from '@/types/common';
@@ -131,23 +132,26 @@ const serializeCollectionListItem = (collection: CollectionWithListData, userId:
   };
 };
 
-const serializeCollectionDetails = (collection: CollectionWithDetailsData, userId: string) => {
+const serializeCollectionDetails = async (collection: CollectionWithDetailsData, userId: string) => {
   const access = getCollectionAccessFromMembers(collection, userId);
 
   if (!access) return null;
 
   const { user, members, items, _count, ...rest } = collection;
+  const relatedUserIds = [user.id, ...members.map((member) => member.userId)].filter((id) => id !== userId);
+  const friendshipStatusMap = await getFriendshipStatusMap(userId, relatedUserIds);
+  const owner = user.id === userId ? user : enrichUserWithFriendship(user, friendshipStatusMap);
 
   return {
     ...rest,
-    owner: user,
+    owner,
     members: members.map((member) => ({
       id: member.id,
       userId: member.userId,
       role: roleToApi(member.role),
       createdAt: member.createdAt,
       updatedAt: member.updatedAt,
-      user: member.user,
+      user: member.userId === userId ? member.user : enrichUserWithFriendship(member.user, friendshipStatusMap),
     })),
     memberCount: _count.members + 1,
     access,

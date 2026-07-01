@@ -1,5 +1,5 @@
 import { UserMedia } from '@/features/user-media/user-media.types';
-import { DataPrivacy } from '@/types/common';
+import { DataPrivacy, FriendStatus } from '@/types/common';
 
 export interface Collection {
   id: string;
@@ -24,6 +24,8 @@ export type CollectionAccessRole = 'owner' | CollectionMemberRole;
 export interface UserSummary {
   id: string;
   username: string;
+  friendshipStatus?: FriendStatus;
+  isRequestSender?: boolean;
 }
 
 export interface CollectionAccess {
