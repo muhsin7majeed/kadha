@@ -2,7 +2,6 @@ import { Collection } from '@/features/collections/collections.types';
 import {
   AbsoluteCenter,
   Accordion,
-  Badge,
   Box,
   HStack,
   Separator,
@@ -19,6 +18,7 @@ import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
 import CollectionSharingMeta, { CollectionSharedIcon } from '@/features/collections/components/collection-sharing-meta';
+import CollectionMembersDialog from '@/features/collections/components/collection-members-dialog';
 
 const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
   if (Array.isArray(genreIds)) return genreIds;
@@ -103,15 +103,9 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
 
                   <HStack gap="2" flexWrap="wrap">
                     <CollectionSharingMeta collection={collectionData} />
-                    {collectionData.members.slice(0, 4).map((member) => (
-                      <Badge key={member.id} variant="outline">
-                        {member.user.username}
-                      </Badge>
-                    ))}
-                    {collectionData.members.length > 4 && (
-                      <Badge variant="outline">+{collectionData.members.length - 4}</Badge>
-                    )}
                   </HStack>
+
+                  <CollectionMembersDialog collection={collectionData} />
                 </Stack>
 
                 <HStack my="4">

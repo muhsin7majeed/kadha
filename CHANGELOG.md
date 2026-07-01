@@ -17,6 +17,7 @@
 - Added a leave action for members of shared collections.
 - Updated collection cards and details to show owner, current role, item counts, and member counts for shared collections.
 - Improved shared collection labeling with shared icons, creator wording, avatars in sharing controls, and clearer shared collection rows in add-to-collection.
+- Added a collection members dialog from the collection header so participants can review members, open profiles, send friend requests, and owners can remove members.
 
 #### Activity Timeline
 
