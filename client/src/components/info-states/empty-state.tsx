@@ -2,8 +2,8 @@ import { EmptyState as ChakraEmptyState, VStack } from '@chakra-ui/react';
 import { LuFolderOpen } from 'react-icons/lu';
 
 interface EmptyStateProps {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   icon?: React.ReactNode;
 }
 

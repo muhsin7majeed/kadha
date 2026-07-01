@@ -5,9 +5,9 @@ interface SimpleAvatarProps extends Avatar.RootProps {
   fallbackName?: string;
 }
 
-const SimpleAvatar: React.FC<SimpleAvatarProps> = ({ src, fallbackName }) => {
+const SimpleAvatar: React.FC<SimpleAvatarProps> = ({ src, fallbackName, ...props }) => {
   return (
-    <Avatar.Root>
+    <Avatar.Root {...props}>
       <Avatar.Image src={src} />
       <Avatar.Fallback name={fallbackName} />
     </Avatar.Root>

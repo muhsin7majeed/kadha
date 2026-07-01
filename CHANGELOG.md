@@ -16,6 +16,7 @@
 - Added collection invite notification actions so recipients can accept or reject shared collection access.
 - Added a leave action for members of shared collections.
 - Updated collection cards and details to show owner, current role, item counts, and member counts for shared collections.
+- Improved shared collection labeling with shared icons, creator wording, avatars in sharing controls, and clearer shared collection rows in add-to-collection.
 
 #### Activity Timeline
 

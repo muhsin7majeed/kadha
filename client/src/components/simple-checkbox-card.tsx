@@ -1,8 +1,8 @@
 import { CheckboxCard, Spinner } from '@chakra-ui/react';
 
 interface SimpleCheckboxCardProps extends CheckboxCard.RootProps {
-  label: string;
-  description?: string;
+  label: React.ReactNode;
+  description?: React.ReactNode;
   isLoading?: boolean;
 }
 

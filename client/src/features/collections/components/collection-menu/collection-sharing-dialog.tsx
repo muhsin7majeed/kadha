@@ -4,6 +4,7 @@ import { Badge, Box, Button, Field, HStack, Input, NativeSelect, Separator, Stac
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import CommonSpinner from '@/components/spinners/common-spinner';
+import SimpleAvatar from '@/components/simple-avatar';
 import useCollection from '@/features/collections/api/use-collection';
 import useCollectionInvites from '@/features/collections/api/use-collection-invites';
 import useCreateCollectionInvite from '@/features/collections/api/use-create-collection-invite';
@@ -79,7 +80,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
         <Text fontWeight="semibold">{collection.name}</Text>
         <HStack gap="2" flexWrap="wrap">
           <Badge variant="surface">{collectionData?.memberCount ?? collection.memberCount ?? 1} members</Badge>
-          {collectionData?.owner && <Badge variant="surface">Owner: {collectionData.owner.username}</Badge>}
+          {collectionData?.owner && <Badge variant="surface">Created by {collectionData.owner.username}</Badge>}
         </HStack>
       </Stack>
 
@@ -88,7 +89,6 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
       <Stack gap="3">
         <Text fontWeight="medium">Search users</Text>
         <Field.Root>
-          <Field.Label>Username</Field.Label>
           <Input
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
@@ -101,7 +101,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
         ) : usersQuery.isError ? (
           <ErrorState title="Error" description="Error searching users" onRetry={usersQuery.refetch} />
         ) : searchQuery.trim() && searchResults.length === 0 ? (
-          <EmptyState title="No users" description="No users found" />
+          <EmptyState description="No users found" />
         ) : (
           <Stack gap="2">
             {searchResults.map((user) => (
@@ -109,6 +109,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                 <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="3">
                   <Stack gap="1">
                     <HStack gap="2">
+                      <SimpleAvatar fallbackName={user.username} size="sm" />
                       <Text fontWeight="medium">{user.username}</Text>
                       {getUserStateLabel(user) && <Badge variant="surface">{getUserStateLabel(user)}</Badge>}
                     </HStack>
@@ -160,7 +161,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
         ) : invitesQuery.isError ? (
           <ErrorState title="Error" description="Error loading invitations" onRetry={invitesQuery.refetch} />
         ) : pendingInvites.length === 0 ? (
-          <EmptyState title="No pending invitations" description="No pending invitations found" />
+          <EmptyState description="No pending invitations found" />
         ) : (
           <Stack gap="2">
             {pendingInvites.map((invite) => (
@@ -176,7 +177,10 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                 flexDirection={{ base: 'column', md: 'row' }}
               >
                 <Stack gap="1">
-                  <Text fontWeight="medium">{invite.invitee.username}</Text>
+                  <HStack gap="2">
+                    <SimpleAvatar fallbackName={invite.invitee.username} size="sm" />
+                    <Text fontWeight="medium">{invite.invitee.username}</Text>
+                  </HStack>
                   <Badge variant="surface" w="fit-content">
                     {ROLE_LABELS[invite.role]}
                   </Badge>
@@ -217,12 +221,15 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
               p="3"
               gap="3"
             >
-              <Text fontWeight="medium">{collectionData.owner.username}</Text>
-              <Badge variant="surface">Owner</Badge>
+              <HStack gap="2">
+                <SimpleAvatar fallbackName={collectionData.owner.username} size="sm" />
+                <Text fontWeight="medium">{collectionData.owner.username}</Text>
+              </HStack>
+              <Badge variant="surface">Creator</Badge>
             </HStack>
 
             {collectionData.members.length === 0 ? (
-              <EmptyState title="No members" description="No members found" />
+              <EmptyState description="No members found" />
             ) : (
               collectionData.members.map((member) => (
                 <HStack
@@ -236,15 +243,16 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                   alignItems={{ base: 'flex-start', md: 'center' }}
                   flexDirection={{ base: 'column', md: 'row' }}
                 >
-                  <Text fontWeight="medium">{member.user.username}</Text>
+                  <HStack gap="2">
+                    <SimpleAvatar fallbackName={member.user.username} size="sm" />
+                    <Text fontWeight="medium">{member.user.username}</Text>
+                  </HStack>
 
                   <HStack gap="2" justifyContent={{ base: 'stretch', md: 'flex-end' }}>
                     <NativeSelect.Root maxW="36" disabled={updateMemberRole.isPending}>
                       <NativeSelect.Field
                         value={member.role}
-                        onChange={(event) =>
-                          handleMemberRoleChange(member, event.target.value as CollectionMemberRole)
-                        }
+                        onChange={(event) => handleMemberRoleChange(member, event.target.value as CollectionMemberRole)}
                       >
                         {roleOptions.map((role) => (
                           <option key={role.value} value={role.value}>
