@@ -16,3 +16,6 @@ server/.env
 
 # Editor specific
 .vscode/
+
+# Others
+temp/

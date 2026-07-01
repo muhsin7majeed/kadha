@@ -9,6 +9,7 @@ import {
   GetCollectionsQuery,
   RespondToCollectionInvitePayload,
   ToggleCollectionPayload,
+  UpdateCollectionMemberPayload,
 } from './collection.schema';
 import {
   createCollectionInvite,
@@ -16,9 +17,14 @@ import {
   deleteUserCollection,
   getUserCollection,
   getUserCollections,
+  leaveSharedCollection,
+  listCollectionInvites,
+  removeCollectionMember,
   respondToCollectionInvite,
+  revokeCollectionInvite,
   searchUsersForCollectionInvite,
   toggleUserCollectionItem,
+  updateCollectionMember,
   updateUserCollection,
 } from './collection.service';
 import z from 'zod';
@@ -80,6 +86,41 @@ export const inviteUserToCollection = async (req: Request, res: Response) => {
   );
 
   sendData(res, data, 201);
+};
+
+export const getCollectionInvites = async (req: Request, res: Response) => {
+  const data = await listCollectionInvites(requireAuthUser(req).id, req.params.id);
+
+  sendData(res, data);
+};
+
+export const revokeInvite = async (req: Request, res: Response) => {
+  const data = await revokeCollectionInvite(requireAuthUser(req).id, req.params.id, req.params.inviteId);
+
+  sendData(res, data);
+};
+
+export const updateMemberRole = async (req: Request, res: Response) => {
+  const data = await updateCollectionMember(
+    requireAuthUser(req).id,
+    req.params.id,
+    req.params.memberId,
+    req.body as UpdateCollectionMemberPayload,
+  );
+
+  sendData(res, data);
+};
+
+export const removeMember = async (req: Request, res: Response) => {
+  await removeCollectionMember(requireAuthUser(req).id, req.params.id, req.params.memberId);
+
+  sendMessage(res, 'Member removed successfully');
+};
+
+export const leaveCollection = async (req: Request, res: Response) => {
+  await leaveSharedCollection(requireAuthUser(req).id, req.params.id);
+
+  sendMessage(res, 'Left collection successfully');
 };
 
 export const respondToInvite = async (req: Request, res: Response) => {

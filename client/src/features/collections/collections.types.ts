@@ -43,6 +43,29 @@ export interface CollectionMember {
   user: UserSummary;
 }
 
+export type CollectionInviteStatus = 'pending' | 'accepted' | 'rejected' | 'revoked';
+export type CollectionInviteUserState = 'available' | 'pending' | 'member';
+
+export interface CollectionInvite {
+  id: string;
+  collectionId: string;
+  inviterId: string;
+  inviteeId: string;
+  role: CollectionMemberRole;
+  status: CollectionInviteStatus;
+  respondedAt: string | null;
+  revokedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  invitee: UserSummary;
+  inviter?: UserSummary;
+}
+
+export interface CollectionInviteUserSearchResult extends UserSummary {
+  state: CollectionInviteUserState;
+  currentRole?: CollectionMemberRole;
+}
+
 export interface AddToCollectionPayload extends Omit<UserMedia, 'id' | 'userId'> {
   collectionId: string;
 }
