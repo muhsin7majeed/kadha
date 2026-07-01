@@ -4,6 +4,7 @@ import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
 import { IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuEllipsis } from 'react-icons/lu';
 import useDeleteCollection from '@/features/collections/api/use-delete-collection';
+import useLeaveCollection from '@/features/collections/api/use-leave-collection';
 import UpdateCollection from './update-collection';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import CollectionSharingDialog from './collection-sharing-dialog';
@@ -16,8 +17,12 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
   const { mutateAsync: deleteCollection, isPending: isDeletingCollection } = useDeleteCollection();
+  const leaveCollection = useLeaveCollection();
+  const canManageSharing = collection.access?.canManageSharing !== false;
+  const canLeaveCollection = collection.access?.relationship === 'member';
 
   const handleDeleteCollection = async () => {
     if (isDeletingCollection) return;
@@ -25,6 +30,14 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
     await deleteCollection(collection.id);
 
     setIsDeleteDialogOpen(false);
+  };
+
+  const handleLeaveCollection = async () => {
+    if (leaveCollection.isPending) return;
+
+    await leaveCollection.mutateAsync(collection.id);
+
+    setIsLeaveDialogOpen(false);
   };
 
   return (
@@ -38,6 +51,18 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
         confirmButtonProps={{
           colorPalette: 'red',
           loading: isDeletingCollection,
+        }}
+      />
+
+      <ConfirmationDialog
+        isOpen={isLeaveDialogOpen}
+        onOpenChange={setIsLeaveDialogOpen}
+        title="Leave Collection"
+        description="Are you sure you want to leave this shared collection?"
+        onConfirm={handleLeaveCollection}
+        confirmButtonProps={{
+          colorPalette: 'red',
+          loading: leaveCollection.isPending,
         }}
       />
 
@@ -77,34 +102,51 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
         <Portal>
           <Menu.Positioner>
             <Menu.Content>
-              <Menu.Item
-                value="share"
-                onClick={() => {
-                  setIsShareDialogOpen(true);
-                }}
-              >
-                Share
-              </Menu.Item>
+              {canManageSharing && (
+                <>
+                  <Menu.Item
+                    value="share"
+                    onClick={() => {
+                      setIsShareDialogOpen(true);
+                    }}
+                  >
+                    Share
+                  </Menu.Item>
 
-              <Menu.Item
-                value="edit"
-                onClick={() => {
-                  setIsUpdateDialogOpen(true);
-                }}
-              >
-                Edit
-              </Menu.Item>
+                  <Menu.Item
+                    value="edit"
+                    onClick={() => {
+                      setIsUpdateDialogOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Menu.Item>
 
-              <Menu.Item
-                value="delete"
-                color="fg.error"
-                _hover={{ bg: 'bg.error', color: 'fg.error' }}
-                onClick={() => {
-                  setIsDeleteDialogOpen(true);
-                }}
-              >
-                Delete
-              </Menu.Item>
+                  <Menu.Item
+                    value="delete"
+                    color="fg.error"
+                    _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                    onClick={() => {
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    Delete
+                  </Menu.Item>
+                </>
+              )}
+
+              {canLeaveCollection && (
+                <Menu.Item
+                  value="leave"
+                  color="fg.error"
+                  _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                  onClick={() => {
+                    setIsLeaveDialogOpen(true);
+                  }}
+                >
+                  Leave
+                </Menu.Item>
+              )}
             </Menu.Content>
           </Menu.Positioner>
         </Portal>

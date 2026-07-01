@@ -4,7 +4,6 @@ import {
   Accordion,
   Badge,
   Box,
-  Button,
   HStack,
   Separator,
   SimpleGrid,
@@ -19,9 +18,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import SyncSpinner from '@/components/spinners/sync-spinner';
 import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
-import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
-import useLeaveCollection from '@/features/collections/api/use-leave-collection';
-import { useState } from 'react';
+import CollectionSharingMeta, { CollectionSharedIcon } from '@/features/collections/components/collection-sharing-meta';
 
 const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
   if (Array.isArray(genreIds)) return genreIds;
@@ -34,12 +31,6 @@ const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
   }
 };
 
-const formatRole = (role?: string) => {
-  if (!role) return null;
-
-  return role.charAt(0).toUpperCase() + role.slice(1);
-};
-
 interface CollectionItemProps {
   collection: Collection;
   index: number;
@@ -47,7 +38,6 @@ interface CollectionItemProps {
 }
 
 const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOpened }) => {
-  const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
   const {
     data: collectionData,
     isLoading,
@@ -55,27 +45,9 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
     error,
     refetch,
   } = useCollection({ collectionId: collection.id, enabled: isOpened });
-  const leaveCollection = useLeaveCollection();
-
-  const handleLeaveCollection = async () => {
-    await leaveCollection.mutateAsync(collection.id);
-    setIsLeaveDialogOpen(false);
-  };
 
   return (
     <>
-      <ConfirmationDialog
-        isOpen={isLeaveDialogOpen}
-        onOpenChange={setIsLeaveDialogOpen}
-        title="Leave Collection"
-        description="Are you sure you want to leave this shared collection?"
-        onConfirm={handleLeaveCollection}
-        confirmButtonProps={{
-          colorPalette: 'red',
-          loading: leaveCollection.isPending,
-        }}
-      />
-
       <Accordion.Item
         key={index}
         value={collection.id}
@@ -89,21 +61,14 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
             <Span flex="1">
               <Stack gap="1">
                 <HStack gap="2" flexWrap="wrap">
+                  <CollectionSharedIcon collection={collection} />
                   <Text as="span" fontWeight="medium">
                     {collection.name}
                   </Text>
-
-                  {collection.access?.relationship === 'member' && (
-                    <Badge size="sm" colorPalette={collection.access.role === 'editor' ? 'green' : 'gray'}>
-                      {formatRole(collection.access.role)}
-                    </Badge>
-                  )}
                 </HStack>
 
                 <HStack gap="2" color="fg.muted" fontSize="sm" flexWrap="wrap">
-                  {collection.access?.relationship === 'member' && collection.owner && (
-                    <Text as="span">Owner: {collection.owner.username}</Text>
-                  )}
+                  <CollectionSharingMeta collection={collection} />
                   {typeof collection.itemCount === 'number' && <Text as="span">{collection.itemCount} items</Text>}
                   {typeof collection.memberCount === 'number' && (
                     <Text as="span">{collection.memberCount} members</Text>
@@ -117,7 +82,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
 
           <AbsoluteCenter axis="vertical" insetEnd="10">
             {isFetching && <SyncSpinner size="sm" me="2" />}
-            {collection.access?.canManageSharing !== false && <CollectionMenu collection={collection} />}
+            <CollectionMenu collection={collection} />
           </AbsoluteCenter>
         </Box>
 
@@ -137,8 +102,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                   )}
 
                   <HStack gap="2" flexWrap="wrap">
-                    {collectionData.owner && <Badge variant="surface">Owner: {collectionData.owner.username}</Badge>}
-                    <Badge variant="surface">Role: {formatRole(collectionData.access.role)}</Badge>
+                    <CollectionSharingMeta collection={collectionData} />
                     {collectionData.members.slice(0, 4).map((member) => (
                       <Badge key={member.id} variant="outline">
                         {member.user.username}
@@ -146,11 +110,6 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                     ))}
                     {collectionData.members.length > 4 && (
                       <Badge variant="outline">+{collectionData.members.length - 4}</Badge>
-                    )}
-                    {collectionData.access.relationship === 'member' && (
-                      <Button size="xs" variant="outline" colorPalette="red" onClick={() => setIsLeaveDialogOpen(true)}>
-                        Leave
-                      </Button>
                     )}
                   </HStack>
                 </Stack>
