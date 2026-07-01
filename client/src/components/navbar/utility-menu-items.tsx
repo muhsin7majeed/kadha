@@ -1,5 +1,6 @@
 import { Box, Menu } from '@chakra-ui/react';
-import { LuGithub, LuInfo, LuMoon, LuSun } from 'react-icons/lu';
+import { LuGithub, LuInfo, LuMoon, LuSettings, LuSun } from 'react-icons/lu';
+import { NavLink } from 'react-router';
 
 import { APP_CONFIG } from '@/config/app-config';
 
@@ -7,11 +8,12 @@ import { useColorMode } from '../ui/color-mode';
 
 interface UtilityMenuItemsProps {
   onOpenChangelog: () => void;
+  settingsPath?: string;
 }
 
 export const MenuSectionSeparator = () => <Box borderTopWidth="1px" borderColor="border" my={1} />;
 
-const UtilityMenuItems = ({ onOpenChangelog }: UtilityMenuItemsProps) => {
+const UtilityMenuItems = ({ onOpenChangelog, settingsPath = '/settings' }: UtilityMenuItemsProps) => {
   const { toggleColorMode, colorMode } = useColorMode();
 
   return (
@@ -19,6 +21,12 @@ const UtilityMenuItems = ({ onOpenChangelog }: UtilityMenuItemsProps) => {
       <Menu.Item value="theme" onClick={() => toggleColorMode()}>
         {colorMode === 'dark' ? <LuSun /> : <LuMoon />}
         {colorMode === 'dark' ? 'Light mode' : 'Dark mode'}
+      </Menu.Item>
+
+      <Menu.Item value="settings" asChild>
+        <NavLink to={settingsPath}>
+          <LuSettings /> Settings
+        </NavLink>
       </Menu.Item>
 
       <Menu.Item

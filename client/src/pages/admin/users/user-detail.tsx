@@ -65,7 +65,7 @@ const AdminUserDetail = () => {
                     {user.id}
                   </Text>
                 </Box>
-                <Badge alignSelf={{ base: 'flex-start', md: 'center' }} colorPalette="orange" variant="subtle">
+                <Badge alignSelf={{ base: 'flex-start', md: 'center' }} colorPalette="brand" variant="subtle">
                   <LuUser />
                   {formatEnumLabel(user.role)}
                 </Badge>

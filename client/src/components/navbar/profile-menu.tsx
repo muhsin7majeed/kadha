@@ -100,7 +100,7 @@ const ProfileMenu = () => {
 
               <MenuSectionSeparator />
 
-              <UtilityMenuItems onOpenChangelog={() => setShowChangelog(true)} />
+              <UtilityMenuItems onOpenChangelog={() => setShowChangelog(true)} settingsPath="/app/settings" />
 
               <MenuSectionSeparator />
 

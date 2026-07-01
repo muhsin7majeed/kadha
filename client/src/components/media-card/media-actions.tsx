@@ -99,7 +99,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </IconButton>
 
-        <IconButton variant="subtle" borderRadius="full" colorPalette="orange" onClick={handleCollection}>
+        <IconButton variant="subtle" borderRadius="full" colorPalette="brand" onClick={handleCollection}>
           <LuPlus />
         </IconButton>
       </VStack>

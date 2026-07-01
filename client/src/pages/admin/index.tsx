@@ -45,7 +45,7 @@ const AdminOverview = () => {
               <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="4">
                 <Box>
                   <HStack gap="2" mb="2" flexWrap="wrap">
-                    <Badge colorPalette="orange" variant="subtle">
+                    <Badge colorPalette="brand" variant="subtle">
                       {data.appName}
                     </Badge>
                     <Badge variant="subtle">v{data.appVersion}</Badge>
@@ -55,7 +55,7 @@ const AdminOverview = () => {
                   </Text>
                 </Box>
 
-                <Button asChild colorPalette="orange" alignSelf={{ base: 'stretch', md: 'center' }}>
+                <Button asChild colorPalette="brand" alignSelf={{ base: 'stretch', md: 'center' }}>
                   <Link to="/app/admin/users">
                     <LuUsers />
                     Users

@@ -58,7 +58,7 @@ const TabBar = () => {
                   title={tab.label}
                 >
                   <Link to={tab.to}>
-                    <Icon size="lg" color="orange.500">
+                    <Icon size="lg" color="brand.solid">
                       {tab.icon}
                     </Icon>
                   </Link>

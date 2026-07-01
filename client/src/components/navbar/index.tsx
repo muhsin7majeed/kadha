@@ -49,7 +49,7 @@ const Navbar = () => {
           <Flex justify="space-between" align="center">
             <HStack gap={2} minW={0} asChild>
               <Link to={isAuthenticated ? '/app' : '/'}>
-                <Icon fontSize={['sm', '2xl']} color="orange">
+                <Icon fontSize={['sm', '2xl']} color="brand.fg">
                   <LuTv />
                 </Icon>
                 <Heading size={['sm', 'lg']} truncate maxW={{ base: '42vw', sm: 'none' }}>
@@ -73,7 +73,7 @@ const Navbar = () => {
                     <Link to="/auth/login">Login</Link>
                   </Button>
 
-                  <Button colorPalette="orange" size="sm" asChild>
+                  <Button colorPalette="brand" size="sm" asChild>
                     <Link to="/auth/register">Sign Up</Link>
                   </Button>
 

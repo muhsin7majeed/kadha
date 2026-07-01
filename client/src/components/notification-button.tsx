@@ -26,8 +26,8 @@ const NotificationButton = () => {
             h="5"
             px="1"
             borderRadius="full"
-            bg="orange.solid"
-            color="orange.contrast"
+            bg="brand.solid"
+            color="brand.contrast"
             fontSize="2xs"
             fontWeight="semibold"
           >

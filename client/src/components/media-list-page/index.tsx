@@ -40,7 +40,7 @@ const MediaListPage = ({
   emptyState,
   errorDescription,
   loadingText,
-  spinnerColor = 'orange',
+  spinnerColor = 'brand.solid',
   pagination,
   onPageChange,
 }: MediaListPageProps) => {

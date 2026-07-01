@@ -4,7 +4,15 @@
 
 ### Feature Changes
 
+#### Theme Presets
+
+- Added a settings page with light/dark mode controls and saved brand accent theme presets.
+
 ### Engineering Changes
+
+#### Theme System
+
+- Replaced the default Chakra system with a project-owned system that exposes reusable brand semantic tokens.
 
 ## v0.1.3
 

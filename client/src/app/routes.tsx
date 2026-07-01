@@ -22,6 +22,7 @@ const Landing = lazy(() => import('@/pages/landing'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
+const Settings = lazy(() => import('@/pages/settings'));
 const UserProfile = lazy(() => import('@/pages/user/profile'));
 const OtherUserCollectionsTab = lazy(() => import('@/pages/user/profile/other-user-data/collections-tab'));
 const OtherUserMediaTab = lazy(() => import('@/pages/user/profile/other-user-data/media-tab'));
@@ -33,6 +34,7 @@ export function AppRoutes() {
     <Suspense fallback={<FullScreenSpinner />}>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="settings" element={<Settings />} />
 
         <Route element={<PublicRoute />}>
           <Route path="auth" element={<AuthLayout />}>
@@ -50,6 +52,7 @@ export function AppRoutes() {
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />
+            <Route path="settings" element={<Settings />} />
 
             <Route path="profile">
               <Route index element={<UserProfile />} />

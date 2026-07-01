@@ -26,7 +26,7 @@ const Watchlist = () => {
         }}
         errorDescription="Failed to fetch watchlist"
         loadingText="Loading your watchlist..."
-        spinnerColor="orange"
+        spinnerColor="brand.solid"
         pagination={watchList?.pagination}
         onPageChange={setPage}
       />

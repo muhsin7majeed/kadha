@@ -37,7 +37,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
               type="submit"
               size="sm"
               variant="subtle"
-              colorPalette="orange"
+              colorPalette="brand"
               loading={isLoading}
               disabled={isLoading}
             >
