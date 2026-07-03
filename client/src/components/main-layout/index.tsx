@@ -12,7 +12,7 @@ const MainLayout = () => {
     <Box py={2}>
       <Navbar />
 
-      <Container w="100%" minH="100vh" py={4}>
+      <Container w="100%" minH="100vh" px="0">
         <Box paddingBottom={20} my={4}>
           <Outlet />
         </Box>

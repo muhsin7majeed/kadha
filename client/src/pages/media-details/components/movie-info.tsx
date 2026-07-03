@@ -34,7 +34,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
             <InfoCard
               label="Profit"
               value={
-                <Text color={profit >= 0 ? 'green.400' : 'red.400'}>
+                <Text as="span" color={profit >= 0 ? 'green.400' : 'red.400'}>
                   {formatCurrency(profit)}
                   {profitPercentage && (
                     <Text as="span" fontSize="sm" color="fg.muted" ml={1}>

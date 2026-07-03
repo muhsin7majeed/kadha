@@ -4,6 +4,11 @@
 
 ### Feature Changes
 
+#### Media Details
+
+- Fixed media detail external links so official website and IMDb buttons open correctly.
+- Fixed invalid nested paragraph markup in movie profit details.
+
 #### Theme Presets
 
 - Added a settings page with light/dark mode controls and saved brand accent theme presets.

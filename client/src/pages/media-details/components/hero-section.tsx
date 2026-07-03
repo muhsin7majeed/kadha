@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Flex, HStack, Image, Link, Text, VStack } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, HStack, Image, Text, VStack } from '@chakra-ui/react';
 import { LuExternalLink, LuStar, LuCalendar, LuClock } from 'react-icons/lu';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import { formatDate, minutesToHours } from '@/utils/date';
@@ -144,24 +144,23 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
           {/* Action Buttons */}
           <HStack gap={3} mt={2}>
             {data.homepage && (
-              <Link asChild href={data.homepage} target="_blank" rel="noopener noreferrer">
-                <Button colorPalette="brand" size="md">
+              <Button colorPalette="brand" size="md" asChild>
+                <a href={data.homepage} target="_blank" rel="noopener noreferrer">
                   <LuExternalLink />
                   Official Website
-                </Button>
-              </Link>
+                </a>
+              </Button>
             )}
             {isMovie && (data as MovieDetailsWithMeta).imdb_id && (
-              <Link
-                asChild
-                href={`https://www.imdb.com/title/${(data as MovieDetailsWithMeta).imdb_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" size="md">
+              <Button variant="outline" size="md" asChild>
+                <a
+                  href={`https://www.imdb.com/title/${(data as MovieDetailsWithMeta).imdb_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   IMDb
-                </Button>
-              </Link>
+                </a>
+              </Button>
             )}
           </HStack>
         </VStack>
