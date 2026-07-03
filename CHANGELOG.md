@@ -4,6 +4,10 @@
 
 ### Feature Changes
 
+#### Navigation
+
+- Unified app page padding so tabbar destinations share consistent outer spacing.
+
 #### Profile
 
 - Improved profile pages with clearer account and privacy settings, stronger public profile headers, better locked-profile messaging, and profile tabs that open the first visible section.

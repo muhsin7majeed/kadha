@@ -8,13 +8,13 @@ import { useColorMode } from '@/components/ui/color-mode';
 import { useThemePreset } from '@/features/theme/use-theme-preset';
 import type { ThemePresetMode } from '@/features/theme/theme.types';
 
-const SettingsContent = () => {
+const SettingsContent = ({ hasShellPadding = false }: { hasShellPadding?: boolean }) => {
   const { colorMode, setColorMode } = useColorMode();
   const { presetId, presets, setPresetId } = useThemePreset();
   const presetMode: ThemePresetMode = colorMode === 'dark' ? 'dark' : 'light';
 
   return (
-    <Container maxW="4xl" py={6}>
+    <Container maxW="4xl" px={hasShellPadding ? 0 : undefined} py={hasShellPadding ? 0 : 6}>
       <VStack align="stretch" gap={6}>
         <PageHeader subHeader="Choose how Kadha looks on this device.">
           <HStack gap={2}>
@@ -91,9 +91,21 @@ const SettingsContent = () => {
                           {preset.label}
                         </Text>
                         <HStack gap={1}>
-                          <Box boxSize="3" rounded="full" bg={variables.subtle} borderWidth="1px" borderColor="border" />
+                          <Box
+                            boxSize="3"
+                            rounded="full"
+                            bg={variables.subtle}
+                            borderWidth="1px"
+                            borderColor="border"
+                          />
                           <Box boxSize="3" rounded="full" bg={variables.muted} borderWidth="1px" borderColor="border" />
-                          <Box boxSize="3" rounded="full" bg={variables.emphasized} borderWidth="1px" borderColor="border" />
+                          <Box
+                            boxSize="3"
+                            rounded="full"
+                            bg={variables.emphasized}
+                            borderWidth="1px"
+                            borderColor="border"
+                          />
                         </HStack>
                       </VStack>
                       {isSelected && (
@@ -137,7 +149,7 @@ const Settings = () => {
   const isAppRoute = location.pathname.startsWith('/app');
 
   return isAppRoute ? (
-    <SettingsContent />
+    <SettingsContent hasShellPadding />
   ) : (
     <Box minH="100vh">
       <Navbar />

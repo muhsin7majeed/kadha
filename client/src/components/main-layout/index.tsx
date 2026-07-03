@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { Box, Container } from '@chakra-ui/react';
 
 import TabBar from '../tabbar';
@@ -7,13 +7,20 @@ import { useGenreMap } from '@/features/media/api/use-genre-map';
 
 const MainLayout = () => {
   useGenreMap();
+  const { pathname } = useLocation();
+  const hasPagePadding = !pathname.startsWith('/app/media/');
 
   return (
-    <Box py={2}>
+    <Box>
       <Navbar />
 
-      <Container w="100%" minH="100vh" px="0">
-        <Box paddingBottom={20} my={4}>
+      <Container
+        w="100%"
+        minH="100vh"
+        maxW={hasPagePadding ? '6xl' : 'full'}
+        px={hasPagePadding ? { base: 4, md: 6 } : 0}
+      >
+        <Box pt={hasPagePadding ? 2 : 0} pb={hasPagePadding ? { base: 24, md: 28 } : 20}>
           <Outlet />
         </Box>
 

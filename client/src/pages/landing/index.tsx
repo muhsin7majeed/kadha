@@ -29,7 +29,7 @@ const Landing = () => {
 
       {/* Hero Section */}
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
-        <Container maxW="4xl" textAlign="center" position="relative" zIndex={1}>
+        <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center" position="relative" zIndex={1}>
           <Badge colorPalette="brand" size="lg" mb={4}>
             Open Source & Privacy-First
           </Badge>
@@ -62,7 +62,7 @@ const Landing = () => {
 
       {/* Current Features */}
       <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="6xl">
+        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="green">Available Now</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>What you can do today</Heading>
@@ -97,7 +97,7 @@ const Landing = () => {
 
       {/* Upcoming Features */}
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
-        <Container maxW="6xl">
+        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="brand">Coming Soon</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>What we're building</Heading>
@@ -132,7 +132,7 @@ const Landing = () => {
 
       {/* Self-Hosting Highlight */}
       <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="4xl">
+        <Container maxW="4xl" px={{ base: 4, md: 6 }}>
           <Card.Root variant="outline" borderColor="brand.muted" bg="brand.subtle">
             <Card.Body py={10}>
               <VStack gap={6} textAlign="center">
@@ -160,7 +160,7 @@ const Landing = () => {
 
       {/* FAQ */}
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
-        <Container maxW="3xl">
+        <Container maxW="3xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Heading size={{ base: '2xl', md: '3xl' }}>Frequently Asked Questions</Heading>
             <Text fontSize="lg" color="fg.muted">
@@ -188,7 +188,7 @@ const Landing = () => {
 
       {/* Final CTA */}
       <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="4xl" textAlign="center">
+        <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center">
           <Heading size={{ base: '2xl', md: '3xl' }} mb={4}>
             Ready to take control?
           </Heading>
@@ -209,7 +209,7 @@ const Landing = () => {
 
       {/* Footer */}
       <Box borderTopWidth="1px" borderColor="border" py={8}>
-        <Container maxW="6xl">
+        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align="center" gap={4}>
             <HStack gap={2}>
               <Icon fontSize="xl" color="brand.fg">

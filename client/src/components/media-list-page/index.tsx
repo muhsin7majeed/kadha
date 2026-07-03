@@ -46,11 +46,9 @@ const MediaListPage = ({
 }: MediaListPageProps) => {
   return (
     <Box>
-      <Box mb={10}>
-        <PageHeader isFetching={isFetching} subHeader={description}>
-          {title}
-        </PageHeader>
-      </Box>
+      <PageHeader isFetching={isFetching} subHeader={description}>
+        {title}
+      </PageHeader>
 
       {isLoading ? (
         <Center py={20}>
