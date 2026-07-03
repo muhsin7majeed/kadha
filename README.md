@@ -1,5 +1,7 @@
 # Kadha
 
+![GitHub release](https://img.shields.io/github/v/release/muhsin7majeed/kadha)
+
 A self-hostable web app to track movies and TV shows.
 
 ## Architecture
@@ -311,6 +313,25 @@ docker compose -f docker-compose.prod.yml up -d
 # Clean up old images
 docker image prune -f
 ```
+
+## Release Workflow
+
+Keep upcoming changes under `## Unreleased` in `CHANGELOG.md`. When you are ready to release, prepare the version from the repository root:
+
+```bash
+node scripts/prepare-release.mjs 0.1.5
+```
+
+The script updates the client and server package versions, lockfile root versions, the frontend fallback app version, `CHANGELOG.md`, and the generated in-app changelog. Review the diff, run the relevant Docker Compose build, lint, or test commands, then commit and tag:
+
+```bash
+git add CHANGELOG.md client server scripts README.md
+git commit -m "Release v0.1.5"
+git tag v0.1.5
+git push origin master --tags
+```
+
+Pushing the tag creates a GitHub Release automatically from the matching `CHANGELOG.md` section.
 
 ## CI/CD
 

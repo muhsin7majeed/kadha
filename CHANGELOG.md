@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.5
+
 ### Feature Changes
 
 #### Landing Page
@@ -11,6 +13,14 @@
 #### Collection Collaboration
 
 - Simplified the collection members mobile UI by collapsing invite search and pending invitations, and moving member management controls into compact row actions.
+
+### Engineering Changes
+
+#### Release Workflow
+
+- Added a release preparation script and README workflow for keeping package versions, the app version fallback, GitHub changelog, and in-app changelog in sync.
+- Added a tag-triggered GitHub Release workflow that publishes release notes from the matching changelog section.
+- Updated agent release instructions to use the release preparation script and tag-triggered GitHub Release workflow.
 
 ## v0.1.4
 

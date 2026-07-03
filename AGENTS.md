@@ -99,12 +99,13 @@ server/src/features/media/
 - During normal feature work, add changelog entries under `## Unreleased`.
 - Do not create a new version section for every feature commit.
 - When `Unreleased` contains enough user-visible or maintainer-significant changes to justify a release, tell the user before starting additional unrelated changes and recommend cutting a release first.
-- A release is usually appropriate when `Unreleased` includes shipped user-facing features, behavior fixes, migrations, deployment/runtime changes, or several related engineering changes that should be grouped for operators.
+- A release is usually appropriate when `Unreleased` includes shipped user-facing features, behavior fixes, migrations, deployment/runtime changes, release workflow changes, or several related engineering changes that should be grouped for operators.
+- Do not cut a release without explicit user approval.
 - When cutting a release:
-  - Rename `## Unreleased` to `## vX.Y.Z`.
-  - Bump `client/package.json`, `client/package-lock.json`, `server/package.json`, and `server/package-lock.json` together unless the project intentionally moves to independent package releases.
-  - Keep client and server fallback version strings aligned.
-  - Run `cd client && npm run sync:changelog`.
+  - Run `node scripts/prepare-release.mjs X.Y.Z` from the repository root, using a SemVer version without a leading `v`.
+  - The release script renames the current `## Unreleased` content to `## vX.Y.Z`, creates a fresh `## Unreleased` section, bumps client and server package versions and lockfile root versions, updates the frontend fallback app version, and syncs the generated in-app changelog.
+  - Review the generated diff before committing and make sure `CHANGELOG.md`, `client/src/generated/changelog.ts`, client/server package files, and `client/src/config/app-config.ts` are consistent.
   - Run the relevant build, lint, or test commands.
   - Commit the version and changelog updates as a release commit, such as `Release vX.Y.Z`.
-- After a release, create a fresh empty `## Unreleased` section for future changes.
+  - Tag the release commit as `vX.Y.Z` and push `master` with tags. The GitHub Release workflow creates a release from the matching `CHANGELOG.md` section when the tag is pushed.
+- After a release, keep future changes under the fresh empty `## Unreleased` section.
