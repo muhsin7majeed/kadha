@@ -8,6 +8,7 @@
 
 - Unified app page padding so tabbar destinations share consistent outer spacing.
 - Added subtle page transitions when navigating across app pages with the tabbar.
+- Fixed media card poster proportions on saved media list pages, especially on mobile screens.
 
 #### Profile
 

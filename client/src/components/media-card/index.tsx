@@ -20,7 +20,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
   const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
 
   return (
-    <Box height="300px" borderRadius="lg" transition="transform 0.2s" position="relative" maxW="300px">
+    <Box aspectRatio="2 / 3" borderRadius="lg" transition="transform 0.2s" position="relative" w="100%" maxW="220px">
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
         alt={`${title} poster`}

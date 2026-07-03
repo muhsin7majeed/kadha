@@ -67,7 +67,7 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6} justifyItems="center">
             {data?.map((media) => (
               <MediaCard key={`${media.media_type}:${media.media_id}`} media={media} />
             ))}
