@@ -1,84 +1,132 @@
 import { Badge, Box, Button, HStack, Stack, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 
+import CommonSpinner from '@/components/spinners/common-spinner';
+import ErrorState from '@/components/info-states/error-state';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import SimpleAvatar from '@/components/simple-avatar';
-import { CollectionDetails } from '@/features/collections/collections.types';
+import { Collection, CollectionDetails } from '@/features/collections/collections.types';
+import useCollection from '@/features/collections/api/use-collection';
 import { useGetMe } from '@/features/user/api/use-get-me';
 import { toCollectionMemberRowUser } from '@/features/collections/utils/collection-members';
 import CollectionMemberRow from './collection-member-row';
+import CollectionSharingDialog from './collection-menu/collection-sharing-dialog';
 
 interface CollectionMembersDialogProps {
-  collection: CollectionDetails;
+  collection: Collection | CollectionDetails;
+  onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+  trigger?: React.ReactNode;
 }
 
 const visibleMembersCount = 5;
 
-const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({ collection }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const hasCollectionDetails = (collection: Collection | CollectionDetails): collection is CollectionDetails => {
+  return Array.isArray(collection.members) && !!collection.owner && !!collection.access;
+};
+
+const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
+  collection,
+  onOpenChange,
+  open,
+  trigger,
+}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open ?? internalOpen;
+  const canManageSharing = collection.access?.canManageSharing === true;
+  const collectionQuery = useCollection({
+    collectionId: collection.id,
+    enabled: isOpen && !canManageSharing && !hasCollectionDetails(collection),
+  });
+  const collectionData = hasCollectionDetails(collection) ? collection : collectionQuery.data;
   const { data: currentUser } = useGetMe({ enabled: isOpen });
-  const members = collection.members;
+  const members = collectionData?.members ?? [];
   const visibleMembers = members.slice(0, visibleMembersCount - 1);
   const hiddenMembersCount = Math.max(members.length - visibleMembers.length, 0);
+  const defaultTrigger = collectionData ? (
+      <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+        <HStack gap="2" flexWrap="wrap">
+          <SimpleAvatar fallbackName={collectionData.owner.username} size="sm" />
+
+          {visibleMembers.map((member) => (
+            <SimpleAvatar key={member.id} fallbackName={member.user.username} size="sm" />
+          ))}
+
+          {hiddenMembersCount > 0 && (
+            <Badge variant="surface" borderRadius="full">
+              +{hiddenMembersCount}
+            </Badge>
+          )}
+
+          <Text as="span" color="fg.muted" fontSize="sm">
+            {collectionData.memberCount} members
+          </Text>
+        </HStack>
+      </Button>
+    ) : (
+      <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+        Members
+      </Button>
+    );
+  const triggerNode = trigger ?? (open === undefined ? defaultTrigger : undefined);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setInternalOpen(nextOpen);
+    onOpenChange?.(nextOpen);
+  };
 
   return (
     <SimpleDialog
       open={isOpen}
-      title="Collection Members"
+      title="Collection members"
       closeButton
-      contentProps={{ maxW: { base: 'calc(100vw - 2rem)', md: '2xl' } }}
-      onOpenChange={(event) => setIsOpen(event.open)}
-      trigger={
-        <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
-          <HStack gap="2" flexWrap="wrap">
-            <SimpleAvatar fallbackName={collection.owner.username} size="sm" />
-
-            {visibleMembers.map((member) => (
-              <SimpleAvatar key={member.id} fallbackName={member.user.username} size="sm" />
-            ))}
-
-            {hiddenMembersCount > 0 && (
-              <Badge variant="surface" borderRadius="full">
-                +{hiddenMembersCount}
-              </Badge>
-            )}
-
-            <Text as="span" color="fg.muted" fontSize="sm">
-              {collection.memberCount} members
-            </Text>
-          </HStack>
-        </Button>
-      }
+      contentProps={{
+        maxW: { base: 'calc(100vw - 1rem)', md: '2xl' },
+        maxH: 'calc(100dvh - 1rem)',
+        overflow: 'hidden',
+        py: { base: 3, md: 4 },
+      }}
+      bodyProps={{ overflowY: 'auto', px: { base: 3, md: 6 } }}
+      onOpenChange={(event) => handleOpenChange(event.open)}
+      trigger={triggerNode}
     >
-      <Stack gap="4">
-        <Box>
-          <Text fontWeight="medium">{collection.name}</Text>
-          <Text color="fg.muted" fontSize="sm">
-            People with access to this collection
-          </Text>
-        </Box>
+      {canManageSharing ? (
+        <CollectionSharingDialog collection={collection} open={isOpen} />
+      ) : collectionQuery.isLoading ? (
+        <CommonSpinner />
+      ) : collectionQuery.isError ? (
+        <ErrorState title="Error" description="Error loading members" onRetry={collectionQuery.refetch} />
+      ) : collectionData ? (
+        <Stack gap={{ base: 3, md: 4 }}>
+          <Box>
+            <Text fontWeight="medium">{collectionData.name}</Text>
+            <Text color="fg.muted" fontSize="sm">
+              People with access to this collection
+            </Text>
+          </Box>
 
-        <Stack gap="2">
-          <CollectionMemberRow
-            collectionId={collection.id}
-            currentUserId={currentUser?.id}
-            currentUserAccess={collection.access}
-            mode={collection.access.canManageSharing ? 'manage' : 'view'}
-            user={{ ...collection.owner, role: 'owner' }}
-          />
-
-          {members.map((member) => (
+          <Stack gap="2">
             <CollectionMemberRow
-              key={member.id}
-              collectionId={collection.id}
+              collectionId={collectionData.id}
               currentUserId={currentUser?.id}
-              currentUserAccess={collection.access}
-              mode={collection.access.canManageSharing ? 'manage' : 'view'}
-              user={toCollectionMemberRowUser(member)}
+              currentUserAccess={collectionData.access}
+              mode="view"
+              user={{ ...collectionData.owner, role: 'owner' }}
             />
-          ))}
+
+            {members.map((member) => (
+              <CollectionMemberRow
+                key={member.id}
+                collectionId={collectionData.id}
+                currentUserId={currentUser?.id}
+                currentUserAccess={collectionData.access}
+                mode="view"
+                user={toCollectionMemberRowUser(member)}
+              />
+            ))}
+          </Stack>
         </Stack>
-      </Stack>
+      ) : null}
     </SimpleDialog>
   );
 };

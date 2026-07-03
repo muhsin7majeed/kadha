@@ -3,6 +3,7 @@ import { Badge, Box, Button, Field, HStack, Input, NativeSelect, Separator, Stac
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
+import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import NavLink from '@/components/nav-link';
 import SimpleAvatar from '@/components/simple-avatar';
@@ -11,8 +12,10 @@ import useCollectionInvites from '@/features/collections/api/use-collection-invi
 import useCreateCollectionInvite from '@/features/collections/api/use-create-collection-invite';
 import useRevokeCollectionInvite from '@/features/collections/api/use-revoke-collection-invite';
 import useSearchCollectionInviteUsers from '@/features/collections/api/use-search-collection-invite-users';
+import { useGetMe } from '@/features/user/api/use-get-me';
 import {
   Collection,
+  CollectionInvite,
   CollectionInviteUserSearchResult,
   CollectionMemberRole,
 } from '@/features/collections/collections.types';
@@ -43,10 +46,12 @@ const getUserStateLabel = (user: CollectionInviteUserSearchResult) => {
 const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ collection, open }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoles, setSelectedRoles] = useState<Record<string, CollectionMemberRole>>({});
+  const [inviteToRevoke, setInviteToRevoke] = useState<CollectionInvite | null>(null);
 
   const collectionQuery = useCollection({ collectionId: collection.id, enabled: open });
   const invitesQuery = useCollectionInvites(collection.id, open);
   const usersQuery = useSearchCollectionInviteUsers(collection.id, searchQuery, open);
+  const { data: currentUser } = useGetMe({ enabled: open });
   const createInvite = useCreateCollectionInvite();
   const revokeInvite = useRevokeCollectionInvite();
 
@@ -64,8 +69,16 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
     });
   };
 
+  const handleRevokeInvite = async () => {
+    if (!inviteToRevoke || revokeInvite.isPending) return;
+
+    await revokeInvite.mutateAsync({ collectionId: collection.id, inviteId: inviteToRevoke.id });
+    setInviteToRevoke(null);
+  };
+
   return (
-    <Stack gap="5">
+    <>
+      <Stack gap="5">
       <Stack gap="1">
         <Text fontWeight="semibold">{collection.name}</Text>
         <HStack gap="2" flexWrap="wrap">
@@ -188,7 +201,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                       variant="outline"
                       colorPalette="red"
                       loading={revokeInvite.isPending}
-                      onClick={() => revokeInvite.mutate({ collectionId: collection.id, inviteId: invite.id })}
+                      onClick={() => setInviteToRevoke(invite)}
                     >
                       Revoke
                     </Button>
@@ -214,7 +227,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
           <Stack gap="2">
             <CollectionMemberRow
               collectionId={collection.id}
-              currentUserId={collectionData.owner.id}
+              currentUserId={currentUser?.id}
               currentUserAccess={collectionData.access}
               mode="manage"
               user={{ ...collectionData.owner, role: 'owner' }}
@@ -227,6 +240,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                 <CollectionMemberRow
                   key={member.id}
                   collectionId={collection.id}
+                  currentUserId={currentUser?.id}
                   currentUserAccess={collectionData.access}
                   mode="manage"
                   user={toCollectionMemberRowUser(member)}
@@ -236,7 +250,24 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
           </Stack>
         )}
       </Stack>
-    </Stack>
+      </Stack>
+
+      <ConfirmationDialog
+        isOpen={!!inviteToRevoke}
+        title="Revoke invitation?"
+        description={
+          inviteToRevoke
+            ? `Revoke the invitation for ${inviteToRevoke.invitee.username}? They will no longer be able to accept it.`
+            : undefined
+        }
+        confirmButtonText="Revoke"
+        confirmButtonProps={{ colorPalette: 'red', loading: revokeInvite.isPending }}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) setInviteToRevoke(null);
+        }}
+        onConfirm={handleRevokeInvite}
+      />
+    </>
   );
 };
 

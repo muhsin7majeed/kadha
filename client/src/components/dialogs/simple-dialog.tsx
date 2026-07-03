@@ -1,6 +1,7 @@
-import { CloseButton, Dialog, DialogContentProps, DialogRootProps, Portal } from '@chakra-ui/react';
+import { CloseButton, Dialog, DialogBodyProps, DialogContentProps, DialogRootProps, Portal } from '@chakra-ui/react';
 
 interface SimpleDialogProps extends DialogRootProps {
+  bodyProps?: DialogBodyProps;
   contentProps?: DialogContentProps;
   closeButton?: boolean;
   footer?: React.ReactNode;
@@ -10,7 +11,7 @@ interface SimpleDialogProps extends DialogRootProps {
 }
 
 const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
-  const { children, closeButton, contentProps, footer, title, trigger, triggerWrapper, ...rootProps } = props;
+  const { bodyProps, children, closeButton, contentProps, footer, title, trigger, triggerWrapper, ...rootProps } = props;
   const dialogTrigger = trigger ? <Dialog.Trigger asChild>{trigger}</Dialog.Trigger> : null;
 
   return (
@@ -28,7 +29,7 @@ const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
               </Dialog.Header>
             )}
 
-            <Dialog.Body>{children}</Dialog.Body>
+            <Dialog.Body {...bodyProps}>{children}</Dialog.Body>
 
             {footer && <Dialog.Footer>{footer}</Dialog.Footer>}
 

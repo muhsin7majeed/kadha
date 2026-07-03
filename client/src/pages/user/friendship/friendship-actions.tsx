@@ -17,10 +17,11 @@ interface FriendshipActionsUser {
 }
 
 interface FriendshipActionsProps {
+  menuWithinDialog?: boolean;
   user: FriendshipActionsUser;
 }
 
-const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
+const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog = false, user }) => {
   const { mutateAsync: sendFriendRequest, isPending: isSendingFriendRequest } = useSendFriendRequest();
   const { mutateAsync: acceptFriendRequest, isPending: isAcceptingFriendRequest } = useAcceptFriendRequest();
   const { mutateAsync: rejectFriendRequest, isPending: isRejectingFriendRequest } = useRejectFriendRequest();
@@ -67,6 +68,12 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
     await unblock(userId);
   };
 
+  const renderMenuPositioner = (children: React.ReactNode) => {
+    if (menuWithinDialog) return children;
+
+    return <Portal>{children}</Portal>;
+  };
+
   const renderFriendshipActions = (user: FriendshipActionsUser) => {
     const { friendshipStatus } = user;
 
@@ -93,7 +100,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
 
     if (friendshipStatus === FriendStatus.Accepted) {
       return (
-        <Menu.Root>
+        <Menu.Root positioning={menuWithinDialog ? { strategy: 'fixed', hideWhenDetached: true } : undefined}>
           <Menu.Trigger asChild>
             <Button variant="subtle" colorPalette="gray" size="sm">
               Friends
@@ -101,7 +108,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
             </Button>
           </Menu.Trigger>
 
-          <Portal>
+          {renderMenuPositioner(
             <Menu.Positioner>
               <Menu.Content>
                 <Menu.Item value="unfriend" onClick={() => setDialogAction('unfriend')}>
@@ -114,7 +121,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
                 </Menu.Item>
               </Menu.Content>
             </Menu.Positioner>
-          </Portal>
+          )}
         </Menu.Root>
       );
     }
@@ -174,14 +181,14 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
           <LuUserPlus />
           Add Friend
         </Button>
-        <Menu.Root>
+        <Menu.Root positioning={menuWithinDialog ? { strategy: 'fixed', hideWhenDetached: true } : undefined}>
           <Menu.Trigger asChild>
             <IconButton variant="ghost" size="sm" aria-label="More user actions">
               <LuEllipsis />
             </IconButton>
           </Menu.Trigger>
 
-          <Portal>
+          {renderMenuPositioner(
             <Menu.Positioner>
               <Menu.Content>
                 <Menu.Item value="block" color="fg.error" onClick={() => setDialogAction('block')}>
@@ -190,7 +197,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ user }) => {
                 </Menu.Item>
               </Menu.Content>
             </Menu.Positioner>
-          </Portal>
+          )}
         </Menu.Root>
       </HStack>
     );

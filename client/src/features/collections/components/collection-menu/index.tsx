@@ -7,7 +7,7 @@ import useDeleteCollection from '@/features/collections/api/use-delete-collectio
 import useLeaveCollection from '@/features/collections/api/use-leave-collection';
 import UpdateCollection from './update-collection';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
-import CollectionSharingDialog from './collection-sharing-dialog';
+import CollectionMembersDialog from '../collection-members-dialog';
 
 interface CollectionMenuProps {
   collection: Collection;
@@ -16,7 +16,7 @@ interface CollectionMenuProps {
 const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
   const { mutateAsync: deleteCollection, isPending: isDeletingCollection } = useDeleteCollection();
@@ -80,17 +80,11 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
         />
       </SimpleDialog>
 
-      <SimpleDialog
-        open={isShareDialogOpen}
-        title="Share Collection"
-        closeButton
-        contentProps={{ maxW: { base: 'calc(100vw - 2rem)', md: '3xl' } }}
-        onOpenChange={(e) => {
-          setIsShareDialogOpen(e.open);
-        }}
-      >
-        <CollectionSharingDialog collection={collection} open={isShareDialogOpen} />
-      </SimpleDialog>
+      <CollectionMembersDialog
+        collection={collection}
+        open={isMembersDialogOpen}
+        onOpenChange={setIsMembersDialogOpen}
+      />
 
       <Menu.Root>
         <Menu.Trigger asChild>
@@ -105,12 +99,12 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
               {canManageSharing && (
                 <>
                   <Menu.Item
-                    value="share"
+                    value="manage-access"
                     onClick={() => {
-                      setIsShareDialogOpen(true);
+                      setIsMembersDialogOpen(true);
                     }}
                   >
-                    Share
+                    Manage access
                   </Menu.Item>
 
                   <Menu.Item

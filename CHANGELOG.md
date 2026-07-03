@@ -9,6 +9,7 @@
 - Unified app page padding so tabbar destinations share consistent outer spacing.
 - Added subtle page transitions when navigating across app pages with the tabbar.
 - Fixed media card poster proportions on saved media list pages, especially on mobile screens.
+- Consolidated collection sharing into the collection members dialog, improved mobile spacing, fixed friend action menus inside dialogs, and added confirmations for removing members and revoking invitations.
 
 #### Profile
 
