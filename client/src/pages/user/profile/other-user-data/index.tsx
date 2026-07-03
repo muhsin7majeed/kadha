@@ -4,7 +4,8 @@ import { LuBookmark, LuCheck, LuFolder, LuHeart } from 'react-icons/lu';
 import { Outlet, useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 import { UserProfileResponse } from '@/features/user/user.types';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import EmptyState from '@/components/info-states/empty-state';
 
 export type OtherUserDataTabs = 'watched' | 'liked' | 'collections' | 'watchlist';
 
@@ -39,9 +40,9 @@ interface OtherUserDataProps {
 const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const visibleTabs = tabs.filter((tab) => profile.sections[tab.value]);
+  const visibleTabs = useMemo(() => tabs.filter((tab) => profile.sections[tab.value]), [profile.sections]);
 
-  // Extract the current tab from the pathname (e.g., /app/profile/username/watched -> sent)
+  // Extract the current tab from the pathname (e.g., /app/profile/username/watched -> watched).
   const pathSegments = location.pathname.split('/');
   const currentTab = (pathSegments[pathSegments.length - 1] as OtherUserDataTabs) || 'watched';
   const hasCurrentTab = visibleTabs.some((tab) => tab.value === currentTab);
@@ -56,21 +57,23 @@ const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile }) => {
     }
   }, [hasCurrentTab, navigate, username, visibleTabs]);
 
+  if (visibleTabs.length === 0) {
+    return <EmptyState title="No visible activity" description="This user is not sharing any profile sections right now." />;
+  }
+
   return (
-    <>
-      <SimpleTabs
-        triggerType="link"
-        tabs={visibleTabs}
-        value={hasCurrentTab ? currentTab : visibleTabs[0]?.value}
-        onValueChange={(value) => {
-          handleTabChange(value as OtherUserDataTabs);
-        }}
-      >
-        <Box pt="4">
-          <Outlet />
-        </Box>
-      </SimpleTabs>
-    </>
+    <SimpleTabs
+      triggerType="link"
+      tabs={visibleTabs}
+      value={hasCurrentTab ? currentTab : visibleTabs[0].value}
+      onValueChange={(value) => {
+        handleTabChange(value as OtherUserDataTabs);
+      }}
+    >
+      <Box pt="4">
+        <Outlet />
+      </Box>
+    </SimpleTabs>
   );
 };
 

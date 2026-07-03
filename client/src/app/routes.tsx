@@ -58,7 +58,6 @@ export function AppRoutes() {
               <Route index element={<UserProfile />} />
 
               <Route path=":username" element={<UserProfile />}>
-                <Route index element={<Navigate to="watched" replace />} />
                 <Route path="watched" element={<OtherUserMediaTab type="watched" />} />
                 <Route path="liked" element={<OtherUserMediaTab type="liked" />} />
                 <Route path="watchlist" element={<OtherUserMediaTab type="watchlist" />} />

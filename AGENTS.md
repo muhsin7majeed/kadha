@@ -28,11 +28,11 @@
 ## Verification Commands
 
 - Client install: `docker compose run --rm client npm ci`
-- Client build: `cd client && npm run build`
-- Client lint: `cd client && npm run lint`
+- Client build: `docker compose run --rm client npm run build`
+- Client lint: `docker compose run --rm client npm run lint`
 - Server install: `docker compose run --rm server npm ci`
-- Server build: `cd server && npm run build`
-- Server tests: `cd server && npm test`
+- Server build: `docker compose run --rm server npm run build`
+- Server tests: `docker compose run --rm server npm test`
 
 Run the most relevant build, lint, or test command for the area changed. If verification cannot be run, explain why.
 
