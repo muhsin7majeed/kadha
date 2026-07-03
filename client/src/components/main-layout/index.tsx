@@ -20,7 +20,7 @@ const MainLayout = () => {
         maxW={hasPagePadding ? '6xl' : 'full'}
         px={hasPagePadding ? { base: 4, md: 6 } : 0}
       >
-        <Box pt={hasPagePadding ? 2 : 0} pb={hasPagePadding ? { base: 24, md: 28 } : 20}>
+        <Box key={pathname} className="kadha-route-transition" pt={hasPagePadding ? 2 : 0} pb={hasPagePadding ? { base: 24, md: 28 } : 20}>
           <Outlet />
         </Box>
 

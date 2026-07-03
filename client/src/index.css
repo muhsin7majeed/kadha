@@ -7,3 +7,66 @@
   --kadha-colors-brand-emphasized: #fdba74;
   --kadha-colors-brand-focus-ring: #ea580c;
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+::view-transition-old(root) {
+  animation-name: kadha-page-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: kadha-page-fade-in;
+}
+
+.kadha-route-transition {
+  animation: kadha-route-enter 220ms ease-out both;
+}
+
+@keyframes kadha-page-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.96;
+  }
+}
+
+@keyframes kadha-page-fade-in {
+  from {
+    opacity: 0.96;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kadha-route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kadha-route-transition {
+    animation-duration: 1ms;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}

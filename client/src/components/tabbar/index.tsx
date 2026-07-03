@@ -57,7 +57,7 @@ const TabBar = () => {
                   flexShrink={0}
                   title={tab.label}
                 >
-                  <Link to={tab.to}>
+                  <Link to={tab.to} viewTransition>
                     <Icon size="lg" color="brand.solid">
                       {tab.icon}
                     </Icon>

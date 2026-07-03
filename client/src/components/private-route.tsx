@@ -16,7 +16,7 @@ const PrivateRoute = () => {
   }
 
   return (
-    <Container maxW="6xl">
+    <Container maxW="6xl" p="0">
       <Outlet />
     </Container>
   );

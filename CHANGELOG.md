@@ -7,6 +7,7 @@
 #### Navigation
 
 - Unified app page padding so tabbar destinations share consistent outer spacing.
+- Added subtle page transitions when navigating across app pages with the tabbar.
 
 #### Profile
 
