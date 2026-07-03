@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.4
+
 ### Feature Changes
 
 #### Navigation
