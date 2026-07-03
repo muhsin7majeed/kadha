@@ -44,30 +44,30 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
   const visibleMembers = members.slice(0, visibleMembersCount - 1);
   const hiddenMembersCount = Math.max(members.length - visibleMembers.length, 0);
   const defaultTrigger = collectionData ? (
-      <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
-        <HStack gap="2" flexWrap="wrap">
-          <SimpleAvatar fallbackName={collectionData.owner.username} size="sm" />
+    <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+      <HStack gap="2" flexWrap="wrap">
+        <SimpleAvatar fallbackName={collectionData.owner.username} size="sm" />
 
-          {visibleMembers.map((member) => (
-            <SimpleAvatar key={member.id} fallbackName={member.user.username} size="sm" />
-          ))}
+        {visibleMembers.map((member) => (
+          <SimpleAvatar key={member.id} fallbackName={member.user.username} size="sm" />
+        ))}
 
-          {hiddenMembersCount > 0 && (
-            <Badge variant="surface" borderRadius="full">
-              +{hiddenMembersCount}
-            </Badge>
-          )}
+        {hiddenMembersCount > 0 && (
+          <Badge variant="surface" borderRadius="full">
+            +{hiddenMembersCount}
+          </Badge>
+        )}
 
-          <Text as="span" color="fg.muted" fontSize="sm">
-            {collectionData.memberCount} members
-          </Text>
-        </HStack>
-      </Button>
-    ) : (
-      <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
-        Members
-      </Button>
-    );
+        <Text as="span" color="fg.muted" fontSize="sm">
+          {collectionData.memberCount} members
+        </Text>
+      </HStack>
+    </Button>
+  ) : (
+    <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+      Members
+    </Button>
+  );
   const triggerNode = trigger ?? (open === undefined ? defaultTrigger : undefined);
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -80,13 +80,6 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
       open={isOpen}
       title="Collection members"
       closeButton
-      contentProps={{
-        maxW: { base: 'calc(100vw - 1rem)', md: '2xl' },
-        maxH: 'calc(100dvh - 1rem)',
-        overflow: 'hidden',
-        py: { base: 3, md: 4 },
-      }}
-      bodyProps={{ overflowY: 'auto', px: { base: 3, md: 6 } }}
       onOpenChange={(event) => handleOpenChange(event.open)}
       trigger={triggerNode}
     >
