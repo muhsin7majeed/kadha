@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
-import { LoginAndRegisterBody } from './auth.schema';
+import { LoginBody, RegisterBody } from './auth.schema';
 import { loginUser, recordLogoutActivity, refreshAccessToken, registerUser } from './auth.service';
 
 const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
@@ -21,7 +21,7 @@ const clearRefreshTokenCookie = (res: Response) => {
   });
 };
 
-export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
+export const register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
   const result = await registerUser(req.body);
 
   if ('fieldErrors' in result) {
@@ -38,7 +38,7 @@ export const register = async (req: Request<{}, {}, LoginAndRegisterBody>, res: 
   });
 };
 
-export const login = async (req: Request<{}, {}, LoginAndRegisterBody>, res: Response) => {
+export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
   const result = await loginUser(req.body);
 
   if (!result) {

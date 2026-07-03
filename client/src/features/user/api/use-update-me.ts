@@ -11,6 +11,7 @@ interface UpdateMePayload {
   watchedPrivacy: string;
   likedPrivacy: string;
   watchlistPrivacy: string;
+  watchRegion: string;
 }
 
 interface UpdateMeResponse {
@@ -20,6 +21,7 @@ interface UpdateMeResponse {
   watchedPrivacy: string;
   likedPrivacy: string;
   watchlistPrivacy: string;
+  watchRegion: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +39,7 @@ const useUpdateMe = () => {
     onError: useErrorHandler,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaWatchProviders });
 
       toaster.success({
         title: 'Profile updated successfully',

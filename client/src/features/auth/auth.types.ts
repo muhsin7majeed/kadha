@@ -9,6 +9,7 @@ export interface LoginInputs {
 
 export interface RegisterInputs extends LoginInputs {
   confirmPassword: string;
+  watchRegion: string;
 }
 
 export interface LoginResponse {

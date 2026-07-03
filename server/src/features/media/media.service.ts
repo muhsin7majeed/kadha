@@ -1,6 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import { createPaginationMeta } from '@/lib/pagination';
 import { badRequest } from '@/lib/http';
+import {
+  DEFAULT_WATCH_REGION,
+  getWatchRegionName,
+  isSupportedWatchRegion,
+  normalizeWatchRegion,
+} from '@/constants/watch-regions';
 
 import {
   MediaType,
@@ -13,6 +19,9 @@ import {
   TMDBTv,
   TMDBTvDetailsWithMeta,
   TMDBTvWithMeta,
+  TMDBWatchProvider,
+  WatchProvider,
+  WatchProvidersResponse,
 } from './media.types';
 import {
   fetchMediaDetails,
@@ -24,6 +33,7 @@ import {
   fetchTrendingMovies,
   fetchTrendingTvs,
   fetchTvGenres,
+  fetchWatchProviders,
   searchMediaByType,
 } from './tmdb.client';
 
@@ -47,6 +57,16 @@ const assertMediaType = (value: string): MediaType => {
   return value;
 };
 
+const assertWatchRegion = (value: string): string => {
+  const region = normalizeWatchRegion(value);
+
+  if (!isSupportedWatchRegion(region)) {
+    throw badRequest('Choose a supported country', { region: 'Choose a supported country' });
+  }
+
+  return region;
+};
+
 const normalizeMovie = (media: TMDBMovie): NormalizedTMDBMovie => ({
   ...media,
   media_type: 'movie',
@@ -58,6 +78,19 @@ const normalizeTv = (media: TMDBTv): NormalizedTMDBTv => ({
 });
 
 const interactionKey = (mediaType: MediaType, mediaId: number) => `${mediaType}:${mediaId}`;
+
+const TMDB_LOGO_BASE_URL = 'https://image.tmdb.org/t/p/w92';
+
+const normalizeWatchProviders = (providers: TMDBWatchProvider[] = []): WatchProvider[] => {
+  return [...providers]
+    .sort((a, b) => a.display_priority - b.display_priority)
+    .map((provider) => ({
+      id: provider.provider_id,
+      name: provider.provider_name,
+      logoUrl: provider.logo_path ? `${TMDB_LOGO_BASE_URL}${provider.logo_path}` : null,
+      displayPriority: provider.display_priority,
+    }));
+};
 
 const enrichMediaWithUserInteractions = async (
   media: NormalizedTMDBMedia[],
@@ -149,6 +182,40 @@ export async function getMediaDetails(userId: string, mediaType: string, id: str
     watched: interactions?.watched ?? false,
     watchlist: interactions?.watchlist ?? false,
   } as TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta;
+}
+
+export async function getWatchProviders(
+  userId: string,
+  mediaType: string,
+  id: string,
+  requestedRegion?: string,
+): Promise<WatchProvidersResponse> {
+  const validMediaType = assertMediaType(mediaType);
+  const mediaId = parseMediaId(id);
+  const userRegion = requestedRegion
+    ? undefined
+    : await prisma.user.findUnique({ where: { id: userId }, select: { watchRegion: true } });
+  const region = assertWatchRegion(requestedRegion ?? userRegion?.watchRegion ?? DEFAULT_WATCH_REGION);
+  const response = await fetchWatchProviders(validMediaType, mediaId);
+  const regionResult = response.results[region];
+
+  return {
+    region: {
+      code: region,
+      name: getWatchRegionName(region) ?? region,
+    },
+    link: regionResult?.link ?? null,
+    providers: {
+      stream: normalizeWatchProviders(regionResult?.flatrate),
+      rent: normalizeWatchProviders(regionResult?.rent),
+      buy: normalizeWatchProviders(regionResult?.buy),
+      free: normalizeWatchProviders(regionResult?.free),
+      ads: normalizeWatchProviders(regionResult?.ads),
+    },
+    attribution: {
+      provider: 'JustWatch',
+    },
+  };
 }
 
 export async function getGenres() {

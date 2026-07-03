@@ -4,7 +4,13 @@ import { sendData, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { BaseResponse, PaginatedResponse } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
-import { TMDBMovieDetailsWithMeta, TMDBMovieWithMeta, TMDBTvDetailsWithMeta, TMDBTvWithMeta } from './media.types';
+import {
+  TMDBMovieDetailsWithMeta,
+  TMDBMovieWithMeta,
+  TMDBTvDetailsWithMeta,
+  TMDBTvWithMeta,
+  WatchProvidersResponse,
+} from './media.types';
 import * as mediaService from './media.service';
 
 export const getTrendingMovies = async (req: Request, res: Response<BaseResponse<TMDBMovieWithMeta[]>>) => {
@@ -49,6 +55,14 @@ export const getMediaDetails = async (
 ) => {
   const { mediaType, id } = req.params;
   const data = await mediaService.getMediaDetails(requireAuthUser(req).id, mediaType, id);
+
+  sendData(res, data);
+};
+
+export const getWatchProviders = async (req: Request, res: Response<BaseResponse<WatchProvidersResponse>>) => {
+  const { mediaType, id } = req.params;
+  const region = typeof req.query.region === 'string' ? req.query.region : undefined;
+  const data = await mediaService.getWatchProviders(requireAuthUser(req).id, mediaType, id, region);
 
   sendData(res, data);
 };

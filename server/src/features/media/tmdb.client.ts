@@ -6,6 +6,7 @@ import {
   MovieDBTvResponse,
   TMDBMovieDetails,
   TMDBTvDetails,
+  TMDBWatchProvidersResponse,
 } from './media.types';
 
 const ONE_MINUTE = 60 * 1000;
@@ -16,6 +17,7 @@ const CACHE_TTL = {
   details: 6 * ONE_HOUR,
   genres: 24 * ONE_HOUR,
   search: ONE_MINUTE,
+  watchProviders: 24 * ONE_HOUR,
 };
 
 interface CacheEntry<T> {
@@ -103,6 +105,13 @@ export async function fetchTopRatedTvs() {
 export async function fetchMediaDetails(mediaType: 'movie' | 'tv', id: number) {
   return getCached(`details:${mediaType}:${id}`, CACHE_TTL.details, async () => {
     const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
+    return response.data;
+  });
+}
+
+export async function fetchWatchProviders(mediaType: 'movie' | 'tv', id: number) {
+  return getCached(`watch-providers:${mediaType}:${id}`, CACHE_TTL.watchProviders, async () => {
+    const response = await api.get<TMDBWatchProvidersResponse>(`/${mediaType}/${id}/watch/providers`);
     return response.data;
   });
 }

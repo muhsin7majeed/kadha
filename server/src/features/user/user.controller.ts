@@ -25,7 +25,8 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const updateMe = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
-  const { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy } = req.body as UpdateMePayload;
+  const { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy, watchRegion } =
+    req.body as UpdateMePayload;
   const result = await updateCurrentUser(
     id,
     username,
@@ -33,6 +34,7 @@ export const updateMe = async (req: Request, res: Response) => {
     (watchedPrivacy || DataPrivacy.Friends) as DataPrivacy,
     (likedPrivacy || DataPrivacy.Friends) as DataPrivacy,
     (watchlistPrivacy || DataPrivacy.OnlyMe) as DataPrivacy,
+    watchRegion,
   );
 
   if ('fieldErrors' in result) {

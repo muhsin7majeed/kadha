@@ -1,10 +1,12 @@
-import { Button, Field, Fieldset, Input } from '@chakra-ui/react';
+import { Button, Field, Fieldset, Input, NativeSelect } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { LuArrowRight, LuLogIn } from 'react-icons/lu';
+
+import { getBrowserWatchRegion, WATCH_REGIONS } from '@/constants/watch-regions';
 import { LoginInputs, RegisterInputs } from '@/features/auth/auth.types';
 
 interface AuthFormProps {
-  apiFieldErrors?: Record<'username', string>;
+  apiFieldErrors?: Partial<Record<'username' | 'watchRegion', string>>;
   isLoading?: boolean;
   type: 'register' | 'login';
   onSubmit: SubmitHandler<LoginInputs> | SubmitHandler<RegisterInputs>;
@@ -20,6 +22,7 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
     defaultValues: {
       username: '',
       password: '',
+      watchRegion: getBrowserWatchRegion(),
     },
   });
 
@@ -55,17 +58,35 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
             </Field.Root>
 
             {isRegister && (
-              <Field.Root invalid={!!registerErrors.confirmPassword}>
-                <Input
-                  type="password"
-                  {...register('confirmPassword', {
-                    required: 'Please confirm your password',
-                    validate: (value) => value === password || 'Passwords do not match',
-                  })}
-                  placeholder="Confirm Password"
-                />
-                <Field.ErrorText>{registerErrors.confirmPassword?.message}</Field.ErrorText>
-              </Field.Root>
+              <>
+                <Field.Root invalid={!!registerErrors.confirmPassword}>
+                  <Input
+                    type="password"
+                    {...register('confirmPassword', {
+                      required: 'Please confirm your password',
+                      validate: (value) => value === password || 'Passwords do not match',
+                    })}
+                    placeholder="Confirm Password"
+                  />
+                  <Field.ErrorText>{registerErrors.confirmPassword?.message}</Field.ErrorText>
+                </Field.Root>
+
+                <Field.Root invalid={!!registerErrors.watchRegion || !!apiFieldErrors?.watchRegion} required>
+                  <Field.Label>Country</Field.Label>
+                  <NativeSelect.Root>
+                    <NativeSelect.Field {...register('watchRegion', { required: 'Country is required' })}>
+                      {WATCH_REGIONS.map((region) => (
+                        <option key={region.code} value={region.code}>
+                          {region.name}
+                        </option>
+                      ))}
+                    </NativeSelect.Field>
+                    <NativeSelect.Indicator />
+                  </NativeSelect.Root>
+                  <Field.HelperText>Used to show streaming availability in your region.</Field.HelperText>
+                  <Field.ErrorText>{registerErrors.watchRegion?.message || apiFieldErrors?.watchRegion}</Field.ErrorText>
+                </Field.Root>
+              </>
             )}
           </Fieldset.Content>
 

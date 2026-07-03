@@ -159,6 +159,52 @@ export interface MovieDBGenreResponse {
   genres: TMDBGenre[];
 }
 
+export interface TMDBWatchProvider {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string | null;
+  display_priority: number;
+}
+
+export interface TMDBWatchProviderRegion {
+  link?: string;
+  flatrate?: TMDBWatchProvider[];
+  rent?: TMDBWatchProvider[];
+  buy?: TMDBWatchProvider[];
+  ads?: TMDBWatchProvider[];
+  free?: TMDBWatchProvider[];
+}
+
+export interface TMDBWatchProvidersResponse {
+  id: number;
+  results: Record<string, TMDBWatchProviderRegion>;
+}
+
+export interface WatchProvider {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+  displayPriority: number;
+}
+
+export interface WatchProvidersResponse {
+  region: {
+    code: string;
+    name: string;
+  };
+  link: string | null;
+  providers: {
+    stream: WatchProvider[];
+    rent: WatchProvider[];
+    buy: WatchProvider[];
+    free: WatchProvider[];
+    ads: WatchProvider[];
+  };
+  attribution: {
+    provider: 'JustWatch';
+  };
+}
+
 export interface MediaMeta {
   liked?: boolean;
   watched?: boolean;

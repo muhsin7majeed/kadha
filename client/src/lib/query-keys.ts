@@ -40,6 +40,9 @@ export const queryKeys = {
   watchList: ['watch-list'] as const,
   mediaDetails: ['media-details'] as const,
   mediaDetailsById: (mediaType: MediaType, id: string) => ['media-details', mediaType, id] as const,
+  mediaWatchProviders: ['media-watch-providers'] as const,
+  mediaWatchProvidersByRegion: (mediaType: MediaType, id: string, region?: string) =>
+    ['media-watch-providers', mediaType, id, region] as const,
   searchMedia: ['search-media'] as const,
   searchMediaByQuery: (mediaType: MediaType, query: string, page = 1) =>
     ['search-media', mediaType, query, page] as const,

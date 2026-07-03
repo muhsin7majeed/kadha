@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "watchRegion" TEXT NOT NULL DEFAULT 'US';

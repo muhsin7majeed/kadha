@@ -1,4 +1,4 @@
-import { Button, Field, Fieldset, Input, Stack } from '@chakra-ui/react';
+import { Button, Field, Fieldset, Input, NativeSelect, Stack } from '@chakra-ui/react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 
@@ -8,6 +8,7 @@ import { User } from '@/features/user/user.types';
 import useUpdateMe from '@/features/user/api/use-update-me';
 import { DataPrivacy } from '@/types/common';
 import { getApiFieldError } from '@/hooks/use-error-handler';
+import { WATCH_REGIONS } from '@/constants/watch-regions';
 
 interface ProfileInputs {
   username: string;
@@ -15,6 +16,7 @@ interface ProfileInputs {
   watchedPrivacy: DataPrivacy;
   likedPrivacy: DataPrivacy;
   watchlistPrivacy: DataPrivacy;
+  watchRegion: string;
 }
 
 interface MyProfileSettingsProps {
@@ -37,6 +39,7 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
       watchedPrivacy: me.watchedPrivacy,
       likedPrivacy: me.likedPrivacy,
       watchlistPrivacy: me.watchlistPrivacy,
+      watchRegion: me.watchRegion,
     },
   });
 
@@ -47,6 +50,7 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
       watchedPrivacy: me.watchedPrivacy,
       likedPrivacy: me.likedPrivacy,
       watchlistPrivacy: me.watchlistPrivacy,
+      watchRegion: me.watchRegion,
     });
   }, [me, reset]);
 
@@ -57,6 +61,7 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
   };
 
   const usernameApiError = getApiFieldError(updateMeError, 'username');
+  const watchRegionApiError = getApiFieldError(updateMeError, 'watchRegion');
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -70,6 +75,29 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
             </Field.Root>
           </Fieldset.Content>
         </Fieldset.Root>
+
+        <Controller
+          control={control}
+          name="watchRegion"
+          rules={{ required: 'Country is required' }}
+          render={({ field }) => (
+            <Field.Root invalid={!!errors.watchRegion || !!watchRegionApiError} required>
+              <Field.Label>Watch region</Field.Label>
+              <NativeSelect.Root>
+                <NativeSelect.Field {...field}>
+                  {WATCH_REGIONS.map((region) => (
+                    <option key={region.code} value={region.code}>
+                      {region.name}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+              <Field.HelperText>Used to show streaming availability in your region.</Field.HelperText>
+              <Field.ErrorText>{errors.watchRegion?.message || watchRegionApiError}</Field.ErrorText>
+            </Field.Root>
+          )}
+        />
 
         <Controller
           control={control}

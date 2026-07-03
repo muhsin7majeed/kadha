@@ -164,3 +164,28 @@ export interface MovieDBTvResponse extends MovieDBBaseResponse {
 export interface MovieDBGenreResponse {
   genres: Genre[];
 }
+
+export interface WatchProvider {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+  displayPriority: number;
+}
+
+export interface WatchProvidersResponse {
+  region: {
+    code: string;
+    name: string;
+  };
+  link: string | null;
+  providers: {
+    stream: WatchProvider[];
+    rent: WatchProvider[];
+    buy: WatchProvider[];
+    free: WatchProvider[];
+    ads: WatchProvider[];
+  };
+  attribution: {
+    provider: 'JustWatch';
+  };
+}

@@ -76,6 +76,7 @@ model User {
   watchedPrivacy   DataPrivacy  @default(FRIENDS)
   likedPrivacy     DataPrivacy  @default(FRIENDS)
   watchlistPrivacy DataPrivacy  @default(ONLY_ME)
+  watchRegion      String       @default("US")
   password         String
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt

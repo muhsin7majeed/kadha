@@ -4,8 +4,9 @@ import jwt from 'jsonwebtoken';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { envConfig } from '@/config/env';
+import { DEFAULT_WATCH_REGION, normalizeWatchRegion } from '@/constants/watch-regions';
 import { prisma } from '@/lib/prisma';
-import { LoginAndRegisterBody } from './auth.schema';
+import { LoginBody, RegisterBody } from './auth.schema';
 
 const ACCESS_TOKEN_EXPIRATION = '10m';
 const REFRESH_TOKEN_EXPIRATION = '1d';
@@ -26,7 +27,7 @@ export function getTokens(username: string, userId: string) {
   return { accessToken, refreshToken };
 }
 
-export async function registerUser({ username, password }: LoginAndRegisterBody) {
+export async function registerUser({ username, password, watchRegion }: RegisterBody) {
   const user = await prisma.user.findUnique({ where: { username } });
 
   if (user) {
@@ -40,6 +41,7 @@ export async function registerUser({ username, password }: LoginAndRegisterBody)
       data: {
         username,
         password: hashedPassword,
+        watchRegion: normalizeWatchRegion(watchRegion ?? DEFAULT_WATCH_REGION),
       },
     });
 
@@ -63,7 +65,7 @@ export async function registerUser({ username, password }: LoginAndRegisterBody)
   };
 }
 
-export async function loginUser({ username, password }: LoginAndRegisterBody) {
+export async function loginUser({ username, password }: LoginBody) {
   const user = await prisma.user.findUnique({ where: { username } });
 
   if (!user) {

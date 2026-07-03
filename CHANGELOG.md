@@ -9,11 +9,20 @@
 - Fixed media detail external links so official website and IMDb buttons open correctly.
 - Fixed invalid nested paragraph markup in movie profit details.
 
+#### Watch Providers
+
+- Added user watch region settings during signup and profile editing.
+- Added region-aware "Where to Watch" availability to movie and TV detail pages.
+
 #### Theme Presets
 
 - Added a settings page with light/dark mode controls and saved brand accent theme presets.
 
 ### Engineering Changes
+
+#### Media Availability
+
+- Added TMDB watch provider integration with normalized server responses and cached provider lookups.
 
 #### Theme System
 

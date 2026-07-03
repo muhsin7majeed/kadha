@@ -21,6 +21,7 @@ const Register = () => {
 
   const { mutate, error, isPending } = useRegister();
   const usernameApiError = getApiFieldError(error, 'username');
+  const watchRegionApiError = getApiFieldError(error, 'watchRegion');
 
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
@@ -31,6 +32,7 @@ const Register = () => {
           user: {
             id: data.userId,
             username: payload.username,
+            watchRegion: payload.watchRegion,
           },
           status: 'authenticated',
         });
@@ -45,7 +47,10 @@ const Register = () => {
       <AuthForm
         onSubmit={onSubmit}
         type="register"
-        apiFieldErrors={usernameApiError ? { username: usernameApiError } : undefined}
+        apiFieldErrors={{
+          ...(usernameApiError ? { username: usernameApiError } : {}),
+          ...(watchRegionApiError ? { watchRegion: watchRegionApiError } : {}),
+        }}
         isLoading={isPending}
       />
 

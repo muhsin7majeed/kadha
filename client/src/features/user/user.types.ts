@@ -8,6 +8,7 @@ export interface User {
   watchedPrivacy: DataPrivacy;
   likedPrivacy: DataPrivacy;
   watchlistPrivacy: DataPrivacy;
+  watchRegion: string;
 }
 
 export interface UserSearchResult extends UserActor {

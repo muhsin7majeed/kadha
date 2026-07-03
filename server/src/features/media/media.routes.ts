@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   getGenre,
   getMediaDetails,
+  getWatchProviders,
   getPopularMovies,
   getPopularTvs,
   getTopRatedMovies,
@@ -27,6 +28,7 @@ router.get('/genres', getGenre);
 
 router.get('/search/:mediaType/:query', searchMedia);
 
+router.get('/:mediaType/:id/watch-providers', getWatchProviders);
 router.get('/:mediaType/:id', getMediaDetails);
 
 export default router;

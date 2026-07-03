@@ -2,6 +2,7 @@ import { UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
+import { normalizeWatchRegion } from '@/constants/watch-regions';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
 import { enrichUsersWithFriendship, getViewerRelationship } from '@/lib/friendship-utils';
 import { createPaginationMeta } from '@/lib/pagination';
@@ -44,6 +45,7 @@ export async function getCurrentUser(id: string) {
       watchedPrivacy: true,
       likedPrivacy: true,
       watchlistPrivacy: true,
+      watchRegion: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -57,6 +59,7 @@ export async function updateCurrentUser(
   watchedPrivacy: DataPrivacy,
   likedPrivacy: DataPrivacy,
   watchlistPrivacy: DataPrivacy,
+  watchRegion: string,
 ) {
   const currentUser = await prisma.user.findUnique({
     where: { id },
@@ -66,6 +69,7 @@ export async function updateCurrentUser(
       watchedPrivacy: true,
       likedPrivacy: true,
       watchlistPrivacy: true,
+      watchRegion: true,
     },
   });
 
@@ -89,7 +93,14 @@ export async function updateCurrentUser(
     const updatedUser = await prisma.$transaction(async (tx) => {
       const user = await tx.user.update({
         where: { id },
-        data: { username, profilePrivacy, watchedPrivacy, likedPrivacy, watchlistPrivacy },
+        data: {
+          username,
+          profilePrivacy,
+          watchedPrivacy,
+          likedPrivacy,
+          watchlistPrivacy,
+          watchRegion: normalizeWatchRegion(watchRegion),
+        },
       });
 
       if (
@@ -98,7 +109,8 @@ export async function updateCurrentUser(
           currentUser.profilePrivacy !== user.profilePrivacy ||
           currentUser.watchedPrivacy !== user.watchedPrivacy ||
           currentUser.likedPrivacy !== user.likedPrivacy ||
-          currentUser.watchlistPrivacy !== user.watchlistPrivacy)
+          currentUser.watchlistPrivacy !== user.watchlistPrivacy ||
+          currentUser.watchRegion !== user.watchRegion)
       ) {
         await createUserActivity(
           {
@@ -123,6 +135,7 @@ export async function updateCurrentUser(
         watchedPrivacy: updatedUser.watchedPrivacy,
         likedPrivacy: updatedUser.likedPrivacy,
         watchlistPrivacy: updatedUser.watchlistPrivacy,
+        watchRegion: updatedUser.watchRegion,
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt,
       },

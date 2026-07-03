@@ -10,6 +10,7 @@ import OverviewSection from './components/overview-section';
 import MovieInfo from './components/movie-info';
 import TvInfo from './components/tv-info';
 import ProductionInfo from './components/production-info';
+import WatchProvidersSection from './components/watch-providers-section';
 
 const MediaDetails = () => {
   const { mediaType, id } = useParams<{ mediaType: MediaType; id: string }>();
@@ -53,6 +54,8 @@ const MediaDetails = () => {
         <VStack gap={10} align="stretch">
           {/* Overview */}
           <OverviewSection overview={data.overview} />
+
+          <WatchProvidersSection mediaType={mediaType} id={id} />
 
           {/* Media-specific Info */}
           {isMovie ? <MovieInfo data={data as MovieDetailsWithMeta} /> : <TvInfo data={data as TvDetailsWithMeta} />}
