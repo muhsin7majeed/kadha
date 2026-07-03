@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Engineering Changes
+
+#### Release Workflow
+
+- Simplified version handling so release preparation only needs to bump package metadata while client and server code read package-derived versions.
+- Updated agent release instructions to match the package-version release flow.
+
 ## v0.1.5
 
 ### Feature Changes

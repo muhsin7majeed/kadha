@@ -12,7 +12,6 @@ const paths = {
   clientLock: path.join(repoRoot, 'client', 'package-lock.json'),
   serverPackage: path.join(repoRoot, 'server', 'package.json'),
   serverLock: path.join(repoRoot, 'server', 'package-lock.json'),
-  appConfig: path.join(repoRoot, 'client', 'src', 'config', 'app-config.ts'),
 };
 
 const usage = 'Usage: node scripts/prepare-release.mjs <version>, for example: node scripts/prepare-release.mjs 0.1.5';
@@ -46,20 +45,6 @@ const setPackageLockVersion = (filePath) => {
   }
 
   writeJson(filePath, lockfile);
-};
-
-const updateAppConfigVersion = () => {
-  const source = readFileSync(paths.appConfig, 'utf8');
-  const updated = source.replace(
-    /version:\s*import\.meta\.env\.VITE_APP_VERSION\s*\|\|\s*'[^']+'/,
-    `version: import.meta.env.VITE_APP_VERSION || '${version}'`,
-  );
-
-  if (source === updated) {
-    throw new Error(`Could not find APP_CONFIG.version fallback in ${path.relative(repoRoot, paths.appConfig)}`);
-  }
-
-  writeFileSync(paths.appConfig, updated);
 };
 
 const updateChangelog = () => {
@@ -105,7 +90,6 @@ setPackageVersion(paths.clientPackage);
 setPackageLockVersion(paths.clientLock);
 setPackageVersion(paths.serverPackage);
 setPackageLockVersion(paths.serverLock);
-updateAppConfigVersion();
 updateChangelog();
 syncChangelog();
 
