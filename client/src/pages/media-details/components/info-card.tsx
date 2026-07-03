@@ -13,11 +13,9 @@ const InfoCard = ({ label, value, icon }: InfoCardProps) => {
       <Text fontSize="sm" color="fg.muted" fontWeight="medium">
         {label}
       </Text>
-      <Box display="flex" alignItems="center" gap={2}>
+      <Box display="flex" alignItems="center" gap={2} fontSize="md" fontWeight="semibold">
         {icon}
-        <Text fontSize="md" fontWeight="semibold">
-          {value || 'N/A'}
-        </Text>
+        <Box>{value || 'N/A'}</Box>
       </Box>
     </VStack>
   );

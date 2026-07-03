@@ -45,7 +45,7 @@ const Navbar = () => {
   return (
     <>
       <Box as="nav" position="sticky" top={0} zIndex={10} bg="bg" borderBottomWidth="1px" borderColor="border">
-        <Container maxW="6xl" py={3} px="0">
+        <Container maxW="6xl" py={3}>
           <Flex justify="space-between" align="center">
             <HStack gap={2} minW={0} asChild>
               <Link to={isAuthenticated ? '/app' : '/'}>

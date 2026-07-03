@@ -8,11 +8,11 @@ interface ProductionInfoProps {
 
 const ProductionInfo = ({ data }: ProductionInfoProps) => {
   return (
-    <VStack gap={8} align="stretch">
+    <VStack gap={6} align="stretch" borderTopWidth="1px" borderColor="border" pt={6}>
       {/* Production Companies */}
       {data.production_companies && data.production_companies.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading size="md" mb={3}>
             <HStack gap={2}>
               <LuBuilding2 />
               <Text>Production Companies</Text>
@@ -73,15 +73,15 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
       {/* Production Countries */}
       {data.production_countries && data.production_countries.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading size="md" mb={3}>
             <HStack gap={2}>
               <LuGlobe />
               <Text>Production Countries</Text>
             </HStack>
           </Heading>
-          <HStack gap={3} flexWrap="wrap">
+          <HStack gap={2} flexWrap="wrap">
             {data.production_countries.map((country) => (
-              <Badge key={country.iso_3166_1} size="lg" variant="outline" colorPalette="blue">
+              <Badge key={country.iso_3166_1} size="md" variant="outline" colorPalette="blue">
                 {country.name}
               </Badge>
             ))}
@@ -92,15 +92,15 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
       {/* Spoken Languages */}
       {data.spoken_languages && data.spoken_languages.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading size="md" mb={3}>
             <HStack gap={2}>
               <LuLanguages />
               <Text>Spoken Languages</Text>
             </HStack>
           </Heading>
-          <HStack gap={3} flexWrap="wrap">
+          <HStack gap={2} flexWrap="wrap">
             {data.spoken_languages.map((language) => (
-              <Badge key={language.iso_639_1} size="lg" variant="subtle" colorPalette="purple">
+              <Badge key={language.iso_639_1} size="md" variant="subtle" colorPalette="purple">
                 {language.english_name}
               </Badge>
             ))}

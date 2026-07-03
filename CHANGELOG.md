@@ -6,6 +6,11 @@
 
 #### Media Details
 
+- Improved the media details page with clearer error states, artwork fallbacks, responsive hero actions, tracking controls, and better handling for long TV season lists.
+- Improved light-mode readability in the media details hero and made watch-provider chips open provider search pages when supported.
+- Refined the media details hero with a consistent readable info card and no heavy text shadows.
+- Updated the watch region dialog actions to use the app theme colors consistently.
+- Made media details metadata easier to scan by reducing low-value empty box-office cards, clarifying estimated financial figures, and making production details secondary.
 - Fixed media detail external links so official website and IMDb buttons open correctly.
 - Fixed invalid nested paragraph markup in movie profit details.
 
@@ -23,10 +28,15 @@
 #### Media Availability
 
 - Added TMDB watch provider integration with normalized server responses and cached provider lookups.
+- Refactored the media details watch provider UI into smaller provider chip, link resolution, grouping, and region dialog modules.
 
 #### Theme System
 
 - Replaced the default Chakra system with a project-owned system that exposes reusable brand semantic tokens.
+
+#### Documentation And Process
+
+- Added frontend guidance requiring intentional theme color palettes for Chakra buttons.
 
 ## v0.1.3
 

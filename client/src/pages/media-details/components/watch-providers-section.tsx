@@ -1,154 +1,25 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  Field,
-  Heading,
-  HStack,
-  Image,
-  Link,
-  NativeSelect,
-  Portal,
-  Skeleton,
-  Stack,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { Box, Heading, HStack, Link, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
 import { LuExternalLink } from 'react-icons/lu';
 
-import { WATCH_REGIONS } from '@/constants/watch-regions';
+import ErrorState from '@/components/info-states/error-state';
+import { DEFAULT_WATCH_REGION } from '@/constants/watch-regions';
 import useWatchProviders from '@/features/media/api/use-watch-providers';
-import { WatchProvider } from '@/features/media/media.types';
 import { useGetMe } from '@/features/user/api/use-get-me';
-import useUpdateMe from '@/features/user/api/use-update-me';
 import { MediaType } from '@/types/common';
+import ProviderChip from './provider-chip';
+import WatchRegionDialog from './watch-region-dialog';
+import { WATCH_PROVIDER_GROUPS } from './watch-provider-groups';
 
 interface WatchProvidersSectionProps {
   mediaType: MediaType;
   id: string;
+  title: string;
 }
 
-const providerGroups: Array<{
-  key: 'stream' | 'rent' | 'buy' | 'free' | 'ads';
-  label: string;
-}> = [
-  { key: 'stream', label: 'Stream' },
-  { key: 'rent', label: 'Rent' },
-  { key: 'buy', label: 'Buy' },
-  { key: 'free', label: 'Free' },
-  { key: 'ads', label: 'Ads' },
-];
-
-const ProviderChip = ({ provider }: { provider: WatchProvider }) => {
-  return (
-    <HStack
-      gap={2}
-      px={3}
-      py={2}
-      borderWidth="1px"
-      borderColor="border"
-      bg="bg.subtle"
-      borderRadius="md"
-      minH="10"
-    >
-      {provider.logoUrl && (
-        <Image
-          src={provider.logoUrl}
-          alt={`${provider.name} logo`}
-          boxSize="6"
-          borderRadius="sm"
-          objectFit="cover"
-          flexShrink={0}
-        />
-      )}
-      <Text fontSize="sm" fontWeight="medium">
-        {provider.name}
-      </Text>
-    </HStack>
-  );
-};
-
-const WatchRegionDialog = ({ currentRegion }: { currentRegion: string }) => {
-  const { data: me } = useGetMe();
-  const { mutateAsync: updateMe, isPending } = useUpdateMe();
-  const [open, setOpen] = useState(false);
-  const [selectedRegion, setSelectedRegion] = useState(currentRegion);
-
-  useEffect(() => {
-    if (open) {
-      setSelectedRegion(currentRegion);
-    }
-  }, [currentRegion, open]);
-
-  const saveRegion = async () => {
-    if (!me || isPending) return;
-
-    await updateMe({
-      username: me.username,
-      profilePrivacy: me.profilePrivacy,
-      watchedPrivacy: me.watchedPrivacy,
-      likedPrivacy: me.likedPrivacy,
-      watchlistPrivacy: me.watchlistPrivacy,
-      watchRegion: selectedRegion,
-    });
-    setOpen(false);
-  };
-
-  return (
-    <Dialog.Root open={open} onOpenChange={(event) => setOpen(event.open)}>
-      <Dialog.Trigger asChild>
-        <Button variant="plain" size="xs" px={1} h="auto">
-          Change
-        </Button>
-      </Dialog.Trigger>
-
-      <Portal>
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <Dialog.Content>
-            <Dialog.Header>
-              <Dialog.Title>Watch region</Dialog.Title>
-            </Dialog.Header>
-            <Dialog.Body>
-              <Field.Root required>
-                <Field.Label>Country</Field.Label>
-                <NativeSelect.Root>
-                  <NativeSelect.Field
-                    value={selectedRegion}
-                    onChange={(event) => setSelectedRegion(event.target.value)}
-                    autoFocus
-                  >
-                    {WATCH_REGIONS.map((region) => (
-                      <option key={region.code} value={region.code}>
-                        {region.name}
-                      </option>
-                    ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
-                <Field.HelperText>Choose the country used for streaming availability.</Field.HelperText>
-              </Field.Root>
-            </Dialog.Body>
-            <Dialog.Footer>
-              <Dialog.ActionTrigger asChild>
-                <Button variant="outline">Cancel</Button>
-              </Dialog.ActionTrigger>
-              <Button onClick={saveRegion} loading={isPending} disabled={!me || isPending}>
-                Save
-              </Button>
-            </Dialog.Footer>
-          </Dialog.Content>
-        </Dialog.Positioner>
-      </Portal>
-    </Dialog.Root>
-  );
-};
-
-const WatchProvidersSection = ({ mediaType, id }: WatchProvidersSectionProps) => {
+const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionProps) => {
   const { data: me, isLoading: isLoadingMe } = useGetMe();
-  const region = me?.watchRegion;
-  const { data, isError, isLoading } = useWatchProviders(mediaType, id, region);
+  const region = me?.watchRegion ?? DEFAULT_WATCH_REGION;
+  const { data, isError, isLoading, refetch } = useWatchProviders(mediaType, id, region);
 
   if (isLoadingMe || isLoading) {
     return (
@@ -168,14 +39,18 @@ const WatchProvidersSection = ({ mediaType, id }: WatchProvidersSectionProps) =>
         <Heading size="lg" mb={3}>
           Where to Watch
         </Heading>
-        <Text color="fg.muted">Could not load watch options right now.</Text>
+        <ErrorState
+          title="Could not load watch options"
+          description="Streaming availability is unavailable right now."
+          onRetry={() => refetch()}
+        />
       </Box>
     );
   }
 
   if (!data) return null;
 
-  const visibleGroups = providerGroups.filter((group) => data.providers[group.key].length > 0);
+  const visibleGroups = WATCH_PROVIDER_GROUPS.filter((group) => data.providers[group.key].length > 0);
   const hasRegionEntry = Boolean(data.link);
 
   return (
@@ -185,10 +60,9 @@ const WatchProvidersSection = ({ mediaType, id }: WatchProvidersSectionProps) =>
           <Heading size="lg" mb={2}>
             Where to Watch
           </Heading>
-          <HStack gap={1} color="fg.muted" flexWrap="wrap">
+          <HStack gap={2} color="fg.muted" flexWrap="wrap">
             <Text fontSize="sm">Based on your region: {data.region.name}</Text>
-            <Text fontSize="sm">·</Text>
-            <WatchRegionDialog currentRegion={data.region.code} />
+            <WatchRegionDialog currentRegion={data.region.code} me={me} />
           </HStack>
         </Box>
 
@@ -201,7 +75,7 @@ const WatchProvidersSection = ({ mediaType, id }: WatchProvidersSectionProps) =>
                 </Heading>
                 <HStack gap={3} flexWrap="wrap">
                   {data.providers[group.key].map((provider) => (
-                    <ProviderChip key={provider.id} provider={provider} />
+                    <ProviderChip key={provider.id} provider={provider} title={title} sourceLink={data.link} />
                   ))}
                 </HStack>
               </Box>
@@ -222,7 +96,7 @@ const WatchProvidersSection = ({ mediaType, id }: WatchProvidersSectionProps) =>
             Availability data provided by {data.attribution.provider}.
           </Text>
           {data.link && (
-            <Link href={data.link} target="_blank" rel="noreferrer" fontSize="xs" colorPalette="brand">
+            <Link href={data.link} target="_blank" rel="noopener noreferrer" fontSize="xs" colorPalette="brand">
               <HStack gap={1}>
                 <Text>View on TMDB</Text>
                 <LuExternalLink />

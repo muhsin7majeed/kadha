@@ -19,6 +19,9 @@ const formatCurrency = (value: number) => {
 const MovieInfo = ({ data }: MovieInfoProps) => {
   const profit = data.revenue && data.budget ? data.revenue - data.budget : null;
   const profitPercentage = profit && data.budget ? ((profit / data.budget) * 100).toFixed(1) : null;
+  const hasBudget = data.budget > 0;
+  const hasRevenue = data.revenue > 0;
+  const hasFinancialData = hasBudget || hasRevenue;
 
   return (
     <VStack gap={6} align="stretch">
@@ -27,26 +30,37 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
         <Heading size="lg" mb={4}>
           Box Office
         </Heading>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={4}>
-          <InfoCard label="Budget" value={formatCurrency(data.budget)} icon={<LuDollarSign />} />
-          <InfoCard label="Revenue" value={formatCurrency(data.revenue)} icon={<LuTrendingUp />} />
-          {profit !== null && data.budget > 0 && data.revenue > 0 && (
-            <InfoCard
-              label="Profit"
-              value={
-                <Text as="span" color={profit >= 0 ? 'green.400' : 'red.400'}>
-                  {formatCurrency(profit)}
-                  {profitPercentage && (
-                    <Text as="span" fontSize="sm" color="fg.muted" ml={1}>
-                      ({profit >= 0 ? '+' : ''}
-                      {profitPercentage}%)
-                    </Text>
-                  )}
-                </Text>
-              }
-            />
-          )}
-        </SimpleGrid>
+        {hasFinancialData ? (
+          <VStack align="stretch" gap={3}>
+            <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={4}>
+              {hasBudget && <InfoCard label="Budget" value={formatCurrency(data.budget)} icon={<LuDollarSign />} />}
+              {hasRevenue && <InfoCard label="Revenue" value={formatCurrency(data.revenue)} icon={<LuTrendingUp />} />}
+              {profit !== null && hasBudget && hasRevenue && (
+                <InfoCard
+                  label="Estimated margin"
+                  value={
+                    <Box as="span" color={profit >= 0 ? 'green.400' : 'red.400'}>
+                      {formatCurrency(profit)}
+                      {profitPercentage && (
+                        <Box as="span" fontSize="sm" color="fg.muted" ml={1}>
+                          ({profit >= 0 ? '+' : ''}
+                          {profitPercentage}%)
+                        </Box>
+                      )}
+                    </Box>
+                  }
+                />
+              )}
+            </SimpleGrid>
+            {profit !== null && hasBudget && hasRevenue && (
+              <Text color="fg.muted" fontSize="sm">
+                Budget and revenue are public TMDB figures and may not include marketing or distribution costs.
+              </Text>
+            )}
+          </VStack>
+        ) : (
+          <Text color="fg.muted">No box-office figures are listed for this movie.</Text>
+        )}
       </Box>
 
       {/* Collection */}
@@ -56,7 +70,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
             Part of Collection
           </Heading>
           <Card.Root variant="outline" overflow="hidden">
-            <HStack gap={0}>
+            <HStack gap={0} align="stretch">
               {data.belongs_to_collection.poster_path && (
                 <Image
                   src={`https://image.tmdb.org/t/p/w200${data.belongs_to_collection.poster_path}`}
@@ -75,7 +89,8 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
                     <Heading size="md">{data.belongs_to_collection.name}</Heading>
                   </HStack>
                   <Text color="fg.muted" fontSize="sm">
-                    This movie is part of the {data.belongs_to_collection.name}
+                    This title belongs to the {data.belongs_to_collection.name}. Collection browsing is not available
+                    from this page yet.
                   </Text>
                 </VStack>
               </Card.Body>

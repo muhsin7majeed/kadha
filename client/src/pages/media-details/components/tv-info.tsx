@@ -1,5 +1,6 @@
-import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
-import { LuCalendar, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
+import { Badge, Box, Button, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
+import { useState } from 'react';
+import { LuCalendar, LuChevronDown, LuChevronUp, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
 import type { TvDetailsWithMeta } from '@/features/media/media.types';
 import InfoCard from './info-card';
 import { formatDate } from '@/utils/date';
@@ -9,6 +10,11 @@ interface TvInfoProps {
 }
 
 const TvInfo = ({ data }: TvInfoProps) => {
+  const [showAllSeasons, setShowAllSeasons] = useState(false);
+  const regularSeasons = data.seasons?.filter((season) => season.season_number > 0) ?? [];
+  const specialsCount = data.seasons?.filter((season) => season.season_number === 0).length ?? 0;
+  const visibleSeasons = showAllSeasons ? regularSeasons : regularSeasons.slice(0, 10);
+
   return (
     <VStack gap={8} align="stretch">
       {/* Quick Stats */}
@@ -87,11 +93,9 @@ const TvInfo = ({ data }: TvInfoProps) => {
                     {network.logo_path ? (
                       <Image
                         src={`https://image.tmdb.org/t/p/w200${network.logo_path}`}
-                        alt={network.name}
+                        alt={`${network.name} logo`}
                         height="30px"
                         objectFit="contain"
-                        filter="brightness(0) invert(1)"
-                        _light={{ filter: 'none' }}
                       />
                     ) : (
                       <Text fontWeight="semibold">{network.name}</Text>
@@ -116,7 +120,7 @@ const TvInfo = ({ data }: TvInfoProps) => {
               <Card.Root variant="outline">
                 <Card.Body>
                   <VStack align="start" gap={3}>
-                    <HStack justify="space-between" width="100%">
+                    <HStack justify="space-between" width="100%" gap={3} align="start" flexWrap="wrap">
                       <Badge colorPalette="blue">Last Episode</Badge>
                       <Text fontSize="sm" color="fg.muted">
                         S{data.last_episode_to_air.season_number} E{data.last_episode_to_air.episode_number}
@@ -142,7 +146,7 @@ const TvInfo = ({ data }: TvInfoProps) => {
               <Card.Root variant="outline" borderColor="brand.muted">
                 <Card.Body>
                   <VStack align="start" gap={3}>
-                    <HStack justify="space-between" width="100%">
+                    <HStack justify="space-between" width="100%" gap={3} align="start" flexWrap="wrap">
                       <Badge colorPalette="brand">Next Episode</Badge>
                       <Text fontSize="sm" color="fg.muted">
                         S{data.next_episode_to_air.season_number} E{data.next_episode_to_air.episode_number}
@@ -167,60 +171,76 @@ const TvInfo = ({ data }: TvInfoProps) => {
       )}
 
       {/* Seasons */}
-      {data.seasons && data.seasons.length > 0 && (
+      {regularSeasons.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
-            Seasons
-          </Heading>
+          <HStack justify="space-between" align="end" mb={4} gap={4} flexWrap="wrap">
+            <Box>
+              <Heading size="lg">Seasons</Heading>
+              {specialsCount > 0 && (
+                <Text color="fg.muted" fontSize="sm" mt={1}>
+                  Specials are not shown in this overview.
+                </Text>
+              )}
+            </Box>
+            {regularSeasons.length > 10 && (
+              <Text color="fg.muted" fontSize="sm">
+                Showing {visibleSeasons.length} of {regularSeasons.length}
+              </Text>
+            )}
+          </HStack>
           <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
-            {data.seasons
-              .filter((season) => season.season_number > 0) // Filter out specials (season 0)
-              .map((season) => (
-                <Card.Root key={season.id} variant="outline" overflow="hidden">
-                  {season.poster_path ? (
-                    <Image
-                      src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
-                      alt={season.name}
-                      width="100%"
-                      height="200px"
-                      objectFit="cover"
-                    />
-                  ) : (
-                    <Box
-                      width="100%"
-                      height="200px"
-                      bg="bg.subtle"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <LuPlay size={40} />
-                    </Box>
-                  )}
-                  <Card.Body p={3}>
-                    <VStack align="start" gap={1}>
-                      <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
-                        {season.name}
-                      </Text>
-                      <HStack gap={2} fontSize="xs" color="fg.muted">
-                        <Text>{season.episode_count} episodes</Text>
-                        {season.air_date && (
-                          <>
-                            <Text>•</Text>
-                            <Text>{formatDate(season.air_date, 'YYYY')}</Text>
-                          </>
-                        )}
-                      </HStack>
-                      {season.vote_average > 0 && (
-                        <Badge size="sm" colorPalette="yellow">
-                          ★ {season.vote_average.toFixed(1)}
-                        </Badge>
+            {visibleSeasons.map((season) => (
+              <Card.Root key={season.id} variant="outline" overflow="hidden">
+                {season.poster_path ? (
+                  <Image
+                    src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
+                    alt={season.name}
+                    width="100%"
+                    height="200px"
+                    objectFit="cover"
+                  />
+                ) : (
+                  <Box
+                    width="100%"
+                    height="200px"
+                    bg="bg.subtle"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <LuPlay size={40} />
+                  </Box>
+                )}
+                <Card.Body p={3}>
+                  <VStack align="start" gap={1}>
+                    <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
+                      {season.name}
+                    </Text>
+                    <HStack gap={2} fontSize="xs" color="fg.muted" flexWrap="wrap">
+                      <Text>{season.episode_count} episodes</Text>
+                      {season.air_date && (
+                        <>
+                          <Text>•</Text>
+                          <Text>{formatDate(season.air_date, 'YYYY')}</Text>
+                        </>
                       )}
-                    </VStack>
-                  </Card.Body>
-                </Card.Root>
-              ))}
+                    </HStack>
+                    {season.vote_average > 0 && (
+                      <Badge size="sm" colorPalette="yellow">
+                        ★ {season.vote_average.toFixed(1)}
+                      </Badge>
+                    )}
+                  </VStack>
+                </Card.Body>
+              </Card.Root>
+            ))}
           </SimpleGrid>
+          {regularSeasons.length > 10 && (
+            <Button variant="outline" mt={4} onClick={() => setShowAllSeasons((current) => !current)}>
+              {showAllSeasons ? <LuChevronUp /> : <LuChevronDown />}
+              {showAllSeasons ? 'Show fewer seasons' : `Show all ${regularSeasons.length} seasons`}
+            </Button>
+          )}
         </Box>
       )}
     </VStack>

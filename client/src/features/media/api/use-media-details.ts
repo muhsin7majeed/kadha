@@ -11,11 +11,11 @@ const fetchMediaDetails = async (mediaType: MediaType, id: string) => {
   return response.data.data;
 };
 
-const useMediaDetails = (mediaType: MediaType, id: string) => {
+const useMediaDetails = (mediaType?: MediaType, id?: string) => {
   return useQuery({
-    queryKey: queryKeys.mediaDetailsById(mediaType, id),
+    queryKey: mediaType && id ? queryKeys.mediaDetailsById(mediaType, id) : queryKeys.mediaDetails,
     staleTime: 1000 * 60 * 5,
-    queryFn: () => fetchMediaDetails(mediaType, id),
+    queryFn: () => fetchMediaDetails(mediaType!, id!),
     enabled: !!mediaType && !!id,
   });
 };

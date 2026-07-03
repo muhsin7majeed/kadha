@@ -27,10 +27,10 @@
 
 ## Verification Commands
 
-- Client install: `cd client && npm ci`
+- Client install: `docker compose run --rm client npm ci`
 - Client build: `cd client && npm run build`
 - Client lint: `cd client && npm run lint`
-- Server install: `cd server && npm ci`
+- Server install: `docker compose run --rm server npm ci`
 - Server build: `cd server && npm run build`
 - Server tests: `cd server && npm test`
 
@@ -69,6 +69,7 @@ server/src/features/media/
 - Feature-owned client types belong near the feature, such as `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned utilities and hooks should live near the feature instead of generic `client/src/utils` or `client/src/hooks`.
 - Before creating a new shared or feature UI component, search for an existing component that already covers the behavior and reuse or extend it when practical.
+- Use theme-aware Chakra styling for UI controls. Buttons must set an intentional `colorPalette` for primary, destructive, status, or branded actions; neutral secondary actions should use an explicit neutral palette such as `gray` with the appropriate variant instead of relying on Chakra defaults.
 - Shared UI-only components can remain in `client/src/components`.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.

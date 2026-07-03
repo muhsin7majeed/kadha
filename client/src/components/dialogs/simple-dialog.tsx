@@ -3,13 +3,14 @@ import { CloseButton, Dialog, DialogContentProps, DialogRootProps, Portal } from
 interface SimpleDialogProps extends DialogRootProps {
   contentProps?: DialogContentProps;
   closeButton?: boolean;
+  footer?: React.ReactNode;
   title?: React.ReactNode;
   trigger?: React.ReactNode;
   triggerWrapper?: (trigger: React.ReactNode) => React.ReactNode;
 }
 
 const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
-  const { children, closeButton, contentProps, title, trigger, triggerWrapper, ...rootProps } = props;
+  const { children, closeButton, contentProps, footer, title, trigger, triggerWrapper, ...rootProps } = props;
   const dialogTrigger = trigger ? <Dialog.Trigger asChild>{trigger}</Dialog.Trigger> : null;
 
   return (
@@ -28,6 +29,8 @@ const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
             )}
 
             <Dialog.Body>{children}</Dialog.Body>
+
+            {footer && <Dialog.Footer>{footer}</Dialog.Footer>}
 
             {closeButton && (
               <Dialog.CloseTrigger asChild>
