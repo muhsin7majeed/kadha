@@ -1,4 +1,4 @@
-import { LuBrain, LuChartBar, LuDownload, LuLink, LuMapPin, LuSparkles, LuUsers } from 'react-icons/lu';
+import { LuBrain, LuChartBar, LuDownload, LuLink, LuSparkles, LuUsers } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
   {
@@ -37,12 +37,6 @@ const UPCOMING_FEATURES = [
     title: 'Watch Statistics',
     description: 'See your viewing habits. How many hours of your life went to TV? Find out (if you dare).',
     badge: 'Insights',
-  },
-  {
-    icon: LuMapPin,
-    title: 'Platform Availability',
-    description: 'Show where a movie or show is available to stream when provider data is wired in.',
-    badge: 'Discovery',
   },
 ];
 

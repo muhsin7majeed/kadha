@@ -4,6 +4,10 @@
 
 ### Feature Changes
 
+#### Landing Page
+
+- Updated the landing page positioning, product comparison, audience messaging, and FAQ to explain when Kadha is a better fit than public review or hosted tracking apps.
+
 #### Collection Collaboration
 
 - Simplified the collection members mobile UI by collapsing invite search and pending invitations, and moving member management controls into compact row actions.

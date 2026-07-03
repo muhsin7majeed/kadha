@@ -1,16 +1,4 @@
-import {
-  LuBookmark,
-  LuBell,
-  LuCheck,
-  LuClapperboard,
-  LuFilter,
-  LuHeart,
-  LuLock,
-  LuSearch,
-  LuSparkles,
-  LuServer,
-  LuUsers,
-} from 'react-icons/lu';
+import { LuBookmark, LuCheck, LuClapperboard, LuHeart, LuLock, LuSparkles, LuServer, LuUsers } from 'react-icons/lu';
 
 const CURRENT_FEATURES = [
   {
@@ -29,21 +17,9 @@ const CURRENT_FEATURES = [
     description: "Mark what you've seen. Never forget if you watched that movie or not.",
   },
   {
-    icon: LuFilter,
-    title: 'Movie and TV Control',
-    description: 'Browse movies and TV shows separately so each media type gets the right details and actions.',
-    badge: 'Discovery',
-  },
-  {
     icon: LuClapperboard,
     title: 'Trending Content',
-    description: "See what's popular right now, including dedicated movie and TV discovery sections.",
-    badge: 'Discovery',
-  },
-  {
-    icon: LuSearch,
-    title: 'Global Search',
-    description: 'Search movies, TV shows, and users from one dialog with paginated results.',
+    description: "See what's popular right now, so you are not missing out.",
     badge: 'Discovery',
   },
   {
@@ -51,12 +27,6 @@ const CURRENT_FEATURES = [
     title: 'Custom Collections',
     description: 'Create themed lists like "Comfort Movies", "Date Night", or anything else you want to organize.',
     badge: 'Organization',
-  },
-  {
-    icon: LuBell,
-    title: 'Notifications',
-    description: 'Track friendship requests and social updates with unread counts and mark-as-read controls.',
-    badge: 'Social',
   },
   {
     icon: LuServer,
@@ -67,7 +37,7 @@ const CURRENT_FEATURES = [
   {
     icon: LuUsers,
     title: 'Friends System',
-    description: 'Find users, send friend requests, accept or reject requests, and block accounts when needed.',
+    description: 'Find users, become friends, share your favorites.',
     badge: 'Social',
   },
   {
