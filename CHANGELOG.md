@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Collection Collaboration
+
+- Simplified the collection members mobile UI by collapsing invite search and pending invitations, and moving member management controls into compact row actions.
+
 ## v0.1.4
 
 ### Feature Changes

@@ -1,5 +1,18 @@
 import { useState } from 'react';
-import { Badge, Box, Button, Field, HStack, Input, NativeSelect, Separator, Stack, Text } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Button,
+  Collapsible,
+  Field,
+  HStack,
+  Input,
+  NativeSelect,
+  Separator,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
+import { LuChevronDown, LuChevronRight, LuUserPlus } from 'react-icons/lu';
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
@@ -47,10 +60,15 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoles, setSelectedRoles] = useState<Record<string, CollectionMemberRole>>({});
   const [inviteToRevoke, setInviteToRevoke] = useState<CollectionInvite | null>(null);
+  const [isInviteSearchOpen, setIsInviteSearchOpen] = useState(false);
+  const [isPendingInvitesOpen, setIsPendingInvitesOpen] = useState(false);
 
-  const collectionQuery = useCollection({ collectionId: collection.id, enabled: open });
+  const collectionQuery = useCollection({
+    collectionId: collection.id,
+    enabled: open,
+  });
   const invitesQuery = useCollectionInvites(collection.id, open);
-  const usersQuery = useSearchCollectionInviteUsers(collection.id, searchQuery, open);
+  const usersQuery = useSearchCollectionInviteUsers(collection.id, searchQuery, open && isInviteSearchOpen);
   const { data: currentUser } = useGetMe({ enabled: open });
   const createInvite = useCreateCollectionInvite();
   const revokeInvite = useRevokeCollectionInvite();
@@ -72,184 +90,227 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
   const handleRevokeInvite = async () => {
     if (!inviteToRevoke || revokeInvite.isPending) return;
 
-    await revokeInvite.mutateAsync({ collectionId: collection.id, inviteId: inviteToRevoke.id });
+    await revokeInvite.mutateAsync({
+      collectionId: collection.id,
+      inviteId: inviteToRevoke.id,
+    });
     setInviteToRevoke(null);
   };
 
   return (
     <>
       <Stack gap="5">
-      <Stack gap="1">
-        <Text fontWeight="semibold">{collection.name}</Text>
-        <HStack gap="2" flexWrap="wrap">
-          <Badge variant="surface">{collectionData?.memberCount ?? collection.memberCount ?? 1} members</Badge>
-          {collectionData?.owner && (
-            <Badge variant="surface">
-              Created by&nbsp;
-              <NavLink to={`/app/profile/${collectionData.owner.username}`}>{collectionData.owner.username}</NavLink>
-            </Badge>
-          )}
-        </HStack>
-      </Stack>
-
-      <Separator />
-
-      <Stack gap="3">
-        <Text fontWeight="medium">Search users</Text>
-        <Field.Root>
-          <Input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search by username"
-          />
-        </Field.Root>
-
-        {usersQuery.isLoading ? (
-          <CommonSpinner />
-        ) : usersQuery.isError ? (
-          <ErrorState title="Error" description="Error searching users" onRetry={usersQuery.refetch} />
-        ) : searchQuery.trim() && searchResults.length === 0 ? (
-          <EmptyState description="No users found" />
-        ) : (
-          <Stack gap="2">
-            {searchResults.map((user) => (
-              <Box key={user.id} border="1px solid" borderColor="border.subtle" borderRadius="md" p="3">
-                <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="3">
-                  <Stack gap="1">
-                    <NavLink to={`/app/profile/${user.username}`} display="flex" alignItems="center" gap="2">
-                      <SimpleAvatar fallbackName={user.username} size="sm" />
-                      <Text fontWeight="medium">{user.username}</Text>
-                    </NavLink>
-                    <HStack gap="2">
-                      {getUserStateLabel(user) && <Badge variant="surface">{getUserStateLabel(user)}</Badge>}
-                    </HStack>
-                  </Stack>
-
-                  <HStack gap="2" justifyContent={{ base: 'stretch', md: 'flex-end' }}>
-                    <NativeSelect.Root maxW="36" disabled={user.state !== 'available'}>
-                      <NativeSelect.Field
-                        value={getSelectedRole(user.id)}
-                        onChange={(event) =>
-                          setSelectedRoles((current) => ({
-                            ...current,
-                            [user.id]: event.target.value as CollectionMemberRole,
-                          }))
-                        }
-                      >
-                        {roleOptions.map((role) => (
-                          <option key={role.value} value={role.value}>
-                            {role.label}
-                          </option>
-                        ))}
-                      </NativeSelect.Field>
-                      <NativeSelect.Indicator />
-                    </NativeSelect.Root>
-
-                    <Button
-                      size="sm"
-                      colorPalette="brand"
-                      disabled={user.state !== 'available'}
-                      loading={createInvite.isPending}
-                      onClick={() => handleInvite(user)}
-                    >
-                      Invite
-                    </Button>
-                  </HStack>
-                </Stack>
-              </Box>
-            ))}
-          </Stack>
-        )}
-      </Stack>
-
-      <Separator />
-
-      {(invitesQuery.isLoading || invitesQuery.isError || pendingInvites.length > 0) && (
-        <>
-          <Stack gap="3">
-            <Text fontWeight="medium">Pending invitations</Text>
-            {invitesQuery.isLoading ? (
-              <CommonSpinner />
-            ) : invitesQuery.isError ? (
-              <ErrorState title="Error" description="Error loading invitations" onRetry={invitesQuery.refetch} />
-            ) : (
-              <Stack gap="2">
-                {pendingInvites.map((invite) => (
-                  <HStack
-                    key={invite.id}
-                    justifyContent="space-between"
-                    border="1px solid"
-                    borderColor="border.subtle"
-                    borderRadius="md"
-                    p="3"
-                    gap="3"
-                    alignItems={{ base: 'flex-start', md: 'center' }}
-                    flexDirection={{ base: 'column', md: 'row' }}
-                  >
-                    <Stack gap="1">
-                      <NavLink to={`/app/profile/${invite.invitee.username}`} display="flex" alignItems="center" gap="2">
-                        <SimpleAvatar fallbackName={invite.invitee.username} size="sm" />
-                        <Text fontWeight="medium">{invite.invitee.username}</Text>
-                      </NavLink>
-                      <Badge variant="surface" w="fit-content">
-                        {ROLE_LABELS[invite.role]}
-                      </Badge>
-                    </Stack>
-
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      colorPalette="red"
-                      loading={revokeInvite.isPending}
-                      onClick={() => setInviteToRevoke(invite)}
-                    >
-                      Revoke
-                    </Button>
-                  </HStack>
-                ))}
-              </Stack>
-            )}
+        <Stack direction={{ base: 'column', sm: 'row' }} justifyContent="space-between" gap="3">
+          <Stack gap="1" minW={0}>
+            <Text fontWeight="semibold">{collection.name}</Text>
+            <HStack gap="2" flexWrap="wrap">
+              <Badge variant="surface">{collectionData?.memberCount ?? collection.memberCount ?? 1} members</Badge>
+              {collectionData?.owner && (
+                <Badge variant="surface">
+                  Created by&nbsp;
+                  <NavLink to={`/app/profile/${collectionData.owner.username}`}>
+                    {collectionData.owner.username}
+                  </NavLink>
+                </Badge>
+              )}
+            </HStack>
           </Stack>
 
-          <Separator />
-        </>
-      )}
+          <Button
+            alignSelf={{ base: 'stretch', sm: 'flex-start' }}
+            colorPalette="brand"
+            size="sm"
+            onClick={() => setIsInviteSearchOpen((current) => !current)}
+          >
+            <LuUserPlus />
+            Invite people
+          </Button>
+        </Stack>
 
-      <Stack gap="3">
-        <Text fontWeight="medium">Members</Text>
-        {collectionQuery.isLoading ? (
-          <CommonSpinner />
-        ) : collectionQuery.isError ? (
-          <ErrorState title="Error" description="Error loading members" onRetry={collectionQuery.refetch} />
-        ) : !collectionData ? (
-          <EmptyState title="No collection" description="No collection found" />
-        ) : (
-          <Stack gap="2">
-            <CollectionMemberRow
-              collectionId={collection.id}
-              currentUserId={currentUser?.id}
-              currentUserAccess={collectionData.access}
-              mode="manage"
-              user={{ ...collectionData.owner, role: 'owner' }}
-            />
+        {isInviteSearchOpen && (
+          <>
+            <Separator />
 
-            {collectionData.members.length === 0 ? (
-              <EmptyState description="No members found" />
-            ) : (
-              collectionData.members.map((member) => (
-                <CollectionMemberRow
-                  key={member.id}
-                  collectionId={collection.id}
-                  currentUserId={currentUser?.id}
-                  currentUserAccess={collectionData.access}
-                  mode="manage"
-                  user={toCollectionMemberRowUser(member)}
+            <Stack gap="3">
+              <Text fontWeight="medium">Invite people</Text>
+              <Field.Root>
+                <Input
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search by username"
                 />
-              ))
-            )}
-          </Stack>
+              </Field.Root>
+
+              {usersQuery.isLoading ? (
+                <CommonSpinner />
+              ) : usersQuery.isError ? (
+                <ErrorState title="Error" description="Error searching users" onRetry={usersQuery.refetch} />
+              ) : searchQuery.trim() && searchResults.length === 0 ? (
+                <EmptyState description="No users found" />
+              ) : (
+                <Stack gap="2">
+                  {searchResults.map((user) => (
+                    <Box key={user.id} border="1px solid" borderColor="border.subtle" borderRadius="md" p="3">
+                      <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="3">
+                        <Stack gap="1">
+                          <NavLink to={`/app/profile/${user.username}`} display="flex" alignItems="center" gap="2">
+                            <SimpleAvatar fallbackName={user.username} size="sm" />
+                            <Text fontWeight="medium">{user.username}</Text>
+                          </NavLink>
+                          <HStack gap="2">
+                            {getUserStateLabel(user) && <Badge variant="surface">{getUserStateLabel(user)}</Badge>}
+                          </HStack>
+                        </Stack>
+
+                        <HStack gap="2" justifyContent={{ base: 'stretch', md: 'flex-end' }}>
+                          <NativeSelect.Root maxW="36" disabled={user.state !== 'available'}>
+                            <NativeSelect.Field
+                              value={getSelectedRole(user.id)}
+                              onChange={(event) =>
+                                setSelectedRoles((current) => ({
+                                  ...current,
+                                  [user.id]: event.target.value as CollectionMemberRole,
+                                }))
+                              }
+                            >
+                              {roleOptions.map((role) => (
+                                <option key={role.value} value={role.value}>
+                                  {role.label}
+                                </option>
+                              ))}
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                          </NativeSelect.Root>
+
+                          <Button
+                            size="sm"
+                            colorPalette="brand"
+                            disabled={user.state !== 'available'}
+                            loading={createInvite.isPending}
+                            onClick={() => handleInvite(user)}
+                          >
+                            Invite
+                          </Button>
+                        </HStack>
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
+            </Stack>
+          </>
         )}
-      </Stack>
+
+        <Separator />
+
+        {(invitesQuery.isLoading || invitesQuery.isError || pendingInvites.length > 0) && (
+          <>
+            <Collapsible.Root open={isPendingInvitesOpen} onOpenChange={(event) => setIsPendingInvitesOpen(event.open)}>
+              <Stack gap="3">
+                <Collapsible.Trigger asChild>
+                  <Button colorPalette="gray" justifyContent="space-between" variant="ghost">
+                    <HStack gap="2">
+                      {isPendingInvitesOpen ? <LuChevronDown /> : <LuChevronRight />}
+                      <Text as="span" fontWeight="medium">
+                        Pending invitations
+                      </Text>
+                    </HStack>
+                    {pendingInvites.length > 0 && <Badge variant="surface">{pendingInvites.length}</Badge>}
+                  </Button>
+                </Collapsible.Trigger>
+
+                <Collapsible.Content>
+                  {invitesQuery.isLoading ? (
+                    <CommonSpinner />
+                  ) : invitesQuery.isError ? (
+                    <ErrorState title="Error" description="Error loading invitations" onRetry={invitesQuery.refetch} />
+                  ) : (
+                    <Stack gap="2">
+                      {pendingInvites.map((invite) => (
+                        <HStack
+                          key={invite.id}
+                          justifyContent="space-between"
+                          border="1px solid"
+                          borderColor="border.subtle"
+                          borderRadius="md"
+                          px="3"
+                          py={{ base: 2, md: 3 }}
+                          gap="3"
+                        >
+                          <Stack gap="1" minW={0}>
+                            <NavLink
+                              to={`/app/profile/${invite.invitee.username}`}
+                              display="flex"
+                              alignItems="center"
+                              gap="2"
+                            >
+                              <SimpleAvatar fallbackName={invite.invitee.username} size="sm" />
+                              <Text fontWeight="medium">{invite.invitee.username}</Text>
+                            </NavLink>
+                          </Stack>
+
+                          <HStack gap="2" flexShrink={0} justifyContent="flex-end">
+                            <Text color="fg.muted" fontSize="sm" textAlign="end" whiteSpace="nowrap">
+                              {ROLE_LABELS[invite.role]}
+                            </Text>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              colorPalette="red"
+                              loading={revokeInvite.isPending}
+                              onClick={() => setInviteToRevoke(invite)}
+                            >
+                              Revoke
+                            </Button>
+                          </HStack>
+                        </HStack>
+                      ))}
+                    </Stack>
+                  )}
+                </Collapsible.Content>
+              </Stack>
+            </Collapsible.Root>
+
+            <Separator />
+          </>
+        )}
+
+        <Stack gap="3">
+          <Text fontWeight="medium">Members</Text>
+          {collectionQuery.isLoading ? (
+            <CommonSpinner />
+          ) : collectionQuery.isError ? (
+            <ErrorState title="Error" description="Error loading members" onRetry={collectionQuery.refetch} />
+          ) : !collectionData ? (
+            <EmptyState title="No collection" description="No collection found" />
+          ) : (
+            <Stack gap="2">
+              <CollectionMemberRow
+                collectionId={collection.id}
+                currentUserId={currentUser?.id}
+                currentUserAccess={collectionData.access}
+                mode="manage"
+                user={{ ...collectionData.owner, role: 'owner' }}
+              />
+
+              {collectionData.members.length === 0 ? (
+                <EmptyState description="No members found" />
+              ) : (
+                collectionData.members.map((member) => (
+                  <CollectionMemberRow
+                    key={member.id}
+                    collectionId={collection.id}
+                    currentUserId={currentUser?.id}
+                    currentUserAccess={collectionData.access}
+                    mode="manage"
+                    user={toCollectionMemberRowUser(member)}
+                  />
+                ))
+              )}
+            </Stack>
+          )}
+        </Stack>
       </Stack>
 
       <ConfirmationDialog
@@ -261,7 +322,10 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
             : undefined
         }
         confirmButtonText="Revoke"
-        confirmButtonProps={{ colorPalette: 'red', loading: revokeInvite.isPending }}
+        confirmButtonProps={{
+          colorPalette: 'red',
+          loading: revokeInvite.isPending,
+        }}
         onOpenChange={(isOpen) => {
           if (!isOpen) setInviteToRevoke(null);
         }}

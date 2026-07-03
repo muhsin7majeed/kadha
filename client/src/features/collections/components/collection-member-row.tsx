@@ -1,5 +1,6 @@
-import { Badge, Button, HStack, NativeSelect, Stack, Text } from '@chakra-ui/react';
+import { Badge, Button, HStack, IconButton, Menu, NativeSelect, Stack, Text } from '@chakra-ui/react';
 import { useState } from 'react';
+import { LuEllipsis, LuTrash2 } from 'react-icons/lu';
 
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
 import UserLink from '@/components/user-link';
@@ -55,9 +56,7 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
   const canManageMember = mode === 'manage' && currentUserAccess.canManageSharing && user.role !== 'owner';
   const shouldShowRoleText = user.role === 'owner' || !canManageMember;
   const canShowFriendshipActions =
-    !isCurrentUser &&
-    user.friendshipStatus !== undefined &&
-    user.isRequestSender !== undefined;
+    !isCurrentUser && user.friendshipStatus !== undefined && user.isRequestSender !== undefined;
 
   const handleRoleChange = (role: CollectionMemberRole) => {
     if (user.role === 'owner') return;
@@ -79,16 +78,43 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
     setIsRemoveDialogOpen(false);
   };
 
+  const menuPositioner = (
+    <Menu.Positioner>
+      <Menu.Content>
+        {canManageMember && (
+          <>
+            {roleOptions.map((role) => (
+              <Menu.Item
+                key={role.value}
+                value={`role-${role.value}`}
+                disabled={user.role === role.value || updateMemberRole.isPending}
+                onClick={() => handleRoleChange(role.value)}
+              >
+                {role.label}
+              </Menu.Item>
+            ))}
+            <Menu.Separator />
+            <Menu.Item value="remove" color="fg.error" onClick={() => setIsRemoveDialogOpen(true)}>
+              <LuTrash2 />
+              Remove member
+            </Menu.Item>
+          </>
+        )}
+      </Menu.Content>
+    </Menu.Positioner>
+  );
+
   return (
     <Stack
       border="1px solid"
       borderColor="border.subtle"
       borderRadius="md"
-      p="3"
-      gap="3"
-      direction={{ base: 'column', md: 'row' }}
+      px="3"
+      py={{ base: 2, md: 3 }}
+      gap={{ base: 2, md: 3 }}
+      direction="row"
       justifyContent="space-between"
-      alignItems={{ base: 'stretch', md: 'center' }}
+      alignItems="center"
     >
       <Stack gap="1" minW={0}>
         <HStack gap="2" minW={0}>
@@ -99,55 +125,88 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
             </Badge>
           )}
         </HStack>
-        {shouldShowRoleText && (
-          <Text color="fg.muted" fontSize="sm">
+      </Stack>
+
+      <HStack gap="2" justifyContent="flex-end" flexShrink={0}>
+        {(shouldShowRoleText || canManageMember) && (
+          <Text
+            color="fg.muted"
+            display={{
+              base: 'block',
+              md: shouldShowRoleText ? 'block' : 'none',
+            }}
+            fontSize="sm"
+            textAlign="end"
+            whiteSpace="nowrap"
+          >
             {getRoleLabel(user.role)}
           </Text>
         )}
-      </Stack>
 
-      <Stack
-        gap="2"
-        direction={{ base: 'column', sm: 'row' }}
-        justifyContent={{ base: 'stretch', md: 'flex-end' }}
-        alignItems={{ base: 'stretch', sm: 'center' }}
-      >
-        {canShowFriendshipActions && (
-          <FriendshipActions
-            menuWithinDialog
-            user={{
-              id: user.id,
-              friendshipStatus: user.friendshipStatus!,
-              isRequestSender: user.isRequestSender!,
-            }}
-          />
-        )}
+        <Stack
+          gap="2"
+          direction={{ base: 'column', sm: 'row' }}
+          justifyContent={{ base: 'stretch', md: 'flex-end' }}
+          alignItems={{ base: 'stretch', sm: 'center' }}
+          display={{ base: canManageMember ? 'none' : 'flex', md: 'flex' }}
+        >
+          {canShowFriendshipActions && (
+            <FriendshipActions
+              menuWithinDialog
+              user={{
+                id: user.id,
+                friendshipStatus: user.friendshipStatus!,
+                isRequestSender: user.isRequestSender!,
+              }}
+            />
+          )}
+
+          {canManageMember && (
+            <>
+              <NativeSelect.Root w={{ base: '100%', sm: '36' }} disabled={updateMemberRole.isPending}>
+                <NativeSelect.Field
+                  value={user.role}
+                  onChange={(event) => handleRoleChange(event.target.value as CollectionMemberRole)}
+                >
+                  {roleOptions.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
+
+              <Button
+                size="sm"
+                variant="outline"
+                colorPalette="red"
+                loading={removeMember.isPending}
+                onClick={() => setIsRemoveDialogOpen(true)}
+              >
+                Remove
+              </Button>
+            </>
+          )}
+        </Stack>
 
         {canManageMember && (
-          <>
-            <NativeSelect.Root w={{ base: '100%', sm: '36' }} disabled={updateMemberRole.isPending}>
-              <NativeSelect.Field value={user.role} onChange={(event) => handleRoleChange(event.target.value as CollectionMemberRole)}>
-                {roleOptions.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </NativeSelect.Field>
-              <NativeSelect.Indicator />
-            </NativeSelect.Root>
+          <Menu.Root positioning={{ strategy: 'fixed', hideWhenDetached: true }}>
+            <Menu.Trigger asChild>
+              <IconButton
+                aria-label={`Manage ${user.username}`}
+                display={{ base: 'inline-flex', md: 'none' }}
+                size="sm"
+                variant="ghost"
+              >
+                <LuEllipsis />
+              </IconButton>
+            </Menu.Trigger>
 
-            <Button
-              size="sm"
-              variant="outline"
-              colorPalette="red"
-              loading={removeMember.isPending}
-              onClick={() => setIsRemoveDialogOpen(true)}
-            >
-              Remove
-            </Button>
-          </>
+            {menuPositioner}
+          </Menu.Root>
         )}
-      </Stack>
+      </HStack>
 
       {user.role !== 'owner' && (
         <ConfirmationDialog
@@ -155,7 +214,10 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
           title="Remove member?"
           description={`Remove ${user.username} from this collection? They will lose access immediately.`}
           confirmButtonText="Remove"
-          confirmButtonProps={{ colorPalette: 'red', loading: removeMember.isPending }}
+          confirmButtonProps={{
+            colorPalette: 'red',
+            loading: removeMember.isPending,
+          }}
           onOpenChange={setIsRemoveDialogOpen}
           onConfirm={handleRemoveMember}
         />
