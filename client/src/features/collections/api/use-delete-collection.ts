@@ -10,7 +10,7 @@ const deleteCollection = async (collectionId: string) => {
 const useDeleteCollection = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, string>({
     mutationFn: deleteCollection,
     onError: useErrorHandler,
     onSuccess: () => {

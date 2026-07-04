@@ -155,7 +155,7 @@ const AdminUsers = () => {
                         <Table.Cell textAlign="right">{user.collectionCount}</Table.Cell>
                         <Table.Cell textAlign="right">{user.friendCount}</Table.Cell>
                         <Table.Cell textAlign="right">
-                          <Button asChild size="xs" variant="outline">
+                          <Button asChild size="xs" variant="outline" colorPalette="gray">
                             <Link to={`/app/admin/users/${user.id}`}>
                               <LuEye />
                               View

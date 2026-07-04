@@ -31,7 +31,7 @@ const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
 const useMediaActionMutation = ({ action, endpoint }: UseMediaActionMutationOptions) => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<BaseInfoResponse, Error, UserMediaPayload, MediaActionMutationContext>({
+  const mutation = useMutation<BaseInfoResponse, unknown, UserMediaPayload, MediaActionMutationContext>({
     mutationFn: (payload) => postMediaAction(endpoint, payload),
     onMutate: (payload) => {
       const snapshot = getMediaActionCacheSnapshot(queryClient);

@@ -44,7 +44,7 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
   const visibleMembers = members.slice(0, visibleMembersCount - 1);
   const hiddenMembersCount = Math.max(members.length - visibleMembers.length, 0);
   const defaultTrigger = collectionData ? (
-    <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+    <Button variant="ghost" colorPalette="gray" h="auto" p="1" justifyContent="flex-start">
       <HStack gap="2" flexWrap="wrap">
         <SimpleAvatar fallbackName={collectionData.owner.username} size="sm" />
 
@@ -64,7 +64,7 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
       </HStack>
     </Button>
   ) : (
-    <Button variant="ghost" h="auto" p="1" justifyContent="flex-start">
+    <Button variant="ghost" colorPalette="gray" h="auto" p="1" justifyContent="flex-start">
       Members
     </Button>
   );

@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import MediaCarousal from '@/components/media-carousal';
+import MediaCarousel from '@/components/media-carousel';
 import useTrendingMovies from '@/features/media/api/use-trending-movies';
 
 const TrendingMovies = () => {
@@ -15,7 +15,7 @@ const TrendingMovies = () => {
       ) : trendingMovies?.length === 0 ? (
         <EmptyState title="No trending movies" description="No trending movies found" />
       ) : (
-        <MediaCarousal
+        <MediaCarousel
           isLoading={isLoading}
           isFetching={isFetching}
           mediaType="movie"

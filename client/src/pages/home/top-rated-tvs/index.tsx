@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import MediaCarousal from '@/components/media-carousal';
+import MediaCarousel from '@/components/media-carousel';
 import useTopRatedTvs from '@/features/media/api/use-top-rated-tvs';
 
 const TopRatedTvs = () => {
@@ -15,7 +15,7 @@ const TopRatedTvs = () => {
       ) : topRatedTvs?.length === 0 ? (
         <EmptyState title="No top rated tvs" description="No top rated tvs found" />
       ) : (
-        <MediaCarousal
+        <MediaCarousel
           isLoading={isLoading}
           isFetching={isFetching}
           mediaType="tv"

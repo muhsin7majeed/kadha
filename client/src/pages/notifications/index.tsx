@@ -50,6 +50,7 @@ const Notifications = () => {
         <Button
           size="sm"
           variant="outline"
+          colorPalette="gray"
           disabled={!hasUnreadNotifications}
           loading={markAllNotificationsRead.isPending}
           onClick={() => markAllNotificationsRead.mutate()}
@@ -94,6 +95,7 @@ const Notifications = () => {
                     <Button
                       size="sm"
                       variant="ghost"
+                      colorPalette="gray"
                       loading={markNotificationRead.isPending}
                       onClick={() => markNotificationRead.mutate(notification.id)}
                     >
@@ -116,6 +118,7 @@ const Notifications = () => {
                       <Button
                         size="sm"
                         variant="outline"
+                        colorPalette="red"
                         loading={respondToCollectionInvite.isPending}
                         onClick={() =>
                           respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'reject' })

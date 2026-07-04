@@ -1,6 +1,6 @@
 import { Box, Flex, Skeleton } from '@chakra-ui/react';
 
-const MediaCarousalSkeleton = () => {
+const MediaCarouselSkeleton = () => {
   return (
     <Box>
       <Skeleton height="40px" width="300px" mb="4" />
@@ -17,4 +17,4 @@ const MediaCarousalSkeleton = () => {
   );
 };
 
-export default MediaCarousalSkeleton;
+export default MediaCarouselSkeleton;

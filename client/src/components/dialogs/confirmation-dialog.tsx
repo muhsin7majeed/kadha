@@ -46,6 +46,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <Dialog.ActionTrigger asChild>
                 <Button
                   variant="outline"
+                  colorPalette="gray"
                   onClick={() => {
                     onOpenChange(false);
                   }}

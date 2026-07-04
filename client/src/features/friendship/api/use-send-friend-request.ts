@@ -12,7 +12,7 @@ const sendFriendRequest = async (userId: string) => {
 const useSendFriendRequest = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, string>({
     mutationFn: sendFriendRequest,
     onSuccess: () => {
       invalidateFriendshipQueries(queryClient);

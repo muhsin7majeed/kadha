@@ -17,7 +17,7 @@ const updateCollectionMemberRole = async ({ collectionId, memberId, role }: Upda
 const useUpdateCollectionMemberRole = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, UpdateCollectionMemberRolePayload>({
     mutationFn: updateCollectionMemberRole,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {

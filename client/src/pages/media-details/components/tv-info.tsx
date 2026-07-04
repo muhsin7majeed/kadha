@@ -236,7 +236,7 @@ const TvInfo = ({ data }: TvInfoProps) => {
             ))}
           </SimpleGrid>
           {regularSeasons.length > 10 && (
-            <Button variant="outline" mt={4} onClick={() => setShowAllSeasons((current) => !current)}>
+            <Button variant="outline" colorPalette="gray" mt={4} onClick={() => setShowAllSeasons((current) => !current)}>
               {showAllSeasons ? <LuChevronUp /> : <LuChevronDown />}
               {showAllSeasons ? 'Show fewer seasons' : `Show all ${regularSeasons.length} seasons`}
             </Button>

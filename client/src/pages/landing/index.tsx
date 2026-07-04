@@ -99,7 +99,7 @@ const Landing = () => {
             <Button colorPalette="brand" size="lg" asChild>
               <Link to="/auth/register">Start Tracking</Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="outline" colorPalette="gray" size="lg" asChild>
               <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                 <LuGithub />
                 View on GitHub
@@ -325,7 +325,7 @@ const Landing = () => {
             <Button colorPalette="brand" size="lg" asChild>
               <Link to="/auth/register">Create Free Account</Link>
             </Button>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="outline" colorPalette="gray" size="lg" asChild>
               <Link to="/auth/login">Login</Link>
             </Button>
           </HStack>

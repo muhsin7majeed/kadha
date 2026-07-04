@@ -85,6 +85,7 @@ const ChangelogDialog = ({ version, open, onOpenChange, trigger }: ChangelogDial
       ) : open === undefined ? (
         <Button
           variant="ghost"
+          colorPalette="gray"
           size="xs"
           px={2}
           color="fg.muted"

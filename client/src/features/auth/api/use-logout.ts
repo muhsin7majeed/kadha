@@ -9,7 +9,7 @@ const logout = async () => {
 };
 
 const useLogout = () => {
-  return useMutation<void, Error>({
+  return useMutation<void, unknown>({
     mutationFn: () => logout(),
     onError: useErrorHandler,
   });

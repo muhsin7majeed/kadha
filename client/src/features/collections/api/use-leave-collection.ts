@@ -11,7 +11,7 @@ const leaveCollection = async (collectionId: string) => {
 const useLeaveCollection = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, string>({
     mutationFn: leaveCollection,
     onError: useErrorHandler,
     onSuccess: (_data, collectionId) => {

@@ -17,7 +17,7 @@ const createCollectionInvite = async ({ collectionId, inviteeId, role }: CreateC
 const useCreateCollectionInvite = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, CreateCollectionInvitePayload>({
     mutationFn: createCollectionInvite,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {

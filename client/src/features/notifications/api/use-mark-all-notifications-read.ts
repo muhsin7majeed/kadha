@@ -9,7 +9,7 @@ const markAllNotificationsRead = async () => {
 const useMarkAllNotificationsRead = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<void, unknown, void>({
     mutationFn: markAllNotificationsRead,
     onSuccess: () => {
       invalidateNotificationQueries(queryClient);

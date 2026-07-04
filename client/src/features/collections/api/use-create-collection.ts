@@ -12,7 +12,7 @@ const createCollection = async (payload: CollectionFormFields) => {
 
 const useCreateCollection = () => {
   const queryClient = useQueryClient();
-  return useMutation({
+  return useMutation<unknown, unknown, CollectionFormFields>({
     mutationFn: createCollection,
     onError: useErrorHandler,
     onSuccess: () => {

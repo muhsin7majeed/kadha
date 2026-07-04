@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import MediaCarousal from '@/components/media-carousal';
+import MediaCarousel from '@/components/media-carousel';
 import usePopularMovies from '@/features/media/api/use-popular-movies';
 
 const PopularMovies = () => {
@@ -15,7 +15,7 @@ const PopularMovies = () => {
       ) : popularMovies?.length === 0 ? (
         <EmptyState title="No popular movies" description="No popular movies found" />
       ) : (
-        <MediaCarousal
+        <MediaCarousel
           isLoading={isLoading}
           isFetching={isFetching}
           mediaType="movie"

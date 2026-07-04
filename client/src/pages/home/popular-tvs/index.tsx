@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/react';
 
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
-import MediaCarousal from '@/components/media-carousal';
+import MediaCarousel from '@/components/media-carousel';
 import usePopularTvs from '@/features/media/api/use-popular-tvs';
 
 const PopularTvs = () => {
@@ -15,7 +15,7 @@ const PopularTvs = () => {
       ) : popularTvs?.length === 0 ? (
         <EmptyState title="No popular tvs" description="No popular tvs found" />
       ) : (
-        <MediaCarousal
+        <MediaCarousel
           isLoading={isLoading}
           isFetching={isFetching}
           mediaType="tv"

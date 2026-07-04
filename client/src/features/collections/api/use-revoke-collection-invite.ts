@@ -16,7 +16,7 @@ const revokeCollectionInvite = async ({ collectionId, inviteId }: RevokeCollecti
 const useRevokeCollectionInvite = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, RevokeCollectionInvitePayload>({
     mutationFn: revokeCollectionInvite,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {

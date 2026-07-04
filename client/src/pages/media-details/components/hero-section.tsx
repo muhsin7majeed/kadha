@@ -289,7 +289,7 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                 </Button>
               )}
               {data.media_type === 'movie' && data.imdb_id && (
-                <Button variant="outline" size="md" asChild>
+                <Button variant="outline" colorPalette="gray" size="md" asChild>
                   <a href={`https://www.imdb.com/title/${data.imdb_id}`} target="_blank" rel="noopener noreferrer">
                     IMDb
                   </a>

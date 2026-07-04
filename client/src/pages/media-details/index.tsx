@@ -70,7 +70,7 @@ const MediaDetails = () => {
             unreachable.
           </Text>
           <HStack gap={3} flexWrap="wrap">
-            <Button variant="outline" onClick={() => navigate(-1)}>
+            <Button variant="outline" colorPalette="gray" onClick={() => navigate(-1)}>
               <LuArrowLeft />
               Back
             </Button>

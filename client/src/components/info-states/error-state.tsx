@@ -19,7 +19,7 @@ const ErrorState = ({ title, description, icon = <LuCircleAlert />, onRetry }: E
           <EmptyState.Description>{description}</EmptyState.Description>
 
           {onRetry && (
-            <Button variant="outline" onClick={onRetry}>
+            <Button variant="outline" colorPalette="gray" onClick={onRetry}>
               Try again
             </Button>
           )}

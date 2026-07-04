@@ -12,7 +12,7 @@ const unfriend = async (userId: string) => {
 const useUnfriend = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, string>({
     mutationFn: unfriend,
     onSuccess: () => {
       invalidateFriendshipQueries(queryClient);

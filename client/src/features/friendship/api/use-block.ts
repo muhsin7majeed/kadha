@@ -12,7 +12,7 @@ const blockUser = async (userId: string) => {
 const useBlock = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, string>({
     mutationFn: blockUser,
     onSuccess: () => {
       invalidateFriendshipQueries(queryClient);

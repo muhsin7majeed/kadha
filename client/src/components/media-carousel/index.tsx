@@ -3,12 +3,12 @@ import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 
 import MediaCard from '../media-card';
-import MediaCarousalSkeleton from './media-carousal-skeleton';
+import MediaCarouselSkeleton from './media-carousel-skeleton';
 import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import PageHeader from '../page-header';
 import { toMediaCardModel } from '@/features/media/media-card-model';
 
-interface MediaCarousalProps {
+interface MediaCarouselProps {
   mediaType: 'movie' | 'tv';
   title: string;
   data: MovieWithMeta[] | TvWithMeta[];
@@ -32,7 +32,7 @@ const ScrollButton = ({ direction, onClick }: { direction: 'left' | 'right'; onC
   );
 };
 
-const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProps) => {
+const MediaCarousel = ({ title, data, isLoading, isFetching }: MediaCarouselProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -57,7 +57,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
   };
 
   if (isLoading) {
-    return <MediaCarousalSkeleton />;
+    return <MediaCarouselSkeleton />;
   }
 
   return (
@@ -82,4 +82,4 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
   );
 };
 
-export default MediaCarousal;
+export default MediaCarousel;

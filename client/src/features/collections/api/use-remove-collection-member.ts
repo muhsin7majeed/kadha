@@ -15,7 +15,7 @@ const removeCollectionMember = async ({ collectionId, memberId }: RemoveCollecti
 const useRemoveCollectionMember = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, RemoveCollectionMemberPayload>({
     mutationFn: removeCollectionMember,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {

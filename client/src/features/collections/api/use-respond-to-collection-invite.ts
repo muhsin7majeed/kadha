@@ -16,7 +16,7 @@ const respondToCollectionInvite = async ({ inviteId, action }: RespondToCollecti
 const useRespondToCollectionInvite = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, RespondToCollectionInvitePayload>({
     mutationFn: respondToCollectionInvite,
     onError: useErrorHandler,
     onSuccess: () => {

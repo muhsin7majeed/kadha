@@ -55,38 +55,36 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
 
         <Fieldset.Root size="lg" maxW="md">
           <Fieldset.Content>
-            <Fieldset.Content>
-              <Field.Root invalid={!!errors.name}>
-                <Field.Label srOnly>Collection name</Field.Label>
-                <Input
-                  type="text"
-                  {...register('name', { required: 'Name is required' })}
-                  placeholder="Collection Name"
-                  autoFocus
-                />
-                <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
-              </Field.Root>
-
-              <Field.Root invalid={!!errors.description}>
-                <Field.Label srOnly>Collection description</Field.Label>
-                <Textarea
-                  rows={4}
-                  {...register('description', {
-                    required: 'Description is required',
-                  })}
-                  placeholder="What is this collection about?"
-                />
-                <Field.ErrorText>{errors.description?.message}</Field.ErrorText>
-              </Field.Root>
-
-              <Controller
-                control={control}
-                name="privacy"
-                render={({ field }) => (
-                  <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
-                )}
+            <Field.Root invalid={!!errors.name}>
+              <Field.Label srOnly>Collection name</Field.Label>
+              <Input
+                type="text"
+                {...register('name', { required: 'Name is required' })}
+                placeholder="Collection Name"
+                autoFocus
               />
-            </Fieldset.Content>
+              <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
+            </Field.Root>
+
+            <Field.Root invalid={!!errors.description}>
+              <Field.Label srOnly>Collection description</Field.Label>
+              <Textarea
+                rows={4}
+                {...register('description', {
+                  required: 'Description is required',
+                })}
+                placeholder="What is this collection about?"
+              />
+              <Field.ErrorText>{errors.description?.message}</Field.ErrorText>
+            </Field.Root>
+
+            <Controller
+              control={control}
+              name="privacy"
+              render={({ field }) => (
+                <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
+              )}
+            />
           </Fieldset.Content>
         </Fieldset.Root>
       </form>

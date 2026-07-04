@@ -63,7 +63,7 @@ const ErrorFallback = ({ onReset }: { onReset: () => void }) => {
               <LuRefreshCw />
               Reload
             </Button>
-            <Button variant="outline" asChild onClick={onReset}>
+            <Button variant="outline" colorPalette="gray" asChild onClick={onReset}>
               <Link to="/">
                 <LuHouse />
                 Home

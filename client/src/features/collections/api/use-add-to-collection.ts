@@ -11,7 +11,7 @@ const addToCollection = async (payload: AddToCollectionPayload) => {
 const useAddToCollection = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<unknown, unknown, AddToCollectionPayload>({
     mutationFn: addToCollection,
     onError: useErrorHandler,
     onSuccess: () => {

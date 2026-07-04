@@ -41,7 +41,7 @@ const AdminUserDetail = () => {
         User Detail
       </PageHeader>
 
-      <Button asChild variant="ghost" size="sm" mb="4">
+      <Button asChild variant="ghost" colorPalette="gray" size="sm" mb="4">
         <Link to="/app/admin/users">
           <LuArrowLeft />
           Users
