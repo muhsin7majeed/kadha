@@ -7,6 +7,7 @@
 #### Frontend Architecture
 
 - Split frontend route declarations into domain route modules while preserving paths and lazy loading.
+- Refactored the settings route to compose feature-owned theme and data export sections.
 
 ## v0.1.6
 
