@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.6
+
 ### Feature Changes
 
 #### Beta Readiness
