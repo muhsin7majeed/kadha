@@ -15,7 +15,7 @@ import {
   Flex,
   Table,
 } from '@chakra-ui/react';
-import { LuGithub, LuTv, LuGlobe, LuLock, LuServer, LuUsers, LuMessagesSquare, LuListChecks } from 'react-icons/lu';
+import { LuGithub, LuTv, LuGlobe, LuLock, LuServer, LuUsers, LuMessagesSquare } from 'react-icons/lu';
 import { Link } from 'react-router';
 import BetaDisclosure from '@/components/beta-disclosure';
 import Navbar from '@/components/navbar';

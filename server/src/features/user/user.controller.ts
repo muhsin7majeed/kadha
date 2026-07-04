@@ -5,6 +5,7 @@ import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import {
+  exportCurrentUserData,
   getCurrentUser,
   getCurrentUserMediaByFlag,
   getUserCollectionsByUsername,
@@ -16,11 +17,24 @@ import {
 } from './user.service';
 import { UpdateMePayload } from './user.schema';
 
+const formatExportFilenamePart = (value: string) => value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+
 export const getMe = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
   const user = await getCurrentUser(id);
 
   sendResponse(res, user);
+};
+
+export const exportMe = async (req: Request, res: Response) => {
+  const { id, username } = requireAuthUser(req);
+  const exportedData = await exportCurrentUserData(id);
+  const exportedDate = new Date().toISOString().slice(0, 10);
+  const filenameUsername = formatExportFilenamePart(username) || 'user';
+
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="kadha-export-${filenameUsername}-${exportedDate}.json"`);
+  res.status(200).send(JSON.stringify(exportedData, null, 2));
 };
 
 export const updateMe = async (req: Request, res: Response) => {

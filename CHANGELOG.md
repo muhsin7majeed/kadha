@@ -8,6 +8,10 @@
 
 - Added hosted beta disclosure, signup privacy warning, and public Privacy Policy and Terms pages.
 
+#### Data Ownership
+
+- Added account data export so users can download their Kadha profile, media, collections, social, notification, and activity data as JSON.
+
 ### Engineering Changes
 
 #### Release Workflow

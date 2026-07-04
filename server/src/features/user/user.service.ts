@@ -2,6 +2,7 @@ import { UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
+import { envConfig } from '@/config/env';
 import { normalizeWatchRegion } from '@/constants/watch-regions';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
 import { enrichUsersWithFriendship, getViewerRelationship } from '@/lib/friendship-utils';
@@ -33,6 +34,195 @@ const privacyFieldByFlag = {
 } as const satisfies Record<UserMediaFlag, 'watchedPrivacy' | 'likedPrivacy' | 'watchlistPrivacy'>;
 
 const usernameAlreadyExists = { fieldErrors: { username: 'Username already exists' } };
+
+const publicUserSelect = {
+  id: true,
+  username: true,
+} as const;
+
+export async function exportCurrentUserData(id: string) {
+  const [
+    account,
+    media,
+    collections,
+    collectionMemberships,
+    collectionInvites,
+    friendships,
+    notifications,
+    activity,
+  ] = await prisma.$transaction([
+    prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        username: true,
+        role: true,
+        profilePrivacy: true,
+        watchedPrivacy: true,
+        likedPrivacy: true,
+        watchlistPrivacy: true,
+        watchRegion: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+    prisma.userMedia.findMany({
+      where: { userId: id },
+      include: {
+        media: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    }),
+    prisma.collection.findMany({
+      where: { userId: id },
+      include: {
+        items: {
+          include: {
+            media: true,
+          },
+          orderBy: {
+            created_at: 'asc',
+          },
+        },
+        members: {
+          include: {
+            user: {
+              select: publicUserSelect,
+            },
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+        invites: {
+          include: {
+            inviter: {
+              select: publicUserSelect,
+            },
+            invitee: {
+              select: publicUserSelect,
+            },
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+    }),
+    prisma.collectionMember.findMany({
+      where: { userId: id },
+      include: {
+        collection: {
+          select: {
+            id: true,
+            userId: true,
+            name: true,
+            description: true,
+            privacy: true,
+            created_at: true,
+            updated_at: true,
+            user: {
+              select: publicUserSelect,
+            },
+          },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    }),
+    prisma.collectionInvite.findMany({
+      where: {
+        OR: [{ inviterId: id }, { inviteeId: id }],
+      },
+      include: {
+        collection: {
+          select: {
+            id: true,
+            userId: true,
+            name: true,
+            description: true,
+            privacy: true,
+            created_at: true,
+            updated_at: true,
+          },
+        },
+        inviter: {
+          select: publicUserSelect,
+        },
+        invitee: {
+          select: publicUserSelect,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    prisma.friendship.findMany({
+      where: {
+        OR: [{ senderId: id }, { receiverId: id }],
+      },
+      include: {
+        sender: {
+          select: publicUserSelect,
+        },
+        receiver: {
+          select: publicUserSelect,
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    }),
+    prisma.notification.findMany({
+      where: { userId: id },
+      include: {
+        actor: {
+          select: publicUserSelect,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    prisma.userActivity.findMany({
+      where: { userId: id },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+  ]);
+
+  return {
+    exportedAt: new Date().toISOString(),
+    app: {
+      name: envConfig.appName,
+      version: envConfig.version,
+    },
+    account,
+    media: media.map(({ media: mediaSnapshot, ...item }) => ({
+      ...item,
+      media: mediaSnapshot,
+    })),
+    collections: collections.map(({ items, ...collection }) => ({
+      ...collection,
+      items: items.map(({ media: mediaSnapshot, ...item }) => ({
+        ...item,
+        media: mediaSnapshot,
+      })),
+    })),
+    collectionMemberships,
+    collectionInvites,
+    friendships,
+    notifications,
+    activity,
+  };
+}
 
 export async function getCurrentUser(id: string) {
   return prisma.user.findUnique({

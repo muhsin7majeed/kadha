@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { validate } from '@/middlewares/validate';
 import {
+  exportMe,
   getMe,
   getUserCollectionsByUsernameController,
   getUserLiked,
@@ -20,6 +21,7 @@ const router = Router();
 
 router.get('/me', getMe);
 router.put('/me', validate(updateMeSchema), updateMe);
+router.get('/export', exportMe);
 
 router.get('/watchlist', getUserWatchlist);
 router.get('/liked', getUserLiked);

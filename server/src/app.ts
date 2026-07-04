@@ -25,6 +25,7 @@ export function createApp(): Express {
   const corsOptions = {
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true,
+    exposedHeaders: ['Content-Disposition'],
     optionsSuccessStatus: 200,
   };
 

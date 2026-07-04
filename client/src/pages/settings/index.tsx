@@ -1,16 +1,18 @@
 import { Badge, Box, Button, Card, Container, Heading, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
-import { LuCheck, LuMoon, LuPalette, LuSettings, LuSun } from 'react-icons/lu';
+import { LuCheck, LuDownload, LuMoon, LuPalette, LuSettings, LuSun } from 'react-icons/lu';
 import { useLocation } from 'react-router';
 
 import Navbar from '@/components/navbar';
 import PageHeader from '@/components/page-header';
 import { useColorMode } from '@/components/ui/color-mode';
 import { useThemePreset } from '@/features/theme/use-theme-preset';
+import useExportUserData from '@/features/user/api/use-export-user-data';
 import type { ThemePresetMode } from '@/features/theme/theme.types';
 
 const SettingsContent = ({ hasShellPadding = false }: { hasShellPadding?: boolean }) => {
   const { colorMode, setColorMode } = useColorMode();
   const { presetId, presets, setPresetId } = useThemePreset();
+  const { mutate: exportUserData, isPending: isExporting } = useExportUserData();
   const presetMode: ThemePresetMode = colorMode === 'dark' ? 'dark' : 'light';
 
   return (
@@ -137,6 +139,27 @@ const SettingsContent = ({ hasShellPadding = false }: { hasShellPadding?: boolea
                 </Text>
               </Box>
             </HStack>
+          </Card.Body>
+        </Card.Root>
+
+        <Card.Root variant="outline">
+          <Card.Header>
+            <Heading size="md">Data</Heading>
+            <Text color="fg.muted" fontSize="sm">
+              Download a JSON copy of your account, media, collections, social data, notifications, and activity.
+            </Text>
+          </Card.Header>
+          <Card.Body>
+            <Button
+              variant="outline"
+              colorPalette="gray"
+              onClick={() => exportUserData()}
+              loading={isExporting}
+              disabled={isExporting}
+            >
+              <LuDownload />
+              Export my data
+            </Button>
           </Card.Body>
         </Card.Root>
       </VStack>
