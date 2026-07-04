@@ -7,7 +7,7 @@ import UserLink from '@/components/user-link';
 import useRemoveCollectionMember from '@/features/collections/api/use-remove-collection-member';
 import useUpdateCollectionMemberRole from '@/features/collections/api/use-update-collection-member-role';
 import { CollectionAccess, CollectionMemberRole, UserSummary } from '@/features/collections/collections.types';
-import FriendshipActions from '@/pages/user/friendship/friendship-actions';
+import FriendshipActions from '@/features/friendship/components/friendship-actions';
 
 type CollectionMemberRowMode = 'view' | 'manage';
 

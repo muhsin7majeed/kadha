@@ -6,9 +6,7 @@ export interface GenericLabelValue<T = string> {
 }
 
 export interface LocationState {
-  from?: {
-    pathname: string;
-  };
+  from?: string;
 }
 
 export interface BaseResponse<T> {

@@ -3,12 +3,12 @@ import { Box, Card, Skeleton, Stack } from '@chakra-ui/react';
 import PageHeader from '@/components/page-header';
 import ErrorState from '@/components/info-states/error-state';
 import { useParams } from 'react-router';
-import { useAuthAtom } from '@/atoms/auth-atom';
 import OtherUserData from './other-user-data';
 import useUserProfile from '@/features/user/api/use-user-profile';
 import MyProfileSettings from './my-profile-settings';
 import OtherUserProfileHeader from './other-user-profile-header';
 import LockedProfileState from './locked-profile-state';
+import { useAuth } from '@/features/auth/use-auth';
 
 type URLParams = {
   username?: string;
@@ -41,7 +41,7 @@ const ProfileLoadingState = () => (
 
 const UserProfile = () => {
   const { username } = useParams<URLParams>();
-  const [auth] = useAuthAtom();
+  const auth = useAuth();
 
   const isMyProfile = username ? username.toLocaleLowerCase() === auth.user?.username?.toLocaleLowerCase() : true;
 

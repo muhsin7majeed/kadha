@@ -8,7 +8,7 @@ import PaginationControls from '@/components/pagination-controls';
 import SimpleAvatar from '@/components/simple-avatar';
 import { SearchTab } from '@/features/search/search.types';
 import useSearchUsers from '@/features/user/api/use-search-users';
-import FriendshipActions from '@/pages/user/friendship/friendship-actions';
+import FriendshipActions from '@/features/friendship/components/friendship-actions';
 import SearchLoadingState from '@/features/search/components/search-loading-state';
 
 interface UserSearchResultsProps {

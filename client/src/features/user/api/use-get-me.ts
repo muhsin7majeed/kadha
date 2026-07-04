@@ -14,7 +14,7 @@ interface UseGetMeProps {
 }
 
 export const useGetMe = ({ enabled }: UseGetMeProps = {}) => {
-  return useQuery({
+  return useQuery<User | null>({
     queryKey: queryKeys.me,
     staleTime: Infinity,
     queryFn: () => getMe(),

@@ -7,14 +7,14 @@ import AuthForm from './auth-form';
 import useRegister from '@/features/auth/api/use-register';
 import { RegisterInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
-import { useSetAuthAtom } from '@/atoms/auth-atom';
 import { useQueryClient } from '@tanstack/react-query';
 import { getApiFieldError } from '@/hooks/use-error-handler';
+import { getMe } from '@/features/user/api/use-get-me';
+import { queryKeys } from '@/lib/query-keys';
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const setAuth = useSetAuthAtom();
   const queryClient = useQueryClient();
 
   const from = (location.state as LocationState)?.from || '/app';
@@ -25,16 +25,13 @@ const Register = () => {
 
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         setAccessToken(data.accessToken);
         queryClient.clear();
-        setAuth({
-          user: {
-            id: data.userId,
-            username: payload.username,
-            watchRegion: payload.watchRegion,
-          },
-          status: 'authenticated',
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.me,
+          queryFn: getMe,
+          staleTime: Infinity,
         });
 
         navigate(from, { replace: true });

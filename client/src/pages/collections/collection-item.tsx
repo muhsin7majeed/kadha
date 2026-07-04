@@ -19,17 +19,7 @@ import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
 import CollectionSharingMeta, { CollectionSharedIcon } from '@/features/collections/components/collection-sharing-meta';
 import CollectionMembersDialog from '@/features/collections/components/collection-members-dialog';
-
-const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
-  if (Array.isArray(genreIds)) return genreIds;
-  if (!genreIds) return [];
-
-  try {
-    return JSON.parse(genreIds);
-  } catch {
-    return [];
-  }
-};
+import { collectionMediaToMediaCardModel } from '@/features/collections/utils/collection-media';
 
 interface CollectionItemProps {
   collection: Collection;
@@ -121,18 +111,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                     {collectionData.media?.map((media) => (
                       <MediaCard
                         key={media.media_id}
-                        media={{
-                          id: media.media_id,
-                          media_type: media.media_type,
-                          title: media.title,
-                          poster_path: media.poster_path,
-                          vote_average: media.vote_average,
-                          vote_count: media.vote_count,
-                          adult: media.adult,
-                          genre_ids: parseGenreIds(media.genre_ids),
-                          release_date: media.release_date,
-                          media_id: media.media_id,
-                        }}
+                        media={collectionMediaToMediaCardModel(media)}
                       />
                     ))}
                   </SimpleGrid>

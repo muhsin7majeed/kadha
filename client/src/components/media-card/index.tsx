@@ -1,29 +1,25 @@
 import { useGenreAtom } from '@/atoms/genre-atom';
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
 
-import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import { formatDate } from '@/utils/date';
 import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
-import { UserMedia } from '@/features/user-media/user-media.types';
 import NavLink from '../nav-link';
+import { MediaCardModel } from '@/features/media/media-card-model';
 
 interface MediaCardProps {
-  media: MovieWithMeta | TvWithMeta | UserMedia;
+  media: MediaCardModel;
   onNavigate?: () => void;
 }
 
 const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
-  const title = 'title' in media ? media.title : media.name;
-  const releaseDate = 'release_date' in media ? media.release_date : media.first_air_date;
-
   return (
     <Box aspectRatio="2 / 3" borderRadius="lg" transition="transform 0.2s" position="relative" w="100%" maxW="220px">
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
-        alt={`${title} poster`}
+        alt={`${media.title} poster`}
         onError={(e) => {
           e.currentTarget.src = '/assets/images/image-placeholder.svg';
         }}
@@ -54,7 +50,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
             <Badge variant="subtle">{media.media_type === 'movie' ? 'Movie' : 'TV'}</Badge>
           </VStack>
 
-          <MediaActions media={media as MovieWithMeta | TvWithMeta} />
+          <MediaActions media={media} />
         </Flex>
 
         <Box
@@ -72,7 +68,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
             lineClamp={2}
             onClick={onNavigate}
           >
-            {title} ({formatDate(releaseDate, 'YYYY')})
+            {media.title} ({formatDate(media.release_date, 'YYYY')})
           </NavLink>
 
           <Flex gap={1} overflowX="auto" css={{ scrollbarWidth: 'none' }} my={1} maxW="200px" overflow="auto">

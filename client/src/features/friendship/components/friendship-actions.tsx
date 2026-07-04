@@ -1,14 +1,15 @@
-import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-request';
-import useSendFriendRequest from '@/features/friendship/api/use-send-friend-request';
-import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
-import { FriendStatus } from '@/types/common';
+import { useState } from 'react';
 import { Button, HStack, IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuBan, LuCheck, LuClock, LuEllipsis, LuShieldOff, LuUserMinus, LuUserPlus, LuX } from 'react-icons/lu';
-import useUnfriend from '@/features/friendship/api/use-unfriend';
-import useBlock from '@/features/friendship/api/use-block';
-import useUnblock from '@/features/friendship/api/use-unblock';
-import { useState } from 'react';
+
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
+import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-request';
+import useBlock from '@/features/friendship/api/use-block';
+import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
+import useSendFriendRequest from '@/features/friendship/api/use-send-friend-request';
+import useUnblock from '@/features/friendship/api/use-unblock';
+import useUnfriend from '@/features/friendship/api/use-unfriend';
+import { FriendStatus } from '@/types/common';
 
 interface FriendshipActionsUser {
   id: string;
@@ -120,7 +121,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
                   Block user
                 </Menu.Item>
               </Menu.Content>
-            </Menu.Positioner>
+            </Menu.Positioner>,
           )}
         </Menu.Root>
       );
@@ -196,7 +197,7 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
                   Block user
                 </Menu.Item>
               </Menu.Content>
-            </Menu.Positioner>
+            </Menu.Positioner>,
           )}
         </Menu.Root>
       </HStack>

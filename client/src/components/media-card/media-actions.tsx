@@ -1,19 +1,18 @@
 import { IconButton, VStack } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
-import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import getUserMediaPayload from '@/features/user-media/utils/get-user-media-payload';
 import { ReactNode, useState } from 'react';
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
-import formatTMDBToUserMedia from '@/features/user-media/utils/format-tmdb-to-user-media';
 import { Tooltip } from '@/components/ui/tooltip';
 import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
+import { MediaCardModel } from '@/features/media/media-card-model';
 
 interface MediaActionsProps {
-  media: MovieWithMeta | TvWithMeta;
+  media: MediaCardModel;
 }
 
 interface MediaActionIconButtonProps {
@@ -50,7 +49,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const watchedLabel = getMediaActionLabel('watched', Boolean(media.watched));
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
   const collectionLabel = 'Add to collection';
-  const collectionMedia = formatTMDBToUserMedia(media);
+  const collectionMedia = getUserMediaPayload(media);
 
   const handleWatchlist = async () => {
     if (isAddingToWatchList) return;

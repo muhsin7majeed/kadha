@@ -72,7 +72,7 @@ export interface AddToCollectionPayload extends Omit<UserMedia, 'id' | 'userId'>
   collectionId: string;
 }
 
-interface CollectionMedia extends Omit<UserMedia, 'genre_ids'> {
+export interface CollectionMedia extends Omit<UserMedia, 'genre_ids'> {
   collectionId: string;
   media_id: number;
   genre_ids: number[] | string;

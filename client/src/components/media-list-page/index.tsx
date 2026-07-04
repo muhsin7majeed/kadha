@@ -8,6 +8,7 @@ import { TvWithMeta } from '@/features/media/media.types';
 import { PaginationMeta } from '@/types/common';
 import PageHeader from '../page-header';
 import PaginationControls from '../pagination-controls';
+import { toMediaCardModel } from '@/features/media/media-card-model';
 
 interface MediaListPageProps {
   title: string;
@@ -69,7 +70,7 @@ const MediaListPage = ({
         <>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6} justifyItems="center">
             {data?.map((media) => (
-              <MediaCard key={`${media.media_type}:${media.media_id}`} media={media} />
+              <MediaCard key={`${media.media_type}:${media.media_id}`} media={toMediaCardModel(media)} />
             ))}
           </SimpleGrid>
           {onPageChange && (

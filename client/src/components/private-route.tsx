@@ -1,11 +1,11 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 
 import FullScreenSpinner from './spinners/full-screen-spinner';
-import { useAuthAtom } from '@/atoms/auth-atom';
 import { Container } from '@chakra-ui/react';
+import { useAuth } from '@/features/auth/use-auth';
 
 const PrivateRoute = () => {
-  const [auth] = useAuthAtom();
+  const auth = useAuth();
 
   const location = useLocation();
 

@@ -6,13 +6,13 @@ import useLogin from '@/features/auth/api/use-login';
 import AuthForm from './auth-form';
 import { LoginInputs } from '@/features/auth/auth.types';
 import { setAccessToken } from '@/lib/token-manager';
-import { useSetAuthAtom } from '@/atoms/auth-atom';
 import { useQueryClient } from '@tanstack/react-query';
+import { getMe } from '@/features/user/api/use-get-me';
+import { queryKeys } from '@/lib/query-keys';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const setAuth = useSetAuthAtom();
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useLogin();
@@ -21,15 +21,13 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<LoginInputs> = (payload) => {
     mutate(payload, {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         setAccessToken(data.accessToken);
         queryClient.clear();
-        setAuth({
-          user: {
-            id: data.userId,
-            username: payload.username,
-          },
-          status: 'authenticated',
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.me,
+          queryFn: getMe,
+          staleTime: Infinity,
         });
 
         navigate(from, { replace: true });

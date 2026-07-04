@@ -3,19 +3,9 @@ import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCard from '@/components/media-card';
 import useUserCollections from '@/features/collections/api/use-user-collections';
+import { collectionMediaToMediaCardModel } from '@/features/collections/utils/collection-media';
 import { Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
 import { useParams } from 'react-router';
-
-const parseGenreIds = (genreIds: number[] | string | null | undefined) => {
-  if (Array.isArray(genreIds)) return genreIds;
-  if (!genreIds) return [];
-
-  try {
-    return JSON.parse(genreIds);
-  } catch {
-    return [];
-  }
-};
 
 const OtherUserCollectionsTab = () => {
   const { username = '' } = useParams();
@@ -71,18 +61,7 @@ const OtherUserCollectionsTab = () => {
                     {collection.media.map((media) => (
                       <MediaCard
                         key={`${media.media_type}-${media.media_id}`}
-                        media={{
-                          id: media.media_id,
-                          media_type: media.media_type,
-                          title: media.title,
-                          poster_path: media.poster_path,
-                          vote_average: media.vote_average,
-                          vote_count: media.vote_count,
-                          adult: media.adult,
-                          genre_ids: parseGenreIds(media.genre_ids),
-                          release_date: media.release_date,
-                          media_id: media.media_id,
-                        }}
+                        media={collectionMediaToMediaCardModel(media)}
                       />
                     ))}
                   </SimpleGrid>

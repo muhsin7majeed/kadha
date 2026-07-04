@@ -1,7 +1,8 @@
 import axios, { InternalAxiosRequestConfig } from 'axios';
-import { getAccessToken, removeAccessToken, setAccessToken } from './token-manager';
+import { getAccessToken, setAccessToken } from './token-manager';
 import refresh from '@/features/auth/api/use-refresh';
 import { APP_CONFIG } from '@/config/app-config';
+import { clearSession } from '@/features/auth/session';
 
 const api = axios.create({
   baseURL: APP_CONFIG.apiUrl,
@@ -89,11 +90,8 @@ api.interceptors.response.use(
         // Retry the original request
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed - logout user
         processQueue(refreshError, null);
-        removeAccessToken();
-
-        // window.location.href = "/auth/login";
+        clearSession();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

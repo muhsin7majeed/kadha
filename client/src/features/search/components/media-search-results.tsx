@@ -6,6 +6,7 @@ import ErrorState from '@/components/info-states/error-state';
 import MediaCard from '@/components/media-card';
 import PaginationControls from '@/components/pagination-controls';
 import useSearchMedia from '@/features/media/api/use-search-media';
+import { toMediaCardModel } from '@/features/media/media-card-model';
 import SearchLoadingState from '@/features/search/components/search-loading-state';
 import { SearchTab } from '@/features/search/search.types';
 
@@ -53,7 +54,7 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
 
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={4}>
         {data.data.map((media) => (
-          <MediaCard key={`${media.media_type}:${media.media_id}`} media={media} onNavigate={onClose} />
+          <MediaCard key={`${media.media_type}:${media.media_id}`} media={toMediaCardModel(media)} onNavigate={onClose} />
         ))}
       </SimpleGrid>
 

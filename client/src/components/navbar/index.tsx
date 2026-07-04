@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Box, Button, Container, Flex, Heading, HStack, Icon, IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuMenu, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
-import { useAuthAtom } from '@/atoms/auth-atom';
 import { APP_CONFIG } from '@/config/app-config';
 import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import GlobalSearchDialog from '@/features/search/global-search-dialog';
+import { useAuth } from '@/features/auth/use-auth';
 
 import NotificationButton from '../notification-button';
 import ProfileMenu from './profile-menu';
@@ -38,7 +38,7 @@ const UtilityMenu = () => {
 };
 
 const Navbar = () => {
-  const [auth] = useAuthAtom();
+  const auth = useAuth();
 
   const isAuthenticated = auth.status === 'authenticated';
 

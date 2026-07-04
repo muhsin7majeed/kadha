@@ -6,6 +6,7 @@ import MediaCard from '../media-card';
 import MediaCarousalSkeleton from './media-carousal-skeleton';
 import { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 import PageHeader from '../page-header';
+import { toMediaCardModel } from '@/features/media/media-card-model';
 
 interface MediaCarousalProps {
   mediaType: 'movie' | 'tv';
@@ -73,7 +74,7 @@ const MediaCarousal = ({ title, data, isLoading, isFetching }: MediaCarousalProp
       <Box ref={scrollContainerRef} overflowX="auto" scrollBehavior="smooth">
         <Flex gap={4}>
           {data.map((media) => (
-            <MediaCard key={media.media_id} media={media} />
+            <MediaCard key={media.media_id} media={toMediaCardModel(media)} />
           ))}
         </Flex>
       </Box>

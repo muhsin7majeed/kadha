@@ -1,4 +1,4 @@
-import FriendshipActions from '@/pages/user/friendship/friendship-actions';
+import FriendshipActions from '@/features/friendship/components/friendship-actions';
 import { UserProfileResponse } from '@/features/user/user.types';
 import { Badge, Box, Card, HStack, Stack, Text } from '@chakra-ui/react';
 import SimpleAvatar from '@/components/simple-avatar';

@@ -62,7 +62,7 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
           </Heading>
           <HStack gap={2} color="fg.muted" flexWrap="wrap">
             <Text fontSize="sm">Based on your region: {data.region.name}</Text>
-            <WatchRegionDialog currentRegion={data.region.code} me={me} />
+            <WatchRegionDialog currentRegion={data.region.code} me={me ?? undefined} />
           </HStack>
         </Box>
 

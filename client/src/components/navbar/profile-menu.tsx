@@ -2,39 +2,30 @@ import { Button, Menu, Portal } from '@chakra-ui/react';
 import SimpleAvatar from '../simple-avatar';
 import { NavLink } from 'react-router';
 import useLogout from '@/features/auth/api/use-logout';
-import { removeAccessToken } from '@/lib/token-manager';
-import { useAuthAtom, useSetAuthAtom } from '@/atoms/auth-atom';
 import { useState } from 'react';
 import ConfirmationDialog from '../dialogs/confirmation-dialog';
 import { LuBell, LuLayoutDashboard, LuLogOut, LuUser, LuUsers } from 'react-icons/lu';
-import { useQueryClient } from '@tanstack/react-query';
 import { APP_CONFIG } from '@/config/app-config';
 import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import UtilityMenuItems, { MenuSectionSeparator } from './utility-menu-items';
 import { UserRole } from '@/types/common';
+import { useAuth } from '@/features/auth/use-auth';
+import { clearSession } from '@/features/auth/session';
 
 const ProfileMenu = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
 
-  const [auth] = useAuthAtom();
+  const auth = useAuth();
   const isAdmin = auth.user?.role === UserRole.Admin;
 
-  const setAuth = useSetAuthAtom();
-  const queryClient = useQueryClient();
   const { mutateAsync: logoutMutation } = useLogout();
 
   const logout = async () => {
     try {
       await logoutMutation();
     } finally {
-      removeAccessToken();
-      queryClient.clear();
-
-      setAuth({
-        user: null,
-        status: 'unauthenticated',
-      });
+      clearSession();
     }
   };
 

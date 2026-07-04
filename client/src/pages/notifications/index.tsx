@@ -6,7 +6,7 @@ import ErrorState from '@/components/info-states/error-state';
 import { Box, Button, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import { Notification, NotificationType } from '@/features/notifications/notifications.types';
 import { formatTimeAgo } from '@/utils/date';
-import FriendshipActions from '../user/friendship/friendship-actions';
+import FriendshipActions from '@/features/friendship/components/friendship-actions';
 import UserLink from '@/components/user-link';
 import useMarkNotificationRead from '@/features/notifications/api/use-mark-notification-read';
 import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-all-notifications-read';

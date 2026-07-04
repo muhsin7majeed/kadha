@@ -1,13 +1,13 @@
 import { Navigate, Outlet } from 'react-router';
 
-import { useAuthAtom } from '@/atoms/auth-atom';
 import FullScreenSpinner from '@/components/spinners/full-screen-spinner';
+import { useAuth } from '@/features/auth/use-auth';
 import { UserRole } from '@/types/common';
 
 const AdminRoute = () => {
-  const [auth] = useAuthAtom();
+  const auth = useAuth();
 
-  if (auth.user && !auth.user.role) {
+  if (auth.status === 'pending') {
     return <FullScreenSpinner />;
   }
 
