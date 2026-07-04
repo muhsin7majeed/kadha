@@ -134,6 +134,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
             <Stack gap="3">
               <Text fontWeight="medium">Invite people</Text>
               <Field.Root>
+                <Field.Label srOnly>Search users by username</Field.Label>
                 <Input
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
@@ -165,6 +166,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                         <HStack gap="2" justifyContent={{ base: 'stretch', md: 'flex-end' }}>
                           <NativeSelect.Root maxW="36" disabled={user.state !== 'available'}>
                             <NativeSelect.Field
+                              aria-label={`Role for ${user.username}`}
                               value={getSelectedRole(user.id)}
                               onChange={(event) =>
                                 setSelectedRoles((current) => ({

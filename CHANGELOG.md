@@ -8,6 +8,7 @@
 
 - Split frontend route declarations into domain route modules while preserving paths and lazy loading.
 - Refactored the settings route to compose feature-owned theme and data export sections.
+- Added accessible names to auth, collection, and search controls without changing their visual layout.
 
 ## v0.1.6
 

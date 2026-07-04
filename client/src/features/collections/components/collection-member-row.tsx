@@ -165,6 +165,7 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
             <>
               <NativeSelect.Root w={{ base: '100%', sm: '36' }} disabled={updateMemberRole.isPending}>
                 <NativeSelect.Field
+                  aria-label={`Role for ${user.username}`}
                   value={user.role}
                   onChange={(event) => handleRoleChange(event.target.value as CollectionMemberRole)}
                 >

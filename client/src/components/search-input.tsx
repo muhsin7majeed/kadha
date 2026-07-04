@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import { LuSearch, LuX } from 'react-icons/lu';
 
 interface SearchInputProps extends Partial<InputGroupProps> {
+  inputAriaLabel?: string;
   onSearchChange?: (value: string) => void;
   placeholder?: string;
   debounceMs?: number;
@@ -10,7 +11,7 @@ interface SearchInputProps extends Partial<InputGroupProps> {
 }
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ onSearchChange, placeholder = 'Search', debounceMs = 300, defaultValue = '', ...props }, ref) => {
+  ({ inputAriaLabel, onSearchChange, placeholder = 'Search', debounceMs = 300, defaultValue = '', ...props }, ref) => {
     const [searchQuery, setSearchQuery] = useState(defaultValue);
 
     useEffect(() => {
@@ -44,7 +45,14 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         }
         {...props}
       >
-        <Input ref={ref} borderRadius="lg" placeholder={placeholder} value={searchQuery} onChange={handleSearch} />
+        <Input
+          ref={ref}
+          aria-label={inputAriaLabel ?? placeholder}
+          borderRadius="lg"
+          placeholder={placeholder}
+          value={searchQuery}
+          onChange={handleSearch}
+        />
       </InputGroup>
     );
   },

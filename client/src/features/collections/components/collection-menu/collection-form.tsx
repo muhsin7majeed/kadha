@@ -57,6 +57,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
           <Fieldset.Content>
             <Fieldset.Content>
               <Field.Root invalid={!!errors.name}>
+                <Field.Label srOnly>Collection name</Field.Label>
                 <Input
                   type="text"
                   {...register('name', { required: 'Name is required' })}
@@ -67,6 +68,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
               </Field.Root>
 
               <Field.Root invalid={!!errors.description}>
+                <Field.Label srOnly>Collection description</Field.Label>
                 <Textarea
                   rows={4}
                   {...register('description', {

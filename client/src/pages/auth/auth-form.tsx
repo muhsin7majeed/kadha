@@ -37,6 +37,7 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
         <Fieldset.Content>
           <Fieldset.Content>
             <Field.Root invalid={!!errors.username || !!apiFieldErrors?.username}>
+              <Field.Label srOnly>Username</Field.Label>
               <Input
                 type="text"
                 {...register('username', { required: 'Username is required' })}
@@ -46,6 +47,7 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
             </Field.Root>
 
             <Field.Root invalid={!!errors.password}>
+              <Field.Label srOnly>Password</Field.Label>
               <Input
                 type="password"
                 {...register('password', {
@@ -60,6 +62,7 @@ const AuthForm = ({ onSubmit, type, apiFieldErrors, isLoading }: AuthFormProps) 
             {isRegister && (
               <>
                 <Field.Root invalid={!!registerErrors.confirmPassword}>
+                  <Field.Label srOnly>Confirm password</Field.Label>
                   <Input
                     type="password"
                     {...register('confirmPassword', {
