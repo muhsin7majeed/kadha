@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Authentication
+
+- Fixed logout/session expiry so protected pages leave the loading state and redirect to login after auth is cleared.
+
 ### Engineering Changes
 
 #### Frontend Architecture

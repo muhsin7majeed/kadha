@@ -2,8 +2,11 @@ import { queryKeys } from '@/lib/query-keys';
 import { queryClient } from '@/lib/query-client';
 import { removeAccessToken } from '@/lib/token-manager';
 
-export const clearSession = () => {
+export const clearSession = async () => {
   removeAccessToken();
-  queryClient.clear();
+  await queryClient.cancelQueries();
+  queryClient.removeQueries({
+    predicate: (query) => query.queryKey[0] !== queryKeys.me[0],
+  });
   queryClient.setQueryData(queryKeys.me, null);
 };

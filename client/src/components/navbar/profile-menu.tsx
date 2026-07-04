@@ -25,7 +25,7 @@ const ProfileMenu = () => {
     try {
       await logoutMutation();
     } finally {
-      clearSession();
+      await clearSession();
     }
   };
 
