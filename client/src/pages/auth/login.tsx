@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Link as ChakraLink, Text } from '@chakra-ui/react';
 import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { LocationState } from '@/types/common';
@@ -40,6 +40,14 @@ const Login = () => {
   return (
     <Box>
       <AuthForm onSubmit={onSubmit} type="login" isLoading={isPending} />
+
+      <Text mt={4} fontSize="xs" color="fg.muted" textAlign="center">
+        No password reset is available during beta. Use a password you do not reuse elsewhere. See the{' '}
+        <ChakraLink asChild color="brand.fg">
+          <Link to="/privacy">Privacy Policy</Link>
+        </ChakraLink>
+        .
+      </Text>
 
       <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
         Don't have an account?{' '}

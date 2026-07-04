@@ -22,7 +22,9 @@ const Landing = lazy(() => import('@/pages/landing'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
+const Privacy = lazy(() => import('@/pages/privacy'));
 const Settings = lazy(() => import('@/pages/settings'));
+const Terms = lazy(() => import('@/pages/terms'));
 const UserProfile = lazy(() => import('@/pages/user/profile'));
 const OtherUserCollectionsTab = lazy(() => import('@/pages/user/profile/other-user-data/collections-tab'));
 const OtherUserMediaTab = lazy(() => import('@/pages/user/profile/other-user-data/media-tab'));
@@ -34,7 +36,9 @@ export function AppRoutes() {
     <Suspense fallback={<FullScreenSpinner />}>
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="privacy" element={<Privacy />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="terms" element={<Terms />} />
 
         <Route element={<PublicRoute />}>
           <Route path="auth" element={<AuthLayout />}>

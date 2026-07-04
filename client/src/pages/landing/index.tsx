@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { LuGithub, LuTv, LuGlobe, LuLock, LuServer, LuUsers, LuMessagesSquare, LuListChecks } from 'react-icons/lu';
 import { Link } from 'react-router';
+import BetaDisclosure from '@/components/beta-disclosure';
 import Navbar from '@/components/navbar';
 import { APP_CONFIG } from '@/config/app-config';
 import FAQ_ITEMS from './faq';
@@ -77,6 +78,7 @@ const Landing = () => {
   return (
     <Box minH="100vh">
       <Navbar />
+      <BetaDisclosure />
 
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
         <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center" position="relative" zIndex={1}>
@@ -111,36 +113,6 @@ const Landing = () => {
       </Box>
 
       <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
-          <SimpleGrid columns={{ base: 1, lg: 3 }} gap={{ base: 8, lg: 10 }} alignItems="start">
-            <VStack align="start" gap={4}>
-              <Badge colorPalette="gray">Why Kadha exists</Badge>
-              <Heading size={{ base: '2xl', md: '3xl' }}>A quieter way to track what you watch</Heading>
-              <Text color="fg.muted" fontSize="lg">
-                Most watch trackers are built around public profiles, reviews, ads, or platform lock-in. Kadha is built
-                for people who want a private place to organize movies and TV with the people they actually watch with.
-              </Text>
-            </VStack>
-
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} gridColumn={{ base: 'auto', lg: 'span 2' }}>
-              {[
-                'Your watch history should not have to be public.',
-                'Your shared watchlist should not live in a group chat.',
-                "Your data should not be trapped in someone else's platform.",
-              ].map((item) => (
-                <HStack key={item} align="start" gap={3} p={4} borderWidth="1px" borderColor="border" rounded="md">
-                  <Icon color="brand.fg" mt={1}>
-                    <LuListChecks />
-                  </Icon>
-                  <Text color="fg.muted">{item}</Text>
-                </HStack>
-              ))}
-            </SimpleGrid>
-          </SimpleGrid>
-        </Container>
-      </Box>
-
-      <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="brand">Built For</Badge>
@@ -375,6 +347,22 @@ const Landing = () => {
             </Text>
 
             <HStack gap={4}>
+              <ChakraLink asChild>
+                <Link to="/privacy">
+                  <Text fontSize="sm" color="fg.muted" _hover={{ color: 'fg' }}>
+                    Privacy
+                  </Text>
+                </Link>
+              </ChakraLink>
+
+              <ChakraLink asChild>
+                <Link to="/terms">
+                  <Text fontSize="sm" color="fg.muted" _hover={{ color: 'fg' }}>
+                    Terms
+                  </Text>
+                </Link>
+              </ChakraLink>
+
               <ChakraLink asChild>
                 <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                   <HStack gap={1} color="fg.muted" _hover={{ color: 'fg' }}>

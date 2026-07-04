@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Beta Readiness
+
+- Added hosted beta disclosure, signup privacy warning, and public Privacy Policy and Terms pages.
+
 ### Engineering Changes
 
 #### Release Workflow

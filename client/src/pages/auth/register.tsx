@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Link as ChakraLink, Text, VStack } from '@chakra-ui/react';
 import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
@@ -44,15 +44,36 @@ const Register = () => {
 
   return (
     <Box>
-      <AuthForm
-        onSubmit={onSubmit}
-        type="register"
-        apiFieldErrors={{
-          ...(usernameApiError ? { username: usernameApiError } : {}),
-          ...(watchRegionApiError ? { watchRegion: watchRegionApiError } : {}),
-        }}
-        isLoading={isPending}
-      />
+      <VStack align="stretch" gap={4}>
+        <Box bg="bg.subtle" borderWidth="1px" borderColor="border" rounded="md" p={4}>
+          <Text fontSize="sm" color="fg.muted">
+            This hosted beta is not end-to-end encrypted yet, the instance operator can access stored account and media
+            data. Self-host Kadha if you want full control of your data.
+          </Text>
+        </Box>
+
+        <AuthForm
+          onSubmit={onSubmit}
+          type="register"
+          apiFieldErrors={{
+            ...(usernameApiError ? { username: usernameApiError } : {}),
+            ...(watchRegionApiError ? { watchRegion: watchRegionApiError } : {}),
+          }}
+          isLoading={isPending}
+        />
+      </VStack>
+
+      <Text mt={4} fontSize="xs" color="fg.muted" textAlign="center">
+        By creating an account, you agree to the{' '}
+        <ChakraLink asChild color="brand.fg">
+          <Link to="/terms">Terms</Link>
+        </ChakraLink>{' '}
+        and acknowledge the{' '}
+        <ChakraLink asChild color="brand.fg">
+          <Link to="/privacy">Privacy Policy</Link>
+        </ChakraLink>
+        .
+      </Text>
 
       <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
         Already have an account?{' '}
