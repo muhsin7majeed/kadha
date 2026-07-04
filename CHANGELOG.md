@@ -22,6 +22,7 @@
 
 - Consolidated frontend auth/session state around the `/me` query, including central session cleanup on refresh failure.
 - Normalized media card rendering through a shared media card model and moved reusable friendship actions into the friendship feature.
+- Centralized media action payload creation for cards and media details.
 
 #### Release Workflow
 

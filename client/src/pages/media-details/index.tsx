@@ -4,7 +4,6 @@ import { LuArrowLeft, LuRefreshCw } from 'react-icons/lu';
 import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
-import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import useMediaDetails from '@/features/media/api/use-media-details';
 import { toaster } from '@/components/ui/toaster';
 import HeroSection from './components/hero-section';
@@ -87,13 +86,12 @@ const MediaDetails = () => {
 
   const validMediaType = mediaType as MediaType;
   const validId = id as string;
-  const isMovie = validMediaType === 'movie';
-  const title = isMovie ? (data as MovieDetailsWithMeta).title : (data as TvDetailsWithMeta).name;
+  const title = data.media_type === 'movie' ? data.title : data.name;
 
   return (
     <Box minH="100vh" bg="bg">
       {/* Hero Section with Backdrop and Poster */}
-      <HeroSection data={data} mediaType={validMediaType} />
+      <HeroSection data={data} />
 
       {/* Main Content */}
       <Container maxW="6xl" py={8}>
@@ -104,7 +102,7 @@ const MediaDetails = () => {
           <WatchProvidersSection mediaType={validMediaType} id={validId} title={title} />
 
           {/* Media-specific Info */}
-          {isMovie ? <MovieInfo data={data as MovieDetailsWithMeta} /> : <TvInfo data={data as TvDetailsWithMeta} />}
+          {data.media_type === 'movie' ? <MovieInfo data={data} /> : <TvInfo data={data} />}
 
           {/* Production Info (shared between movie and TV) */}
           <ProductionInfo data={data} />

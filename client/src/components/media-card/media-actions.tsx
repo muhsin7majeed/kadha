@@ -4,7 +4,7 @@ import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'rea
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
-import getUserMediaPayload from '@/features/user-media/utils/get-user-media-payload';
+import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { ReactNode, useState } from 'react';
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -49,12 +49,12 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const watchedLabel = getMediaActionLabel('watched', Boolean(media.watched));
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
   const collectionLabel = 'Add to collection';
-  const collectionMedia = getUserMediaPayload(media);
+  const collectionMedia = buildUserMediaPayload(media);
 
   const handleWatchlist = async () => {
     if (isAddingToWatchList) return;
 
-    const payload = getUserMediaPayload(media, 'watchlist');
+    const payload = buildUserMediaPayload(media, 'watchlist');
 
     await addToWatchList(payload);
   };
@@ -62,7 +62,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const handleWatched = async () => {
     if (isAddingToWatched) return;
 
-    const payload = getUserMediaPayload(media, 'watched');
+    const payload = buildUserMediaPayload(media, 'watched');
 
     await addToWatched(payload);
   };
@@ -70,7 +70,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const handleLike = async () => {
     if (isAddingToLiked) return;
 
-    const payload = getUserMediaPayload(media, 'liked');
+    const payload = buildUserMediaPayload(media, 'liked');
 
     await addToLiked(payload);
   };

@@ -17,35 +17,29 @@ import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/m
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
-import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
-import getMediaDetailsPayload from '@/features/user-media/utils/get-media-details-payload';
+import type { MediaAction } from '@/features/user-media/user-media.types';
+import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionStateLabel } from '@/features/user-media/utils/media-action-copy';
 import { formatDate, minutesToHours } from '@/utils/date';
 
 interface HeroSectionProps {
   data: MovieDetailsWithMeta | TvDetailsWithMeta;
-  mediaType: 'movie' | 'tv';
 }
 
-const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
+const HeroSection = ({ data }: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
-  const isMovie = mediaType === 'movie';
-  const title = isMovie ? (data as MovieDetailsWithMeta).title : (data as TvDetailsWithMeta).name;
-  const releaseDate = isMovie
-    ? (data as MovieDetailsWithMeta).release_date
-    : (data as TvDetailsWithMeta).first_air_date;
-  const runtime = isMovie ? (data as MovieDetailsWithMeta).runtime : (data as TvDetailsWithMeta).episode_run_time?.[0];
+  const isMovie = data.media_type === 'movie';
+  const title = data.media_type === 'movie' ? data.title : data.name;
+  const releaseDate = data.media_type === 'movie' ? data.release_date : data.first_air_date;
+  const runtime = data.media_type === 'movie' ? data.runtime : data.episode_run_time?.[0];
   const releaseYear = releaseDate ? formatDate(releaseDate, 'YYYY') : null;
   const mutedTextColor = 'fg.muted';
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
   const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
-  const mediaPayload = getMediaDetailsPayload(data, mediaType);
+  const mediaPayload = buildUserMediaPayload(data);
 
-  const getActionPayload = (action: MediaAction): UserMediaPayload => ({
-    ...mediaPayload,
-    [action]: data[action] ? false : true,
-  });
+  const getActionPayload = (action: MediaAction) => buildUserMediaPayload(data, action);
 
   const handleLike = async () => {
     if (isAddingToLiked) return;
@@ -294,13 +288,9 @@ const HeroSection = ({ data, mediaType }: HeroSectionProps) => {
                   </a>
                 </Button>
               )}
-              {isMovie && (data as MovieDetailsWithMeta).imdb_id && (
+              {data.media_type === 'movie' && data.imdb_id && (
                 <Button variant="outline" size="md" asChild>
-                  <a
-                    href={`https://www.imdb.com/title/${(data as MovieDetailsWithMeta).imdb_id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={`https://www.imdb.com/title/${data.imdb_id}`} target="_blank" rel="noopener noreferrer">
                     IMDb
                   </a>
                 </Button>
