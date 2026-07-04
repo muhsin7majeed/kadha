@@ -1,32 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useMediaActionMutation from './use-media-action-mutation';
 
-import { toaster } from '@/components/ui/toaster';
-import { useErrorHandler } from '@/hooks/use-error-handler';
-import api from '@/lib/axios-instance';
-import { BaseInfoResponse } from '@/types/common';
-import { capitalize } from '@/utils/capitalize';
-import { updateMediaActionCache } from './update-media-action-cache';
-import { UserMediaPayload } from '../user-media.types';
-
-const addToWatchList = async (payload: UserMediaPayload) => {
-  const response = await api.post(`/api/user-media/watchlist`, payload);
-  return response.data;
-};
-
-const useAddToWatchList = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation<BaseInfoResponse, Error, UserMediaPayload>({
-    mutationFn: (payload: UserMediaPayload) => addToWatchList(payload),
-    onError: useErrorHandler,
-    onSuccess: (data, payload) => {
-      updateMediaActionCache(queryClient, 'watchlist', payload);
-
-      toaster.success({
-        title: capitalize(data.message),
-      });
-    },
+const useAddToWatchList = () =>
+  useMediaActionMutation({
+    action: 'watchlist',
+    endpoint: '/api/user-media/watchlist',
   });
-};
 
 export default useAddToWatchList;

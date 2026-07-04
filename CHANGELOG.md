@@ -12,6 +12,10 @@
 
 - Added account data export so users can download their Kadha profile, media, collections, social, notification, and activity data as JSON.
 
+#### Media Actions
+
+- Improved media action buttons with clearer labels, collection access from media details, more helpful feedback messages, and undo actions when removing saved media.
+
 ### Engineering Changes
 
 #### Release Workflow

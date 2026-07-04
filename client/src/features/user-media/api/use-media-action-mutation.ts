@@ -1,0 +1,71 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { toaster } from '@/components/ui/toaster';
+import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
+import api from '@/lib/axios-instance';
+import { BaseInfoResponse } from '@/types/common';
+import { MediaAction, UserMediaPayload } from '../user-media.types';
+import { getMediaActionToast, getUndoMediaActionPayload } from '../utils/media-action-copy';
+import {
+  MediaActionCacheSnapshot,
+  getMediaActionCacheSnapshot,
+  invalidateMediaDiscoveryQueries,
+  restoreMediaActionCacheSnapshot,
+  updateMediaActionCache,
+} from './update-media-action-cache';
+
+interface MediaActionMutationContext {
+  snapshot: MediaActionCacheSnapshot;
+}
+
+interface UseMediaActionMutationOptions {
+  action: MediaAction;
+  endpoint: string;
+}
+
+const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
+  const response = await api.post<BaseInfoResponse>(endpoint, payload);
+  return response.data;
+};
+
+const useMediaActionMutation = ({ action, endpoint }: UseMediaActionMutationOptions) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation<BaseInfoResponse, Error, UserMediaPayload, MediaActionMutationContext>({
+    mutationFn: (payload) => postMediaAction(endpoint, payload),
+    onMutate: (payload) => {
+      const snapshot = getMediaActionCacheSnapshot(queryClient);
+
+      updateMediaActionCache(queryClient, action, payload);
+
+      return { snapshot };
+    },
+    onError: (error, _payload, context) => {
+      if (context) {
+        restoreMediaActionCacheSnapshot(queryClient, context.snapshot);
+      }
+
+      handleApiError(error);
+    },
+    onSuccess: async (_data, payload) => {
+      const toast = getMediaActionToast(action, payload);
+      const nextValue = payload[action];
+
+      toaster.success({
+        ...toast,
+        action: nextValue
+          ? undefined
+          : {
+              label: 'Undo',
+              onClick: () => mutation.mutate(getUndoMediaActionPayload(action, payload)),
+            },
+      });
+
+      await invalidateMediaDiscoveryQueries(queryClient);
+    },
+  });
+
+  return mutation;
+};
+
+export default useMediaActionMutation;

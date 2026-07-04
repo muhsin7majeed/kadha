@@ -1,5 +1,7 @@
 import { MediaMeta, MediaType } from '@/types/common';
 
+export type MediaAction = 'liked' | 'watched' | 'watchlist';
+
 export interface UserMedia extends MediaMeta {
   /**
    * The ID of the user media table item in the database

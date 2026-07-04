@@ -3,18 +3,18 @@ import { QueryClient, QueryKey } from '@tanstack/react-query';
 import { MovieDetailsWithMeta, MovieWithMeta, TvDetailsWithMeta, TvWithMeta } from '@/features/media/media.types';
 import { queryKeys } from '@/lib/query-keys';
 import { MediaMeta, PaginatedResponse, ResourceAccessResponse } from '@/types/common';
-import { UserMedia, UserMediaPayload } from '../user-media.types';
-
-export type MediaAction = 'liked' | 'watched' | 'watchlist';
+import { MediaAction, UserMedia, UserMediaPayload } from '../user-media.types';
 
 type MediaCacheItem = MovieWithMeta | TvWithMeta | MovieDetailsWithMeta | TvDetailsWithMeta | UserMedia;
 type MediaListCache = MediaCacheItem[];
 type PaginatedMediaCache = PaginatedResponse<MediaCacheItem[]>;
 type ResourceMediaCache = ResourceAccessResponse<MediaCacheItem[]> & Partial<PaginatedResponse<MediaCacheItem[]>>;
 type MediaCacheData = MediaCacheItem | MediaListCache | PaginatedMediaCache | ResourceMediaCache;
+export type MediaActionCacheSnapshot = Array<[QueryKey, unknown]>;
 
-const mediaContentQueryKeys: QueryKey[] = [
-  queryKeys.mediaDetails,
+const mediaContentQueryKeys: QueryKey[] = [queryKeys.mediaDetails];
+
+const mediaDiscoveryQueryKeys: QueryKey[] = [
   queryKeys.searchMedia,
   queryKeys.trendingMovies,
   queryKeys.trendingTvs,
@@ -31,6 +31,27 @@ const savedListQueryKeys: Record<MediaAction, QueryKey[]> = {
 };
 
 const savedMediaQueryKeys: QueryKey[] = [queryKeys.liked, queryKeys.watched, queryKeys.watchList];
+const optimisticMediaQueryKeys: QueryKey[] = [...mediaContentQueryKeys, ...savedMediaQueryKeys];
+
+const queryKeyStartsWith = (queryKey: QueryKey, prefix: QueryKey) =>
+  prefix.every((keyPart, index) => queryKey[index] === keyPart);
+
+export const getMediaActionCacheSnapshot = (queryClient: QueryClient): MediaActionCacheSnapshot =>
+  queryClient
+    .getQueryCache()
+    .findAll({
+      predicate: (query) => optimisticMediaQueryKeys.some((queryKey) => queryKeyStartsWith(query.queryKey, queryKey)),
+    })
+    .map((query) => [query.queryKey, query.state.data]);
+
+export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapshot: MediaActionCacheSnapshot) => {
+  snapshot.forEach(([queryKey, data]) => {
+    queryClient.setQueryData(queryKey, data);
+  });
+};
+
+export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
+  Promise.all(mediaDiscoveryQueryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
 
 const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): MediaMeta => {
   if (action === 'watched') {
@@ -84,10 +105,7 @@ const patchMediaCacheData = (
   return patchMediaItem(oldData, payload, meta);
 };
 
-const formatPayloadForSavedList = (
-  payload: UserMediaPayload,
-  meta: MediaMeta,
-): UserMedia => ({
+const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): UserMedia => ({
   media_id: payload.media_id,
   media_type: payload.media_type,
   title: payload.title,

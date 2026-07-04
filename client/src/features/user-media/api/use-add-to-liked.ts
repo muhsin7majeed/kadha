@@ -1,32 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import useMediaActionMutation from './use-media-action-mutation';
 
-import { toaster } from '@/components/ui/toaster';
-import { useErrorHandler } from '@/hooks/use-error-handler';
-import api from '@/lib/axios-instance';
-import { BaseInfoResponse } from '@/types/common';
-import { capitalize } from '@/utils/capitalize';
-import { updateMediaActionCache } from './update-media-action-cache';
-import { UserMediaPayload } from '../user-media.types';
-
-const addToLiked = async (payload: UserMediaPayload) => {
-  const response = await api.post(`/api/user-media/liked`, payload);
-  return response.data;
-};
-
-const useAddToLiked = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation<BaseInfoResponse, Error, UserMediaPayload>({
-    mutationFn: (payload: UserMediaPayload) => addToLiked(payload),
-    onError: useErrorHandler,
-    onSuccess: (data, payload) => {
-      updateMediaActionCache(queryClient, 'liked', payload);
-
-      toaster.success({
-        title: capitalize(data.message),
-      });
-    },
+const useAddToLiked = () =>
+  useMediaActionMutation({
+    action: 'liked',
+    endpoint: '/api/user-media/liked',
   });
-};
 
 export default useAddToLiked;
