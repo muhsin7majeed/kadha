@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
 import useMediaDetails from '@/features/media/api/use-media-details';
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/components/ui/toaster-store';
 import HeroSection from './components/hero-section';
 import OverviewSection from './components/overview-section';
 import MovieInfo from './components/movie-info';

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { useColorMode } from '@/components/ui/color-mode';
+import { useColorMode } from '@/components/ui/color-mode-hooks';
 
 import {
   applyThemePresetVariables,

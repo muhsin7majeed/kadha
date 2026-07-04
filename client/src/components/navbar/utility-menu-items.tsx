@@ -3,8 +3,7 @@ import { LuGithub, LuInfo, LuMoon, LuSettings, LuSun } from 'react-icons/lu';
 import { NavLink } from 'react-router';
 
 import { APP_CONFIG } from '@/config/app-config';
-
-import { useColorMode } from '../ui/color-mode';
+import { useColorMode } from '@/components/ui/color-mode-hooks';
 
 interface UtilityMenuItemsProps {
   onOpenChangelog: () => void;

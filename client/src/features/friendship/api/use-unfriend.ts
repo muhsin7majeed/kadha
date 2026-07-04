@@ -1,4 +1,4 @@
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

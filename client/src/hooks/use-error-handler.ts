@@ -1,4 +1,4 @@
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/components/ui/toaster-store';
 import { ApiErrorResponse, ApiFieldErrors } from '@/types/common';
 import { isAxiosError } from 'axios';
 

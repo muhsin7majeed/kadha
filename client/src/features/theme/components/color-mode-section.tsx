@@ -1,7 +1,7 @@
 import { Button, Card, Heading, HStack, Text } from '@chakra-ui/react';
 import { LuMoon, LuSun } from 'react-icons/lu';
 
-import { useColorMode } from '@/components/ui/color-mode';
+import { useColorMode } from '@/components/ui/color-mode-hooks';
 
 const ColorModeSection = () => {
   const { colorMode, setColorMode } = useColorMode();

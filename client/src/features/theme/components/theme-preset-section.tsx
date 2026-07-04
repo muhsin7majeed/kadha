@@ -1,7 +1,7 @@
 import { Badge, Box, Button, Card, Heading, HStack, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuCheck } from 'react-icons/lu';
 
-import { useColorMode } from '@/components/ui/color-mode';
+import { useColorMode } from '@/components/ui/color-mode-hooks';
 import type { ThemePresetMode } from '@/features/theme/theme.types';
 import { useThemePreset } from '@/features/theme/use-theme-preset';
 

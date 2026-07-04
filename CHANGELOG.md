@@ -10,6 +10,7 @@
 - Refactored the settings route to compose feature-owned theme and data export sections.
 - Added accessible names to auth, collection, and search controls without changing their visual layout.
 - Renamed the media carousel component, removed duplicate form wrappers, standardized mutation error typing, and made neutral button palettes explicit.
+- Split Chakra UI helper exports so client Fast Refresh linting runs without warnings.
 
 ## v0.1.6
 

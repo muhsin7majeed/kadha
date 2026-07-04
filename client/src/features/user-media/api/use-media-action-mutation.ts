@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { toaster } from '@/components/ui/toaster';
+import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { BaseInfoResponse } from '@/types/common';
