@@ -22,6 +22,7 @@ import PaginationControls from '@/components/pagination-controls';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import useActivity from '@/features/activity/api/use-activity';
 import { ActivityMetadata, UserActivity, UserActivityType } from '@/features/activity/activity.types';
+import { parseActivityMetadata } from '@/features/activity/utils/activity-metadata';
 import { formatTimeAgo } from '@/utils/date';
 
 interface ActivityCopy {
@@ -124,21 +125,6 @@ const activityCopyByType: Record<UserActivityType, ActivityCopy> = {
   },
 };
 
-const isActivityMetadata = (value: unknown): value is ActivityMetadata => {
-  return typeof value === 'object' && value !== null;
-};
-
-const parseMetadata = (metadata: string | null): ActivityMetadata => {
-  if (!metadata) return {};
-
-  try {
-    const parsed = JSON.parse(metadata) as unknown;
-    return isActivityMetadata(parsed) ? parsed : {};
-  } catch {
-    return {};
-  }
-};
-
 const getActivityCopy = (type: UserActivityType): ActivityCopy => {
   return activityCopyByType[type];
 };
@@ -221,7 +207,7 @@ const ActivityThumbnail = ({ activity, metadata }: { activity: UserActivity; met
 };
 
 const ActivityItem = ({ activity }: { activity: UserActivity }) => {
-  const metadata = parseMetadata(activity.metadata);
+  const metadata = parseActivityMetadata(activity.metadata);
   const copy = getActivityCopy(activity.type);
 
   return (

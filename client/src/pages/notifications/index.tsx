@@ -13,30 +13,7 @@ import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-a
 import PaginationControls from '@/components/pagination-controls';
 import { useState } from 'react';
 import useRespondToCollectionInvite from '@/features/collections/api/use-respond-to-collection-invite';
-
-interface CollectionInviteMetadata {
-  collectionName?: string;
-  role?: 'viewer' | 'editor';
-}
-
-const parseCollectionInviteMetadata = (metadata: string | null): CollectionInviteMetadata => {
-  if (!metadata) return {};
-
-  try {
-    const parsed = JSON.parse(metadata) as unknown;
-
-    if (!parsed || typeof parsed !== 'object') return {};
-
-    const data = parsed as Record<string, unknown>;
-
-    return {
-      collectionName: typeof data.collectionName === 'string' ? data.collectionName : undefined,
-      role: data.role === 'viewer' || data.role === 'editor' ? data.role : undefined,
-    };
-  } catch {
-    return {};
-  }
-};
+import { parseCollectionInviteMetadata } from '@/features/notifications/utils/notification-metadata';
 
 const getNotificationMessage = (notification: Notification) => {
   switch (notification.type) {

@@ -25,6 +25,7 @@
 - Centralized media action payload creation for cards and media details.
 - Grouped frontend query keys by feature and added collection and notification invalidation helpers.
 - Narrowed media action cache updates to typed detail and saved-list caches.
+- Moved activity and notification metadata parsing into feature utilities.
 
 #### Release Workflow
 
