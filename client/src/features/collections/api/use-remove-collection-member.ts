@@ -1,6 +1,6 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { invalidateCollection, invalidateCollections } from '@/features/collections/api/invalidate-collection-queries';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RemoveCollectionMemberPayload {
@@ -19,8 +19,8 @@ const useRemoveCollectionMember = () => {
     mutationFn: removeCollectionMember,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.collectionById(variables.collectionId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
+      invalidateCollection(queryClient, variables.collectionId);
+      invalidateCollections(queryClient);
     },
   });
 };

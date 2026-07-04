@@ -1,6 +1,7 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { invalidateCollections } from '@/features/collections/api/invalidate-collection-queries';
+import { invalidateNotificationQueries } from '@/features/notifications/api/invalidate-notification-queries';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RespondToCollectionInvitePayload {
@@ -19,9 +20,8 @@ const useRespondToCollectionInvite = () => {
     mutationFn: respondToCollectionInvite,
     onError: useErrorHandler,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
-      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
-      queryClient.invalidateQueries({ queryKey: queryKeys.unreadNotificationsCount });
+      invalidateNotificationQueries(queryClient);
+      invalidateCollections(queryClient);
     },
   });
 };

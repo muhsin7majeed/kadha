@@ -1,9 +1,9 @@
 import { toaster } from '@/components/ui/toaster';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
 import { CollectionFormFields } from '@/features/collections/collections.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateCollections } from './invalidate-collection-queries';
 
 interface UpdateCollectionPayload extends CollectionFormFields {
   id: string;
@@ -26,7 +26,7 @@ const useUpdateCollection = () => {
         title: 'Collection updated successfully',
       });
 
-      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
+      invalidateCollections(queryClient);
     },
   });
 };

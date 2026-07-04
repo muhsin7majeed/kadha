@@ -1,6 +1,7 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { invalidateCollectionInviteQueries } from '@/features/collections/api/invalidate-collection-queries';
+import { invalidateNotificationQueries } from '@/features/notifications/api/invalidate-notification-queries';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface RevokeCollectionInvitePayload {
@@ -19,10 +20,8 @@ const useRevokeCollectionInvite = () => {
     mutationFn: revokeCollectionInvite,
     onError: useErrorHandler,
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.collectionInvites(variables.collectionId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.collectionInviteUsers(variables.collectionId) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
-      queryClient.invalidateQueries({ queryKey: queryKeys.unreadNotificationsCount });
+      invalidateCollectionInviteQueries(queryClient, variables.collectionId);
+      invalidateNotificationQueries(queryClient);
     },
   });
 };

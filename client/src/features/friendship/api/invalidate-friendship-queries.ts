@@ -6,11 +6,11 @@ const friendshipMutationQueryKeys = [
   queryKeys.friendships,
   queryKeys.searchUsers,
   queryKeys.notifications,
-  ['user-profile'],
-  ['user-watched'],
-  ['user-liked'],
-  ['user-watch-list'],
-  ['user-collections'],
+  queryKeys.userProfiles,
+  queryKeys.userWatchedRoot,
+  queryKeys.userLikedRoot,
+  queryKeys.userWatchListRoot,
+  queryKeys.userCollectionsRoot,
 ];
 
 const invalidateFriendshipQueries = (queryClient: QueryClient) => {

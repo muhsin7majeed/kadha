@@ -1,4 +1,5 @@
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { invalidateCollections } from '@/features/collections/api/invalidate-collection-queries';
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -14,7 +15,7 @@ const useLeaveCollection = () => {
     mutationFn: leaveCollection,
     onError: useErrorHandler,
     onSuccess: (_data, collectionId) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.collections });
+      invalidateCollections(queryClient);
       queryClient.removeQueries({ queryKey: queryKeys.collectionById(collectionId) });
     },
   });
