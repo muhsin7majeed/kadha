@@ -1,15 +1,13 @@
 import { QueryClient, QueryKey } from '@tanstack/react-query';
 
-import { MovieDetailsWithMeta, MovieWithMeta, TvDetailsWithMeta, TvWithMeta } from '@/features/media/media.types';
+import { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import { queryKeys } from '@/lib/query-keys';
 import { MediaMeta, PaginatedResponse, ResourceAccessResponse } from '@/types/common';
 import { MediaAction, UserMedia, UserMediaPayload } from '../user-media.types';
 
-type MediaCacheItem = MovieWithMeta | TvWithMeta | MovieDetailsWithMeta | TvDetailsWithMeta | UserMedia;
-type MediaListCache = MediaCacheItem[];
-type PaginatedMediaCache = PaginatedResponse<MediaCacheItem[]>;
-type ResourceMediaCache = ResourceAccessResponse<MediaCacheItem[]> & Partial<PaginatedResponse<MediaCacheItem[]>>;
-type MediaCacheData = MediaCacheItem | MediaListCache | PaginatedMediaCache | ResourceMediaCache;
+type MediaIdentity = Pick<UserMediaPayload, 'media_id' | 'media_type'>;
+type MediaDetailsCache = MovieDetailsWithMeta | TvDetailsWithMeta;
+type SavedMediaCache = ResourceAccessResponse<UserMedia[]> & Partial<PaginatedResponse<UserMedia[]>>;
 export type MediaActionCacheSnapshot = Array<[QueryKey, unknown]>;
 
 const mediaContentQueryKeys: QueryKey[] = [queryKeys.mediaDetails];
@@ -66,10 +64,10 @@ const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): Me
   };
 };
 
-const isSameMedia = (media: MediaCacheItem, payload: UserMediaPayload) =>
-  media.media_id === payload.media_id && media.media_type === payload.media_type;
+const isSameMedia = (media: MediaIdentity, identity: MediaIdentity) =>
+  media.media_id === identity.media_id && media.media_type === identity.media_type;
 
-const patchMediaItem = <T extends MediaCacheItem>(media: T, payload: UserMediaPayload, meta: MediaMeta): T => {
+const patchMediaItem = <T extends MediaIdentity>(media: T, payload: UserMediaPayload, meta: MediaMeta): T => {
   if (!isSameMedia(media, payload)) return media;
 
   return {
@@ -78,32 +76,14 @@ const patchMediaItem = <T extends MediaCacheItem>(media: T, payload: UserMediaPa
   };
 };
 
-const patchMediaList = <T extends MediaCacheItem>(media: T[], payload: UserMediaPayload, meta: MediaMeta) =>
+const patchMediaList = <T extends MediaIdentity>(media: T[], payload: UserMediaPayload, meta: MediaMeta) =>
   media.map((item) => patchMediaItem(item, payload, meta));
 
-const hasMediaDataArray = (data: MediaCacheData): data is PaginatedMediaCache | ResourceMediaCache =>
-  'data' in data && Array.isArray(data.data);
-
-const patchMediaCacheData = (
-  oldData: MediaCacheData | undefined,
+const patchMediaDetailsData = (
+  oldData: MediaDetailsCache | undefined,
   payload: UserMediaPayload,
   meta: MediaMeta,
-): MediaCacheData | undefined => {
-  if (!oldData) return oldData;
-
-  if (Array.isArray(oldData)) {
-    return patchMediaList(oldData, payload, meta);
-  }
-
-  if (hasMediaDataArray(oldData)) {
-    return {
-      ...oldData,
-      data: patchMediaList(oldData.data, payload, meta),
-    };
-  }
-
-  return patchMediaItem(oldData, payload, meta);
-};
+): MediaDetailsCache | undefined => (oldData ? patchMediaItem(oldData, payload, meta) : oldData);
 
 const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): UserMedia => ({
   media_id: payload.media_id,
@@ -125,7 +105,7 @@ const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): 
   ...meta,
 });
 
-const updatePaginationTotal = <T extends ResourceMediaCache>(data: T, totalDelta: number): T => {
+const updatePaginationTotal = <T extends SavedMediaCache>(data: T, totalDelta: number): T => {
   if (!data.pagination || totalDelta === 0) return data;
 
   const total = Math.max(data.pagination.total + totalDelta, 0);
@@ -144,11 +124,11 @@ const updatePaginationTotal = <T extends ResourceMediaCache>(data: T, totalDelta
 };
 
 const updateSavedListData = (
-  oldData: ResourceMediaCache | undefined,
+  oldData: SavedMediaCache | undefined,
   action: MediaAction,
   payload: UserMediaPayload,
   shouldInclude: boolean,
-): ResourceMediaCache | undefined => {
+): SavedMediaCache | undefined => {
   if (!oldData) return oldData;
 
   const meta = getActionMetaUpdate(action, payload);
@@ -181,10 +161,10 @@ const updateSavedListQueries = (
   payload: UserMediaPayload,
   shouldInclude: boolean,
 ) => {
-  queryClient.getQueriesData<ResourceMediaCache>({ queryKey }).forEach(([matchedQueryKey]) => {
+  queryClient.getQueriesData<SavedMediaCache>({ queryKey }).forEach(([matchedQueryKey]) => {
     const page = matchedQueryKey[1];
 
-    queryClient.setQueryData<ResourceMediaCache>(matchedQueryKey, (oldData) => {
+    queryClient.setQueryData<SavedMediaCache>(matchedQueryKey, (oldData) => {
       if (typeof page === 'number' && page !== 1 && shouldInclude) {
         const existingItem = oldData?.data.find((item) => isSameMedia(item, payload));
 
@@ -208,11 +188,13 @@ export const updateMediaActionCache = (queryClient: QueryClient, action: MediaAc
   const meta = getActionMetaUpdate(action, payload);
 
   mediaContentQueryKeys.forEach((queryKey) => {
-    queryClient.setQueriesData<MediaCacheData>({ queryKey }, (oldData) => patchMediaCacheData(oldData, payload, meta));
+    queryClient.setQueriesData<MediaDetailsCache>({ queryKey }, (oldData) =>
+      patchMediaDetailsData(oldData, payload, meta),
+    );
   });
 
   savedMediaQueryKeys.forEach((queryKey) => {
-    queryClient.setQueriesData<ResourceMediaCache>({ queryKey }, (oldData) =>
+    queryClient.setQueriesData<SavedMediaCache>({ queryKey }, (oldData) =>
       oldData
         ? {
             ...oldData,
