@@ -2,32 +2,21 @@ import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 
 import FullScreenSpinner from '@/components/spinners/full-screen-spinner';
-import AdminRoute from '@/components/admin-route';
 import PrivateRoute from '@/components/private-route';
-import PublicRoute from '@/components/public-route';
+import { adminRoutes } from './routes/admin-routes';
+import { authRoutes } from './routes/auth-routes';
+import { friendshipRoutes } from './routes/friendship-routes';
+import { profileRoutes } from './routes/profile-routes';
+import { publicRoutes } from './routes/public-routes';
 
 const MainLayout = lazy(() => import('@/components/main-layout'));
 const Activity = lazy(() => import('@/pages/activity'));
-const AdminOverview = lazy(() => import('@/pages/admin'));
-const AdminUserDetail = lazy(() => import('@/pages/admin/users/user-detail'));
-const AdminUsers = lazy(() => import('@/pages/admin/users'));
-const AuthLayout = lazy(() => import('@/pages/auth/auth-layout'));
-const Login = lazy(() => import('@/pages/auth/login'));
-const Register = lazy(() => import('@/pages/auth/register'));
 const Collections = lazy(() => import('@/pages/collections'));
-const Friends = lazy(() => import('@/pages/user/friendship/friends'));
-const FriendshipList = lazy(() => import('@/pages/user/friendship/friends/friendship-list'));
 const Home = lazy(() => import('@/pages/home'));
-const Landing = lazy(() => import('@/pages/landing'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
-const Privacy = lazy(() => import('@/pages/privacy'));
 const Settings = lazy(() => import('@/pages/settings'));
-const Terms = lazy(() => import('@/pages/terms'));
-const UserProfile = lazy(() => import('@/pages/user/profile'));
-const OtherUserCollectionsTab = lazy(() => import('@/pages/user/profile/other-user-data/collections-tab'));
-const OtherUserMediaTab = lazy(() => import('@/pages/user/profile/other-user-data/media-tab'));
 const Watched = lazy(() => import('@/pages/watched'));
 const Watchlist = lazy(() => import('@/pages/watchlist'));
 
@@ -35,17 +24,8 @@ export function AppRoutes() {
   return (
     <Suspense fallback={<FullScreenSpinner />}>
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="privacy" element={<Privacy />} />
-        <Route path="settings" element={<Settings />} />
-        <Route path="terms" element={<Terms />} />
-
-        <Route element={<PublicRoute />}>
-          <Route path="auth" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-          </Route>
-        </Route>
+        {publicRoutes}
+        {authRoutes}
 
         <Route element={<PrivateRoute />}>
           <Route path="app" element={<MainLayout />}>
@@ -58,68 +38,10 @@ export function AppRoutes() {
             <Route path="collections" element={<Collections />} />
             <Route path="settings" element={<Settings />} />
 
-            <Route path="profile">
-              <Route index element={<UserProfile />} />
-
-              <Route path=":username" element={<UserProfile />}>
-                <Route path="watched" element={<OtherUserMediaTab type="watched" />} />
-                <Route path="liked" element={<OtherUserMediaTab type="liked" />} />
-                <Route path="watchlist" element={<OtherUserMediaTab type="watchlist" />} />
-                <Route path="collections" element={<OtherUserCollectionsTab />} />
-              </Route>
-            </Route>
-
+            {profileRoutes}
             <Route path="notifications" element={<Notifications />} />
-
-            <Route element={<AdminRoute />}>
-              <Route path="admin" element={<AdminOverview />} />
-              <Route path="admin/users" element={<AdminUsers />} />
-              <Route path="admin/users/:id" element={<AdminUserDetail />} />
-            </Route>
-
-            <Route path="friends" element={<Friends />}>
-              <Route index element={<Navigate to="friends" replace />} />
-              <Route
-                path="friends"
-                element={
-                  <FriendshipList
-                    type="friends"
-                    emptyTitle="No friends yet"
-                    emptyDescription="Your friends will appear here"
-                  />
-                }
-              />
-              <Route
-                path="sent"
-                element={
-                  <FriendshipList
-                    type="sent"
-                    emptyTitle="No sent requests"
-                    emptyDescription="Friend requests you've sent will appear here"
-                  />
-                }
-              />
-              <Route
-                path="received"
-                element={
-                  <FriendshipList
-                    type="received"
-                    emptyTitle="No pending requests"
-                    emptyDescription="Friend requests you've received will appear here"
-                  />
-                }
-              />
-              <Route
-                path="blocked"
-                element={
-                  <FriendshipList
-                    type="blocked"
-                    emptyTitle="No blocked users"
-                    emptyDescription="Users you've blocked will appear here"
-                  />
-                }
-              />
-            </Route>
+            {adminRoutes}
+            {friendshipRoutes}
           </Route>
         </Route>
 

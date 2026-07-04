@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Engineering Changes
+
+#### Frontend Architecture
+
+- Split frontend route declarations into domain route modules while preserving paths and lazy loading.
+
 ## v0.1.6
 
 ### Feature Changes
