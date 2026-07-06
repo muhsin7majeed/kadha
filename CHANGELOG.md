@@ -13,6 +13,7 @@
 #### Testing
 
 - Added Vitest-based server and client test foundations, including Supertest API coverage, an isolated Prisma SQLite test database, and React Testing Library setup.
+- Added server integration test helpers and collection permission coverage for owners, viewers, editors, and member role changes.
 
 #### Frontend Architecture
 
