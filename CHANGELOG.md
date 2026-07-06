@@ -4,6 +4,11 @@
 
 ### Feature Changes
 
+#### Media Actions
+
+- Added optional 5-star ratings, watched dates, and private notes to liked, watched, and watchlist tracking flows.
+- Added focused tracking dialogs on media detail pages while keeping media-card actions one-click with optional toast actions for details.
+
 #### Authentication
 
 - Fixed logout/session expiry so protected pages leave the loading state and redirect to login after auth is cleared.
@@ -32,6 +37,11 @@
 - Added accessible names to auth, collection, and search controls without changing their visual layout.
 - Renamed the media carousel component, removed duplicate form wrappers, standardized mutation error typing, and made neutral button palettes explicit.
 - Split Chakra UI helper exports so client Fast Refresh linting runs without warnings.
+
+#### Media Tracking
+
+- Extended user-media persistence and validation for private ratings, action-specific notes, and normalized watched dates.
+- Kept private tracking details out of username-based profile media APIs while preserving them for the signed-in user's own lists and media details.
 
 ## v0.1.6
 

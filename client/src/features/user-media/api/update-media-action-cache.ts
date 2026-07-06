@@ -52,16 +52,51 @@ export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
   Promise.all(mediaDiscoveryQueryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
 
 const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): MediaMeta => {
+  const trackingMeta = getTrackingMetaUpdate(payload);
+
   if (action === 'watched') {
     return {
       watched: payload.watched ?? false,
       watchlist: false,
+      ...(hasPayloadKey(payload, 'liked') ? { liked: payload.liked ?? false } : {}),
+      ...trackingMeta,
     };
   }
 
   return {
     [action]: payload[action] ?? false,
+    ...(action === 'liked' && payload.watched ? { watched: true, watchlist: false } : {}),
+    ...trackingMeta,
   };
+};
+
+const hasPayloadKey = <Key extends keyof UserMediaPayload>(payload: UserMediaPayload, key: Key) =>
+  Object.prototype.hasOwnProperty.call(payload, key);
+
+const getTrackingMetaUpdate = (payload: UserMediaPayload): MediaMeta => {
+  const meta: MediaMeta = {};
+
+  if (hasPayloadKey(payload, 'rating')) {
+    meta.rating = payload.rating ?? null;
+  }
+
+  if (hasPayloadKey(payload, 'watchedOn')) {
+    meta.watchedOn = payload.watchedOn ?? null;
+  }
+
+  if (hasPayloadKey(payload, 'likedNote')) {
+    meta.likedNote = payload.likedNote ?? null;
+  }
+
+  if (hasPayloadKey(payload, 'watchedNote')) {
+    meta.watchedNote = payload.watchedNote ?? null;
+  }
+
+  if (hasPayloadKey(payload, 'watchlistNote')) {
+    meta.watchlistNote = payload.watchlistNote ?? null;
+  }
+
+  return meta;
 };
 
 const isSameMedia = (media: MediaIdentity, identity: MediaIdentity) =>
@@ -102,6 +137,7 @@ const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): 
   original_language: payload.original_language,
   runtime: payload.runtime,
   status: payload.status,
+  ...getTrackingMetaUpdate(payload),
   ...meta,
 });
 
@@ -209,6 +245,15 @@ export const updateMediaActionCache = (queryClient: QueryClient, action: MediaAc
   });
 
   if (action === 'watched') {
+    updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false);
+
+    if (hasPayloadKey(payload, 'liked')) {
+      updateSavedListQueries(queryClient, queryKeys.liked, 'liked', payload, Boolean(payload.liked));
+    }
+  }
+
+  if (action === 'liked' && payload.watched) {
+    updateSavedListQueries(queryClient, queryKeys.watched, 'watched', payload, true);
     updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false);
   }
 };

@@ -61,6 +61,7 @@ describe('updateMediaActionCache', () => {
     const queryClient = new QueryClient();
     const payload = createPayload({ media_id: 10, watched: true, watchlist: true });
     const cachedMedia = createUserMedia({ media_id: 10, watched: false, watchlist: true });
+    delete payload.liked;
 
     queryClient.setQueryData(queryKeys.mediaDetailsById('movie', '10'), {
       media_id: 10,
@@ -103,6 +104,72 @@ describe('updateMediaActionCache', () => {
       total: 1,
       totalPages: 1,
     });
+  });
+
+  it('patches tracking details in detail and saved-list caches', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({
+      liked: true,
+      media_id: 13,
+      rating: 9,
+      likedNote: 'Private favorite.',
+    });
+
+    queryClient.setQueryData(queryKeys.mediaDetailsById('movie', '13'), {
+      media_id: 13,
+      media_type: 'movie',
+      liked: false,
+      rating: null,
+    });
+    queryClient.setQueryData(queryKeys.liked, createSavedResponse([], 0));
+
+    updateMediaActionCache(queryClient, 'liked', payload);
+
+    expect(
+      queryClient.getQueryData<{ liked?: boolean; rating?: number | null; likedNote?: string | null }>(
+        queryKeys.mediaDetailsById('movie', '13'),
+      ),
+    ).toMatchObject({
+      liked: true,
+      rating: 9,
+      likedNote: 'Private favorite.',
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.liked)?.data[0]).toMatchObject({
+      liked: true,
+      media_id: 13,
+      rating: 9,
+      likedNote: 'Private favorite.',
+    });
+  });
+
+  it('updates watched and watchlist caches when liking also marks watched', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({
+      liked: true,
+      watched: true,
+      watchlist: true,
+      media_id: 14,
+      title: 'Liked Watched Movie',
+    });
+    const watchlistItem = createUserMedia({ media_id: 14, watchlist: true });
+
+    queryClient.setQueryData(queryKeys.liked, createSavedResponse([], 0));
+    queryClient.setQueryData(queryKeys.watched, createSavedResponse([], 0));
+    queryClient.setQueryData(queryKeys.watchList, createSavedResponse([watchlistItem], 1));
+
+    updateMediaActionCache(queryClient, 'liked', payload);
+
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.liked)?.data[0]).toMatchObject({
+      liked: true,
+      watched: true,
+      watchlist: false,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watched)?.data[0]).toMatchObject({
+      liked: true,
+      watched: true,
+      watchlist: false,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toEqual([]);
   });
 
   it('captures and restores optimistic cache snapshots', () => {

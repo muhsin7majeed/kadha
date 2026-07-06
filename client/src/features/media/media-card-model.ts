@@ -21,11 +21,22 @@ export interface MediaCardModel extends MediaMeta {
   vote_count: number;
 }
 
+const getTrackingMeta = (media: MediaMeta): MediaMeta => ({
+  liked: media.liked,
+  watched: media.watched,
+  watchlist: media.watchlist,
+  rating: media.rating,
+  ratedAt: media.ratedAt,
+  watchedOn: media.watchedOn,
+  likedNote: media.likedNote,
+  watchedNote: media.watchedNote,
+  watchlistNote: media.watchlistNote,
+});
+
 export const movieToMediaCardModel = (movie: MovieWithMeta): MediaCardModel => ({
   adult: movie.adult,
   backdrop_path: movie.backdrop_path,
   genre_ids: movie.genre_ids,
-  liked: movie.liked,
   media_id: movie.media_id,
   media_type: movie.media_type,
   original_language: movie.original_language,
@@ -37,15 +48,13 @@ export const movieToMediaCardModel = (movie: MovieWithMeta): MediaCardModel => (
   title: movie.title,
   vote_average: movie.vote_average,
   vote_count: movie.vote_count,
-  watched: movie.watched,
-  watchlist: movie.watchlist,
+  ...getTrackingMeta(movie),
 });
 
 export const tvToMediaCardModel = (tv: TvWithMeta): MediaCardModel => ({
   adult: tv.adult,
   backdrop_path: tv.backdrop_path,
   genre_ids: tv.genre_ids,
-  liked: tv.liked,
   media_id: tv.media_id,
   media_type: tv.media_type,
   original_language: tv.original_language,
@@ -57,15 +66,13 @@ export const tvToMediaCardModel = (tv: TvWithMeta): MediaCardModel => ({
   title: tv.name,
   vote_average: tv.vote_average,
   vote_count: tv.vote_count,
-  watched: tv.watched,
-  watchlist: tv.watchlist,
+  ...getTrackingMeta(tv),
 });
 
 export const userMediaToMediaCardModel = (media: UserMedia): MediaCardModel => ({
   adult: media.adult,
   backdrop_path: media.backdrop_path,
   genre_ids: media.genre_ids,
-  liked: media.liked,
   media_id: media.media_id,
   media_type: media.media_type,
   original_language: media.original_language,
@@ -79,8 +86,7 @@ export const userMediaToMediaCardModel = (media: UserMedia): MediaCardModel => (
   title: media.title,
   vote_average: media.vote_average,
   vote_count: media.vote_count,
-  watched: media.watched,
-  watchlist: media.watchlist,
+  ...getTrackingMeta(media),
 });
 
 export const toMediaCardModel = (media: MovieWithMeta | TvWithMeta | UserMedia): MediaCardModel => {

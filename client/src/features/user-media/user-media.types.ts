@@ -31,4 +31,4 @@ export interface UserMedia extends MediaMeta {
   watchlistAt?: string | null;
 }
 
-export type UserMediaPayload = Omit<UserMedia, 'id'>;
+export type UserMediaPayload = Omit<UserMedia, 'id' | 'ratedAt'>;

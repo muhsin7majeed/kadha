@@ -18,6 +18,7 @@ import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import type { MediaAction } from '@/features/user-media/user-media.types';
+import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionStateLabel } from '@/features/user-media/utils/media-action-copy';
 import { formatDate, minutesToHours } from '@/utils/date';
@@ -28,6 +29,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({ data }: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
+  const [trackingAction, setTrackingAction] = useState<MediaAction | null>(null);
   const isMovie = data.media_type === 'movie';
   const title = data.media_type === 'movie' ? data.title : data.name;
   const releaseDate = data.media_type === 'movie' ? data.release_date : data.first_air_date;
@@ -43,16 +45,31 @@ const HeroSection = ({ data }: HeroSectionProps) => {
 
   const handleLike = async () => {
     if (isAddingToLiked) return;
+    if (!data.liked) {
+      setTrackingAction('liked');
+      return;
+    }
+
     await addToLiked(getActionPayload('liked'));
   };
 
   const handleWatched = async () => {
     if (isAddingToWatched) return;
+    if (!data.watched) {
+      setTrackingAction('watched');
+      return;
+    }
+
     await addToWatched(getActionPayload('watched'));
   };
 
   const handleWatchlist = async () => {
     if (isAddingToWatchList) return;
+    if (!data.watchlist) {
+      setTrackingAction('watchlist');
+      return;
+    }
+
     await addToWatchList(getActionPayload('watchlist'));
   };
 
@@ -67,6 +84,20 @@ const HeroSection = ({ data }: HeroSectionProps) => {
         open={showAddToCollectionDialog}
         onOpenChange={setShowAddToCollectionDialog}
       />
+      {trackingAction && (
+        <MediaTrackingDialog
+          action={trackingAction}
+          context="detail-pre-action"
+          media={mediaPayload}
+          currentState={data}
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setTrackingAction(null);
+            }
+          }}
+        />
+      )}
 
       <Box position="relative" overflow="hidden" bg="bg">
         {/* Backdrop Image */}

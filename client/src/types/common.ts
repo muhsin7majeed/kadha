@@ -56,6 +56,12 @@ export interface MediaMeta {
   liked?: boolean;
   watched?: boolean;
   watchlist?: boolean;
+  rating?: number | null;
+  ratedAt?: string | null;
+  watchedOn?: string | null;
+  likedNote?: string | null;
+  watchedNote?: string | null;
+  watchlistNote?: string | null;
 }
 
 export enum DataPrivacy {

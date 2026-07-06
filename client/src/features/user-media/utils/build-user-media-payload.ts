@@ -4,6 +4,14 @@ import { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.
 
 type UserMediaPayloadSource = MediaCardModel | MovieDetailsWithMeta | TvDetailsWithMeta;
 
+const buildTrackingDetailsPayload = (media: UserMediaPayloadSource): Partial<UserMediaPayload> => ({
+  ...(media.rating !== undefined ? { rating: media.rating } : {}),
+  ...(media.watchedOn !== undefined ? { watchedOn: media.watchedOn } : {}),
+  ...(media.likedNote !== undefined ? { likedNote: media.likedNote } : {}),
+  ...(media.watchedNote !== undefined ? { watchedNote: media.watchedNote } : {}),
+  ...(media.watchlistNote !== undefined ? { watchlistNote: media.watchlistNote } : {}),
+});
+
 const buildBasePayload = (media: UserMediaPayloadSource): UserMediaPayload => {
   if ('genres' in media) {
     const title = media.media_type === 'movie' ? media.title : media.name;
@@ -28,6 +36,7 @@ const buildBasePayload = (media: UserMediaPayloadSource): UserMediaPayload => {
       original_language: media.original_language,
       runtime: runtime ?? null,
       status: media.status,
+      ...buildTrackingDetailsPayload(media),
     };
   }
 
@@ -48,6 +57,7 @@ const buildBasePayload = (media: UserMediaPayloadSource): UserMediaPayload => {
     original_language: media.original_language,
     runtime: media.runtime,
     status: media.status,
+    ...buildTrackingDetailsPayload(media),
   };
 };
 

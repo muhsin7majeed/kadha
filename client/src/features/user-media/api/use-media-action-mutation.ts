@@ -18,9 +18,25 @@ interface MediaActionMutationContext {
   snapshot: MediaActionCacheSnapshot;
 }
 
+interface MediaActionToast {
+  title: string;
+  description?: string;
+}
+
+export interface MediaActionToastAction {
+  label: string;
+  onClick: () => void;
+}
+
+export interface MediaActionMutationBehavior {
+  getToast?: (action: MediaAction, payload: UserMediaPayload) => MediaActionToast;
+  getToastAction?: (payload: UserMediaPayload) => MediaActionToastAction | undefined;
+}
+
 interface UseMediaActionMutationOptions {
   action: MediaAction;
   endpoint: string;
+  behavior?: MediaActionMutationBehavior;
 }
 
 const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
@@ -28,7 +44,7 @@ const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
   return response.data;
 };
 
-const useMediaActionMutation = ({ action, endpoint }: UseMediaActionMutationOptions) => {
+const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMutationOptions) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<BaseInfoResponse, unknown, UserMediaPayload, MediaActionMutationContext>({
@@ -48,12 +64,15 @@ const useMediaActionMutation = ({ action, endpoint }: UseMediaActionMutationOpti
       handleApiError(error);
     },
     onSuccess: async (_data, payload) => {
-      const toast = getMediaActionToast(action, payload);
+      const toast = behavior?.getToast?.(action, payload) ?? getMediaActionToast(action, payload);
       const nextValue = payload[action];
+      const customToastAction = behavior?.getToastAction?.(payload);
 
       toaster.success({
         ...toast,
-        action: nextValue
+        action: customToastAction
+          ? customToastAction
+          : nextValue
           ? undefined
           : {
               label: 'Undo',

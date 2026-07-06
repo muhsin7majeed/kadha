@@ -209,6 +209,12 @@ export interface MediaMeta {
   liked?: boolean;
   watched?: boolean;
   watchlist?: boolean;
+  rating?: number | null;
+  ratedAt?: Date | string | null;
+  watchedOn?: string | null;
+  likedNote?: string | null;
+  watchedNote?: string | null;
+  watchlistNote?: string | null;
 }
 
 export type TMDBMovieWithMediaId = Omit<NormalizedTMDBMovie, 'id'> & { media_id: number };

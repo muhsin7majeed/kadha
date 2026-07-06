@@ -11,6 +11,11 @@ interface TestMediaPayloadOptions {
   liked?: boolean;
   watched?: boolean;
   watchlist?: boolean;
+  rating?: number | null;
+  watchedOn?: string | null;
+  likedNote?: string | null;
+  watchedNote?: string | null;
+  watchlistNote?: string | null;
 }
 
 export interface UserMediaListItem {
@@ -23,6 +28,12 @@ export interface UserMediaListItem {
   likedAt: string | null;
   watchedAt: string | null;
   watchlistAt: string | null;
+  rating?: number | null;
+  ratedAt?: string | null;
+  watchedOn?: string | null;
+  likedNote?: string | null;
+  watchedNote?: string | null;
+  watchlistNote?: string | null;
 }
 
 export interface UserMediaListResponseBody {
@@ -49,6 +60,11 @@ export const buildTestMediaPayload = ({
   liked = false,
   watched = false,
   watchlist = false,
+  rating,
+  watchedOn,
+  likedNote,
+  watchedNote,
+  watchlistNote,
 }: TestMediaPayloadOptions = {}) => ({
   media_id: mediaId,
   media_type: mediaType,
@@ -69,6 +85,11 @@ export const buildTestMediaPayload = ({
   original_language: 'en',
   runtime: 118,
   status: 'Released',
+  ...(rating !== undefined ? { rating } : {}),
+  ...(watchedOn !== undefined ? { watchedOn } : {}),
+  ...(likedNote !== undefined ? { likedNote } : {}),
+  ...(watchedNote !== undefined ? { watchedNote } : {}),
+  ...(watchlistNote !== undefined ? { watchlistNote } : {}),
 });
 
 export const updateUserMediaFlag = async (
@@ -76,6 +97,7 @@ export const updateUserMediaFlag = async (
   flag: UserMediaFlag,
   flagValue: boolean,
   mediaId = 881001,
+  details: Omit<TestMediaPayloadOptions, 'mediaId' | 'mediaType'> = {},
 ) => {
   return request(await getTestApp())
     .post(`/api/user-media/${flag}`)
@@ -84,6 +106,7 @@ export const updateUserMediaFlag = async (
       buildTestMediaPayload({
         mediaId,
         [flag]: flagValue,
+        ...details,
       }),
     )
     .expect(200);

@@ -125,6 +125,23 @@ describe('buildUserMediaPayload', () => {
     expect(buildUserMediaPayload(cardMedia, 'watched').watched).toBe(true);
   });
 
+  it('includes known tracking details without inventing missing values', () => {
+    expect(
+      buildUserMediaPayload({
+        ...cardMedia,
+        rating: 8,
+        watchedOn: '2026-01-15',
+        watchedNote: 'Private note',
+      }),
+    ).toMatchObject({
+      rating: 8,
+      watchedOn: '2026-01-15',
+      watchedNote: 'Private note',
+    });
+
+    expect(buildUserMediaPayload(cardMedia)).not.toHaveProperty('rating');
+  });
+
   it('normalizes movie details into a user media payload', () => {
     expect(buildUserMediaPayload(movieDetails, 'liked')).toMatchObject({
       genre_ids: [12, 878],

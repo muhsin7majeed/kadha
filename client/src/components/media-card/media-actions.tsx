@@ -10,6 +10,8 @@ import AddToCollectionDialog from '@/features/collections/components/add-to-coll
 import { Tooltip } from '@/components/ui/tooltip';
 import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
 import { MediaCardModel } from '@/features/media/media-card-model';
+import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
+import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
 
 interface MediaActionsProps {
   media: MediaCardModel;
@@ -41,10 +43,24 @@ const MediaActionIconButton = ({ label, colorPalette, loading, onClick, children
 
 const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
+  const [trackingDialog, setTrackingDialog] = useState<{ action: MediaAction; media: UserMediaPayload } | null>(null);
+  const getDetailsToastAction = (action: MediaAction, label: string) => (payload: UserMediaPayload) =>
+    payload[action]
+      ? {
+          label,
+          onClick: () => setTrackingDialog({ action, media: payload }),
+        }
+      : undefined;
 
-  const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
-  const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
-  const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
+  const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList({
+    getToastAction: getDetailsToastAction('watchlist', 'Add note'),
+  });
+  const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched({
+    getToastAction: getDetailsToastAction('watched', 'Add details'),
+  });
+  const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked({
+    getToastAction: getDetailsToastAction('liked', 'Add details'),
+  });
   const likeLabel = getMediaActionLabel('liked', Boolean(media.liked));
   const watchedLabel = getMediaActionLabel('watched', Boolean(media.watched));
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
@@ -86,6 +102,20 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         open={showAddToCollectionDialog}
         onOpenChange={setShowAddToCollectionDialog}
       />
+      {trackingDialog && (
+        <MediaTrackingDialog
+          action={trackingDialog.action}
+          context="card-post-action"
+          media={trackingDialog.media}
+          currentState={{ ...media, ...trackingDialog.media }}
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setTrackingDialog(null);
+            }
+          }}
+        />
+      )}
 
       <VStack gap={1} backdropFilter="blur(10px)" p={1} borderRadius="full">
         <MediaActionIconButton label={likeLabel} colorPalette="red" onClick={handleLike} loading={isAddingToLiked}>

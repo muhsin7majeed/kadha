@@ -2,6 +2,10 @@ import { UserActivityType } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
+import {
+  formatUserMediaTrackingDetails,
+  stripPrivateUserMediaTrackingDetails,
+} from '@/features/user-media/user-media.serializer';
 import { envConfig } from '@/config/env';
 import { normalizeWatchRegion } from '@/constants/watch-regions';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
@@ -468,7 +472,13 @@ export async function getUserProfileByUsername(viewerId: string, username: strin
   };
 }
 
-export async function getUserMediaByFlag(id: string, flag: UserMediaFlag, page: number, limit: number) {
+export async function getUserMediaByFlag(
+  id: string,
+  flag: UserMediaFlag,
+  page: number,
+  limit: number,
+  includePrivateTrackingDetails = true,
+) {
   const where = {
     userId: id,
     [flag]: true,
@@ -490,7 +500,11 @@ export async function getUserMediaByFlag(id: string, flag: UserMediaFlag, page: 
   ]);
 
   return {
-    data: data.map(flattenMediaSnapshot),
+    data: data.map((item) => {
+      const formatted = formatUserMediaTrackingDetails(flattenMediaSnapshot(item));
+
+      return includePrivateTrackingDetails ? formatted : stripPrivateUserMediaTrackingDetails(formatted);
+    }),
     pagination: createPaginationMeta(page, limit, total),
   };
 }
@@ -534,7 +548,7 @@ export async function getUserMediaByUsername(
     return lockedResource(getLockedReason(privacy));
   }
 
-  const result = await getUserMediaByFlag(owner.id, flag, page, limit);
+  const result = await getUserMediaByFlag(owner.id, flag, page, limit, false);
 
   return {
     ...viewableResource(result.data),

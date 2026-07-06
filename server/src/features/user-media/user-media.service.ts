@@ -5,8 +5,15 @@ import { createUserActivity } from '@/features/activity/activity.service';
 import { upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
 import { UserMediaPayload } from './user-media.schema';
 
-type UserMediaFlagUpdate = Pick<Prisma.UserMediaCreateInput, 'liked' | 'watched' | 'watchlist'>;
-type UserMediaFlag = keyof UserMediaFlagUpdate;
+type UserMediaFlag = 'liked' | 'watched' | 'watchlist';
+type UserMediaFlagUpdate = Partial<Record<UserMediaFlag, boolean>>;
+type UserMediaNoteField = 'likedNote' | 'watchedNote' | 'watchlistNote';
+type UserMediaTrackingUpdate = Partial<
+  Pick<
+    Prisma.UserMediaUncheckedCreateInput,
+    'rating' | 'ratedAt' | 'watchedOn' | 'likedNote' | 'watchedNote' | 'watchlistNote'
+  >
+>;
 
 const activityTypeByFlagValue = {
   liked: {
@@ -28,6 +35,54 @@ const getTimestampUpdates = (flagUpdate: UserMediaFlagUpdate, timestamp: Date) =
   watchedAt: typeof flagUpdate.watched === 'boolean' ? (flagUpdate.watched ? timestamp : null) : undefined,
   watchlistAt: typeof flagUpdate.watchlist === 'boolean' ? (flagUpdate.watchlist ? timestamp : null) : undefined,
 });
+
+const noteFields: UserMediaNoteField[] = ['likedNote', 'watchedNote', 'watchlistNote'];
+
+const hasPayloadKey = <Key extends keyof UserMediaPayload>(payload: UserMediaPayload, key: Key) =>
+  Object.prototype.hasOwnProperty.call(payload, key);
+
+const normalizeNote = (value: UserMediaPayload[UserMediaNoteField]) => {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+
+  return value ?? null;
+};
+
+const normalizeWatchedOnForStorage = (value: UserMediaPayload['watchedOn']) => {
+  if (value === null) return null;
+  if (!value) return undefined;
+
+  return new Date(`${value}T00:00:00.000Z`);
+};
+
+const getTrackingUpdates = (
+  payload: UserMediaPayload,
+  existingMedia: { rating: number | null } | null,
+  timestamp: Date,
+): UserMediaTrackingUpdate => {
+  const updates: UserMediaTrackingUpdate = {};
+
+  if (hasPayloadKey(payload, 'rating')) {
+    const nextRating = payload.rating ?? null;
+
+    updates.rating = nextRating;
+    updates.ratedAt = nextRating === null ? null : existingMedia?.rating === nextRating ? undefined : timestamp;
+  }
+
+  if (hasPayloadKey(payload, 'watchedOn')) {
+    updates.watchedOn = normalizeWatchedOnForStorage(payload.watchedOn);
+  }
+
+  noteFields.forEach((field) => {
+    if (hasPayloadKey(payload, field)) {
+      updates[field] = normalizeNote(payload[field]);
+    }
+  });
+
+  return updates;
+};
 
 export async function upsertUserMedia(userId: string, payload: UserMediaPayload, flagUpdate: UserMediaFlagUpdate) {
   const mediaType = payload.media_type as MediaType;
@@ -53,10 +108,12 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
         liked: true,
         watched: true,
         watchlist: true,
+        rating: true,
       },
     });
     const now = new Date();
     const timestampUpdates = getTimestampUpdates(flagUpdate, now);
+    const trackingUpdates = getTrackingUpdates(payload, existingMedia, now);
 
     const updatedMedia = await tx.userMedia.upsert({
       where: {
@@ -69,6 +126,7 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
       update: {
         ...flagUpdate,
         ...timestampUpdates,
+        ...trackingUpdates,
       },
       create: {
         userId,
@@ -76,6 +134,7 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
         media_type: mediaType,
         ...flagUpdate,
         ...timestampUpdates,
+        ...trackingUpdates,
       },
     });
 

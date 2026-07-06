@@ -1,5 +1,26 @@
 import { z } from 'zod';
 
+const noteSchema = z.preprocess(
+  (value) => (typeof value === 'string' && value.trim() === '' ? null : value),
+  z.string().max(500, 'Note must be 500 characters or less').nullable().optional(),
+);
+
+const getTodayDateOnly = () => new Date().toISOString().slice(0, 10);
+
+const watchedOnSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Watched date must be a valid date')
+  .refine((value) => {
+    const date = new Date(`${value}T00:00:00.000Z`);
+
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  }, {
+    message: 'Watched date must be a valid date',
+  })
+  .refine((value) => value <= getTodayDateOnly(), {
+    message: 'Watched date cannot be in the future',
+  });
+
 export const userMediaSchema = z.object({
   id: z.coerce.string().optional(),
   media_id: z.number({ required_error: 'Media ID is required' }),
@@ -25,6 +46,11 @@ export const userMediaSchema = z.object({
   original_language: z.string().nullable().optional(),
   runtime: z.number().nullable().optional(),
   status: z.string().nullable().optional(),
+  rating: z.number().int().min(1).max(10).nullable().optional(),
+  watchedOn: watchedOnSchema.nullable().optional(),
+  likedNote: noteSchema,
+  watchedNote: noteSchema,
+  watchlistNote: noteSchema,
 });
 
 export type UserMediaPayload = z.infer<typeof userMediaSchema>;

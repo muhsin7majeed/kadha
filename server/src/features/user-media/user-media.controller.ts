@@ -7,21 +7,25 @@ import { upsertUserMedia } from './user-media.service';
 
 export const addToLiked = async (req: Request, res: Response) => {
   const payload = req.body as UserMediaPayload;
-
-  await upsertUserMedia(requireAuthUser(req).id, payload, {
+  const flagUpdate = {
     liked: payload.liked,
-  });
+    ...(payload.watched === true ? { watched: true, watchlist: false } : {}),
+  };
+
+  await upsertUserMedia(requireAuthUser(req).id, payload, flagUpdate);
 
   return sendMessage(res, `${payload.media_type} ${payload.liked ? 'liked' : 'unliked'}`);
 };
 
 export const addToWatched = async (req: Request, res: Response) => {
   const payload = req.body as UserMediaPayload;
-
-  await upsertUserMedia(requireAuthUser(req).id, payload, {
+  const flagUpdate = {
     watched: payload.watched,
     watchlist: false,
-  });
+    ...(typeof payload.liked === 'boolean' ? { liked: payload.liked } : {}),
+  };
+
+  await upsertUserMedia(requireAuthUser(req).id, payload, flagUpdate);
 
   return sendMessage(res, `${payload.media_type} ${payload.watched ? 'watched' : 'unwatched'}`);
 };

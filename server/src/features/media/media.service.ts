@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { createPaginationMeta } from '@/lib/pagination';
 import { badRequest } from '@/lib/http';
+import { pickUserMediaTrackingDetails } from '@/features/user-media/user-media.serializer';
 import {
   DEFAULT_WATCH_REGION,
   getWatchRegionName,
@@ -181,6 +182,7 @@ export async function getMediaDetails(userId: string, mediaType: string, id: str
     liked: interactions?.liked ?? false,
     watched: interactions?.watched ?? false,
     watchlist: interactions?.watchlist ?? false,
+    ...pickUserMediaTrackingDetails(interactions),
   } as TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta;
 }
 
