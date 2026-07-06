@@ -1,8 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Provider } from '@/components/ui/provider';
+import { renderWithProviders } from '@/test/render';
 import SearchInput from './search-input';
 
 describe('SearchInput', () => {
@@ -10,11 +10,7 @@ describe('SearchInput', () => {
     const user = userEvent.setup();
     const onSearchChange = vi.fn();
 
-    render(
-      <Provider>
-        <SearchInput debounceMs={0} onSearchChange={onSearchChange} placeholder="Find media" />
-      </Provider>,
-    );
+    renderWithProviders(<SearchInput debounceMs={0} onSearchChange={onSearchChange} placeholder="Find media" />);
 
     await user.type(screen.getByRole('textbox', { name: 'Find media' }), 'dune');
 

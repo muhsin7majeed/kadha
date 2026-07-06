@@ -19,6 +19,7 @@
 - Added admin API coverage for unauthenticated, non-admin, overview, user list, and user detail access.
 - Added collection sharing edge-case coverage for duplicate invites, revoked invites, removed members, leaving shared collections, and owner leave rejection.
 - Added remaining backend coverage for auth edge cases, friendship lifecycle, notifications, activity, data export, and TMDB-backed media service behavior.
+- Added frontend coverage for route guards, session cleanup, token state, media action payload/copy/cache utilities, metadata parsers, collection helpers, and theme presets.
 
 #### CI
 
