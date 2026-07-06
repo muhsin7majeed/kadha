@@ -32,6 +32,17 @@ export interface UserMediaListResponseBody {
   };
 }
 
+export interface UserMediaAccessResponseBody {
+  data: UserMediaListItem[];
+  pagination?: {
+    total: number;
+  };
+  access: {
+    canView: boolean;
+    lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY';
+  };
+}
+
 export const buildTestMediaPayload = ({
   mediaId = 881001,
   mediaType = 'movie',
@@ -85,4 +96,13 @@ export const getCurrentUserMediaList = async (user: TestUser, flag: UserMediaFla
     .expect(200);
 
   return response.body as UserMediaListResponseBody;
+};
+
+export const getUserMediaListByUsername = async (viewer: TestUser, username: string, flag: UserMediaFlag) => {
+  const response = await request(await getTestApp())
+    .get(`/api/users/${username}/${flag}`)
+    .set('Authorization', authorization(viewer))
+    .expect(200);
+
+  return response.body as UserMediaAccessResponseBody;
 };
