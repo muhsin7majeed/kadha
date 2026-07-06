@@ -97,6 +97,29 @@ export interface TMDBSeason {
   vote_average: number;
 }
 
+export interface TMDBTvSeasonEpisode {
+  air_date: string | null;
+  episode_number: number;
+  id: number;
+  name: string;
+  overview: string;
+  runtime: number | null;
+  season_number: number;
+  still_path: string | null;
+  vote_average: number;
+  vote_count: number;
+}
+
+export interface TMDBTvSeasonDetails {
+  air_date: string | null;
+  episodes: TMDBTvSeasonEpisode[];
+  id: number;
+  name: string;
+  overview: string;
+  poster_path: string | null;
+  season_number: number;
+}
+
 export interface TMDBMovieDetails extends Omit<TMDBMovie, 'genre_ids'> {
   belongs_to_collection: {
     id: number;

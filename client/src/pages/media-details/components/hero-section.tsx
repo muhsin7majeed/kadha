@@ -17,17 +17,30 @@ import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/m
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
-import type { MediaAction } from '@/features/user-media/user-media.types';
+import type { MediaAction, TvProgressResponse } from '@/features/user-media/user-media.types';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionStateLabel } from '@/features/user-media/utils/media-action-copy';
+import { getTvProgressPrimaryActionLabel } from '@/features/user-media/utils/tv-progress';
 import { formatDate, minutesToHours } from '@/utils/date';
 
 interface HeroSectionProps {
   data: MovieDetailsWithMeta | TvDetailsWithMeta;
+  tvProgress?: TvProgressResponse;
+  isTvProgressLoading?: boolean;
+  isMarkingNextEpisode?: boolean;
+  onMarkNextEpisode?: () => void;
+  onOpenTvProgress?: () => void;
 }
 
-const HeroSection = ({ data }: HeroSectionProps) => {
+const HeroSection = ({
+  data,
+  tvProgress,
+  isTvProgressLoading,
+  isMarkingNextEpisode,
+  onMarkNextEpisode,
+  onOpenTvProgress,
+}: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingAction, setTrackingAction] = useState<MediaAction | null>(null);
   const isMovie = data.media_type === 'movie';
@@ -55,6 +68,16 @@ const HeroSection = ({ data }: HeroSectionProps) => {
 
   const handleWatched = async () => {
     if (isAddingToWatched) return;
+    if (!isMovie) {
+      if (tvProgress?.status === 'in_progress' && tvProgress.nextEpisode) {
+        onMarkNextEpisode?.();
+        return;
+      }
+
+      onOpenTvProgress?.();
+      return;
+    }
+
     if (!data.watched) {
       setTrackingAction('watched');
       return;
@@ -286,13 +309,13 @@ const HeroSection = ({ data }: HeroSectionProps) => {
                 {getMediaActionStateLabel('liked', Boolean(data.liked))}
               </Button>
               <Button
-                variant={data.watched ? 'solid' : 'outline'}
+                variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : data.watched ? 'solid' : 'outline'}
                 colorPalette="blue"
                 onClick={handleWatched}
-                loading={isAddingToWatched}
+                loading={isMovie ? isAddingToWatched : isTvProgressLoading || isMarkingNextEpisode}
               >
                 <LuCheck />
-                {getMediaActionStateLabel('watched', Boolean(data.watched))}
+                {isMovie ? getMediaActionStateLabel('watched', Boolean(data.watched)) : getTvProgressPrimaryActionLabel(tvProgress)}
               </Button>
               <Button
                 variant={data.watchlist ? 'solid' : 'outline'}

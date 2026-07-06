@@ -1,10 +1,13 @@
 import { Box, Button, Container, Heading, HStack, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LuArrowLeft, LuRefreshCw } from 'react-icons/lu';
 import { useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
 import useMediaDetails from '@/features/media/api/use-media-details';
+import TvEpisodeProgressDialog from '@/features/user-media/components/tv-episode-progress-dialog';
+import useMarkNextEpisodeWatched from '@/features/user-media/api/use-mark-next-episode-watched';
+import useTvProgress from '@/features/user-media/api/use-tv-progress';
 import { toaster } from '@/components/ui/toaster-store';
 import HeroSection from './components/hero-section';
 import OverviewSection from './components/overview-section';
@@ -16,9 +19,14 @@ import WatchProvidersSection from './components/watch-providers-section';
 const MediaDetails = () => {
   const { mediaType, id } = useParams<{ mediaType: MediaType; id: string }>();
   const navigate = useNavigate();
+  const [tvProgressDialogOpen, setTvProgressDialogOpen] = useState(false);
+  const [tvProgressDialogSeason, setTvProgressDialogSeason] = useState<number | undefined>();
   const isValidMediaType = mediaType === 'movie' || mediaType === 'tv';
   const hasValidParams = isValidMediaType && Boolean(id);
   const { data, isError, isLoading, isFetching, refetch } = useMediaDetails(isValidMediaType ? mediaType : undefined, id);
+  const tvMediaId = data?.media_type === 'tv' ? data.media_id : undefined;
+  const tvProgress = useTvProgress(tvMediaId, { enabled: Boolean(tvMediaId) });
+  const markNextEpisodeWatched = useMarkNextEpisodeWatched(tvMediaId ?? 0);
 
   useEffect(() => {
     if (hasValidParams) return;
@@ -87,11 +95,31 @@ const MediaDetails = () => {
   const validMediaType = mediaType as MediaType;
   const validId = id as string;
   const title = data.media_type === 'movie' ? data.title : data.name;
+  const openTvProgressDialog = (seasonNumber?: number) => {
+    setTvProgressDialogSeason(seasonNumber);
+    setTvProgressDialogOpen(true);
+  };
 
   return (
     <Box minH="100vh" bg="bg">
       {/* Hero Section with Backdrop and Poster */}
-      <HeroSection data={data} />
+      <HeroSection
+        data={data}
+        tvProgress={tvProgress.data}
+        isTvProgressLoading={tvProgress.isLoading}
+        isMarkingNextEpisode={markNextEpisodeWatched.isPending}
+        onMarkNextEpisode={() => markNextEpisodeWatched.mutate()}
+        onOpenTvProgress={openTvProgressDialog}
+      />
+
+      {tvMediaId && (
+        <TvEpisodeProgressDialog
+          mediaId={tvMediaId}
+          initialSeasonNumber={tvProgressDialogSeason}
+          open={tvProgressDialogOpen}
+          onOpenChange={setTvProgressDialogOpen}
+        />
+      )}
 
       {/* Main Content */}
       <Container maxW="6xl" py={8}>
@@ -102,7 +130,18 @@ const MediaDetails = () => {
           <WatchProvidersSection mediaType={validMediaType} id={validId} title={title} />
 
           {/* Media-specific Info */}
-          {data.media_type === 'movie' ? <MovieInfo data={data} /> : <TvInfo data={data} />}
+          {data.media_type === 'movie' ? (
+            <MovieInfo data={data} />
+          ) : (
+            <TvInfo
+              data={data}
+              progress={tvProgress.data}
+              isProgressLoading={tvProgress.isLoading}
+              isMarkingNextEpisode={markNextEpisodeWatched.isPending}
+              onMarkNextEpisode={() => markNextEpisodeWatched.mutate()}
+              onOpenTvProgress={openTvProgressDialog}
+            />
+          )}
 
           {/* Production Info (shared between movie and TV) */}
           <ProductionInfo data={data} />

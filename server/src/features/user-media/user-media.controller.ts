@@ -1,8 +1,17 @@
 import { Request, Response } from 'express';
 
-import { sendMessage } from '@/lib/http';
+import { sendData, sendMessage } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
-import { UserMediaPayload } from './user-media.schema';
+import { EpisodeWatchPayload, UserMediaPayload } from './user-media.schema';
+import {
+  clearEpisodeWatched,
+  clearSeasonWatched,
+  getTvProgress,
+  markAllAiredWatched,
+  markEpisodeWatched,
+  markNextEpisodeWatched,
+  markSeasonWatched,
+} from './tv-progress.service';
 import { upsertUserMedia } from './user-media.service';
 
 export const addToLiked = async (req: Request, res: Response) => {
@@ -41,4 +50,61 @@ export const addToWatchlist = async (req: Request, res: Response) => {
     res,
     `${payload.media_type} ${payload.watchlist ? 'added to watchlist' : 'removed from watchlist'}`,
   );
+};
+
+export const getTvProgressController = async (req: Request, res: Response) => {
+  const selectedSeasonNumber =
+    typeof req.query.seasonNumber === 'string' ? Number(req.query.seasonNumber) : undefined;
+  const includeSpecials = req.query.includeSpecials === 'true';
+  const data = await getTvProgress(requireAuthUser(req).id, req.params.mediaId, {
+    selectedSeasonNumber,
+    includeSpecials,
+  });
+
+  return sendData(res, data);
+};
+
+export const markEpisodeWatchedController = async (req: Request, res: Response) => {
+  const data = await markEpisodeWatched(
+    requireAuthUser(req).id,
+    req.params.mediaId,
+    req.body as EpisodeWatchPayload,
+  );
+
+  return sendData(res, data);
+};
+
+export const clearEpisodeWatchedController = async (req: Request, res: Response) => {
+  const data = await clearEpisodeWatched(
+    requireAuthUser(req).id,
+    req.params.mediaId,
+    req.params.seasonNumber,
+    req.params.episodeNumber,
+  );
+
+  return sendData(res, data);
+};
+
+export const markSeasonWatchedController = async (req: Request, res: Response) => {
+  const data = await markSeasonWatched(requireAuthUser(req).id, req.params.mediaId, req.params.seasonNumber);
+
+  return sendData(res, data);
+};
+
+export const clearSeasonWatchedController = async (req: Request, res: Response) => {
+  const data = await clearSeasonWatched(requireAuthUser(req).id, req.params.mediaId, req.params.seasonNumber);
+
+  return sendData(res, data);
+};
+
+export const markAllAiredWatchedController = async (req: Request, res: Response) => {
+  const data = await markAllAiredWatched(requireAuthUser(req).id, req.params.mediaId);
+
+  return sendData(res, data);
+};
+
+export const markNextEpisodeWatchedController = async (req: Request, res: Response) => {
+  const data = await markNextEpisodeWatched(requireAuthUser(req).id, req.params.mediaId);
+
+  return sendData(res, data);
 };

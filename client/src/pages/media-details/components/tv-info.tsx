@@ -2,21 +2,48 @@ import { Badge, Box, Button, Card, Heading, HStack, Image, SimpleGrid, Text, VSt
 import { useState } from 'react';
 import { LuCalendar, LuChevronDown, LuChevronUp, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
 import type { TvDetailsWithMeta } from '@/features/media/media.types';
+import useUpdateSeasonWatch from '@/features/user-media/api/use-update-season-watch';
+import TvProgressSummary from '@/features/user-media/components/tv-progress-summary';
+import type { TvProgressResponse } from '@/features/user-media/user-media.types';
 import InfoCard from './info-card';
 import { formatDate } from '@/utils/date';
 
 interface TvInfoProps {
   data: TvDetailsWithMeta;
+  progress?: TvProgressResponse;
+  isProgressLoading?: boolean;
+  isMarkingNextEpisode?: boolean;
+  onMarkNextEpisode: () => void;
+  onOpenTvProgress: (seasonNumber?: number) => void;
 }
 
-const TvInfo = ({ data }: TvInfoProps) => {
+const TvInfo = ({
+  data,
+  progress,
+  isProgressLoading,
+  isMarkingNextEpisode,
+  onMarkNextEpisode,
+  onOpenTvProgress,
+}: TvInfoProps) => {
   const [showAllSeasons, setShowAllSeasons] = useState(false);
+  const updateSeasonWatch = useUpdateSeasonWatch(data.media_id);
   const regularSeasons = data.seasons?.filter((season) => season.season_number > 0) ?? [];
   const specialsCount = data.seasons?.filter((season) => season.season_number === 0).length ?? 0;
   const visibleSeasons = showAllSeasons ? regularSeasons : regularSeasons.slice(0, 10);
+  const progressBySeason = new Map((progress?.seasons ?? []).map((season) => [season.seasonNumber, season]));
 
   return (
     <VStack gap={8} align="stretch">
+      <Box>
+        <TvProgressSummary
+          progress={progress}
+          isLoading={isProgressLoading}
+          isMarkingNext={isMarkingNextEpisode}
+          onMarkNext={onMarkNextEpisode}
+          onTrackEpisodes={() => onOpenTvProgress()}
+        />
+      </Box>
+
       {/* Quick Stats */}
       <Box>
         <Heading size="lg" mb={4}>
@@ -189,54 +216,104 @@ const TvInfo = ({ data }: TvInfoProps) => {
             )}
           </HStack>
           <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} gap={4}>
-            {visibleSeasons.map((season) => (
-              <Card.Root key={season.id} variant="outline" overflow="hidden">
-                {season.poster_path ? (
-                  <Image
-                    src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
-                    alt={season.name}
-                    width="100%"
-                    height="200px"
-                    objectFit="cover"
-                  />
-                ) : (
-                  <Box
-                    width="100%"
-                    height="200px"
-                    bg="bg.subtle"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <LuPlay size={40} />
-                  </Box>
-                )}
-                <Card.Body p={3}>
-                  <VStack align="start" gap={1}>
-                    <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
-                      {season.name}
-                    </Text>
-                    <HStack gap={2} fontSize="xs" color="fg.muted" flexWrap="wrap">
-                      <Text>{season.episode_count} episodes</Text>
-                      {season.air_date && (
-                        <>
-                          <Text>•</Text>
-                          <Text>{formatDate(season.air_date, 'YYYY')}</Text>
-                        </>
+            {visibleSeasons.map((season) => {
+              const seasonProgress = progressBySeason.get(season.season_number);
+              const isSeasonWatched = Boolean(
+                seasonProgress &&
+                  seasonProgress.airedCount > 0 &&
+                  seasonProgress.watchedCount >= seasonProgress.airedCount,
+              );
+
+              return (
+                <Card.Root key={season.id} variant="outline" overflow="hidden">
+                  {season.poster_path ? (
+                    <Image
+                      src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
+                      alt={season.name}
+                      width="100%"
+                      height="200px"
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <Box
+                      width="100%"
+                      height="200px"
+                      bg="bg.subtle"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <LuPlay size={40} />
+                    </Box>
+                  )}
+                  <Card.Body p={3}>
+                    <VStack align="start" gap={2}>
+                      <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
+                        {season.name}
+                      </Text>
+                      <HStack gap={2} fontSize="xs" color="fg.muted" flexWrap="wrap">
+                        <Text>{season.episode_count} episodes</Text>
+                        {season.air_date && (
+                          <>
+                            <Text>•</Text>
+                            <Text>{formatDate(season.air_date, 'YYYY')}</Text>
+                          </>
+                        )}
+                      </HStack>
+                      {seasonProgress && seasonProgress.airedCount > 0 && (
+                        <Text fontSize="xs" color="fg.muted">
+                          {seasonProgress.watchedCount} of {seasonProgress.airedCount} watched
+                        </Text>
                       )}
-                    </HStack>
-                    {season.vote_average > 0 && (
-                      <Badge size="sm" colorPalette="yellow">
-                        ★ {season.vote_average.toFixed(1)}
-                      </Badge>
-                    )}
-                  </VStack>
-                </Card.Body>
-              </Card.Root>
-            ))}
+                      {isSeasonWatched ? (
+                        <Badge size="sm" colorPalette="green">
+                          Watched
+                        </Badge>
+                      ) : (
+                        season.vote_average > 0 && (
+                          <Badge size="sm" colorPalette="yellow">
+                            ★ {season.vote_average.toFixed(1)}
+                          </Badge>
+                        )
+                      )}
+                      <HStack gap="2" flexWrap="wrap" pt="1">
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          colorPalette="gray"
+                          onClick={() => onOpenTvProgress(season.season_number)}
+                        >
+                          Continue
+                        </Button>
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          colorPalette={isSeasonWatched ? 'gray' : 'blue'}
+                          disabled={!seasonProgress?.airedCount}
+                          loading={updateSeasonWatch.isPending}
+                          onClick={() =>
+                            updateSeasonWatch.mutate({
+                              seasonNumber: season.season_number,
+                              watched: !isSeasonWatched,
+                            })
+                          }
+                        >
+                          {isSeasonWatched ? 'Clear' : 'Mark watched'}
+                        </Button>
+                      </HStack>
+                    </VStack>
+                  </Card.Body>
+                </Card.Root>
+              );
+            })}
           </SimpleGrid>
           {regularSeasons.length > 10 && (
-            <Button variant="outline" colorPalette="gray" mt={4} onClick={() => setShowAllSeasons((current) => !current)}>
+            <Button
+              variant="outline"
+              colorPalette="gray"
+              mt={4}
+              onClick={() => setShowAllSeasons((current) => !current)}
+            >
               {showAllSeasons ? <LuChevronUp /> : <LuChevronDown />}
               {showAllSeasons ? 'Show fewer seasons' : `Show all ${regularSeasons.length} seasons`}
             </Button>

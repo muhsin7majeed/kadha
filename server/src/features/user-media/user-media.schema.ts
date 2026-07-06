@@ -53,4 +53,14 @@ export const userMediaSchema = z.object({
   watchlistNote: noteSchema,
 });
 
+export const episodeWatchSchema = z.object({
+  seasonNumber: z.number().int().min(0),
+  episodeNumber: z.number().int().min(1),
+  episodeId: z.number().int().positive().nullable().optional(),
+  watchedOn: watchedOnSchema.nullable().optional(),
+  rating: z.number().int().min(1).max(10).nullable().optional(),
+  note: noteSchema,
+});
+
 export type UserMediaPayload = z.infer<typeof userMediaSchema>;
+export type EpisodeWatchPayload = z.infer<typeof episodeWatchSchema>;

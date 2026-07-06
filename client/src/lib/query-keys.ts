@@ -91,6 +91,9 @@ export const userQueryKeys = {
 
 export const userMediaQueryKeys = {
   liked: ['liked'] as const,
+  tvProgress: ['tv-progress'] as const,
+  tvProgressByMedia: (mediaId?: number, seasonNumber?: number, includeSpecials = false) =>
+    ['tv-progress', mediaId, seasonNumber, includeSpecials] as const,
   watched: ['watched'] as const,
   watchList: ['watch-list'] as const,
 };
