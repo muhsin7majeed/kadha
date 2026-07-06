@@ -62,6 +62,17 @@ docker compose up --build
 - App: http://localhost:3000
 - API: http://localhost:5000
 
+### Test
+
+Run tests through Docker Compose so the dependency and runtime versions match local development:
+
+```bash
+docker compose run --rm server npm test
+docker compose run --rm client npm test
+```
+
+The server test setup creates a temporary SQLite database for each run and does not touch the development database.
+
 ## Configuration
 
 ### Custom Instance Name

@@ -10,6 +10,10 @@
 
 ### Engineering Changes
 
+#### Testing
+
+- Added Vitest-based server and client test foundations, including Supertest API coverage, an isolated Prisma SQLite test database, and React Testing Library setup.
+
 #### Frontend Architecture
 
 - Split frontend route declarations into domain route modules while preserving paths and lazy loading.
