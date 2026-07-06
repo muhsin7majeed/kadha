@@ -6,6 +6,7 @@ import {
   formatUserMediaTrackingDetails,
   stripPrivateUserMediaTrackingDetails,
 } from '@/features/user-media/user-media.serializer';
+import { getTvProgress } from '@/features/user-media/tv-progress.service';
 import { envConfig } from '@/config/env';
 import { normalizeWatchRegion } from '@/constants/watch-regions';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
@@ -15,6 +16,7 @@ import { prisma } from '@/lib/prisma';
 import { canViewByPrivacy, getLockedReason, isBlockingRelationship } from '@/lib/privacy-utils';
 
 type UserMediaFlag = 'watchlist' | 'liked' | 'watched';
+export type InProgressTvSort = 'recent' | 'next';
 
 const viewableResource = <T>(data: T): ResourceAccessResponse<T> => ({
   data,
@@ -615,3 +617,100 @@ export const getCurrentUserMediaByFlag = async (id: string, flag: UserMediaFlag,
     pagination: result.pagination,
   };
 };
+
+export async function getCurrentUserInProgressTv(id: string, page: number, limit: number, sort: InProgressTvSort) {
+  const episodeWatches = await prisma.userEpisodeWatch.findMany({
+    where: {
+      userId: id,
+      media_type: 'tv',
+    },
+    orderBy: {
+      watchedAt: 'desc',
+    },
+    select: {
+      media_id: true,
+      watchedAt: true,
+    },
+  });
+  const lastWatchedByMedia = new Map<number, Date>();
+
+  episodeWatches.forEach((watch) => {
+    if (!lastWatchedByMedia.has(watch.media_id)) {
+      lastWatchedByMedia.set(watch.media_id, watch.watchedAt);
+    }
+  });
+
+  const mediaIds = Array.from(lastWatchedByMedia.keys());
+
+  if (mediaIds.length === 0) {
+    return {
+      ...viewableResource([]),
+      pagination: createPaginationMeta(page, limit, 0),
+    };
+  }
+
+  const mediaRows = await prisma.userMedia.findMany({
+    where: {
+      userId: id,
+      media_id: {
+        in: mediaIds,
+      },
+      media_type: 'tv',
+    },
+    include: {
+      media: true,
+    },
+  });
+  const mediaById = new Map(mediaRows.map((item) => [item.media_id, item]));
+  const progressItems = (
+    await Promise.all(
+      mediaIds.map(async (mediaId) => {
+        const media = mediaById.get(mediaId);
+        const lastWatchedAt = lastWatchedByMedia.get(mediaId);
+
+        if (!media || !lastWatchedAt) return null;
+
+        const progress = await getTvProgress(id, String(mediaId));
+
+        if (progress.watchedEpisodeCount === 0 || progress.status === 'completed') {
+          return null;
+        }
+
+        return {
+          ...formatUserMediaTrackingDetails(flattenMediaSnapshot(media)),
+          tvProgress: {
+            status: progress.status,
+            watchedEpisodeCount: progress.watchedEpisodeCount,
+            totalAiredEpisodeCount: progress.totalAiredEpisodeCount,
+            nextEpisode: progress.nextEpisode,
+            lastWatchedAt: lastWatchedAt.toISOString(),
+          },
+        };
+      }),
+    )
+  ).filter((item) => item !== null);
+
+  progressItems.sort((first, second) => {
+    if (sort === 'next') {
+      const firstNext = first.tvProgress.nextEpisode;
+      const secondNext = second.tvProgress.nextEpisode;
+
+      if (firstNext && secondNext) {
+        return firstNext.seasonNumber - secondNext.seasonNumber || firstNext.episodeNumber - secondNext.episodeNumber;
+      }
+
+      if (firstNext) return -1;
+      if (secondNext) return 1;
+    }
+
+    return second.tvProgress.lastWatchedAt.localeCompare(first.tvProgress.lastWatchedAt);
+  });
+
+  const start = (page - 1) * limit;
+  const paginatedItems = progressItems.slice(start, start + limit);
+
+  return {
+    ...viewableResource(paginatedItems),
+    pagination: createPaginationMeta(page, limit, progressItems.length),
+  };
+}

@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { validate } from '@/middlewares/validate';
 import {
   exportMe,
+  getUserInProgressTv,
   getMe,
   getUserCollectionsByUsernameController,
   getUserLiked,
@@ -26,6 +27,7 @@ router.get('/export', exportMe);
 router.get('/watchlist', getUserWatchlist);
 router.get('/liked', getUserLiked);
 router.get('/watched', getUserWatched);
+router.get('/in-progress', getUserInProgressTv);
 
 router.get('/search', searchUsers);
 

@@ -7,10 +7,12 @@ import { requireAuthUser } from '@/middlewares/auth';
 import {
   exportCurrentUserData,
   getCurrentUser,
+  getCurrentUserInProgressTv,
   getCurrentUserMediaByFlag,
   getUserCollectionsByUsername,
   getUserMediaByUsername,
   getUserProfileByUsername,
+  InProgressTvSort,
   lockedResource,
   searchUsersByUsername,
   updateCurrentUser,
@@ -160,6 +162,21 @@ export const getUserWatched = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
   const { page, limit } = getPaginationParams(req.query);
   const data = await getCurrentUserMediaByFlag(id, 'watched', page, limit);
+
+  sendResponse(res, data);
+};
+
+const getInProgressTvSort = (sort: unknown): InProgressTvSort => {
+  if (sort === undefined || sort === 'recent') return 'recent';
+  if (sort === 'next') return 'next';
+
+  throw badRequest('Sort must be recent or next');
+};
+
+export const getUserInProgressTv = async (req: Request, res: Response) => {
+  const { id } = requireAuthUser(req);
+  const { page, limit } = getPaginationParams(req.query);
+  const data = await getCurrentUserInProgressTv(id, page, limit, getInProgressTvSort(req.query.sort));
 
   sendResponse(res, data);
 };

@@ -79,3 +79,17 @@ export interface TvProgressResponse {
   seasons: TvProgressSeason[];
   selectedSeason?: TvProgressSelectedSeason;
 }
+
+export type InProgressTvSort = 'recent' | 'next';
+
+export interface TvInProgressSummary {
+  status: Exclude<TvProgressStatus, 'not_started' | 'plan_to_watch'>;
+  watchedEpisodeCount: number;
+  totalAiredEpisodeCount: number;
+  nextEpisode: TvProgressNextEpisode | null;
+  lastWatchedAt: string;
+}
+
+export interface TvInProgressItem extends UserMedia {
+  tvProgress: TvInProgressSummary;
+}

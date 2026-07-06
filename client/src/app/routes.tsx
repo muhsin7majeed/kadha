@@ -13,6 +13,7 @@ const MainLayout = lazy(() => import('@/components/main-layout'));
 const Activity = lazy(() => import('@/pages/activity'));
 const Collections = lazy(() => import('@/pages/collections'));
 const Home = lazy(() => import('@/pages/home'));
+const InProgress = lazy(() => import('@/pages/in-progress'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
@@ -33,6 +34,7 @@ export function AppRoutes() {
             <Route path="activity" element={<Activity />} />
             <Route path="watched" element={<Watched />} />
             <Route path="watchlist" element={<Watchlist />} />
+            <Route path="in-progress" element={<InProgress />} />
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />

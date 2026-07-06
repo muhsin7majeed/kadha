@@ -1,3 +1,4 @@
+import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const tmdbClient = vi.hoisted(() => ({
@@ -15,6 +16,8 @@ import {
   markNextEpisodeWatched,
   markSeasonWatched,
 } from '@/features/user-media/tv-progress.service';
+import { getTestApp } from './helpers/app';
+import { authorization, registerTestUser } from './helpers/auth';
 
 const createProgressUser = (username: string) =>
   prisma.user.create({
@@ -287,6 +290,46 @@ describe('TV progress service', () => {
     expect(rows[0]).toMatchObject({
       note: 'Private episode note.',
       rating: 8,
+    });
+  });
+
+  it('lists current user in-progress TV shows with next episode metadata', async () => {
+    const user = await registerTestUser('tv-progress-list-user');
+
+    await markNextEpisodeWatched(user.userId, '887101');
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=next&page=1&limit=1')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      access: {
+        canView: true,
+      },
+      pagination: {
+        page: 1,
+        limit: 1,
+        total: 1,
+      },
+      data: [
+        {
+          media_id: 887101,
+          media_type: 'tv',
+          title: 'Progress Show',
+          tvProgress: {
+            status: 'in_progress',
+            watchedEpisodeCount: 1,
+            totalAiredEpisodeCount: 4,
+            nextEpisode: {
+              seasonNumber: 1,
+              episodeNumber: 2,
+              name: 'Episode 2',
+            },
+            lastWatchedAt: expect.any(String),
+          },
+        },
+      ],
     });
   });
 });

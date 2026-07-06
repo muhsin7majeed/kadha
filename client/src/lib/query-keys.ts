@@ -90,6 +90,8 @@ export const userQueryKeys = {
 };
 
 export const userMediaQueryKeys = {
+  inProgressTvRoot: ['in-progress-tv'] as const,
+  inProgressTv: (page = 1, sort = 'recent') => ['in-progress-tv', page, sort] as const,
   liked: ['liked'] as const,
   tvProgress: ['tv-progress'] as const,
   tvProgressByMedia: (mediaId?: number, seasonNumber?: number, includeSpecials = false) =>
