@@ -17,6 +17,7 @@
 - Added user-media API coverage for liked, watched, watchlist, watchlist removal on watched media, and per-user media isolation.
 - Added profile and media privacy API coverage for private, friends-only, everyone-visible, owner, and accepted-friend access.
 - Added admin API coverage for unauthenticated, non-admin, overview, user list, and user detail access.
+- Added collection sharing edge-case coverage for duplicate invites, revoked invites, removed members, leaving shared collections, and owner leave rejection.
 
 #### Frontend Architecture
 
