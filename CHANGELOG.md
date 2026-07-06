@@ -19,6 +19,10 @@
 - Added admin API coverage for unauthenticated, non-admin, overview, user list, and user detail access.
 - Added collection sharing edge-case coverage for duplicate invites, revoked invites, removed members, leaving shared collections, and owner leave rejection.
 
+#### CI
+
+- Added a GitHub Actions CI workflow that runs Docker Compose-backed server build/tests and client lint/tests/build on pushes and pull requests to `master`.
+
 #### Frontend Architecture
 
 - Split frontend route declarations into domain route modules while preserving paths and lazy loading.

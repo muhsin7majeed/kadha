@@ -73,6 +73,8 @@ docker compose run --rm client npm test
 
 The server test setup creates a temporary SQLite database for each run and does not touch the development database.
 
+CI runs the same Docker Compose-backed server build/tests and client lint/tests/build on pushes and pull requests to `master`.
+
 ## Configuration
 
 ### Custom Instance Name

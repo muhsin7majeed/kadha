@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DATABASE_URL: file:./db/ci.db
+  JWT_ACCESS_SECRET: ci-access-secret
+  JWT_REFRESH_SECRET: ci-refresh-secret
+  TMDB_API_KEY: ci-tmdb-api-key
+  TMDB_BEARER_TOKEN: ci-tmdb-bearer-token
+  APP_NAME: Kadha
+  CLIENT_URL: http://localhost:3000
+  APP_URL: http://localhost:3000
+  VITE_APP_NAME: Kadha
+  VITE_APP_URL: http://localhost:3000
+  VITE_API_URL: http://localhost:5000
+
+jobs:
+  server:
+    name: Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build server image
+        run: docker compose build server
+
+      - name: Build server
+        run: docker compose run --rm --no-deps server npm run build
+
+      - name: Test server
+        run: docker compose run --rm --no-deps server npm test
+
+  client:
+    name: Client
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build client image
+        run: docker compose build client
+
+      - name: Lint client
+        run: docker compose run --rm --no-deps client npm run lint
+
+      - name: Test client
+        run: docker compose run --rm --no-deps client npm test
+
+      - name: Build client
+        run: docker compose run --rm --no-deps client npm run build
