@@ -69,7 +69,7 @@ const Navbar = () => {
                 </Flex>
               ) : (
                 <>
-                  <Button variant="ghost" colorPalette="gray" size="sm" asChild display={{ base: 'none', sm: 'flex' }}>
+                  <Button variant="ghost" colorPalette="gray" size="sm" asChild>
                     <Link to="/auth/login">Login</Link>
                   </Button>
 
