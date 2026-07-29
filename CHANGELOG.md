@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.7
+
 ### Feature Changes
 
 #### Navigation
@@ -47,6 +49,7 @@
 #### CI
 
 - Added a GitHub Actions CI workflow that runs Docker Compose-backed server build/tests and client lint/tests/build on pushes and pull requests to `master`.
+- Cancelled superseded CI and deployment runs so only the latest workflow run for a branch continues.
 
 #### Frontend Architecture
 
