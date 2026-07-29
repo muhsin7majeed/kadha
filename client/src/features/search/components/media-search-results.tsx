@@ -48,13 +48,17 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
 
   return (
     <Box>
-      <Text color="fg.muted" fontSize="sm" mb={4}>
+      <Text color="fg.muted" fontSize={{ base: 'xs', md: 'sm' }} mb={4}>
         {data.pagination.total} results
       </Text>
 
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={4}>
         {data.data.map((media) => (
-          <MediaCard key={`${media.media_type}:${media.media_id}`} media={toMediaCardModel(media)} onNavigate={onClose} />
+          <MediaCard
+            key={`${media.media_type}:${media.media_id}`}
+            media={toMediaCardModel(media)}
+            onNavigate={onClose}
+          />
         ))}
       </SimpleGrid>
 

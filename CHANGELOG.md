@@ -4,6 +4,11 @@
 
 ### Feature Changes
 
+#### Media Cards
+
+- Reduced media card, control, shared heading, and search text sizes on smaller screens while preserving the existing desktop layout.
+- Fixed media action and badge sizing at intermediate screen widths.
+
 #### Media Actions
 
 - Added optional 5-star ratings, watched dates, and private notes to liked, watched, and watchlist tracking flows.

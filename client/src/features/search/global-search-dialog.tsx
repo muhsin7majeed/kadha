@@ -40,7 +40,7 @@ const GlobalSearchDialog = () => {
       open={open}
       onOpenChange={(details) => setOpen(details.open)}
       initialFocusEl={() => inputRef.current}
-      size="cover"
+      size="full"
       scrollBehavior="inside"
       title="Search"
       closeButton

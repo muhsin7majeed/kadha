@@ -9,12 +9,12 @@ interface PageHeaderProps extends FlexProps {
 const PageHeader: React.FC<PageHeaderProps> = ({ isFetching, children, subHeader, ...props }) => {
   return (
     <Flex justifyContent="space-between" direction="column" gap={2} mb="4" {...props}>
-      <Heading>
+      <Heading size={{ mdDown: 'lg', md: 'xl' }}>
         {children} {isFetching && <SyncSpinner size="sm" />}
       </Heading>
 
       {subHeader && (
-        <Text color="fg.muted" textStyle="sm">
+        <Text color="fg.muted" textStyle={{ mdDown: 'xs', md: 'sm' }}>
           {subHeader}
         </Text>
       )}

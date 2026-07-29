@@ -47,7 +47,7 @@ const SearchTabs = ({
           <Box overflowX="auto" mt={4}>
             <Tabs.List minW="fit-content" whiteSpace="nowrap">
               {tabs.map((tab) => (
-                <Tabs.Trigger key={tab.value} value={tab.value}>
+                <Tabs.Trigger key={tab.value} value={tab.value} textStyle={{ base: 'xs', md: 'sm' }}>
                   {tab.label}
                 </Tabs.Trigger>
               ))}

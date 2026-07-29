@@ -1,35 +1,46 @@
 import { IconButton, VStack } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
+import { type ReactNode, useState } from 'react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
+
+import { Tooltip } from '@/components/ui/tooltip';
+import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
+import { MediaCardModel } from '@/features/media/media-card-model';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
-import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
-import { ReactNode, useState } from 'react';
-import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
-import { Tooltip } from '@/components/ui/tooltip';
-import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
-import { MediaCardModel } from '@/features/media/media-card-model';
-import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
+import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
+import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
+import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
 
 interface MediaActionsProps {
   media: MediaCardModel;
+  size?: IconButtonProps['size'];
 }
 
 interface MediaActionIconButtonProps {
   label: string;
   colorPalette: IconButtonProps['colorPalette'];
+  size?: IconButtonProps['size'];
   loading?: boolean;
   onClick: () => void;
   children: ReactNode;
 }
 
-const MediaActionIconButton = ({ label, colorPalette, loading, onClick, children }: MediaActionIconButtonProps) => (
+const MediaActionIconButton = ({
+  label,
+  colorPalette,
+  size,
+  loading,
+  onClick,
+  children,
+}: MediaActionIconButtonProps) => (
   <Tooltip content={label} showArrow>
     <IconButton
       aria-label={label}
       title={label}
+      size={size}
       variant="subtle"
       borderRadius="full"
       colorPalette={colorPalette}
@@ -41,7 +52,7 @@ const MediaActionIconButton = ({ label, colorPalette, loading, onClick, children
   </Tooltip>
 );
 
-const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
+const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingDialog, setTrackingDialog] = useState<{ action: MediaAction; media: UserMediaPayload } | null>(null);
   const getDetailsToastAction = (action: MediaAction, label: string) => (payload: UserMediaPayload) =>
@@ -117,14 +128,21 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         />
       )}
 
-      <VStack gap={1} backdropFilter="blur(10px)" p={1} borderRadius="full">
-        <MediaActionIconButton label={likeLabel} colorPalette="red" onClick={handleLike} loading={isAddingToLiked}>
+      <VStack gap={{ base: 0.5, md: 1 }} backdropFilter="blur(10px)" p={{ base: 0.5, md: 1 }} borderRadius="full">
+        <MediaActionIconButton
+          label={likeLabel}
+          colorPalette="red"
+          size={size}
+          onClick={handleLike}
+          loading={isAddingToLiked}
+        >
           <LuHeart fill={media.liked ? 'red' : 'none'} />
         </MediaActionIconButton>
 
         <MediaActionIconButton
           label={watchedLabel}
           colorPalette="blue"
+          size={size}
           onClick={handleWatched}
           loading={isAddingToWatched}
         >
@@ -134,13 +152,14 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media }) => {
         <MediaActionIconButton
           label={watchlistLabel}
           colorPalette="green"
+          size={size}
           onClick={handleWatchlist}
           loading={isAddingToWatchList}
         >
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </MediaActionIconButton>
 
-        <MediaActionIconButton label={collectionLabel} colorPalette="brand" onClick={handleCollection}>
+        <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
           <LuPlus />
         </MediaActionIconButton>
       </VStack>

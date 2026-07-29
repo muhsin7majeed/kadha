@@ -1,11 +1,11 @@
-import { useGenreAtom } from '@/atoms/genre-atom';
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
-
-import { formatDate } from '@/utils/date';
-import MediaActions from './media-actions';
 import { LuStar } from 'react-icons/lu';
-import NavLink from '../nav-link';
+
+import { useGenreAtom } from '@/atoms/genre-atom';
 import { MediaCardModel } from '@/features/media/media-card-model';
+import { formatDate } from '@/utils/date';
+import NavLink from '../nav-link';
+import MediaActions from './media-actions';
 
 interface MediaCardProps {
   media: MediaCardModel;
@@ -16,7 +16,15 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   return (
-    <Box aspectRatio="2 / 3" borderRadius="lg" transition="transform 0.2s" position="relative" w="100%" maxW="220px">
+    <Box
+      aspectRatio="2 / 3"
+      borderRadius="lg"
+      transition="transform 0.2s"
+      position="relative"
+      w={{ base: '150px', md: '100%' }}
+      maxW="220px"
+      flexShrink={0}
+    >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
         alt={`${media.title} poster`}
@@ -32,30 +40,41 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
         left={0}
       />
 
-      <VStack justify="space-between" position="relative" zIndex={2} h="100%" alignItems="flex-start" p={1}>
+      <VStack
+        justify="space-between"
+        position="relative"
+        zIndex={2}
+        h="100%"
+        alignItems="flex-start"
+        p={{ base: 0.5, md: 1 }}
+      >
         <Flex justify="space-between" w="100%">
           <VStack gap={1} alignItems="flex-start">
-            <Badge variant="surface" colorPalette="blackAlpha">
+            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="surface" colorPalette="blackAlpha">
               <LuStar fill="yellow" />
 
               {media.vote_average.toFixed(1)}
 
-              <Text fontSize="sm" color="gray.400">
+              <Text as="span" hideBelow="md" fontSize="sm" color="gray.400">
                 from {media.vote_count} votes
               </Text>
             </Badge>
 
-            <Badge variant="subtle">{media.adult ? 'R' : 'PG-13'}</Badge>
+            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
+              {media.adult ? 'R' : 'PG-13'}
+            </Badge>
 
-            <Badge variant="subtle">{media.media_type === 'movie' ? 'Movie' : 'TV'}</Badge>
+            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
+              {media.media_type === 'movie' ? 'Movie' : 'TV'}
+            </Badge>
           </VStack>
 
-          <MediaActions media={media} />
+          <MediaActions media={media} size={{ mdDown: 'xs', md: 'md' }} />
         </Flex>
 
         <Box
           bg={{ _light: 'white', _dark: 'blackAlpha.700' }}
-          p={2}
+          p={{ base: 1, md: 2 }}
           color={{ _light: 'gray.950', _dark: 'white' }}
           backdropFilter="blur(10px)"
           borderRadius="lg"
@@ -63,7 +82,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
         >
           <NavLink
             to={`/app/media/${media.media_type}/${media.media_id}`}
-            fontSize="md"
+            fontSize={{ base: 'sm', md: 'md' }}
             fontWeight="bold"
             lineClamp={2}
             onClick={onNavigate}
@@ -71,9 +90,17 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
             {media.title} ({formatDate(media.release_date, 'YYYY')})
           </NavLink>
 
-          <Flex gap={1} overflowX="auto" css={{ scrollbarWidth: 'none' }} my={1} maxW="200px" overflow="auto">
+          <Flex
+            gap={1}
+            w="100%"
+            minW={0}
+            maxW="100%"
+            overflowX="auto"
+            css={{ scrollbarWidth: 'none' }}
+            my={{ base: 0, md: 1 }}
+          >
             {media.genre_ids.map((genre) => (
-              <Badge key={genre} variant="plain" colorPalette="cyan" mr={1}>
+              <Badge key={genre} size={{ mdDown: 'xs', md: 'sm' }} variant="plain" colorPalette="cyan" mr={1}>
                 {genreMap[genre]}
               </Badge>
             ))}

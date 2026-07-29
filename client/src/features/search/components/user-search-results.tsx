@@ -43,7 +43,7 @@ const UserSearchResults = ({ activeTab, query, page, open, onClose, onPageChange
 
   return (
     <Box>
-      <Text color="fg.muted" fontSize="sm" mb={4}>
+      <Text color="fg.muted" fontSize={{ base: 'xs', md: 'sm' }} mb={4}>
         {data.pagination.total} results
       </Text>
 
@@ -64,6 +64,7 @@ const UserSearchResults = ({ activeTab, query, page, open, onClose, onPageChange
                 </NavLink>
 
                 <FriendshipActions
+                  menuWithinDialog
                   user={{
                     id: user.id,
                     friendshipStatus: user.friendshipStatus,
