@@ -261,7 +261,7 @@ const HeroSection = ({
               <HStack gap={1} color="yellow.400">
                 <LuStar fill="currentColor" />
                 <Text fontWeight="semibold">{data.vote_average.toFixed(1)}</Text>
-                <Text color={mutedTextColor} fontSize="sm">
+                <Text color={mutedTextColor} textStyle="supporting">
                   ({data.vote_count.toLocaleString()} votes)
                 </Text>
               </HStack>
@@ -277,7 +277,7 @@ const HeroSection = ({
                 <HStack gap={1} color={mutedTextColor}>
                   <LuClock />
                   <Text>{minutesToHours(runtime)}</Text>
-                  {!isMovie && <Text fontSize="sm">/episode</Text>}
+                  {!isMovie && <Text textStyle="supporting">/episode</Text>}
                 </HStack>
               )}
             </HStack>
@@ -293,7 +293,12 @@ const HeroSection = ({
 
             {/* Tagline */}
             {data.tagline && (
-              <Text fontSize="lg" fontStyle="italic" color={mutedTextColor} textAlign={{ base: 'center', md: 'left' }}>
+              <Text
+                textStyle="lead"
+                fontStyle="italic"
+                color={mutedTextColor}
+                textAlign={{ base: 'center', md: 'left' }}
+              >
                 "{data.tagline}"
               </Text>
             )}
@@ -315,7 +320,9 @@ const HeroSection = ({
                 loading={isMovie ? isAddingToWatched : isTvProgressLoading || isMarkingNextEpisode}
               >
                 <LuCheck />
-                {isMovie ? getMediaActionStateLabel('watched', Boolean(data.watched)) : getTvProgressPrimaryActionLabel(tvProgress)}
+                {isMovie
+                  ? getMediaActionStateLabel('watched', Boolean(data.watched))
+                  : getTvProgressPrimaryActionLabel(tvProgress)}
               </Button>
               <Button
                 variant={data.watchlist ? 'solid' : 'outline'}

@@ -33,6 +33,7 @@ const SimpleTabs: React.FC<SimpleTabsProps> = ({ tabs, defaultValue, value, onVa
               value={tab.value}
               as={triggerType === 'link' ? NavLink : undefined}
               outline={triggerType === 'link' ? 'none' : undefined}
+              textStyle="compactLabel"
             >
               {tab.icon}
               {tab.label}

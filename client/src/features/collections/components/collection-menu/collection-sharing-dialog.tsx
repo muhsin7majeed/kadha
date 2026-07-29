@@ -252,7 +252,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
                           </Stack>
 
                           <HStack gap="2" flexShrink={0} justifyContent="flex-end">
-                            <Text color="fg.muted" fontSize="sm" textAlign="end" whiteSpace="nowrap">
+                            <Text color="fg.muted" textStyle="supporting" textAlign="end" whiteSpace="nowrap">
                               {ROLE_LABELS[invite.role]}
                             </Text>
 

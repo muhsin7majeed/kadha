@@ -170,7 +170,7 @@ const AdminUsers = () => {
             </Card.Root>
 
             <HStack justifyContent="space-between" flexWrap="wrap" gap="3">
-              <Text color="fg.muted" fontSize="sm">
+              <Text color="fg.muted" textStyle="supporting">
                 {data?.pagination.total ?? 0} total users
               </Text>
               <PaginationControls pagination={data?.pagination} onPageChange={setPage} isDisabled={isFetching} />

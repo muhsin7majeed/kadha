@@ -7,7 +7,7 @@ import { APP_CONFIG } from '@/config/app-config';
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <Box as="section">
-    <Heading size="lg" mb={3}>
+    <Heading textStyle="sectionTitle" mb={3}>
       {title}
     </Heading>
     <VStack align="start" gap={3} color="fg.muted">

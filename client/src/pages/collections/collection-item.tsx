@@ -1,15 +1,5 @@
 import { Collection } from '@/features/collections/collections.types';
-import {
-  AbsoluteCenter,
-  Accordion,
-  Box,
-  HStack,
-  Separator,
-  SimpleGrid,
-  Span,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Stack, Text } from '@chakra-ui/react';
 import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
@@ -57,7 +47,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                   </Text>
                 </HStack>
 
-                <HStack gap="2" color="fg.muted" fontSize="sm" flexWrap="wrap">
+                <HStack gap="2" color="fg.muted" textStyle="supporting" flexWrap="wrap">
                   <CollectionSharingMeta collection={collection} />
                   {typeof collection.itemCount === 'number' && <Text as="span">{collection.itemCount} items</Text>}
                   {typeof collection.memberCount === 'number' && (
@@ -86,7 +76,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
               <Box>
                 <Stack gap="2" mb="4">
                   {collectionData.description && (
-                    <Text color="fg.muted" fontSize="sm">
+                    <Text color="fg.muted" textStyle="supporting">
                       {collectionData.description}
                     </Text>
                   )}
@@ -100,7 +90,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
 
                 <HStack my="4">
                   <Separator flex="1" />
-                  <Text flexShrink="0" color="fg.muted" fontSize="sm">
+                  <Text flexShrink="0" color="fg.muted" textStyle="supporting">
                     In this collection
                   </Text>
                   <Separator flex="1" />
@@ -109,10 +99,7 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
                 {collectionData.media?.length > 0 ? (
                   <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
                     {collectionData.media?.map((media) => (
-                      <MediaCard
-                        key={media.media_id}
-                        media={collectionMediaToMediaCardModel(media)}
-                      />
+                      <MediaCard key={media.media_id} media={collectionMediaToMediaCardModel(media)} />
                     ))}
                   </SimpleGrid>
                 ) : (

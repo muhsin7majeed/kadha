@@ -70,6 +70,9 @@ server/src/features/media/
 - Feature-owned utilities and hooks should live near the feature instead of generic `client/src/utils` or `client/src/hooks`.
 - Before creating a new shared or feature UI component, search for an existing component that already covers the behavior and reuse or extend it when practical.
 - Use theme-aware Chakra styling for UI controls. Buttons must set an intentional `colorPalette` for primary, destructive, status, or branded actions; neutral secondary actions should use an explicit neutral palette such as `gray` with the appropriate variant instead of relying on Chakra defaults.
+- Use the semantic responsive typography roles defined in `client/src/theme/text-styles.ts` for standard application text such as page, section, subsection, and card titles, body copy, supporting text, and compact labels. Prefer these shared `textStyle` roles over repeated responsive `fontSize`, component `size`, or ad hoc text-style values.
+- Do not implement responsive typography by scaling the root or body font size. Keep explicit responsive sizing for genuinely unique display or hero treatments, and add or extend a semantic text style when a reusable application role is missing.
+- Run `npm run typegen` from `client/` after adding or changing custom Chakra theme values, including semantic text styles.
 - Shared UI-only components can remain in `client/src/components`.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.

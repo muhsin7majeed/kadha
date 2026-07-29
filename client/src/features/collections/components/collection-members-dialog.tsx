@@ -58,7 +58,7 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
           </Badge>
         )}
 
-        <Text as="span" color="fg.muted" fontSize="sm">
+        <Text as="span" color="fg.muted" textStyle="supporting">
           {collectionData.memberCount} members
         </Text>
       </HStack>
@@ -93,7 +93,7 @@ const CollectionMembersDialog: React.FC<CollectionMembersDialogProps> = ({
         <Stack gap={{ base: 3, md: 4 }}>
           <Box>
             <Text fontWeight="medium">{collectionData.name}</Text>
-            <Text color="fg.muted" fontSize="sm">
+            <Text color="fg.muted" textStyle="supporting">
               People with access to this collection
             </Text>
           </Box>

@@ -27,7 +27,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
     <VStack gap={6} align="stretch">
       {/* Financial Info */}
       <Box>
-        <Heading size="lg" mb={4}>
+        <Heading textStyle="sectionTitle" mb={4}>
           Box Office
         </Heading>
         {hasFinancialData ? (
@@ -53,7 +53,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
               )}
             </SimpleGrid>
             {profit !== null && hasBudget && hasRevenue && (
-              <Text color="fg.muted" fontSize="sm">
+              <Text color="fg.muted" textStyle="supporting">
                 Budget and revenue are public TMDB figures and may not include marketing or distribution costs.
               </Text>
             )}
@@ -66,7 +66,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
       {/* Collection */}
       {data.belongs_to_collection && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading textStyle="sectionTitle" mb={4}>
             Part of Collection
           </Heading>
           <Card.Root variant="outline" overflow="hidden">
@@ -86,9 +86,9 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
                     <Box p={2} bg="brand.subtle" borderRadius="md">
                       <LuFilm color="var(--chakra-colors-brand-fg)" />
                     </Box>
-                    <Heading size="md">{data.belongs_to_collection.name}</Heading>
+                    <Heading textStyle="subsectionTitle">{data.belongs_to_collection.name}</Heading>
                   </HStack>
-                  <Text color="fg.muted" fontSize="sm">
+                  <Text color="fg.muted" textStyle="supporting">
                     This title belongs to the {data.belongs_to_collection.name}. Collection browsing is not available
                     from this page yet.
                   </Text>

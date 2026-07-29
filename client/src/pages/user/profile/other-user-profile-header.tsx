@@ -39,7 +39,7 @@ const OtherUserProfileHeader: React.FC<OtherUserProfileHeaderProps> = ({ profile
             <SimpleAvatar fallbackName={profile.username} size="xl" flexShrink={0} />
 
             <Box minW="0">
-              <Text as="h2" textStyle="2xl" fontWeight="semibold" wordBreak="break-word">
+              <Text as="h2" textStyle="pageTitle" wordBreak="break-word">
                 {profile.username}
               </Text>
 

@@ -52,8 +52,8 @@ const ErrorFallback = ({ onReset }: { onReset: () => void }) => {
           </Box>
 
           <VStack gap={3}>
-            <Heading size={{ base: 'xl', md: '2xl' }}>Something went wrong</Heading>
-            <Text color="fg.muted" fontSize="md">
+            <Heading textStyle="pageTitle">Something went wrong</Heading>
+            <Text color="fg.muted" textStyle="body">
               Kadha hit an unexpected client error. Try reloading the page or return home.
             </Text>
           </VStack>

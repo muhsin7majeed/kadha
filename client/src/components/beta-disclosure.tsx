@@ -10,7 +10,7 @@ const BetaDisclosureContent = () => (
     <Icon color="brand.fg" mt={0.5} flexShrink={0}>
       <LuInfo />
     </Icon>
-    <Text fontSize="sm" color="fg.muted">
+    <Text textStyle="supporting" color="fg.muted">
       Kadha is in early beta. There's a chance I might fuck up your data during testing / development lol.
     </Text>
   </HStack>

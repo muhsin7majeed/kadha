@@ -9,11 +9,11 @@ const OverviewSection = ({ overview }: OverviewSectionProps) => {
 
   return (
     <Box>
-      <Heading size="lg" mb={4}>
+      <Heading textStyle="sectionTitle" mb={4}>
         Overview
       </Heading>
       <VStack align="start" gap={4}>
-        <Text fontSize="lg" color="fg.muted" lineHeight="tall">
+        <Text textStyle="lead" color="fg.muted">
           {overview}
         </Text>
       </VStack>

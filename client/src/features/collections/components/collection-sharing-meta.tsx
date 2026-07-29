@@ -28,7 +28,7 @@ const CollectionSharingMeta: React.FC<CollectionSharingMetaProps> = ({ collectio
   if (!isSharedWithCurrentUser && sharedMemberCount === 0 && !accessLabel) return null;
 
   return (
-    <HStack gap="2" color="fg.muted" fontSize="sm" flexWrap="wrap">
+    <HStack gap="2" color="fg.muted" textStyle="supporting" flexWrap="wrap">
       {isSharedWithCurrentUser && collection.owner?.username && (
         <HStack as="span" gap="1">
           <CollectionSharedIcon collection={collection} />

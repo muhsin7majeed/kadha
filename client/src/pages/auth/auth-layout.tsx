@@ -1,4 +1,4 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import { Outlet } from 'react-router';
 
 import BetaDisclosure from '@/components/beta-disclosure';
@@ -17,9 +17,9 @@ const AuthLayout = () => {
       mx="auto"
       p={4}
     >
-      <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+      <Heading as="h1" textStyle="pageTitle" textAlign="center">
         {APP_CONFIG.appName}
-      </Text>
+      </Heading>
 
       <BetaDisclosure contained={false} />
 

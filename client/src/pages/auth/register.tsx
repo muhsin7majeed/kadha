@@ -43,7 +43,7 @@ const Register = () => {
     <Box>
       <VStack align="stretch" gap={4}>
         <Box bg="bg.subtle" borderWidth="1px" borderColor="border" rounded="md" p={4}>
-          <Text fontSize="sm" color="fg.muted">
+          <Text textStyle="supporting" color="fg.muted">
             This hosted beta is not end-to-end encrypted yet, the instance operator can access stored account and media
             data. Self-host Kadha if you want full control of your data.
           </Text>
@@ -72,7 +72,7 @@ const Register = () => {
         .
       </Text>
 
-      <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
+      <Text mt={4} textStyle="supporting" color="gray.500" textAlign="center">
         Already have an account?{' '}
         <Text as="span" color="purple.400">
           <Link to="/auth/login" state={{ from }}>

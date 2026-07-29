@@ -36,7 +36,7 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
   if (isError) {
     return (
       <Box>
-        <Heading size="lg" mb={3}>
+        <Heading textStyle="sectionTitle" mb={3}>
           Where to Watch
         </Heading>
         <ErrorState
@@ -57,11 +57,11 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
     <Box as="section">
       <VStack align="stretch" gap={4}>
         <Box>
-          <Heading size="lg" mb={2}>
+          <Heading textStyle="sectionTitle" mb={2}>
             Where to Watch
           </Heading>
           <HStack gap={2} color="fg.muted" flexWrap="wrap">
-            <Text fontSize="sm">Based on your region: {data.region.name}</Text>
+            <Text textStyle="supporting">Based on your region: {data.region.name}</Text>
             <WatchRegionDialog currentRegion={data.region.code} me={me ?? undefined} />
           </HStack>
         </Box>
@@ -70,7 +70,7 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
           <VStack align="stretch" gap={5}>
             {visibleGroups.map((group) => (
               <Box key={group.key}>
-                <Heading size="sm" mb={3}>
+                <Heading textStyle="subsectionTitle" mb={3}>
                   {group.label}
                 </Heading>
                 <HStack gap={3} flexWrap="wrap">
@@ -92,11 +92,17 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
         )}
 
         <HStack gap={3} flexWrap="wrap">
-          <Text fontSize="xs" color="fg.muted">
+          <Text textStyle="supporting" color="fg.muted">
             Availability data provided by {data.attribution.provider}.
           </Text>
           {data.link && (
-            <Link href={data.link} target="_blank" rel="noopener noreferrer" fontSize="xs" colorPalette="brand">
+            <Link
+              href={data.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              textStyle="supporting"
+              colorPalette="brand"
+            >
               <HStack gap={1}>
                 <Text>View on TMDB</Text>
                 <LuExternalLink />

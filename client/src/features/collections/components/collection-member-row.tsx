@@ -135,7 +135,7 @@ const CollectionMemberRow: React.FC<CollectionMemberRowProps> = ({
               base: 'block',
               md: shouldShowRoleText ? 'block' : 'none',
             }}
-            fontSize="sm"
+            textStyle="supporting"
             textAlign="end"
             whiteSpace="nowrap"
           >

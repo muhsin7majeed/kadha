@@ -9,10 +9,10 @@ const AccentPreviewCard = () => (
           <LuPalette />
         </Box>
         <Box>
-          <Heading size="sm" color="brand.fg">
+          <Heading textStyle="subsectionTitle" color="brand.fg">
             Accent Preview
           </Heading>
-          <Text color="brand.fg" fontSize="sm">
+          <Text color="brand.fg" textStyle="supporting">
             Buttons, badges, links, and app highlights use the selected brand palette.
           </Text>
         </Box>

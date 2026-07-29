@@ -9,8 +9,8 @@ const DataExportSection = () => {
   return (
     <Card.Root variant="outline">
       <Card.Header>
-        <Heading size="md">Data</Heading>
-        <Text color="fg.muted" fontSize="sm">
+        <Heading textStyle="subsectionTitle">Data</Heading>
+        <Text color="fg.muted" textStyle="supporting">
           Download a JSON copy of your account, media, collections, social data, notifications, and activity.
         </Text>
       </Card.Header>

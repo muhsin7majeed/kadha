@@ -37,10 +37,10 @@ interface SettingsSectionProps {
 const SettingsSection = ({ title, description, children }: SettingsSectionProps) => (
   <Card.Root variant="outline">
     <Card.Header pb="3">
-      <Heading as="h2" textStyle="lg">
+      <Heading as="h2" textStyle="sectionTitle">
         {title}
       </Heading>
-      <Text color="fg.muted" textStyle="sm">
+      <Text color="fg.muted" textStyle="supporting">
         {description}
       </Text>
     </Card.Header>
@@ -73,7 +73,7 @@ const PrivacyRadioGroup = ({ options, ...props }: PrivacyRadioGroupProps) => (
           <RadioGroup.ItemText>
             <Stack gap="1">
               <Text fontWeight="medium">{option.label}</Text>
-              <Text color="fg.muted" textStyle="sm">
+              <Text color="fg.muted" textStyle="supporting">
                 {privacyDescriptions[option.value]}
               </Text>
             </Stack>
@@ -127,10 +127,7 @@ const MyProfileSettings: React.FC<MyProfileSettingsProps> = ({ me }) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="5" maxW="3xl">
-        <SettingsSection
-          title="Account"
-          description="Keep your public name and regional watch availability accurate."
-        >
+        <SettingsSection title="Account" description="Keep your public name and regional watch availability accurate.">
           <Field.Root invalid={!!errors.username || !!usernameApiError} required>
             <Field.Label>Username</Field.Label>
             <Input type="text" {...register('username', { required: 'Username is required' })} />

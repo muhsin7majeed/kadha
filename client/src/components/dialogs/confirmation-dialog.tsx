@@ -33,14 +33,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.Header>
-              <Dialog.Title>{title}</Dialog.Title>
+              <Dialog.Title textStyle="sectionTitle">{title}</Dialog.Title>
             </Dialog.Header>
 
-            {description && (
-              <Dialog.Body>
-                <p>{description}</p>
-              </Dialog.Body>
-            )}
+            {description && <Dialog.Body textStyle="body">{description}</Dialog.Body>}
 
             <Dialog.Footer>
               <Dialog.ActionTrigger asChild>

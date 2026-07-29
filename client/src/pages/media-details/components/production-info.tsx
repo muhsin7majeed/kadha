@@ -12,7 +12,7 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
       {/* Production Companies */}
       {data.production_companies && data.production_companies.length > 0 && (
         <Box>
-          <Heading size="md" mb={3}>
+          <Heading textStyle="subsectionTitle" mb={3}>
             <HStack gap={2}>
               <LuBuilding2 />
               <Text>Production Companies</Text>
@@ -54,7 +54,7 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
                         <LuBuilding2 size={24} />
                       </Box>
                     )}
-                    <Text fontSize="sm" fontWeight="medium" lineClamp={2}>
+                    <Text textStyle="compactLabel" lineClamp={2}>
                       {company.name}
                     </Text>
                     {company.origin_country && (
@@ -73,7 +73,7 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
       {/* Production Countries */}
       {data.production_countries && data.production_countries.length > 0 && (
         <Box>
-          <Heading size="md" mb={3}>
+          <Heading textStyle="subsectionTitle" mb={3}>
             <HStack gap={2}>
               <LuGlobe />
               <Text>Production Countries</Text>
@@ -92,7 +92,7 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
       {/* Spoken Languages */}
       {data.spoken_languages && data.spoken_languages.length > 0 && (
         <Box>
-          <Heading size="md" mb={3}>
+          <Heading textStyle="subsectionTitle" mb={3}>
             <HStack gap={2}>
               <LuLanguages />
               <Text>Spoken Languages</Text>

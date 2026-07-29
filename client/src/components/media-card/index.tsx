@@ -55,7 +55,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
 
               {media.vote_average.toFixed(1)}
 
-              <Text as="span" hideBelow="md" fontSize="sm" color="gray.400">
+              <Text as="span" hideBelow="md" textStyle="supporting" color="gray.400">
                 from {media.vote_count} votes
               </Text>
             </Badge>
@@ -82,8 +82,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
         >
           <NavLink
             to={`/app/media/${media.media_type}/${media.media_id}`}
-            fontSize={{ base: 'sm', md: 'md' }}
-            fontWeight="bold"
+            textStyle="cardTitle"
             lineClamp={2}
             onClick={onNavigate}
           >

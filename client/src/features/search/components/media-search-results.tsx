@@ -48,7 +48,7 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
 
   return (
     <Box>
-      <Text color="fg.muted" fontSize={{ base: 'xs', md: 'sm' }} mb={4}>
+      <Text color="fg.muted" textStyle="supporting" mb={4}>
         {data.pagination.total} results
       </Text>
 

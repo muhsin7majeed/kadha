@@ -22,7 +22,7 @@ const formatEnumLabel = (value: string) =>
 
 const DetailItem = ({ label, value }: DetailItemProps) => (
   <Box>
-    <Text color="fg.muted" fontSize="sm">
+    <Text color="fg.muted" textStyle="supporting">
       {label}
     </Text>
     <Text fontWeight="medium" overflowWrap="anywhere">
@@ -58,10 +58,10 @@ const AdminUserDetail = () => {
             <Card.Body>
               <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="4">
                 <Box minW="0">
-                  <Text fontSize="2xl" fontWeight="semibold" overflowWrap="anywhere">
+                  <Text textStyle="pageTitle" overflowWrap="anywhere">
                     {user.username}
                   </Text>
-                  <Text color="fg.muted" fontSize="sm" overflowWrap="anywhere">
+                  <Text color="fg.muted" textStyle="supporting" overflowWrap="anywhere">
                     {user.id}
                   </Text>
                 </Box>

@@ -24,7 +24,9 @@ const getNotificationMessage = (notification: Notification) => {
     case NotificationType.CollectionInvite: {
       const metadata = parseCollectionInviteMetadata(notification.metadata);
       const action = metadata.role === 'editor' ? 'collaborate on' : 'view';
-      return metadata.collectionName ? `Invited you to ${action} ${metadata.collectionName}` : 'Invited you to a collection';
+      return metadata.collectionName
+        ? `Invited you to ${action} ${metadata.collectionName}`
+        : 'Invited you to a collection';
     }
     default:
       return 'Sent you a notification';
@@ -81,7 +83,7 @@ const Notifications = () => {
                 direction={{ base: 'column', md: 'row' }}
               >
                 <Box flex="1" minW="0">
-                  <Text fontSize="sm" color="GrayText" mb={1}>
+                  <Text textStyle="supporting" color="GrayText" mb={1}>
                     {formatTimeAgo(notification.createdAt)}
                   </Text>
 
@@ -110,7 +112,10 @@ const Notifications = () => {
                         colorPalette="brand"
                         loading={respondToCollectionInvite.isPending}
                         onClick={() =>
-                          respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'accept' })
+                          respondToCollectionInvite.mutate({
+                            inviteId: notification.entityId!,
+                            action: 'accept',
+                          })
                         }
                       >
                         Accept
@@ -121,7 +126,10 @@ const Notifications = () => {
                         colorPalette="red"
                         loading={respondToCollectionInvite.isPending}
                         onClick={() =>
-                          respondToCollectionInvite.mutate({ inviteId: notification.entityId!, action: 'reject' })
+                          respondToCollectionInvite.mutate({
+                            inviteId: notification.entityId!,
+                            action: 'reject',
+                          })
                         }
                       >
                         Reject

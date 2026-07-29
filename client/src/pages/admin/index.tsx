@@ -15,7 +15,7 @@ interface MetricCardProps {
 const MetricCard = ({ label, value }: MetricCardProps) => (
   <Card.Root>
     <Card.Body gap="2">
-      <Text color="fg.muted" fontSize="sm">
+      <Text color="fg.muted" textStyle="supporting">
         {label}
       </Text>
       <Text fontSize="2xl" fontWeight="semibold">
@@ -50,7 +50,7 @@ const AdminOverview = () => {
                     </Badge>
                     <Badge variant="subtle">v{data.appVersion}</Badge>
                   </HStack>
-                  <Text color="fg.muted" fontSize="sm">
+                  <Text color="fg.muted" textStyle="supporting">
                     Instance-level usage and account metrics.
                   </Text>
                 </Box>

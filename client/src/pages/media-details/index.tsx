@@ -23,7 +23,10 @@ const MediaDetails = () => {
   const [tvProgressDialogSeason, setTvProgressDialogSeason] = useState<number | undefined>();
   const isValidMediaType = mediaType === 'movie' || mediaType === 'tv';
   const hasValidParams = isValidMediaType && Boolean(id);
-  const { data, isError, isLoading, isFetching, refetch } = useMediaDetails(isValidMediaType ? mediaType : undefined, id);
+  const { data, isError, isLoading, isFetching, refetch } = useMediaDetails(
+    isValidMediaType ? mediaType : undefined,
+    id,
+  );
   const tvMediaId = data?.media_type === 'tv' ? data.media_id : undefined;
   const tvProgress = useTvProgress(tvMediaId, { enabled: Boolean(tvMediaId) });
   const markNextEpisodeWatched = useMarkNextEpisodeWatched(tvMediaId ?? 0);
@@ -47,7 +50,11 @@ const MediaDetails = () => {
         <Box px={{ base: 4, md: 8 }} pt={{ base: 20, md: 28 }} pb={8}>
           <Container maxW="6xl" px={0}>
             <Stack direction={{ base: 'column', md: 'row' }} gap={{ base: 6, md: 10 }} align={{ md: 'end' }}>
-              <Skeleton width={{ base: '200px', md: '280px' }} height={{ base: '300px', md: '420px' }} borderRadius="xl" />
+              <Skeleton
+                width={{ base: '200px', md: '280px' }}
+                height={{ base: '300px', md: '420px' }}
+                borderRadius="xl"
+              />
               <VStack align={{ base: 'center', md: 'start' }} gap={4} flex={1}>
                 <Skeleton height="7" width="40" />
                 <Skeleton height="12" width={{ base: 'full', md: '70%' }} />
@@ -72,7 +79,7 @@ const MediaDetails = () => {
     return (
       <Container maxW="3xl" py={{ base: 12, md: 20 }}>
         <VStack align="start" gap={5}>
-          <Heading size="xl">Could not load this title</Heading>
+          <Heading textStyle="pageTitle">Could not load this title</Heading>
           <Text color="fg.muted">
             The media details are unavailable right now. The title may have moved, or the service may be temporarily
             unreachable.

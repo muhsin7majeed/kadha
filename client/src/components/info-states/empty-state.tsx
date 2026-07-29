@@ -14,8 +14,8 @@ const EmptyState = ({ title, description, icon = <LuFolderOpen /> }: EmptyStateP
         <ChakraEmptyState.Indicator>{icon}</ChakraEmptyState.Indicator>
 
         <VStack textAlign="center">
-          <ChakraEmptyState.Title>{title}</ChakraEmptyState.Title>
-          <ChakraEmptyState.Description>{description}</ChakraEmptyState.Description>
+          <ChakraEmptyState.Title textStyle="sectionTitle">{title}</ChakraEmptyState.Title>
+          <ChakraEmptyState.Description textStyle="supporting">{description}</ChakraEmptyState.Description>
         </VStack>
       </ChakraEmptyState.Content>
     </ChakraEmptyState.Root>

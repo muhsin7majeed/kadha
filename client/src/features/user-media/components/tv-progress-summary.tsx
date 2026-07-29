@@ -53,14 +53,14 @@ const TvProgressSummary = ({
             <Text fontWeight="semibold">Your progress</Text>
             <Badge colorPalette={getBadgePalette(progress.status)}>{tvProgressStatusLabel[progress.status]}</Badge>
           </HStack>
-          <Text color="fg.muted" fontSize="sm">
+          <Text color="fg.muted" textStyle="supporting">
             {nextEpisodeLabel && progress.nextEpisode
               ? `${nextEpisodeLabel} next: ${progress.nextEpisode.name}`
               : progress.watchedEpisodeCount > 0
                 ? 'No aired episodes left to watch'
                 : 'No episodes watched yet'}
           </Text>
-          <Text color="fg.muted" fontSize="sm">
+          <Text color="fg.muted" textStyle="supporting">
             {progress.watchedEpisodeCount} of {progress.totalAiredEpisodeCount} aired episodes watched
           </Text>
         </Stack>

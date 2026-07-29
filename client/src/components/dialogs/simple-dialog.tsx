@@ -11,7 +11,8 @@ interface SimpleDialogProps extends DialogRootProps {
 }
 
 const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
-  const { bodyProps, children, closeButton, contentProps, footer, title, trigger, triggerWrapper, ...rootProps } = props;
+  const { bodyProps, children, closeButton, contentProps, footer, title, trigger, triggerWrapper, ...rootProps } =
+    props;
   const dialogTrigger = trigger ? <Dialog.Trigger asChild>{trigger}</Dialog.Trigger> : null;
 
   return (
@@ -25,7 +26,7 @@ const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
           <Dialog.Content py="4" {...contentProps}>
             {title && (
               <Dialog.Header>
-                <Dialog.Title>{title}</Dialog.Title>
+                <Dialog.Title textStyle="sectionTitle">{title}</Dialog.Title>
               </Dialog.Header>
             )}
 

@@ -46,7 +46,7 @@ const TvInfo = ({
 
       {/* Quick Stats */}
       <Box>
-        <Heading size="lg" mb={4}>
+        <Heading textStyle="sectionTitle" mb={4}>
           Series Info
         </Heading>
         <SimpleGrid columns={{ base: 2, sm: 3, md: 4 }} gap={4}>
@@ -67,7 +67,7 @@ const TvInfo = ({
       {/* Created By */}
       {data.created_by && data.created_by.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading textStyle="sectionTitle" mb={4}>
             Created By
           </Heading>
           <HStack gap={4} flexWrap="wrap">
@@ -97,7 +97,7 @@ const TvInfo = ({
                         <LuUser size={24} />
                       </Box>
                     )}
-                    <Text fontWeight="semibold">{creator.name}</Text>
+                    <Text textStyle="subsectionTitle">{creator.name}</Text>
                   </HStack>
                 </Card.Body>
               </Card.Root>
@@ -109,7 +109,7 @@ const TvInfo = ({
       {/* Networks */}
       {data.networks && data.networks.length > 0 && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading textStyle="sectionTitle" mb={4}>
             Networks
           </Heading>
           <HStack gap={4} flexWrap="wrap">
@@ -125,7 +125,7 @@ const TvInfo = ({
                         objectFit="contain"
                       />
                     ) : (
-                      <Text fontWeight="semibold">{network.name}</Text>
+                      <Text textStyle="subsectionTitle">{network.name}</Text>
                     )}
                   </HStack>
                 </Card.Body>
@@ -138,7 +138,7 @@ const TvInfo = ({
       {/* Episode Info */}
       {(data.last_episode_to_air || data.next_episode_to_air) && (
         <Box>
-          <Heading size="lg" mb={4}>
+          <Heading textStyle="sectionTitle" mb={4}>
             Episodes
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
@@ -149,17 +149,17 @@ const TvInfo = ({
                   <VStack align="start" gap={3}>
                     <HStack justify="space-between" width="100%" gap={3} align="start" flexWrap="wrap">
                       <Badge colorPalette="blue">Last Episode</Badge>
-                      <Text fontSize="sm" color="fg.muted">
+                      <Text textStyle="supporting" color="fg.muted">
                         S{data.last_episode_to_air.season_number} E{data.last_episode_to_air.episode_number}
                       </Text>
                     </HStack>
-                    <Heading size="md">{data.last_episode_to_air.name}</Heading>
-                    <HStack gap={2} color="fg.muted" fontSize="sm">
+                    <Heading textStyle="subsectionTitle">{data.last_episode_to_air.name}</Heading>
+                    <HStack gap={2} color="fg.muted" textStyle="supporting">
                       <LuCalendar size={14} />
                       <Text>{formatDate(data.last_episode_to_air.air_date)}</Text>
                     </HStack>
                     {data.last_episode_to_air.overview && (
-                      <Text color="fg.muted" fontSize="sm" lineClamp={3}>
+                      <Text color="fg.muted" textStyle="supporting" lineClamp={3}>
                         {data.last_episode_to_air.overview}
                       </Text>
                     )}
@@ -175,17 +175,17 @@ const TvInfo = ({
                   <VStack align="start" gap={3}>
                     <HStack justify="space-between" width="100%" gap={3} align="start" flexWrap="wrap">
                       <Badge colorPalette="brand">Next Episode</Badge>
-                      <Text fontSize="sm" color="fg.muted">
+                      <Text textStyle="supporting" color="fg.muted">
                         S{data.next_episode_to_air.season_number} E{data.next_episode_to_air.episode_number}
                       </Text>
                     </HStack>
-                    <Heading size="md">{data.next_episode_to_air.name}</Heading>
-                    <HStack gap={2} color="fg.muted" fontSize="sm">
+                    <Heading textStyle="subsectionTitle">{data.next_episode_to_air.name}</Heading>
+                    <HStack gap={2} color="fg.muted" textStyle="supporting">
                       <LuCalendar size={14} />
                       <Text>{formatDate(data.next_episode_to_air.air_date)}</Text>
                     </HStack>
                     {data.next_episode_to_air.overview && (
-                      <Text color="fg.muted" fontSize="sm" lineClamp={3}>
+                      <Text color="fg.muted" textStyle="supporting" lineClamp={3}>
                         {data.next_episode_to_air.overview}
                       </Text>
                     )}
@@ -202,15 +202,15 @@ const TvInfo = ({
         <Box>
           <HStack justify="space-between" align="end" mb={4} gap={4} flexWrap="wrap">
             <Box>
-              <Heading size="lg">Seasons</Heading>
+              <Heading textStyle="sectionTitle">Seasons</Heading>
               {specialsCount > 0 && (
-                <Text color="fg.muted" fontSize="sm" mt={1}>
+                <Text color="fg.muted" textStyle="supporting" mt={1}>
                   Specials are not shown in this overview.
                 </Text>
               )}
             </Box>
             {regularSeasons.length > 10 && (
-              <Text color="fg.muted" fontSize="sm">
+              <Text color="fg.muted" textStyle="supporting">
                 Showing {visibleSeasons.length} of {regularSeasons.length}
               </Text>
             )}
@@ -220,8 +220,8 @@ const TvInfo = ({
               const seasonProgress = progressBySeason.get(season.season_number);
               const isSeasonWatched = Boolean(
                 seasonProgress &&
-                  seasonProgress.airedCount > 0 &&
-                  seasonProgress.watchedCount >= seasonProgress.airedCount,
+                seasonProgress.airedCount > 0 &&
+                seasonProgress.watchedCount >= seasonProgress.airedCount,
               );
 
               return (
@@ -248,10 +248,10 @@ const TvInfo = ({
                   )}
                   <Card.Body p={3}>
                     <VStack align="start" gap={2}>
-                      <Text fontWeight="semibold" fontSize="sm" lineClamp={1}>
+                      <Text textStyle="compactLabel" lineClamp={1}>
                         {season.name}
                       </Text>
-                      <HStack gap={2} fontSize="xs" color="fg.muted" flexWrap="wrap">
+                      <HStack gap={2} textStyle="supporting" color="fg.muted" flexWrap="wrap">
                         <Text>{season.episode_count} episodes</Text>
                         {season.air_date && (
                           <>
@@ -261,7 +261,7 @@ const TvInfo = ({
                         )}
                       </HStack>
                       {seasonProgress && seasonProgress.airedCount > 0 && (
-                        <Text fontSize="xs" color="fg.muted">
+                        <Text textStyle="supporting" color="fg.muted">
                           {seasonProgress.watchedCount} of {seasonProgress.airedCount} watched
                         </Text>
                       )}

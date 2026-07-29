@@ -4,9 +4,13 @@
 
 ### Feature Changes
 
+#### Responsive Typography
+
+- Added consistent responsive typography across page and section titles, dialogs, application states, cards, tabs, search results, and supporting metadata.
+
 #### Media Cards
 
-- Reduced media card, control, shared heading, and search text sizes on smaller screens while preserving the existing desktop layout.
+- Reduced media card and control sizes on smaller screens while preserving the existing desktop layout.
 - Fixed media action and badge sizing at intermediate screen widths.
 
 #### Media Actions
@@ -44,6 +48,10 @@
 - Added accessible names to auth, collection, and search controls without changing their visual layout.
 - Renamed the media carousel component, removed duplicate form wrappers, standardized mutation error typing, and made neutral button palettes explicit.
 - Split Chakra UI helper exports so client Fast Refresh linting runs without warnings.
+
+#### Theme System
+
+- Added semantic responsive text styles and a Chakra type-generation workflow so typography roles stay centralized and type-safe.
 
 #### Media Tracking
 

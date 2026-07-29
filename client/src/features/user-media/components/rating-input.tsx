@@ -48,7 +48,11 @@ const RatingInput = ({ value, onChange, disabled }: RatingInputProps) => (
               cursor={disabled ? 'not-allowed' : 'pointer'}
               bg="transparent"
               border={0}
-              _focusVisible={{ outline: '2px solid', outlineColor: 'border.focused', outlineOffset: '2px' }}
+              _focusVisible={{
+                outline: '2px solid',
+                outlineColor: 'border.focused',
+                outlineOffset: '2px',
+              }}
               onClick={() => onChange(halfValue)}
             />
 
@@ -65,7 +69,11 @@ const RatingInput = ({ value, onChange, disabled }: RatingInputProps) => (
               cursor={disabled ? 'not-allowed' : 'pointer'}
               bg="transparent"
               border={0}
-              _focusVisible={{ outline: '2px solid', outlineColor: 'border.focused', outlineOffset: '2px' }}
+              _focusVisible={{
+                outline: '2px solid',
+                outlineColor: 'border.focused',
+                outlineOffset: '2px',
+              }}
               onClick={() => onChange(fullValue)}
             />
           </Box>
@@ -73,7 +81,7 @@ const RatingInput = ({ value, onChange, disabled }: RatingInputProps) => (
       })}
     </HStack>
 
-    <Text color="fg.muted" textStyle="sm" minW="20">
+    <Text color="fg.muted" textStyle="supporting" minW="20">
       {value ? formatRatingLabel(value).replace(' stars', '') : 'No rating'}
     </Text>
 

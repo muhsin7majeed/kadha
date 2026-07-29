@@ -22,9 +22,7 @@ const ProviderChipContent = ({ provider }: { provider: WatchProvider }) => (
         flexShrink={0}
       />
     )}
-    <Text fontSize="sm" fontWeight="medium">
-      {provider.name}
-    </Text>
+    <Text textStyle="compactLabel">{provider.name}</Text>
   </>
 );
 

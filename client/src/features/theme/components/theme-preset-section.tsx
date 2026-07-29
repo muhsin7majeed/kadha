@@ -13,8 +13,8 @@ const ThemePresetSection = () => {
   return (
     <Card.Root variant="outline">
       <Card.Header>
-        <Heading size="md">Theme Preset</Heading>
-        <Text color="fg.muted" fontSize="sm">
+        <Heading textStyle="subsectionTitle">Theme Preset</Heading>
+        <Text color="fg.muted" textStyle="supporting">
           Accent colors update immediately and are saved for this browser.
         </Text>
       </Card.Header>

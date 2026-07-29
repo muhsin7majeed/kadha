@@ -10,7 +10,7 @@ interface InfoCardProps {
 const InfoCard = ({ label, value, icon }: InfoCardProps) => {
   return (
     <VStack align="start" gap={1} p={4} bg="bg.subtle" borderRadius="lg" borderWidth="1px" borderColor="border">
-      <Text fontSize="sm" color="fg.muted" fontWeight="medium">
+      <Text textStyle="compactLabel" color="fg.muted">
         {label}
       </Text>
       <Box display="flex" alignItems="center" gap={2} fontSize="md" fontWeight="semibold">

@@ -17,9 +17,7 @@ interface TvEpisodeProgressDialogProps {
 }
 
 const getDefaultSeasonNumber = (seasons: TvProgressSeason[]) => {
-  const inProgressSeason = seasons.find(
-    (season) => season.airedCount > 0 && season.watchedCount < season.airedCount,
-  );
+  const inProgressSeason = seasons.find((season) => season.airedCount > 0 && season.watchedCount < season.airedCount);
 
   return inProgressSeason?.seasonNumber ?? seasons.find((season) => season.seasonNumber > 0)?.seasonNumber;
 };
@@ -65,7 +63,10 @@ const TvEpisodeProgressDialog = ({
       onOpenChange={(details) => onOpenChange(details.open)}
       title="Track episodes"
       closeButton
-      contentProps={{ width: { base: 'calc(100vw - 2rem)', md: '2xl' }, maxW: '2xl' }}
+      contentProps={{
+        width: { base: 'calc(100vw - 2rem)', md: '2xl' },
+        maxW: '2xl',
+      }}
       footer={
         <HStack gap="3" justify="flex-end" width="full">
           <Button variant="outline" colorPalette="gray" onClick={() => onOpenChange(false)}>
@@ -122,7 +123,10 @@ const TvEpisodeProgressDialog = ({
             loading={updateSeasonWatch.isPending}
             onClick={() => {
               if (selectedSeasonNumber === undefined) return;
-              updateSeasonWatch.mutate({ seasonNumber: selectedSeasonNumber, watched: true });
+              updateSeasonWatch.mutate({
+                seasonNumber: selectedSeasonNumber,
+                watched: true,
+              });
             }}
           >
             Mark season watched
@@ -135,7 +139,10 @@ const TvEpisodeProgressDialog = ({
             loading={updateSeasonWatch.isPending}
             onClick={() => {
               if (selectedSeasonNumber === undefined) return;
-              updateSeasonWatch.mutate({ seasonNumber: selectedSeasonNumber, watched: false });
+              updateSeasonWatch.mutate({
+                seasonNumber: selectedSeasonNumber,
+                watched: false,
+              });
             }}
           >
             Clear season
@@ -195,13 +202,13 @@ const TvEpisodeProgressDialog = ({
                       S{episode.seasonNumber} E{episode.episodeNumber}: {episode.name}
                     </Text>
                     {!episode.isAired && (
-                      <Text color="fg.muted" fontSize="xs" whiteSpace="nowrap">
+                      <Text color="fg.muted" textStyle="supporting" whiteSpace="nowrap">
                         Unaired
                       </Text>
                     )}
                   </HStack>
                   {episode.airDate && (
-                    <Text color="fg.muted" fontSize="sm">
+                    <Text color="fg.muted" textStyle="supporting">
                       {formatDate(episode.airDate)}
                     </Text>
                   )}

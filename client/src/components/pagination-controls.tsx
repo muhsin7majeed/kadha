@@ -27,7 +27,7 @@ const PaginationControls = ({ pagination, onPageChange, isDisabled }: Pagination
       >
         <LuChevronLeft />
       </IconButton>
-      <Text minW="24" textAlign="center" color="fg.muted" fontSize="sm">
+      <Text minW="24" textAlign="center" color="fg.muted" textStyle="supporting">
         Page {page} of {totalPages}
       </Text>
       <IconButton

@@ -47,7 +47,7 @@ const Login = () => {
         .
       </Text>
 
-      <Text mt={4} fontSize="sm" color="gray.500" textAlign="center">
+      <Text mt={4} textStyle="supporting" color="gray.500" textAlign="center">
         Don't have an account?{' '}
         <Text as="span" color="purple.400">
           <Link to="/auth/register" state={{ from }}>

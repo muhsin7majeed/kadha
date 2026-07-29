@@ -15,8 +15,8 @@ const ErrorState = ({ title, description, icon = <LuCircleAlert />, onRetry }: E
         <EmptyState.Indicator>{icon}</EmptyState.Indicator>
 
         <VStack textAlign="center">
-          <EmptyState.Title>{title}</EmptyState.Title>
-          <EmptyState.Description>{description}</EmptyState.Description>
+          <EmptyState.Title textStyle="sectionTitle">{title}</EmptyState.Title>
+          <EmptyState.Description textStyle="supporting">{description}</EmptyState.Description>
 
           {onRetry && (
             <Button variant="outline" colorPalette="gray" onClick={onRetry}>

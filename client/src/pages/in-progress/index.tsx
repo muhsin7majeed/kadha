@@ -60,7 +60,7 @@ const InProgressTvCard = ({ item }: InProgressTvCardProps) => {
           <Badge colorPalette={getBadgePalette(item.tvProgress.status)}>
             {tvProgressStatusLabel[item.tvProgress.status]}
           </Badge>
-          <Text color="fg.muted" fontSize="xs" whiteSpace="nowrap">
+          <Text color="fg.muted" textStyle="supporting" whiteSpace="nowrap">
             {formatTimeAgo(item.tvProgress.lastWatchedAt)}
           </Text>
         </HStack>
@@ -68,21 +68,19 @@ const InProgressTvCard = ({ item }: InProgressTvCardProps) => {
         <Stack gap="1" flex="1">
           {nextEpisode ? (
             <>
-              <Text fontWeight="semibold" fontSize="sm">
+              <Text textStyle="compactLabel">
                 {nextEpisodeLabel}: {nextEpisode.name}
               </Text>
               {nextEpisode.airDate && (
-                <Text color="fg.muted" fontSize="xs">
+                <Text color="fg.muted" textStyle="supporting">
                   Aired {formatDate(nextEpisode.airDate)}
                 </Text>
               )}
             </>
           ) : (
-            <Text fontWeight="semibold" fontSize="sm">
-              No aired episodes left
-            </Text>
+            <Text textStyle="compactLabel">No aired episodes left</Text>
           )}
-          <Text color="fg.muted" fontSize="xs">
+          <Text color="fg.muted" textStyle="supporting">
             {item.tvProgress.watchedEpisodeCount} of {item.tvProgress.totalAiredEpisodeCount} aired watched
           </Text>
         </Stack>

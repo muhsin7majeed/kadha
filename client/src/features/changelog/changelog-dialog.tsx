@@ -16,17 +16,17 @@ interface ChangelogDialogProps {
 
 const markdownComponents: Components = {
   h1: ({ children }) => (
-    <Heading as="h2" size="lg" mb={2}>
+    <Heading as="h2" textStyle="sectionTitle" mb={2}>
       {children}
     </Heading>
   ),
   h2: ({ children }) => (
-    <Heading as="h3" size="md" mt={5} mb={2}>
+    <Heading as="h3" textStyle="subsectionTitle" mt={5} mb={2}>
       {children}
     </Heading>
   ),
   h3: ({ children }) => (
-    <Heading as="h4" size="sm" mt={4} mb={1}>
+    <Heading as="h4" textStyle="compactLabel" mt={4} mb={1}>
       {children}
     </Heading>
   ),
@@ -97,9 +97,7 @@ const ChangelogDialog = ({ version, open, onOpenChange, trigger }: ChangelogDial
         >
           v{version}
         </Button>
-      ) : (
-        null
-      )}
+      ) : null}
 
       <SimpleDialog
         open={dialogOpen}

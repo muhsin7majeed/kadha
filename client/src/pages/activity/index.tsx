@@ -228,14 +228,14 @@ const ActivityItem = ({ activity }: { activity: UserActivity }) => {
             <Badge colorPalette={copy.colorPalette} variant="subtle">
               {copy.label}
             </Badge>
-            <Text color="fg.muted" fontSize="sm">
+            <Text color="fg.muted" textStyle="supporting">
               {formatTimeAgo(activity.createdAt)}
             </Text>
           </HStack>
 
           <ActivitySubject activity={activity} metadata={metadata} />
 
-          <Text color="fg.muted" fontSize="sm" mt="1">
+          <Text color="fg.muted" textStyle="supporting" mt="1">
             {copy.detail}
             {metadata.collectionName && activity.media_id ? ` in ${metadata.collectionName}` : ''}
           </Text>

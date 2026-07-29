@@ -43,14 +43,14 @@ const OtherUserCollectionsTab = () => {
             <Accordion.ItemBody>
               <Box>
                 {collection.description && (
-                  <Text color="fg.muted" fontSize="sm" mb="4">
+                  <Text color="fg.muted" textStyle="supporting" mb="4">
                     {collection.description}
                   </Text>
                 )}
 
                 <HStack my="4">
                   <Separator flex="1" />
-                  <Text flexShrink="0" color="fg.muted" fontSize="sm">
+                  <Text flexShrink="0" color="fg.muted" textStyle="supporting">
                     In this collection
                   </Text>
                   <Separator flex="1" />

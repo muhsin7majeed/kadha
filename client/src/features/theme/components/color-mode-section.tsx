@@ -9,8 +9,8 @@ const ColorModeSection = () => {
   return (
     <Card.Root variant="outline">
       <Card.Header>
-        <Heading size="md">Color Mode</Heading>
-        <Text color="fg.muted" fontSize="sm">
+        <Heading textStyle="subsectionTitle">Color Mode</Heading>
+        <Text color="fg.muted" textStyle="supporting">
           Light and dark mode are independent from the accent preset.
         </Text>
       </Card.Header>
