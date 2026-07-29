@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
+import { REFRESH_TOKEN_EXPIRATION_SECONDS } from './auth.constants';
 import { LoginBody, RegisterBody } from './auth.schema';
 import { loginUser, recordLogoutActivity, refreshAccessToken, registerUser } from './auth.service';
 
@@ -9,7 +10,7 @@ const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
     httpOnly: true,
     sameSite: 'none',
     secure: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: REFRESH_TOKEN_EXPIRATION_SECONDS * 1000,
   });
 };
 
@@ -33,7 +34,6 @@ export const register = async (req: Request<{}, {}, RegisterBody>, res: Response
   sendResponse(res, {
     message: 'User registered successfully',
     accessToken: result.accessToken,
-    refreshToken: result.refreshToken,
     userId: result.userId,
   });
 };
@@ -50,7 +50,6 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
   sendResponse(res, {
     message: 'User logged in successfully',
     accessToken: result.accessToken,
-    refreshToken: result.refreshToken,
     userId: result.userId,
   });
 };

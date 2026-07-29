@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { authorization, registerTestUser } from './helpers/auth';
+import { authorization, getRefreshCookie, registerTestUser } from './helpers/auth';
 import { getTestApp } from './helpers/app';
 
 describe('app routes', () => {
@@ -36,9 +36,9 @@ describe('auth routes', () => {
       message: 'User registered successfully',
       userId: expect.any(String),
       accessToken: expect.any(String),
-      refreshToken: expect.any(String),
     });
-    expect(response.headers['set-cookie']?.[0]).toContain('jwt=');
+    expect(response.body).not.toHaveProperty('refreshToken');
+    expect(getRefreshCookie(response)).toContain('jwt=');
   });
 
   it('lets registered users access their current profile', async () => {

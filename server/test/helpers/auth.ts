@@ -4,7 +4,6 @@ import { getTestApp } from './app';
 
 interface AuthResponseBody {
   accessToken: string;
-  refreshToken: string;
   userId: string;
 }
 
@@ -16,6 +15,21 @@ export interface TestUser {
 }
 
 let userCounter = 0;
+
+export const getRefreshCookie = (response: request.Response) => {
+  const refreshCookie = response.headers['set-cookie']?.find((cookie) => cookie.startsWith('jwt='));
+
+  if (!refreshCookie) {
+    throw new Error('Expected a refresh token cookie');
+  }
+
+  return refreshCookie;
+};
+
+export const getRefreshToken = (response: request.Response) => {
+  const cookieValue = getRefreshCookie(response).split(';', 1)[0];
+  return cookieValue.slice('jwt='.length);
+};
 
 export const registerTestUser = async (username = `test-user-${++userCounter}`): Promise<TestUser> => {
   const response = await request(await getTestApp())
@@ -31,7 +45,7 @@ export const registerTestUser = async (username = `test-user-${++userCounter}`):
 
   return {
     accessToken: body.accessToken,
-    refreshToken: body.refreshToken,
+    refreshToken: getRefreshToken(response),
     userId: body.userId,
     username,
   };

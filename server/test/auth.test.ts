@@ -1,8 +1,10 @@
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { REFRESH_TOKEN_EXPIRATION_SECONDS } from '@/features/auth/auth.constants';
 import { getTestApp } from './helpers/app';
-import { registerTestUser } from './helpers/auth';
+import { getRefreshCookie, getRefreshToken, registerTestUser } from './helpers/auth';
 
 describe('auth edge cases', () => {
   it('rejects duplicate usernames during registration', async () => {
@@ -54,7 +56,26 @@ describe('auth edge cases', () => {
       })
       .expect(200);
 
-    const refreshToken = loginResponse.body.refreshToken as string;
+    const refreshCookie = getRefreshCookie(loginResponse);
+    const refreshToken = getRefreshToken(loginResponse);
+    const refreshTokenPayload = jwt.decode(refreshToken);
+
+    expect(loginResponse.body).not.toHaveProperty('refreshToken');
+    expect(refreshCookie).toContain(`Max-Age=${REFRESH_TOKEN_EXPIRATION_SECONDS}`);
+    expect(refreshCookie).toContain('HttpOnly');
+    expect(refreshCookie).toContain('Secure');
+    expect(refreshCookie).toContain('SameSite=None');
+
+    if (
+      !refreshTokenPayload ||
+      typeof refreshTokenPayload === 'string' ||
+      typeof refreshTokenPayload.iat !== 'number' ||
+      typeof refreshTokenPayload.exp !== 'number'
+    ) {
+      throw new Error('Expected refresh token timestamps');
+    }
+
+    expect(refreshTokenPayload.exp - refreshTokenPayload.iat).toBe(REFRESH_TOKEN_EXPIRATION_SECONDS);
 
     const refreshResponse = await request(await getTestApp())
       .post('/api/auth/refresh')

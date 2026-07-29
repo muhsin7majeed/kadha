@@ -23,6 +23,8 @@
 #### Authentication
 
 - Fixed logout/session expiry so protected pages leave the loading state and redirect to login after auth is cleared.
+- Extended refresh-token sessions from one day to seven days and aligned the signed token lifetime with its cookie.
+- Kept refresh tokens exclusively in secure HTTP-only cookies instead of including them in authentication response bodies.
 
 ### Engineering Changes
 

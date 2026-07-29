@@ -11,7 +11,6 @@ export interface RegisterInputs extends LoginInputs {
 export interface LoginResponse {
   message: string;
   accessToken: string;
-  refreshToken: string;
   userId: string;
 }
 

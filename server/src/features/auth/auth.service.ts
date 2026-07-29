@@ -6,10 +6,8 @@ import { createUserActivity } from '@/features/activity/activity.service';
 import { envConfig } from '@/config/env';
 import { DEFAULT_WATCH_REGION, normalizeWatchRegion } from '@/constants/watch-regions';
 import { prisma } from '@/lib/prisma';
+import { ACCESS_TOKEN_EXPIRATION_SECONDS, REFRESH_TOKEN_EXPIRATION_SECONDS } from './auth.constants';
 import { LoginBody, RegisterBody } from './auth.schema';
-
-const ACCESS_TOKEN_EXPIRATION = '10m';
-const REFRESH_TOKEN_EXPIRATION = '1d';
 
 interface RefreshTokenPayload {
   username: string;
@@ -18,10 +16,10 @@ interface RefreshTokenPayload {
 
 export function getTokens(username: string, userId: string) {
   const accessToken = jwt.sign({ username, userId }, envConfig.jwtAccessSecret, {
-    expiresIn: ACCESS_TOKEN_EXPIRATION,
+    expiresIn: ACCESS_TOKEN_EXPIRATION_SECONDS,
   });
   const refreshToken = jwt.sign({ username, userId }, envConfig.jwtRefreshSecret, {
-    expiresIn: REFRESH_TOKEN_EXPIRATION,
+    expiresIn: REFRESH_TOKEN_EXPIRATION_SECONDS,
   });
 
   return { accessToken, refreshToken };
@@ -96,7 +94,7 @@ export function refreshAccessToken(refreshToken: string) {
   const decoded = jwt.verify(refreshToken, envConfig.jwtRefreshSecret) as RefreshTokenPayload;
 
   return jwt.sign({ username: decoded.username, userId: decoded.userId }, envConfig.jwtAccessSecret, {
-    expiresIn: ACCESS_TOKEN_EXPIRATION,
+    expiresIn: ACCESS_TOKEN_EXPIRATION_SECONDS,
   });
 }
 
