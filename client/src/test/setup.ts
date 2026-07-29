@@ -2,6 +2,14 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
+class ResizeObserverMock {
+  observe() {}
+
+  unobserve() {}
+
+  disconnect() {}
+}
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string): MediaQueryList => ({
@@ -14,6 +22,11 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: () => undefined,
     removeListener: () => undefined,
   }),
+});
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
 });
 
 afterEach(() => {

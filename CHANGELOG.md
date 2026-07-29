@@ -4,6 +4,10 @@
 
 ### Feature Changes
 
+#### Navigation
+
+- Replaced the overflowing floating tab bar with a fixed bottom navigation bar that keeps primary destinations visible and moves lower-frequency destinations into a More menu.
+
 #### Responsive Typography
 
 - Added consistent responsive typography across page and section titles, dialogs, application states, cards, tabs, search results, and supporting metadata.

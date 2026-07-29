@@ -20,25 +20,30 @@ const MainLayout = () => {
         maxW={hasPagePadding ? '6xl' : 'full'}
         px={hasPagePadding ? { base: 4, md: 6 } : 0}
       >
-        <Box key={pathname} className="kadha-route-transition" pt={hasPagePadding ? 2 : 0} pb={hasPagePadding ? { base: 24, md: 28 } : 20}>
+        <Box
+          key={pathname}
+          className="kadha-route-transition"
+          pt={hasPagePadding ? 2 : 0}
+          pb={hasPagePadding ? { base: 24, md: 24 } : 20}
+        >
           <Outlet />
         </Box>
-
-        <Box
-          position="fixed"
-          bottom={[2, 4]}
-          left={0}
-          right={0}
-          zIndex={2}
-          p={2}
-          backdropFilter="blur(10px)"
-          rounded="full"
-          width="fit-content"
-          mx={'auto'}
-        >
-          <TabBar />
-        </Box>
       </Container>
+
+      <Box
+        position="fixed"
+        bottom={0}
+        left={0}
+        right={0}
+        zIndex={2}
+        bg="bg"
+        borderTopWidth="1px"
+        borderColor="border"
+        pb="env(safe-area-inset-bottom)"
+        px={{ base: 0, md: 4 }}
+      >
+        <TabBar />
+      </Box>
     </Box>
   );
 };
