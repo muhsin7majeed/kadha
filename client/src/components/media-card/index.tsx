@@ -1,4 +1,5 @@
 import { Badge, Box, Flex, Image, Text, VStack } from '@chakra-ui/react';
+import type { BoxProps } from '@chakra-ui/react';
 import { LuStar } from 'react-icons/lu';
 
 import { useGenreAtom } from '@/atoms/genre-atom';
@@ -10,9 +11,10 @@ import MediaActions from './media-actions';
 interface MediaCardProps {
   media: MediaCardModel;
   onNavigate?: () => void;
+  width?: BoxProps['width'];
 }
 
-const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
+const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   return (
@@ -21,7 +23,7 @@ const MediaCard = ({ media, onNavigate }: MediaCardProps) => {
       borderRadius="lg"
       transition="transform 0.2s"
       position="relative"
-      w={{ base: '150px', md: '100%' }}
+      w={width}
       maxW="220px"
       flexShrink={0}
     >

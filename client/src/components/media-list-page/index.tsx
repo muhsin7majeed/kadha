@@ -68,9 +68,22 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6} justifyItems="center">
+          <SimpleGrid
+            gridTemplateColumns={{
+              base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
+              sm: 'repeat(2, minmax(0, 1fr))',
+              md: 'repeat(3, minmax(0, 1fr))',
+              lg: 'repeat(4, minmax(0, 1fr))',
+            }}
+            gap={{ base: 2, sm: 4, md: 6 }}
+            justifyItems="center"
+          >
             {data?.map((media) => (
-              <MediaCard key={`${media.media_type}:${media.media_id}`} media={toMediaCardModel(media)} />
+              <MediaCard
+                key={`${media.media_type}:${media.media_id}`}
+                media={toMediaCardModel(media)}
+                width="100%"
+              />
             ))}
           </SimpleGrid>
           {onPageChange && (

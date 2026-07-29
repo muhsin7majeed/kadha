@@ -12,6 +12,7 @@
 
 - Reduced media card and control sizes on smaller screens while preserving the existing desktop layout.
 - Fixed media action and badge sizing at intermediate screen widths.
+- Displayed up to two fluid media-card columns on small screens, falling back to one when the available width is too narrow.
 
 #### Media Actions
 
