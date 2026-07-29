@@ -1,120 +1,102 @@
-# Movie App Roadmap
+# Kadha Roadmap
 
-This project is a self-hostable, open source movie & TV media manager powered by TMDB.
-The goal is simple: track, discover, and organize what you watch without giving up control of your data.
+Last reviewed: 2026-07-29
 
----
+Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
-## Phase 1: Core Features (Completed)
+## Shipped Foundation
 
-### Discovery
+### Discovery And Media Details
 
-- [x] API integration with TMDB
-  - [x] Trending content
-  - [x] Popular content
-  - [x] Upcoming content
-  - [x] Movie & TV details
-- [x] Search movies and TV shows
-- [x] Filter by type (movie / TV / both)
-- [x] Homepage with responsive grids and carousels
+- [x] TMDB integration for trending, popular, and top-rated movies and TV shows.
+- [x] Movie and TV search with media-type filters and pagination.
+- [x] Responsive discovery grids, carousels, and media details.
+- [x] Cast, metadata, artwork fallbacks, and external media links.
+- [x] Region-aware streaming availability using TMDB watch-provider data powered by JustWatch.
+- [x] Saved watch-region settings during signup and profile editing.
+- [ ] Dedicated upcoming-release discovery feed.
 
-### Details Page
+### Tracking And Organization
 
-- [x] Title, description, cast, metadata
-- [x] User actions (watchlist, liked, watched)
-- [ ] Platform availability (JustWatch integration)
-- [x] Updated details page.
+- [x] Watched, liked, and watchlist tracking.
+- [x] Optional ratings, watched dates, and private action-specific notes.
+- [x] TV episode and season progress tracking.
+- [x] In Progress TV library with next-episode context, sorting, and pagination.
+- [x] Custom collections for movies and TV shows.
+- [x] Private activity timeline for account, media, collection, and profile actions.
 
----
+### Social And Privacy
 
-## Phase 2: User Library (Completed)
+- [x] Friend requests, unfriend, block, and unblock flows.
+- [x] Profile, watched, liked, watchlist, and collection privacy controls.
+- [x] Private-profile and locked-content states for unauthorized viewers.
+- [x] Private collection invitations with viewer and editor roles.
+- [x] Shared collection membership, role management, and collaboration.
+- [x] Notifications with unread state and collection-invite actions.
 
-### Tracking
+### Ownership, Administration, And Operations
 
-- [x] Mark as watched
-- [x] Watchlist management
-- [x] Like / favorite items
-- [x] Persist user activity in database
+- [x] Docker-first local development and production deployment.
+- [x] Environment-based instance and public URL configuration.
+- [x] Full account data export as JSON.
+- [x] Read-only admin dashboard with user search and instance metrics.
+- [x] Theme presets with independent light and dark modes.
+- [x] Automated server and client builds, tests, linting, and CI.
+- [x] Canonical package versions and automated release preparation.
 
-### Organization
+## Near-Term Priorities
 
-- [x] Separate movies and TV shows
-- [x] Custom collections (themed lists, mood lists, etc.)
+### Release And Beta Reliability
 
----
+- [ ] Add end-to-end smoke coverage for authentication, media tracking, collection permissions, and privacy.
+- [ ] Document and verify upgrades from existing SQLite databases.
+- [ ] Measure client startup and home-page performance, then set a practical bundle budget.
+- [ ] Make CI verify that the root and generated in-app changelogs are synchronized.
 
-## Phase 3: Social & Privacy (In Progress)
+### Data Ownership
+
+- [ ] Add self-service account deletion with clear confirmation and session cleanup.
+- [ ] Add versioned JSON import with validation, preview, idempotency, and conflict handling.
+- [ ] Add supported import adapters for services such as Letterboxd or Trakt.
 
 ### Social
 
-- [x] Friends system
-- [ ] View friends’ activity and recommendations
-- [ ] Share collections with public links
+- [ ] Add a privacy-aware friends activity feed.
+- [ ] Add opt-in public collection links.
+- [ ] Add a full ghost mode with no public profile footprint.
 
-### Privacy
+## Later Product Work
 
-- [x] Per-list privacy (public / friends / private)
-- [ ] Private profiles
-- [ ] Full ghost mode (no public footprint)
+### Recommendations
 
----
+- [ ] Add genre-based and similar-title recommendations using TMDB.
+- [ ] Add recommendations based on a user's saved and watched media.
+- [ ] Evaluate optional bring-your-own-key or local AI recommendations without server-side data training.
 
-## Phase 4: Data Ownership & Hosting
+### Insights And Statistics
 
-- [x] Self-hosting support (Docker-first)
-- [x] Environment-based configuration
-- [ ] Import data (JSON)
-- [ ] Export all user data
-- [ ] Zero vendor lock-in guarantee
+- [ ] Add watch-history totals and trends.
+- [ ] Add time-watched estimates.
+- [ ] Add genre and media-type breakdowns.
+- [ ] Add TV progress and viewing-pattern insights.
 
----
+### Integrations
 
-## Phase 5: Recommendations
+- [ ] Complete Plex Phase 0 technical validation.
+- [ ] Add supported Plex Watchlist preview and import after the integration architecture is validated.
+- [ ] Evaluate Plex library availability and deep links as a later follow-up.
 
-### Basic
+### Optional Experiments And Sustainability
 
-- [ ] Genre-based recommendations using TMDB
-- [ ] Similar-content suggestions
-
-### Advanced (Optional)
-
-- [ ] AI-powered recommendations
-- [ ] Bring-your-own API key or local AI
-- [ ] No server-side data training
-
----
-
-## Phase 6: Insights & Stats
-
-- [ ] Watch history statistics
-- [ ] Time spent watching
-- [ ] Genre breakdowns
-- [ ] Viewing trends over time
-
----
-
-## Phase 7: UI Experiments (Optional)
-
-- [ ] Swipe-based discovery (Tinder-like)
-- [ ] Framer Motion animations
-- [ ] Feedback-driven recommendation tuning
-
----
-
-## Phase 8: Sustainability
-
-- [ ] Optional paid subscription for hosted users
-- [ ] Self-hosting remains free
-- [ ] No features locked behind payment
-- [ ] Unify release/version management with one canonical app version source and an automated release script
-
----
+- [ ] Evaluate swipe-based discovery and feedback-driven recommendation tuning.
+- [ ] Decide whether the hosted service needs an optional paid plan.
+- [ ] Keep self-hosting free and avoid locking core features behind payment.
 
 ## Guiding Principles
 
-- User owns their data
-- Self-hosting is first-class
-- Privacy is opt-in, not an afterthought
-- Social features are optional
-- No dark patterns
-- No algorithm manipulation
+- Users own their data.
+- Self-hosting is first-class.
+- Privacy is opt-in, not an afterthought.
+- Social features are optional.
+- No dark patterns.
+- No algorithm manipulation.

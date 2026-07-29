@@ -82,14 +82,14 @@ const Privacy = () => {
 
             <Section title="Data Export And Deletion">
               <Text>
-                Account export and account deletion tools are planned. Until those tools are available, request help
-                through the project feedback channel.
+                You can download a JSON export of your account data from Settings. Self-service account deletion is not
+                yet available; request deletion through the project feedback channel.
               </Text>
             </Section>
 
             <Section title="Contact And Feedback">
               <Text>
-                For questions, feedback, or deletion/export requests during beta, open an issue on{' '}
+                For questions, feedback, or account deletion requests during beta, open an issue on{' '}
                 <ChakraLink asChild color="brand.fg">
                   <a href={`${APP_CONFIG.githubUrl}/issues`} target="_blank" rel="noopener noreferrer">
                     GitHub

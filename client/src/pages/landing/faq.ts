@@ -36,7 +36,7 @@ const FAQ_ITEMS = [
   {
     question: 'Can I import from Letterboxd or Trakt?',
     answer:
-      'Not yet. Import and export tools are planned because data ownership only works if you can bring your history in and take it back out.',
+      'Not yet. Kadha already lets you export your account data as JSON. Imports from Letterboxd, Trakt, and other services are planned.',
   },
 ];
 

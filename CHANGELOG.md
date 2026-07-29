@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Product Information
+
+- Updated the public roadmap, landing page, and privacy policy to accurately distinguish shipped data export from planned import and account deletion work.
+
 ## v0.1.7
 
 ### Feature Changes

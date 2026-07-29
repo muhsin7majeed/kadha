@@ -28,8 +28,8 @@ const UPCOMING_FEATURES = [
   },
   {
     icon: LuDownload,
-    title: 'Import/Export',
-    description: 'Bring data in, export everything out, and avoid vendor lock-in.',
+    title: 'Data Import',
+    description: 'Bring your existing history into Kadha. Full account export is already available today.',
     badge: 'Data',
   },
   {
