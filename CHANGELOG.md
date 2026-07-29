@@ -7,6 +7,7 @@
 #### Product Information
 
 - Updated the public roadmap, landing page, and privacy policy to accurately distinguish shipped data export from planned import and account deletion work.
+- Added prioritized privacy and security hardening work to the public roadmap and required future feature changes to keep roadmap status synchronized.
 
 ## v0.1.7
 

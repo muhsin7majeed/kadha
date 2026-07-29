@@ -38,13 +38,41 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 
 - [x] Docker-first local development and production deployment.
 - [x] Environment-based instance and public URL configuration.
-- [x] Full account data export as JSON.
+- [x] Account data export as JSON.
 - [x] Read-only admin dashboard with user search and instance metrics.
 - [x] Theme presets with independent light and dark modes.
 - [x] Automated server and client builds, tests, linting, and CI.
 - [x] Canonical package versions and automated release preparation.
 
 ## Near-Term Priorities
+
+### Privacy And Security Hardening
+
+#### P0 — Immediate
+
+- [ ] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
+- [ ] Protect authentication endpoints with rate limits, stronger password requirements, and breached-password rejection.
+- [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
+- [ ] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
+- [ ] Add authenticated self-service account deletion with session cleanup, a private support fallback, and documented backup handling.
+- [ ] Complete account exports with episode-watch history and automated coverage for every user-owned data category.
+- [ ] Automate encrypted backups before migrations and verify that production data can be restored.
+- [ ] Complete the hosted privacy notice with operator contact, purposes, retention, recipients, user rights, cookies, and deletion details.
+
+#### P1 — Next Security And Privacy Release
+
+- [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
+- [ ] Make new profiles private by default and evaluate opt-in username discovery.
+- [ ] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
+- [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
+- [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
+- [ ] Add authenticated password changes that revoke existing sessions.
+
+#### P2 — Follow-Up Hardening
+
+- [ ] Define and enforce retention periods for obsolete activity, resolved notifications, old invitations, and operational logs.
+- [ ] Require recent reauthentication before account export, deletion, password changes, and other sensitive account actions.
+- [ ] Expand third-party transparency for TMDB search, media lookup, artwork, and hosting data flows.
 
 ### Release And Beta Reliability
 
@@ -55,7 +83,6 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 
 ### Data Ownership
 
-- [ ] Add self-service account deletion with clear confirmation and session cleanup.
 - [ ] Add versioned JSON import with validation, preview, idempotency, and conflict handling.
 - [ ] Add supported import adapters for services such as Letterboxd or Trakt.
 
@@ -96,7 +123,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 
 - Users own their data.
 - Self-hosting is first-class.
-- Privacy is opt-in, not an afterthought.
+- Privacy is the default, not an afterthought.
 - Social features are optional.
 - No dark patterns.
 - No algorithm manipulation.

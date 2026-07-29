@@ -96,6 +96,7 @@ server/src/features/media/
 - Keep the top changelog section focused on end-user feature changes, then include engineering notes below it.
 - Keep `README.md` aligned with setup, deployment, and operations changes.
 - Keep `docs/project-structure.md` aligned when changing architectural boundaries or placement rules.
+- Update `roadmap.md` whenever a feature is added, removed, completed, deferred, or materially changed, and keep its shipped and planned checkboxes accurate in the same change.
 
 ## Release And Changelog Workflow
 
