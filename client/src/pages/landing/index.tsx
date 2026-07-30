@@ -50,7 +50,7 @@ const AUDIENCES = [
 const COMPARISON_ROWS = [
   {
     label: 'Best for',
-    kadha: 'Private tracking and shared lists',
+    kadha: 'Privacy-controlled tracking and shared lists',
     letterboxd: 'Film culture and reviews',
     trakt: 'Automated media tracking',
   },
@@ -68,7 +68,7 @@ const COMPARISON_ROWS = [
   },
   {
     label: 'Data ownership',
-    kadha: 'Primary focus',
+    kadha: 'Visibility controls, export, and self-hosting',
     letterboxd: 'Hosted platform',
     trakt: 'Hosted platform',
   },
@@ -86,14 +86,14 @@ const Landing = () => {
             Open Source & Self-Hostable
           </Badge>
           <Heading size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
-            Your private home for{' '}
+            A privacy-conscious home for{' '}
             <Text as="span" color="brand.fg">
               movies and TV.
             </Text>
           </Heading>
           <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg.muted" mb={8} maxW="2xl" mx="auto">
             Track what you've watched, save what you want to watch next, and build shared collections with people you
-            trust. Use Kadha online or run it on your own server.
+            trust. Use the hosted beta or run Kadha on your own server.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
             <Button colorPalette="brand" size="lg" asChild>
@@ -107,7 +107,7 @@ const Landing = () => {
             </Button>
           </HStack>
           <Text fontSize="sm" color="fg.muted" mt={4}>
-            No credit card required. Open source, self-hostable, and powered by TMDB.
+            Hosted beta access is complimentary. No credit card, advertising, or data sales.
           </Text>
         </Container>
       </Box>
@@ -118,7 +118,7 @@ const Landing = () => {
             <Badge colorPalette="brand">Built For</Badge>
             <Heading size={{ base: '2xl', md: '3xl' }}>People who watch together</Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
-              Kadha is strongest when tracking is personal, private, and shared with a small group.
+              New accounts start private, and sharing is a deliberate choice you control.
             </Text>
           </VStack>
 
@@ -154,7 +154,7 @@ const Landing = () => {
             <Heading size={{ base: '2xl', md: '3xl' }}>Not trying to be next Letterboxd</Heading>
             <Text color="fg.muted" fontSize="lg" maxW="3xl">
               Letterboxd is excellent for public film culture. Trakt and Simkl are strong hosted trackers. Kadha is for
-              private movie and TV tracking, shared planning, and self-hosting.
+              privacy-controlled movie and TV tracking, shared planning, and self-hosting.
             </Text>
           </VStack>
 
@@ -185,7 +185,7 @@ const Landing = () => {
 
           <Text color="fg.muted" mt={5} textAlign="center">
             Use Letterboxd if you want public reviews, ratings, and film-community discovery. Use Kadha if you want a
-            private, self-hostable tracker for movies, TV, and shared watch planning.
+            tracker with private defaults, deliberate sharing, and a self-hosting path.
           </Text>
         </Container>
       </Box>
@@ -270,8 +270,8 @@ const Landing = () => {
                 </Box>
                 <Heading size={{ base: 'xl', md: '2xl' }}>Your Server, Your Cinema</Heading>
                 <Text fontSize="lg" color="fg.muted" maxW="xl">
-                  Don't want your watch history on someone else's server? Fork the repo, deploy with Docker, and run
-                  your own instance. Modify it however you want.
+                  Don't want your watch history on someone else's server? Fork the MIT-licensed repo, deploy with
+                  Docker, and modify your instance to fit your needs.
                 </Text>
                 <Button variant="outline" colorPalette="brand" asChild>
                   <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
@@ -318,12 +318,12 @@ const Landing = () => {
             Start your private watch hub
           </Heading>
           <Text fontSize="lg" color="fg.muted" mb={8}>
-            Keep your movies, shows, lists, and shared plans in one place without turning your taste into public
-            content.
+            Keep your movies, shows, lists, and shared plans in one place. Your account starts private, and you choose
+            what to share.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
             <Button colorPalette="brand" size="lg" asChild>
-              <Link to="/auth/register">Create Free Account</Link>
+              <Link to="/auth/register">Create Beta Account</Link>
             </Button>
             <Button variant="outline" colorPalette="gray" size="lg" asChild>
               <Link to="/auth/login">Login</Link>
@@ -343,7 +343,7 @@ const Landing = () => {
             </HStack>
 
             <Text color="fg.muted" fontSize="sm">
-              Open source. Privacy-first. Built for private movie and TV tracking.
+              Open source. Privacy-conscious. Built for deliberate sharing.
             </Text>
 
             <HStack gap={4}>

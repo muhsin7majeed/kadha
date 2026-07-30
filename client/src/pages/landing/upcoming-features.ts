@@ -4,20 +4,20 @@ const UPCOMING_FEATURES = [
   {
     icon: LuSparkles,
     title: 'TMDB Recommendations',
-    description: 'Find similar movies and shows from TMDB based on what you already like or watched.',
+    description: 'Optionally find similar movies and shows from TMDB using titles you choose to include.',
     badge: 'Recommendations',
   },
   {
     icon: LuBrain,
     title: 'AI Recommendations',
     description:
-      "Bring your own AI API key or use in-browser AI. Your data stays yours, not some tech giant's training set.",
+      'Evaluate local or bring-your-own-provider recommendations, with a clear disclosure before any data leaves Kadha.',
     badge: 'AI',
   },
   {
     icon: LuUsers,
     title: 'Friends Activity',
-    description: 'See what friends are watching and discover recommendations from people you trust.',
+    description: 'See only the activity friends choose to share and discover recommendations from people you trust.',
     badge: 'Social',
   },
   {
@@ -29,7 +29,8 @@ const UPCOMING_FEATURES = [
   {
     icon: LuDownload,
     title: 'Data Import',
-    description: 'Bring your existing history into Kadha. Full account export is already available today.',
+    description:
+      'Bring your existing history into Kadha. A JSON export is available today; episode-history export is still planned.',
     badge: 'Data',
   },
   {

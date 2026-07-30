@@ -75,9 +75,9 @@ model User {
   id               String       @id @default(uuid())
   username         String       @unique
   role             UserRole     @default(USER)
-  profilePrivacy   DataPrivacy  @default(EVERYONE)
-  watchedPrivacy   DataPrivacy  @default(FRIENDS)
-  likedPrivacy     DataPrivacy  @default(FRIENDS)
+  profilePrivacy   DataPrivacy  @default(ONLY_ME)
+  watchedPrivacy   DataPrivacy  @default(ONLY_ME)
+  likedPrivacy     DataPrivacy  @default(ONLY_ME)
   watchlistPrivacy DataPrivacy  @default(ONLY_ME)
   watchRegion      String       @default("US")
   password         String

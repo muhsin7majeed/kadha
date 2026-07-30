@@ -75,8 +75,9 @@ const Register = () => {
       <VStack align="stretch" gap={4}>
         <Box bg="bg.subtle" borderWidth="1px" borderColor="border" rounded="md" p={4}>
           <Text textStyle="supporting" color="fg.muted">
-            This hosted beta is not end-to-end encrypted yet, the instance operator can access stored account and media
-            data. Self-host Kadha if you want full control of your data.
+            This hosted beta is not end-to-end encrypted. The instance operator can technically access stored account
+            and media data but does not routinely inspect private content. Kadha is pseudonymous, not anonymous.
+            Self-host the MIT-licensed app if you need control of the server and database.
           </Text>
         </Box>
 

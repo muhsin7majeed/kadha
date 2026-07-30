@@ -2,7 +2,26 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Privacy And Product Transparency
+
+- Made new accounts and collections private by default without changing existing users' visibility choices.
+- Clarified that hosted Kadha is pseudonymous rather than anonymous, is not end-to-end encrypted, and remains
+  technically accessible to the instance operator.
+- Documented visibility scopes, operator access, data uses, TMDB artwork requests, necessary cookies, current export
+  limitations, and the lack of a private deletion-request channel during beta.
+- Published Kadha under the MIT License and aligned open-source, modification, redistribution, and self-hosting claims
+  with the granted permissions.
+- Clarified that hosted beta access is complimentary and that the planned sustainable model keeps a useful free core
+  while reserving advanced or heavier-use features for a paid tier.
+
 ### Engineering Changes
+
+#### Privacy Defaults
+
+- Added an existing-data-preserving migration for private user defaults and enforced those defaults explicitly during
+  registration.
 
 #### Dependency Security
 

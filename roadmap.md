@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-07-30
 
-Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
+Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
 ## Shipped Foundation
 
@@ -64,7 +64,8 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 #### P1 — Next Security And Privacy Release
 
 - [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
-- [ ] Make new profiles private by default and evaluate opt-in username discovery.
+- [x] Make newly registered profiles, activity sections, and collections private by default.
+- [ ] Evaluate opt-in username discovery.
 - [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
 - [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
 - [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
@@ -118,12 +119,14 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 ### Optional Experiments And Sustainability
 
 - [ ] Evaluate swipe-based discovery and feedback-driven recommendation tuning.
-- [ ] Decide whether the hosted service needs an optional paid plan.
-- [ ] Keep self-hosting free and avoid locking core features behind payment.
+- [x] Choose a hosted model with a useful free core and a paid tier for advanced or heavier-use features.
+- [ ] Measure hosted usage and support costs, then define transparent free-tier limits and paid pricing.
+- [ ] Add hosted subscriptions without paywalling privacy, account security, export, or deletion.
+- [x] Publish the project under the MIT License and keep self-hosting available without hosted subscription gating.
 
 ## Guiding Principles
 
-- Users own their data.
+- Users should be able to control, export, and delete their data.
 - Self-hosting is first-class.
 - Privacy is the default, not an afterthought.
 - Social features are optional.

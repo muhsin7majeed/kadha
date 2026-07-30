@@ -4,6 +4,8 @@
 
 User accounts are searchable unless either user has blocked the other. Private profiles are still discoverable, but their profile content and activity sections are locked until the viewer has access.
 
+New users start with their profile and all activity sections set to `ONLY_ME`. Existing users keep their chosen settings.
+
 Search excludes:
 
 - the current user
@@ -39,6 +41,7 @@ The database uses `DataPrivacy` for both profile and section privacy:
 - `ONLY_ME`
 
 For profile UI, `ONLY_ME` is presented as `Private`.
+`EVERYONE` means every authenticated user on the same Kadha instance, not an anonymous visitor on the public internet.
 
 Profile access:
 
@@ -87,6 +90,7 @@ Allowed activity responses include:
 ```
 
 Collections keep per-collection privacy. Other-user collection lists return only collections visible to the current viewer.
+New collections start as `ONLY_ME`; changing visibility or inviting a member is a deliberate sharing action.
 
 ## Blocking
 

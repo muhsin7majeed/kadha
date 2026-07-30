@@ -36,6 +36,10 @@ describe('auth edge cases', () => {
     const storedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.userId },
       select: {
+        profilePrivacy: true,
+        watchedPrivacy: true,
+        likedPrivacy: true,
+        watchlistPrivacy: true,
         recoveryCodeHash: true,
         recoveryCodeIssuedAt: true,
       },
@@ -46,6 +50,12 @@ describe('auth edge cases', () => {
     expect(storedUser.recoveryCodeHash).toBe(hashRecoveryCode(normalizedCode!));
     expect(storedUser.recoveryCodeHash).not.toContain(user.recoveryCode);
     expect(storedUser.recoveryCodeIssuedAt).toBeInstanceOf(Date);
+    expect(storedUser).toMatchObject({
+      profilePrivacy: 'ONLY_ME',
+      watchedPrivacy: 'ONLY_ME',
+      likedPrivacy: 'ONLY_ME',
+      watchlistPrivacy: 'ONLY_ME',
+    });
 
     const statusResponse = await request(await getTestApp())
       .get('/api/auth/recovery-code/status')

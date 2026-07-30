@@ -40,6 +40,12 @@ const Terms = () => {
                 Kadha is provided as an early beta. Features may change, hosted data may be reset, and the service may
                 be paused or discontinued while the product is being tested.
               </Text>
+              <Text>
+                Hosted beta access is currently complimentary and requires no payment method. A useful free core and a
+                paid tier for advanced or heavier-use features are planned if hosting costs require subscriptions.
+                Users will receive advance notice before hosted pricing changes, and no one will be charged without
+                explicitly choosing a paid subscription.
+              </Text>
             </Section>
 
             <Section title="Your Account">
@@ -54,6 +60,21 @@ const Terms = () => {
               </List.Root>
             </Section>
 
+            <Section title="Privacy And Sharing">
+              <Text>
+                New accounts start private, but you can choose to share profile sections or collections with friends or
+                other signed-in users. People who receive shared data may copy or disclose it outside Kadha.
+              </Text>
+              <Text>
+                The hosted service is not end-to-end encrypted. The application server and hosted operator can
+                technically access stored account data as explained in the{' '}
+                <ChakraLink asChild color="brand.fg">
+                  <Link to="/privacy">Privacy Policy</Link>
+                </ChakraLink>
+                .
+              </Text>
+            </Section>
+
             <Section title="Acceptable Use">
               <Text>
                 Do not use Kadha for spam, harassment, abusive usernames, attempts to disrupt the service, or content
@@ -63,8 +84,22 @@ const Terms = () => {
 
             <Section title="Self-Hosting">
               <Text>
-                Kadha is open source and self-hostable. If you run your own instance, you are responsible for
-                configuration, security, backups, updates, and any users on that instance.
+                Kadha is open-source software licensed under the{' '}
+                <ChakraLink asChild color="brand.fg">
+                  <a
+                    href={`${APP_CONFIG.githubUrl}/blob/master/LICENSE`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    MIT License
+                  </a>
+                </ChakraLink>
+                . The license permits use, copying, modification, distribution, sublicensing, and sale subject to its
+                copyright and permission-notice requirements.
+              </Text>
+              <Text>
+                If you operate an instance, you are responsible for configuration, security, backups, updates, privacy
+                disclosures, and any users on that instance.
               </Text>
             </Section>
 

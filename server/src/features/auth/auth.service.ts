@@ -1,4 +1,4 @@
-import { UserActivityType } from '@prisma/client';
+import { DataPrivacy, UserActivityType } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -45,6 +45,10 @@ export async function registerUser({ username, password, watchRegion }: Register
         password: hashedPassword,
         recoveryCodeHash,
         recoveryCodeIssuedAt: new Date(),
+        profilePrivacy: DataPrivacy.ONLY_ME,
+        watchedPrivacy: DataPrivacy.ONLY_ME,
+        likedPrivacy: DataPrivacy.ONLY_ME,
+        watchlistPrivacy: DataPrivacy.ONLY_ME,
         watchRegion: normalizeWatchRegion(watchRegion ?? DEFAULT_WATCH_REGION),
       },
     });

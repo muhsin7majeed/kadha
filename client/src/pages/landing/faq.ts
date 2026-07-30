@@ -2,12 +2,12 @@ const FAQ_ITEMS = [
   {
     question: 'Is Kadha a Letterboxd alternative?',
     answer:
-      "Kadha overlaps with Letterboxd, but it is not trying to replace Letterboxd's public review community. Kadha is focused on private movie and TV tracking, shared collections, privacy controls, and self-hosting.",
+      "Kadha overlaps with Letterboxd, but it is not trying to replace Letterboxd's public review community. Kadha is focused on privacy-controlled movie and TV tracking, shared collections, and self-hosting.",
   },
   {
     question: 'Why would I use this instead of Letterboxd?',
     answer:
-      'Use Kadha if you care more about private tracking, shared watch planning, or owning your data. Use Letterboxd if you want public reviews, ratings, and a large film community.',
+      'Use Kadha if you care more about private defaults, deliberate sharing, JSON export, or self-hosting. Use Letterboxd if you want public reviews, ratings, and a large film community.',
   },
   {
     question: 'Can I share lists with other people?',
@@ -15,12 +15,23 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Can I keep my watch history private?',
-    answer: 'Yes. Kadha has privacy controls for your profile, watched list, liked list, watchlist, and collections.',
+    answer:
+      'Yes. New accounts start private. You can separately share your profile and lists with friends or every signed-in user on your Kadha instance.',
+  },
+  {
+    question: 'Is hosted Kadha end-to-end encrypted?',
+    answer:
+      'No. The hosted operator can technically access stored account and media data, but does not routinely inspect private content. A self-hosted deployment gives its operator control of the server and database.',
+  },
+  {
+    question: 'Is Kadha anonymous?',
+    answer:
+      'Yes and No. Kadha does not require an email address or phone number, but usernames are searchable and servers may process network information such as IP addresses. Kadha is pseudonymous, not anonymous.',
   },
   {
     question: 'Can I self-host this?',
     answer:
-      'Yes. Kadha is designed to be self-hostable with Docker, so you can run your own instance and keep your data on your own server.',
+      'Yes. Kadha is open source under the MIT License and includes Docker deployment configuration, so you can run and modify your own instance.',
   },
   {
     question: 'What if I forget my password?',
@@ -34,12 +45,12 @@ const FAQ_ITEMS = [
   {
     question: 'Is this really free?',
     answer:
-      "The app is open source. The hosted version is free for now, but may need a small fee later to cover server costs. We'll be upfront if that changes.",
+      'The hosted beta is complimentary and requires no credit card. The long-term plan is a useful free core plus a paid tier for advanced or heavier-use features. Privacy controls, export, deletion, and account security will not be paywalled, and pricing changes will be announced in advance.',
   },
   {
     question: 'Can I import from Letterboxd or Trakt?',
     answer:
-      'Not yet. Kadha already lets you export your account data as JSON. Imports from Letterboxd, Trakt, and other services are planned.',
+      'Not yet. Kadha can export most account data as JSON, but episode-watch history is not included yet. Complete export and imports from Letterboxd, Trakt, and other services are planned.',
   },
 ];
 

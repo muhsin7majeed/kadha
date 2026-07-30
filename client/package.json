@@ -2,6 +2,7 @@
   "name": "kadha",
   "private": true,
   "version": "0.1.8",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "sync:changelog": "node scripts/generate-changelog.mjs",

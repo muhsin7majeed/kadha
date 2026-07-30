@@ -31,7 +31,8 @@ const CURRENT_FEATURES = [
   {
     icon: LuServer,
     title: 'Self-Hosting',
-    description: "Don't trust us? Host it yourself. Docker makes it easy. Your data, your server, your rules.",
+    description:
+      'Host it yourself with Docker. Kadha is open source under the permissive MIT License.',
     badge: 'Core',
   },
   {
@@ -43,7 +44,8 @@ const CURRENT_FEATURES = [
   {
     icon: LuLock,
     title: 'Privacy Controls',
-    description: 'Control who can see your profile, watched list, liked list, watchlist, and collections.',
+    description:
+      'New accounts start private. You can choose who sees your profile, watched list, liked list, watchlist, and collections.',
     badge: 'Privacy',
   },
 ];

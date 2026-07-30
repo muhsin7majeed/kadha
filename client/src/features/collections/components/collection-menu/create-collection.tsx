@@ -27,7 +27,7 @@ const CreateCollection: React.FC<CreateCollectionProps> = ({ onClose }) => {
   const initialValues: CollectionFormFields = {
     name: '',
     description: '',
-    privacy: DataPrivacy.Everyone,
+    privacy: DataPrivacy.OnlyMe,
   };
 
   return (

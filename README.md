@@ -2,7 +2,23 @@
 
 ![GitHub release](https://img.shields.io/github/v/release/muhsin7majeed/kadha)
 
-A self-hostable web app to track movies and TV shows.
+An open-source, self-hostable web app for movie and TV tracking.
+
+## License
+
+Kadha is open-source software licensed under the [MIT License](LICENSE). You may use, copy, modify, distribute,
+sublicense, or sell copies of the software subject to the license terms.
+
+## Privacy Model
+
+New accounts and collections start private. Users can deliberately share profile sections and collections with
+accepted friends or all signed-in users on their Kadha instance. Usernames remain searchable unless blocked, so Kadha
+is pseudonymous rather than anonymous.
+
+The hosted service is not end-to-end encrypted. The application server and instance operator can technically access
+stored data. The hosted operator does not routinely inspect private content, and Kadha does not sell or rent personal
+data, target advertising from it, or train AI models on it. Self-hosting gives the instance operator control of the
+server, database, logs, backups, and access policies.
 
 ## Architecture
 

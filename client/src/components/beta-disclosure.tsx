@@ -11,7 +11,8 @@ const BetaDisclosureContent = () => (
       <LuInfo />
     </Icon>
     <Text textStyle="supporting" color="fg.muted">
-      Kadha is in early beta. There's a chance I might fuck up your data during testing / development lol.
+      Kadha is in early beta. Features may change and hosted data may be reset. Keep a separate record of anything
+      important.
     </Text>
   </HStack>
 );

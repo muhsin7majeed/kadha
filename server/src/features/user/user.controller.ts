@@ -47,8 +47,8 @@ export const updateMe = async (req: Request, res: Response) => {
     id,
     username,
     profilePrivacy as DataPrivacy,
-    (watchedPrivacy || DataPrivacy.Friends) as DataPrivacy,
-    (likedPrivacy || DataPrivacy.Friends) as DataPrivacy,
+    (watchedPrivacy || DataPrivacy.OnlyMe) as DataPrivacy,
+    (likedPrivacy || DataPrivacy.OnlyMe) as DataPrivacy,
     (watchlistPrivacy || DataPrivacy.OnlyMe) as DataPrivacy,
     watchRegion,
   );

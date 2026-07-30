@@ -82,7 +82,13 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
               control={control}
               name="privacy"
               render={({ field }) => (
-                <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
+                <Field.Root>
+                  <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
+                  <Field.HelperText>
+                    All users means anyone signed in to this Kadha instance. Collection members retain their invited
+                    access.
+                  </Field.HelperText>
+                </Field.Root>
               )}
             />
           </Fieldset.Content>

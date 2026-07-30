@@ -31,7 +31,7 @@ const privacySettings: PrivacySetting[] = [
   {
     name: 'profilePrivacy',
     label: 'Profile',
-    description: 'Controls whether your profile page itself can be opened.',
+    description: 'Controls who can open your profile. All users means anyone signed in to this Kadha instance.',
     options: PROFILE_PRIVACY_OPTIONS,
   },
   {
