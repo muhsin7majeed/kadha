@@ -112,9 +112,10 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ### Integrations
 
-- [ ] Complete Plex Phase 0 technical validation.
-- [ ] Add supported Plex Watchlist preview and import after the integration architecture is validated.
-- [ ] Evaluate Plex library availability and deep links as a later follow-up.
+- [ ] Complete Plex activity-sync Phase 0 validation for authorization, webhooks, GUID mapping, imports, and reconciliation.
+- [ ] Add supported Plex-to-Kadha sync for watched movies, TV episode progress, and ratings.
+- [ ] Add Plex library availability and deep links after activity sync is stable.
+- [ ] Add supported Plex Watchlist preview and import as a separate RSS-based follow-up.
 
 ### Optional Experiments And Sustainability
 
