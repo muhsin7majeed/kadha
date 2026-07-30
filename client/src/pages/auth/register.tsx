@@ -1,43 +1,74 @@
+import { useState } from 'react';
 import { Box, Link as ChakraLink, Text, VStack } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
+import useRegister from '@/features/auth/api/use-register';
+import { RegisterInputs, RegisterResponse } from '@/features/auth/auth.types';
+import RecoveryCodeDisplay from '@/features/auth/components/recovery-code-display';
+import { getMe } from '@/features/user/api/use-get-me';
+import { getApiFieldError } from '@/hooks/use-error-handler';
+import { queryKeys } from '@/lib/query-keys';
+import { setAccessToken } from '@/lib/token-manager';
 import { LocationState } from '@/types/common';
 import AuthForm from './auth-form';
-import useRegister from '@/features/auth/api/use-register';
-import { RegisterInputs } from '@/features/auth/auth.types';
-import { setAccessToken } from '@/lib/token-manager';
-import { useQueryClient } from '@tanstack/react-query';
-import { getApiFieldError } from '@/hooks/use-error-handler';
-import { getMe } from '@/features/user/api/use-get-me';
-import { queryKeys } from '@/lib/query-keys';
+
+interface PendingRegistration extends RegisterResponse {
+  username: string;
+}
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
+  const [pendingRegistration, setPendingRegistration] = useState<PendingRegistration | null>(null);
 
   const from = (location.state as LocationState)?.from || '/app';
 
-  const { mutate, error, isPending } = useRegister();
+  const { mutate, error, isPending, reset: resetRegistration } = useRegister();
   const usernameApiError = getApiFieldError(error, 'username');
   const watchRegionApiError = getApiFieldError(error, 'watchRegion');
 
   const onSubmit: SubmitHandler<RegisterInputs> = (payload) => {
     mutate(payload, {
-      onSuccess: async (data) => {
-        setAccessToken(data.accessToken);
-        queryClient.clear();
-        await queryClient.fetchQuery({
-          queryKey: queryKeys.me,
-          queryFn: getMe,
-          staleTime: Infinity,
+      onSuccess: (data) => {
+        setPendingRegistration({
+          ...data,
+          username: payload.username,
         });
-
-        navigate(from, { replace: true });
+        resetRegistration();
       },
     });
   };
+
+  const completeRegistration = async () => {
+    if (!pendingRegistration) {
+      return;
+    }
+
+    setAccessToken(pendingRegistration.accessToken);
+    queryClient.clear();
+    await queryClient.fetchQuery({
+      queryKey: queryKeys.me,
+      queryFn: getMe,
+      staleTime: Infinity,
+    });
+
+    setPendingRegistration(null);
+    navigate(from, { replace: true });
+  };
+
+  if (pendingRegistration) {
+    return (
+      <RecoveryCodeDisplay
+        continueLabel="Continue to Kadha"
+        recoveryCode={pendingRegistration.recoveryCode}
+        username={pendingRegistration.username}
+        onContinue={completeRegistration}
+      />
+    );
+  }
 
   return (
     <Box>

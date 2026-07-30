@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-07-29
+Last reviewed: 2026-07-30
 
 Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -39,6 +39,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 - [x] Docker-first local development and production deployment.
 - [x] Environment-based instance and public URL configuration.
 - [x] Account data export as JSON.
+- [x] Contact-free password recovery using user-held, single-use recovery codes.
 - [x] Read-only admin dashboard with user search and instance metrics.
 - [x] Theme presets with independent light and dark modes.
 - [x] Automated server and client builds, tests, linting, and CI.

@@ -39,12 +39,12 @@ const Login = () => {
     <Box>
       <AuthForm onSubmit={onSubmit} type="login" isLoading={isPending} />
 
-      <Text mt={4} fontSize="xs" color="fg.muted" textAlign="center">
-        No password reset is available during beta. Use a password you do not reuse elsewhere. See the{' '}
+      <Text mt={4} textStyle="supporting" color="fg.muted" textAlign="center">
         <ChakraLink asChild color="brand.fg">
-          <Link to="/privacy">Privacy Policy</Link>
+          <Link to="/auth/recover" state={{ from }}>
+            Forgot password?
+          </Link>
         </ChakraLink>
-        .
       </Text>
 
       <Text mt={4} textStyle="supporting" color="gray.500" textAlign="center">

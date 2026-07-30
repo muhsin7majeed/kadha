@@ -17,6 +17,7 @@ interface AdminUsersListParams {
 
 export const authQueryKeys = {
   me: ['me'] as const,
+  recoveryCodeStatus: ['auth', 'recovery-code-status'] as const,
 };
 
 export const activityQueryKeys = {

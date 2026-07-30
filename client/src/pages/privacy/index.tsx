@@ -49,7 +49,9 @@ const Privacy = () => {
             <Section title="Data Kadha Stores">
               <Text>Kadha may store the following data when you use the hosted beta:</Text>
               <List.Root ps={5}>
-                <List.Item>Username, password hash, account role, and watch region.</List.Item>
+                <List.Item>
+                  Username, password hash, account role, watch region, and account recovery-code verifier.
+                </List.Item>
                 <List.Item>Watched, liked, and watchlist items.</List.Item>
                 <List.Item>Collections, collection items, collection sharing, and invitations.</List.Item>
                 <List.Item>Friendships, blocks, notifications, and account activity records.</List.Item>
@@ -60,6 +62,7 @@ const Privacy = () => {
             <Section title="Data Kadha Does Not Currently Collect">
               <List.Root ps={5}>
                 <List.Item>Email addresses.</List.Item>
+                <List.Item>Phone numbers.</List.Item>
                 <List.Item>Payment information.</List.Item>
                 <List.Item>Advertising identifiers.</List.Item>
                 <List.Item>Analytics events, unless this changes and is disclosed later.</List.Item>
@@ -77,6 +80,18 @@ const Privacy = () => {
               <Text>
                 Kadha uses TMDB for movie and TV metadata. This product uses the TMDB API but is not endorsed or
                 certified by TMDB.
+              </Text>
+            </Section>
+
+            <Section title="Account Recovery">
+              <Text>
+                Kadha issues a private recovery code without requiring an email address or phone number. The plaintext
+                code is shown when it is created, while Kadha stores only a one-way verifier and its issue date.
+              </Text>
+              <Text>
+                Anyone with your username and recovery code can reset your password. Keep the code private and outside
+                Kadha. If you lose both your password and recovery code, the account cannot be recovered through the
+                product or support.
               </Text>
             </Section>
 

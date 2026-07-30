@@ -34,6 +34,9 @@ export const forbidden = (message = 'Forbidden') => new AppError(message, { stat
 
 export const notFound = (message = 'Not found') => new AppError(message, { statusCode: 404, code: 'NOT_FOUND' });
 
+export const tooManyRequests = (message = 'Too many requests') =>
+  new AppError(message, { statusCode: 429, code: 'TOO_MANY_REQUESTS' });
+
 export const sendData = <T>(res: Response, data: T, statusCode = 200) => {
   return res.status(statusCode).json({ data });
 };

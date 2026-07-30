@@ -9,6 +9,8 @@ import {
   LuListPlus,
   LuLogIn,
   LuLogOut,
+  LuKeyRound,
+  LuRefreshCw,
   LuSettings,
   LuUserPlus,
   LuX,
@@ -50,6 +52,24 @@ const activityCopyByType: Record<UserActivityType, ActivityCopy> = {
     detail: 'Logged out of this account',
     icon: <LuLogOut />,
     colorPalette: 'gray',
+  },
+  [UserActivityType.RecoveryCodeCreated]: {
+    label: 'Recovery enabled',
+    detail: 'Created an account recovery code',
+    icon: <LuKeyRound />,
+    colorPalette: 'green',
+  },
+  [UserActivityType.RecoveryCodeReplaced]: {
+    label: 'Recovery code replaced',
+    detail: 'Replaced the account recovery code',
+    icon: <LuRefreshCw />,
+    colorPalette: 'orange',
+  },
+  [UserActivityType.PasswordResetWithRecoveryCode]: {
+    label: 'Password reset',
+    detail: 'Reset the password with a recovery code',
+    icon: <LuKeyRound />,
+    colorPalette: 'blue',
   },
   [UserActivityType.MediaLiked]: {
     label: 'Liked',
@@ -133,7 +153,10 @@ const getActivityTitle = (activity: UserActivity, metadata: ActivityMetadata) =>
   if (
     activity.type === UserActivityType.AccountCreated ||
     activity.type === UserActivityType.AccountLoggedIn ||
-    activity.type === UserActivityType.AccountLoggedOut
+    activity.type === UserActivityType.AccountLoggedOut ||
+    activity.type === UserActivityType.RecoveryCodeCreated ||
+    activity.type === UserActivityType.RecoveryCodeReplaced ||
+    activity.type === UserActivityType.PasswordResetWithRecoveryCode
   ) {
     return 'Account';
   }

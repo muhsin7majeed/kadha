@@ -45,6 +45,10 @@ const Terms = () => {
             <Section title="Your Account">
               <List.Root ps={5}>
                 <List.Item>Use a password you do not reuse on other services.</List.Item>
+                <List.Item>Keep your account recovery code private and store a copy outside Kadha.</List.Item>
+                <List.Item>
+                  Understand that your account cannot be recovered if you lose both your password and recovery code.
+                </List.Item>
                 <List.Item>Do not add highly sensitive personal information to the hosted beta.</List.Item>
                 <List.Item>You are responsible for the content and collections you create or share.</List.Item>
               </List.Root>

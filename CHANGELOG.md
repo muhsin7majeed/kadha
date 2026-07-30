@@ -4,10 +4,24 @@
 
 ### Feature Changes
 
+#### Account Recovery
+
+- Added contact-free password recovery using a private, single-use recovery code issued during signup.
+- Added recovery-code creation and replacement in Settings for existing accounts, with copy, download, and print options.
+- Added a recovery activity history and clear guidance that accounts cannot be recovered if both the password and recovery code are lost.
+
 #### Product Information
 
 - Updated the public roadmap, landing page, and privacy policy to accurately distinguish shipped data export from planned import and account deletion work.
 - Added prioritized privacy and security hardening work to the public roadmap and required future feature changes to keep roadmap status synchronized.
+
+### Engineering Changes
+
+#### Authentication Security
+
+- Stored only one-way recovery-code verifiers, rotated codes after use, and protected recovery attempts with account and IP rate limits.
+- Added per-user session versions so password recovery immediately invalidates previously issued access and refresh tokens.
+- Added server and client coverage for recovery issuance, replacement, reset, reuse protection, throttling, session revocation, recovery kits, and save acknowledgment.
 
 ## v0.1.7
 

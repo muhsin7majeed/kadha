@@ -4,11 +4,13 @@ import { getTestApp } from './app';
 
 interface AuthResponseBody {
   accessToken: string;
+  recoveryCode: string;
   userId: string;
 }
 
 export interface TestUser {
   accessToken: string;
+  recoveryCode: string;
   refreshToken: string;
   userId: string;
   username: string;
@@ -45,6 +47,7 @@ export const registerTestUser = async (username = `test-user-${++userCounter}`):
 
   return {
     accessToken: body.accessToken,
+    recoveryCode: body.recoveryCode,
     refreshToken: getRefreshToken(response),
     userId: body.userId,
     username,

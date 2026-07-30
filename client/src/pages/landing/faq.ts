@@ -11,18 +11,21 @@ const FAQ_ITEMS = [
   },
   {
     question: 'Can I share lists with other people?',
-    answer:
-      'Yes. You can create collections and share them with other users using viewer or editor permissions.',
+    answer: 'Yes. You can create collections and share them with other users using viewer or editor permissions.',
   },
   {
     question: 'Can I keep my watch history private?',
-    answer:
-      'Yes. Kadha has privacy controls for your profile, watched list, liked list, watchlist, and collections.',
+    answer: 'Yes. Kadha has privacy controls for your profile, watched list, liked list, watchlist, and collections.',
   },
   {
     question: 'Can I self-host this?',
     answer:
       'Yes. Kadha is designed to be self-hostable with Docker, so you can run your own instance and keep your data on your own server.',
+  },
+  {
+    question: 'What if I forget my password?',
+    answer:
+      'Kadha gives you a private recovery code during signup, without asking for an email address or phone number. Save it somewhere safe: if you lose both your password and recovery code, the account cannot be recovered.',
   },
   {
     question: 'Where does the movie and TV data come from?',

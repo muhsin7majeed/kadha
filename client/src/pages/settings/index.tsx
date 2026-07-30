@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 
 import Navbar from '@/components/navbar';
 import PageHeader from '@/components/page-header';
+import AccountRecoverySection from '@/features/auth/components/account-recovery-section';
 import ThemeSettingsSection from '@/features/theme/components/theme-settings-section';
 import DataExportSection from '@/features/user/components/data-export-section';
 
@@ -19,6 +20,7 @@ const SettingsContent = ({ hasShellPadding = false }: { hasShellPadding?: boolea
         </PageHeader>
 
         <ThemeSettingsSection />
+        <AccountRecoverySection />
         <DataExportSection />
       </VStack>
     </Container>

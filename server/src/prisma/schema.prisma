@@ -37,6 +37,9 @@ enum UserActivityType {
   ACCOUNT_CREATED
   ACCOUNT_LOGGED_IN
   ACCOUNT_LOGGED_OUT
+  RECOVERY_CODE_CREATED
+  RECOVERY_CODE_REPLACED
+  PASSWORD_RESET_WITH_RECOVERY_CODE
   MEDIA_LIKED
   MEDIA_UNLIKED
   MEDIA_WATCHED
@@ -78,6 +81,9 @@ model User {
   watchlistPrivacy DataPrivacy  @default(ONLY_ME)
   watchRegion      String       @default("US")
   password         String
+  recoveryCodeHash String?
+  recoveryCodeIssuedAt DateTime?
+  sessionVersion Int @default(0)
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
   user_media       UserMedia[]
