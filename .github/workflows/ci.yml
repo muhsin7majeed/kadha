@@ -5,6 +5,8 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+  schedule:
+    - cron: '17 6 * * 1'
   workflow_dispatch:
 
 concurrency:
@@ -28,6 +30,25 @@ env:
   VITE_API_URL: http://localhost:5000
 
 jobs:
+  production-audit:
+    name: Production Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Audit server production dependencies
+        run: node scripts/audit-production.mjs server
+
+      - name: Audit client production dependencies
+        run: node scripts/audit-production.mjs client
+
   server:
     name: Server
     runs-on: ubuntu-latest

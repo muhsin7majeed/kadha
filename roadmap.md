@@ -52,7 +52,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 
 #### P0 — Immediate
 
-- [ ] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
+- [x] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
 - [ ] Protect authentication endpoints with rate limits, stronger password requirements, and breached-password rejection.
 - [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
 - [ ] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
@@ -65,7 +65,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 
 - [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
 - [ ] Make new profiles private by default and evaluate opt-in username discovery.
-- [ ] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
+- [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
 - [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
 - [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
 - [ ] Add authenticated password changes that revoke existing sessions.

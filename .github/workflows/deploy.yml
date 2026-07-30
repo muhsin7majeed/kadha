@@ -1,21 +1,24 @@
 name: Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [master]
-  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}-server
+  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
 
 jobs:
   # Build and deploy React client to GitHub Pages
   deploy-client:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,6 +30,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -65,15 +70,18 @@ jobs:
 
   # Build and push server Docker image to GHCR
   build-server:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
+      image_ref: ${{ steps.image.outputs.ref }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       # Test build locally first to see errors
       - name: Setup Node.js
@@ -108,8 +116,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=
+            type=raw,value=${{ env.DEPLOY_SHA }}
             type=raw,value=latest
+
+      - name: Resolve immutable image reference
+        id: image
+        run: echo "ref=${REGISTRY}/${IMAGE_NAME}:${DEPLOY_SHA}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -126,11 +138,14 @@ jobs:
 
   # Deploy server to VPS
   deploy-server:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' }}
     needs: build-server
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - name: Copy docker-compose to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -144,7 +159,7 @@ jobs:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         env:
-          IMAGE: ghcr.io/${{ github.repository }}-server:latest
+          IMAGE: ${{ needs.build-server.outputs.image_ref }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
@@ -153,7 +168,7 @@ jobs:
           script: |
             cd ~/apps/kadha
 
-            # Pull latest image (package must be public, or use PAT for private)
+            # Pull the exact image built from the CI-tested commit.
             docker pull $IMAGE
 
             # Update .env with the image name

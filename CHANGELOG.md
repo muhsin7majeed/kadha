@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Engineering Changes
+
+#### Dependency Security
+
+- Updated the server's production dependency baseline, removed type-only and unused packages from the runtime dependency tree, added an audited transitive security override, and kept development image installs locked to `npm ci`.
+- Updated client HTTP dependencies and pinned React Router to the tested Node 20-compatible release while documenting the non-applicable React Server Components advisory.
+- Added high- and critical-severity production dependency audit gates for pull requests, pushes, manual CI runs, and a weekly scheduled check, with expiring repository-owned exceptions.
+
+#### Deployment Safety
+
+- Gated hosted production deployments on successful CI runs from `master`.
+- Changed hosted server deployments to use the exact CI-tested commit image while retaining commit-tagged images and a documented rollback path.
+
 ## v0.1.8
 
 ### Feature Changes

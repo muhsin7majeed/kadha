@@ -1,0 +1,11 @@
+{
+  "exceptions": [
+    {
+      "workspace": "client",
+      "advisoryId": "1124282",
+      "package": "react-router",
+      "expiresOn": "2026-10-31",
+      "reason": "Kadha is a client-rendered Vite SPA and does not use the affected React Server Components mode. React Router 8.3.0 requires Node 22.22, while Kadha currently supports Node 20."
+    }
+  ]
+}

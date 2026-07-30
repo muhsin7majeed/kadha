@@ -304,6 +304,28 @@ Run migrations manually:
 docker compose -f docker-compose.prod.yml exec server npx prisma migrate deploy
 ```
 
+### Automated Deployments And Rollback
+
+The hosted deployment workflow runs only after CI succeeds for a push to `master`. It checks out the tested commit, publishes the server image with the full commit SHA, and writes that immutable image reference to the production `.env`. The `latest` tag remains available for self-hosted update workflows, but the hosted deployment does not use it.
+
+To roll back the hosted server:
+
+1. Choose the full commit SHA from the previous successful deployment.
+2. Set `SERVER_IMAGE=ghcr.io/muhsin7majeed/kadha-server:<commit-sha>` in the production `.env`.
+3. Pull and restart that exact image:
+
+```bash
+docker compose -f docker-compose.prod.yml pull server
+docker compose -f docker-compose.prod.yml up -d server
+docker compose -f docker-compose.prod.yml ps
+```
+
+Commit-tagged images are retained by the normal deployment cleanup because it removes only dangling images. Rolling back an image does not reverse a database migration, so back up SQLite before migration-bearing releases and review the migration before attempting a code rollback.
+
+### Dependency Audits
+
+Production dependency audits run in CI and weekly. See [`docs/dependency-security.md`](docs/dependency-security.md) for local commands, enforcement behavior, and the current time-bounded advisory exception.
+
 ### Admin Setup
 
 Promote an existing user to admin in local Docker Compose:

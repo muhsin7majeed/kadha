@@ -5,7 +5,6 @@ WORKDIR /app
 COPY server/package*.json ./
 
 RUN npm ci
-RUN npm i -D tsx
 
 COPY server ./
 
