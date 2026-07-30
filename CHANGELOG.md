@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.8
+
 ### Feature Changes
 
 #### Settings And Profile
