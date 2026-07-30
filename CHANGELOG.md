@@ -4,6 +4,15 @@
 
 ### Feature Changes
 
+#### Mobile Installation
+
+- Made Kadha installable from supported mobile and desktop browsers with branded Home Screen icons and an app-style
+  standalone window.
+- Added a contextual install action, iPhone and iPad installation guidance, connection-status feedback, and a
+  user-controlled prompt when a new Kadha version is ready.
+- Kept account and library data network-only: the installed app caches its static interface but requires a connection
+  to load or update personal content.
+
 #### Privacy And Product Transparency
 
 - Made new accounts and collections private by default without changing existing users' visibility choices.
@@ -17,6 +26,14 @@
   while reserving advanced or heavier-use features for a paid tier.
 
 ### Engineering Changes
+
+#### Progressive Web App
+
+- Added a build-generated web app manifest and Workbox service worker with static application-shell precaching,
+  explicit network-only API handling, and outdated-cache cleanup.
+- Added standard, maskable, and Apple touch icons plus focused install-environment and prompt-lifecycle coverage.
+- Added production Nginx cache policies that revalidate the app shell and service worker while keeping hashed assets
+  immutable.
 
 #### Privacy Defaults
 

@@ -4,6 +4,7 @@ import { NavLink } from 'react-router';
 
 import { APP_CONFIG } from '@/config/app-config';
 import { useColorMode } from '@/components/ui/color-mode-hooks';
+import PwaInstallMenuItem from '@/features/pwa/pwa-install-menu-item';
 
 interface UtilityMenuItemsProps {
   onOpenChangelog: () => void;
@@ -27,6 +28,8 @@ const UtilityMenuItems = ({ onOpenChangelog, settingsPath = '/settings' }: Utili
           <LuSettings /> Settings
         </NavLink>
       </Menu.Item>
+
+      <PwaInstallMenuItem />
 
       <Menu.Item
         value="changelog"

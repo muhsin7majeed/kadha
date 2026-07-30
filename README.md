@@ -22,7 +22,7 @@ server, database, logs, backups, and access policies.
 
 ## Architecture
 
-- **Frontend**: React SPA, deployable to GitHub Pages, any static host, or a frontend Docker container
+- **Frontend**: Installable React PWA, deployable to GitHub Pages, any static host, or a frontend Docker container
 - **Backend**: Node.js + SQLite, deployable with Docker
 
 ```
@@ -34,6 +34,22 @@ GitHub Pages / Static Host         Your VPS
                                   │        └─► SQLite       │
                                   └─────────────────────────┘
 ```
+
+## Install As An App
+
+Kadha can be installed directly from a supported browser without an app store:
+
+- **Android and desktop Chromium browsers**: open the browser menu and choose **Install app**, or use
+  **Install Kadha** from Kadha's utility menu when the browser offers it.
+- **iPhone and iPad**: open the Share menu, choose **Add to Home Screen**, leave **Open as Web App** enabled, and tap
+  **Add**. Kadha also shows these instructions from its utility menu.
+
+The installed app caches Kadha's static interface for reliable startup. Account, library, note, activity, and other
+authenticated API responses are not stored in the service-worker cache, so a connection is required to load or update
+personal content. When a new frontend version is ready, Kadha offers an update action instead of reloading while work
+may be in progress.
+
+Production installations require HTTPS. Localhost remains available for development and testing.
 
 ## Local Development
 
@@ -234,6 +250,8 @@ docker compose -f docker-compose.prod.yml up -d
 ### 3. Frontend Deployment
 
 The recommended frontend deployment is a static host such as GitHub Pages, Nginx, Caddy, or any static hosting service.
+Use HTTPS and deploy the complete `client/dist` directory so `manifest.webmanifest`, `sw.js`, icons, and generated
+assets remain together at the frontend origin.
 
 For GitHub Pages, set these GitHub Actions variables:
 

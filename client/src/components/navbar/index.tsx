@@ -44,7 +44,16 @@ const Navbar = () => {
 
   return (
     <>
-      <Box as="nav" position="sticky" top={0} zIndex={10} bg="bg" borderBottomWidth="1px" borderColor="border">
+      <Box
+        as="nav"
+        position="sticky"
+        top={0}
+        zIndex={10}
+        bg="bg"
+        borderBottomWidth="1px"
+        borderColor="border"
+        pt="env(safe-area-inset-top)"
+      >
         <Container maxW="6xl" px="4" py={3}>
           <Flex justify="space-between" align="center">
             <HStack gap={2} minW={0} asChild>
