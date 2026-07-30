@@ -3,13 +3,19 @@ import { LuDownload } from 'react-icons/lu';
 
 import useExportUserData from '@/features/user/api/use-export-user-data';
 
-const DataExportSection = () => {
+interface DataExportSectionProps {
+  headingAs?: 'h2' | 'h3';
+}
+
+const DataExportSection = ({ headingAs = 'h2' }: DataExportSectionProps) => {
   const { mutate: exportUserData, isPending: isExporting } = useExportUserData();
 
   return (
     <Card.Root variant="outline">
       <Card.Header>
-        <Heading textStyle="subsectionTitle">Data</Heading>
+        <Heading as={headingAs} textStyle="subsectionTitle">
+          Export
+        </Heading>
         <Text color="fg.muted" textStyle="supporting">
           Download a JSON copy of your account, media, collections, social data, notifications, and activity.
         </Text>

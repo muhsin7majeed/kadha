@@ -110,7 +110,7 @@ Frontend variables prefixed with `VITE_` are build-time values. If you change `V
 
 Kadha does not require an email address or phone number. Instead, new accounts receive a private recovery code during signup. Users should copy, download, or print the recovery kit and keep it somewhere outside Kadha.
 
-Existing users can create a recovery code from **Settings → Account recovery** after confirming their current password. Replacing a recovery code immediately invalidates the previous one.
+Existing users can create a recovery code from **Settings → Security → Account recovery** after confirming their current password. Replacing a recovery code immediately invalidates the previous one.
 
 Kadha stores only a one-way verifier for the code and cannot reveal it later. If a user loses both their password and recovery code, the account cannot be recovered through the product or support. Instance operators with direct server and database control retain the technical capabilities and responsibilities inherent in self-hosting.
 

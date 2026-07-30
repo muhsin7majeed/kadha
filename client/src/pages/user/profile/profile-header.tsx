@@ -1,10 +1,14 @@
-import FriendshipActions from '@/features/friendship/components/friendship-actions';
-import { UserProfileResponse } from '@/features/user/user.types';
-import { Badge, Box, Card, HStack, Stack, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Card, HStack, Stack, Text } from '@chakra-ui/react';
+import { LuPencil, LuShield } from 'react-icons/lu';
+import { Link } from 'react-router';
+
 import SimpleAvatar from '@/components/simple-avatar';
+import FriendshipActions from '@/features/friendship/components/friendship-actions';
+import type { UserProfileResponse } from '@/features/user/user.types';
 import { DataPrivacy, FriendStatus } from '@/types/common';
 
-interface OtherUserProfileHeaderProps {
+interface ProfileHeaderProps {
+  isOwner?: boolean;
   profile: UserProfileResponse;
 }
 
@@ -22,7 +26,7 @@ const friendshipLabel: Partial<Record<FriendStatus, string>> = {
   [FriendStatus.BlockedMe]: 'Unavailable',
 };
 
-const OtherUserProfileHeader: React.FC<OtherUserProfileHeaderProps> = ({ profile }) => {
+const ProfileHeader = ({ isOwner = false, profile }: ProfileHeaderProps) => {
   const visibleSectionCount = Object.values(profile.sections).filter(Boolean).length;
   const connectionLabel = friendshipLabel[profile.friendshipStatus];
 
@@ -47,8 +51,8 @@ const OtherUserProfileHeader: React.FC<OtherUserProfileHeaderProps> = ({ profile
                 <Badge variant="surface" colorPalette="gray">
                   {profilePrivacyLabel[profile.profilePrivacy]}
                 </Badge>
-                {connectionLabel && <Badge variant="surface">{connectionLabel}</Badge>}
-                {profile.access.canView && (
+                {!isOwner && connectionLabel && <Badge variant="surface">{connectionLabel}</Badge>}
+                {!isOwner && profile.access.canView && (
                   <Badge variant="surface" colorPalette="brand">
                     {visibleSectionCount} visible {visibleSectionCount === 1 ? 'section' : 'sections'}
                   </Badge>
@@ -58,7 +62,24 @@ const OtherUserProfileHeader: React.FC<OtherUserProfileHeaderProps> = ({ profile
           </HStack>
 
           <Box alignSelf={{ base: 'stretch', md: 'center' }}>
-            <FriendshipActions user={profile} />
+            {isOwner ? (
+              <Stack direction={{ base: 'column', sm: 'row' }} gap="2">
+                <Button asChild variant="outline" colorPalette="gray">
+                  <Link to="/app/settings/account">
+                    <LuPencil />
+                    Edit profile
+                  </Link>
+                </Button>
+                <Button asChild variant="subtle" colorPalette="brand">
+                  <Link to="/app/settings/privacy">
+                    <LuShield />
+                    Manage privacy
+                  </Link>
+                </Button>
+              </Stack>
+            ) : (
+              <FriendshipActions user={profile} />
+            )}
           </Box>
         </Stack>
       </Card.Body>
@@ -66,4 +87,4 @@ const OtherUserProfileHeader: React.FC<OtherUserProfileHeaderProps> = ({ profile
   );
 };
 
-export default OtherUserProfileHeader;
+export default ProfileHeader;

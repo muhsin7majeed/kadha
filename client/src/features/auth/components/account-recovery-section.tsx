@@ -13,13 +13,17 @@ interface GeneratedRecoveryCode extends ManageRecoveryCodeResponse {
   isReplacement: boolean;
 }
 
+interface AccountRecoverySectionProps {
+  headingAs?: 'h2' | 'h3';
+}
+
 const formatCreatedAt = (createdAt: string) => {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'medium',
   }).format(new Date(createdAt));
 };
 
-const AccountRecoverySection = () => {
+const AccountRecoverySection = ({ headingAs = 'h2' }: AccountRecoverySectionProps) => {
   const auth = useAuth();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [generatedCode, setGeneratedCode] = useState<GeneratedRecoveryCode | null>(null);
@@ -79,7 +83,9 @@ const AccountRecoverySection = () => {
       <Card.Header>
         <HStack gap={2}>
           <LuKeyRound aria-hidden />
-          <Heading textStyle="subsectionTitle">Account recovery</Heading>
+          <Heading as={headingAs} textStyle="subsectionTitle">
+            Account recovery
+          </Heading>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
           Use a private recovery code to reset your password without an email address or phone number.

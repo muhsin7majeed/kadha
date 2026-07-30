@@ -17,9 +17,9 @@ interface OtherUserMediaTabProps {
 const meta = {
   watched: {
     title: 'Watched',
-    description: 'Movies and shows this user has watched.',
+    description: 'Movies and shows marked as watched.',
     emptyTitle: 'Nothing watched',
-    emptyDescription: 'No visible watched activity yet.',
+    emptyDescription: 'No watched activity here yet.',
     errorDescription: 'Failed to fetch watched',
     loadingText: 'Loading watched...',
     icon: <LuCheck />,
@@ -27,9 +27,9 @@ const meta = {
   },
   liked: {
     title: 'Liked',
-    description: 'Movies and shows this user liked.',
+    description: 'Movies and shows marked as liked.',
     emptyTitle: 'Nothing liked',
-    emptyDescription: 'No visible liked activity yet.',
+    emptyDescription: 'No liked activity here yet.',
     errorDescription: 'Failed to fetch liked',
     loadingText: 'Loading liked...',
     icon: <LuHeart />,
@@ -37,9 +37,9 @@ const meta = {
   },
   watchlist: {
     title: 'Watchlist',
-    description: 'Movies and shows this user plans to watch.',
+    description: 'Movies and shows saved for later.',
     emptyTitle: 'Empty watchlist',
-    emptyDescription: 'No visible watchlist items yet.',
+    emptyDescription: 'No watchlist items here yet.',
     errorDescription: 'Failed to fetch watchlist',
     loadingText: 'Loading watchlist...',
     icon: <LuBookmark />,

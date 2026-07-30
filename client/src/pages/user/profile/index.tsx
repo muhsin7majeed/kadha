@@ -1,12 +1,10 @@
-import { useGetMe } from '@/features/user/api/use-get-me';
 import { Box, Card, Skeleton, Stack } from '@chakra-ui/react';
 import PageHeader from '@/components/page-header';
 import ErrorState from '@/components/info-states/error-state';
 import { useParams } from 'react-router';
 import OtherUserData from './other-user-data';
 import useUserProfile from '@/features/user/api/use-user-profile';
-import MyProfileSettings from './my-profile-settings';
-import OtherUserProfileHeader from './other-user-profile-header';
+import ProfileHeader from './profile-header';
 import LockedProfileState from './locked-profile-state';
 import { useAuth } from '@/features/auth/use-auth';
 
@@ -44,8 +42,6 @@ const UserProfile = () => {
   const auth = useAuth();
 
   const isMyProfile = username ? username.toLocaleLowerCase() === auth.user?.username?.toLocaleLowerCase() : true;
-
-  const { data: me, isLoading, isFetching, error, refetch } = useGetMe({ enabled: isMyProfile });
   const {
     data: profile,
     isLoading: isProfileLoading,
@@ -57,10 +53,10 @@ const UserProfile = () => {
   return (
     <Box>
       <PageHeader
-        isFetching={isMyProfile ? isFetching : isProfileFetching}
+        isFetching={isProfileFetching}
         subHeader={
           isMyProfile
-            ? 'Manage your account details, watch region, and profile visibility.'
+            ? 'Review your profile and the activity sections connected to it.'
             : 'Review visible activity and connection options for this user.'
         }
         mb="5"
@@ -69,23 +65,13 @@ const UserProfile = () => {
       </PageHeader>
 
       <Box>
-        {isMyProfile ? (
-          isLoading ? (
-            <ProfileLoadingState />
-          ) : error ? (
-            <ErrorState title="Error" description="Error fetching user profile" onRetry={refetch} />
-          ) : me ? (
-            <MyProfileSettings me={me} />
-          ) : (
-            <ErrorState title="Not found" description="User profile not found" onRetry={refetch} />
-          )
-        ) : isProfileLoading ? (
+        {isProfileLoading ? (
           <ProfileLoadingState />
         ) : profileError ? (
           <ErrorState title="Error" description="Error fetching user profile" onRetry={refetchProfile} />
         ) : profile ? (
           <Stack gap="5">
-            <OtherUserProfileHeader profile={profile} />
+            <ProfileHeader profile={profile} isOwner={isMyProfile} />
 
             {profile.access.canView ? (
               <OtherUserData username={username!} profile={profile} />

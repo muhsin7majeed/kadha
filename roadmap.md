@@ -13,7 +13,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 - [x] Responsive discovery grids, carousels, and media details.
 - [x] Cast, metadata, artwork fallbacks, and external media links.
 - [x] Region-aware streaming availability using TMDB watch-provider data powered by JustWatch.
-- [x] Saved watch-region settings during signup and profile editing.
+- [x] Saved watch-region settings during signup and account settings.
 - [ ] Dedicated upcoming-release discovery feed.
 
 ### Tracking And Organization
@@ -42,6 +42,7 @@ Kadha is a self-hostable movie and TV tracker powered by TMDB. This roadmap refl
 - [x] Contact-free password recovery using user-held, single-use recovery codes.
 - [x] Read-only admin dashboard with user search and instance metrics.
 - [x] Theme presets with independent light and dark modes.
+- [x] Responsive grouped navigation for account, privacy, appearance, security, and data settings.
 - [x] Automated server and client builds, tests, linting, and CI.
 - [x] Canonical package versions and automated release preparation.
 

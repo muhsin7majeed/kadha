@@ -6,20 +6,12 @@ import SimpleDialog from '@/components/dialogs/simple-dialog';
 import { WATCH_REGIONS } from '@/constants/watch-regions';
 import useUpdateMe from '@/features/user/api/use-update-me';
 import type { User } from '@/features/user/user.types';
+import { getUpdateUserPayload } from '@/features/user/user-settings';
 
 interface WatchRegionDialogProps {
   currentRegion: string;
   me?: User;
 }
-
-const getUpdateMePayload = (me: User, watchRegion: string) => ({
-  username: me.username,
-  profilePrivacy: me.profilePrivacy,
-  watchedPrivacy: me.watchedPrivacy,
-  likedPrivacy: me.likedPrivacy,
-  watchlistPrivacy: me.watchlistPrivacy,
-  watchRegion,
-});
 
 const WatchRegionDialog = ({ currentRegion, me }: WatchRegionDialogProps) => {
   const { mutateAsync: updateMe, isPending } = useUpdateMe();
@@ -35,7 +27,10 @@ const WatchRegionDialog = ({ currentRegion, me }: WatchRegionDialogProps) => {
   const saveRegion = async () => {
     if (!me || isPending) return;
 
-    await updateMe(getUpdateMePayload(me, selectedRegion));
+    await updateMe({
+      ...getUpdateUserPayload(me),
+      watchRegion: selectedRegion,
+    });
     setOpen(false);
   };
 

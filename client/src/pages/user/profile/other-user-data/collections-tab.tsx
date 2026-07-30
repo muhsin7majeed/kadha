@@ -20,7 +20,7 @@ const OtherUserCollectionsTab = () => {
   }
 
   if (!data?.data.length) {
-    return <EmptyState title="No collections" description="No visible collections found" />;
+    return <EmptyState title="No collections" description="No collections found" />;
   }
 
   return (

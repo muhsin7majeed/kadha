@@ -10,13 +10,18 @@ import { profileRoutes } from './routes/profile-routes';
 import { publicRoutes } from './routes/public-routes';
 
 const MainLayout = lazy(() => import('@/components/main-layout'));
+const AccountSettings = lazy(() => import('@/pages/settings/account'));
 const Activity = lazy(() => import('@/pages/activity'));
+const AppearanceSettings = lazy(() => import('@/pages/settings/appearance'));
 const Collections = lazy(() => import('@/pages/collections'));
+const DataSettings = lazy(() => import('@/pages/settings/data'));
 const Home = lazy(() => import('@/pages/home'));
 const InProgress = lazy(() => import('@/pages/in-progress'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
 const Notifications = lazy(() => import('@/pages/notifications'));
+const PrivacySettings = lazy(() => import('@/pages/settings/privacy'));
+const SecuritySettings = lazy(() => import('@/pages/settings/security'));
 const Settings = lazy(() => import('@/pages/settings'));
 const Watched = lazy(() => import('@/pages/watched'));
 const Watchlist = lazy(() => import('@/pages/watchlist'));
@@ -38,7 +43,14 @@ export function AppRoutes() {
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="settings" element={<Settings />}>
+              <Route index element={<Navigate to="account" replace />} />
+              <Route path="account" element={<AccountSettings />} />
+              <Route path="privacy" element={<PrivacySettings />} />
+              <Route path="appearance" element={<AppearanceSettings />} />
+              <Route path="security" element={<SecuritySettings />} />
+              <Route path="data" element={<DataSettings />} />
+            </Route>
 
             {profileRoutes}
             <Route path="notifications" element={<Notifications />} />

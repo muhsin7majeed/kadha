@@ -1,18 +1,21 @@
-import { Button, Card, Heading, HStack, Text } from '@chakra-ui/react';
+import { Button, Card, Heading, HStack } from '@chakra-ui/react';
 import { LuMoon, LuSun } from 'react-icons/lu';
 
 import { useColorMode } from '@/components/ui/color-mode-hooks';
 
-const ColorModeSection = () => {
+interface ColorModeSectionProps {
+  headingAs?: 'h2' | 'h3';
+}
+
+const ColorModeSection = ({ headingAs = 'h2' }: ColorModeSectionProps) => {
   const { colorMode, setColorMode } = useColorMode();
 
   return (
     <Card.Root variant="outline">
       <Card.Header>
-        <Heading textStyle="subsectionTitle">Color Mode</Heading>
-        <Text color="fg.muted" textStyle="supporting">
-          Light and dark mode are independent from the accent preset.
-        </Text>
+        <Heading as={headingAs} textStyle="subsectionTitle">
+          Color mode
+        </Heading>
       </Card.Header>
       <Card.Body>
         <HStack gap={3} flexWrap="wrap">

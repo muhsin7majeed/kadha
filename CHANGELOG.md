@@ -4,10 +4,16 @@
 
 ### Feature Changes
 
+#### Settings And Profile
+
+- Reorganized authenticated Settings into responsive Account, Privacy, Appearance, Security, and Data sections with direct URLs for each category.
+- Moved account details and profile visibility controls into Settings, and changed My Profile to show the owner's profile activity with account and privacy shortcuts.
+- Kept public Settings focused on device appearance so signed-out users no longer see unavailable account recovery or data export actions.
+
 #### Account Recovery
 
 - Added contact-free password recovery using a private, single-use recovery code issued during signup.
-- Added recovery-code creation and replacement in Settings for existing accounts, with copy, download, and print options.
+- Added recovery-code creation and replacement under Settings → Security for existing accounts, with copy, download, and print options.
 - Added a recovery activity history and clear guidance that accounts cannot be recovered if both the password and recovery code are lost.
 
 #### Product Information
@@ -16,6 +22,10 @@
 - Added prioritized privacy and security hardening work to the public roadmap and required future feature changes to keep roadmap status synchronized.
 
 ### Engineering Changes
+
+#### Frontend Architecture
+
+- Added route-backed Settings categories, shared typed user-update payload construction, and frontend coverage for responsive settings navigation and independent account and privacy updates.
 
 #### Authentication Security
 

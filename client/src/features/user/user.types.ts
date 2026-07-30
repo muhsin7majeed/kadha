@@ -11,6 +11,11 @@ export interface User {
   watchRegion: string;
 }
 
+export type UpdateUserPayload = Pick<
+  User,
+  'username' | 'profilePrivacy' | 'watchedPrivacy' | 'likedPrivacy' | 'watchlistPrivacy' | 'watchRegion'
+>;
+
 export interface UserSearchResult extends UserActor {
   id: string;
   username: string;
