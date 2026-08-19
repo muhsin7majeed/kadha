@@ -30,6 +30,9 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  const { resetAuthRateLimitsForTests } = await import('@/features/auth/auth-rate-limit');
+  resetAuthRateLimitsForTests();
+
   await prisma.$transaction([
     prisma.collectionInvite.deleteMany(),
     prisma.collectionMember.deleteMany(),

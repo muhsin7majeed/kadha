@@ -12,13 +12,14 @@ import {
   register,
 } from './auth.controller';
 import { loginSchema, manageRecoveryCodeSchema, recoverAccountSchema, registerSchema } from './auth.schema';
+import { loginRateLimit, refreshRateLimit, registrationRateLimit } from './auth-rate-limit';
 import { recoveryRateLimit } from './recovery-rate-limit';
 
 const router = Router();
 
-router.post('/register', validate(registerSchema), register);
-router.post('/login', validate(loginSchema), login);
-router.post('/refresh', refresh);
+router.post('/register', registrationRateLimit, validate(registerSchema), register);
+router.post('/login', loginRateLimit, validate(loginSchema), login);
+router.post('/refresh', refreshRateLimit, refresh);
 router.post('/logout', logout);
 router.get('/recovery-code/status', authMiddleware, getRecoveryStatus);
 router.post('/recovery-code', authMiddleware, validate(manageRecoveryCodeSchema), manageRecoveryCode);

@@ -8,7 +8,7 @@ import useRegister from '@/features/auth/api/use-register';
 import { RegisterInputs, RegisterResponse } from '@/features/auth/auth.types';
 import RecoveryCodeDisplay from '@/features/auth/components/recovery-code-display';
 import { getMe } from '@/features/user/api/use-get-me';
-import { getApiFieldError } from '@/hooks/use-error-handler';
+import { getApiErrorMessage, getApiFieldError, getApiFieldErrors } from '@/hooks/use-error-handler';
 import { queryKeys } from '@/lib/query-keys';
 import { setAccessToken } from '@/lib/token-manager';
 import { LocationState } from '@/types/common';
@@ -82,6 +82,7 @@ const Register = () => {
         </Box>
 
         <AuthForm
+          apiError={getApiFieldErrors(error) ? undefined : getApiErrorMessage(error)}
           onSubmit={onSubmit}
           type="register"
           apiFieldErrors={{
@@ -104,13 +105,13 @@ const Register = () => {
         .
       </Text>
 
-      <Text mt={4} textStyle="supporting" color="gray.500" textAlign="center">
+      <Text mt={4} textStyle="supporting" color="fg.muted" textAlign="center">
         Already have an account?{' '}
-        <Text as="span" color="purple.400">
+        <ChakraLink asChild color="brand.fg">
           <Link to="/auth/login" state={{ from }}>
             Login
           </Link>
-        </Text>
+        </ChakraLink>
       </Text>
     </Box>
   );

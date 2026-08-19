@@ -4,6 +4,12 @@
 
 ### Feature Changes
 
+#### Authentication Security
+
+- Added targeted abuse protection for login, registration, account recovery, and session-refresh requests.
+- Raised the minimum length for new passwords to eight characters while keeping additional strength recommendations optional.
+- Added accessible password-strength guidance, password visibility controls, and password-manager-compatible login and registration fields.
+
 #### Mobile Installation
 
 - Made Kadha installable from supported mobile and desktop browsers with branded Home Screen icons and an app-style
@@ -26,6 +32,11 @@
   while reserving advanced or heavier-use features for a paid tier.
 
 ### Engineering Changes
+
+#### Authentication Security
+
+- Added privacy-conscious per-account login throttling, per-IP authentication limits, and configurable trusted-proxy handling for accurate client addresses behind a reverse proxy.
+- Added lazy-loaded zxcvbn password estimation and focused server and client coverage for authentication limits and form accessibility.
 
 #### Progressive Web App
 

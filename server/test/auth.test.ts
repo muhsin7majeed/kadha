@@ -9,6 +9,25 @@ import { getTestApp } from './helpers/app';
 import { authorization, getRefreshCookie, getRefreshToken, registerTestUser } from './helpers/auth';
 
 describe('auth edge cases', () => {
+  it('requires at least eight characters for new passwords', async () => {
+    const response = await request(await getTestApp())
+      .post('/api/auth/register')
+      .send({
+        username: 'short-password-user',
+        password: 'short7!',
+        watchRegion: 'US',
+      })
+      .expect(400);
+
+    expect(response.body).toEqual({
+      code: 'BAD_REQUEST',
+      message: 'Validation failed',
+      fieldErrors: {
+        password: 'Password must be at least 8 characters long',
+      },
+    });
+  });
+
   it('rejects duplicate usernames during registration', async () => {
     await registerTestUser('duplicate-auth-user');
 
@@ -85,6 +104,52 @@ describe('auth edge cases', () => {
     });
   });
 
+  it('rate-limits repeated failed logins for one account', async () => {
+    const user = await registerTestUser('rate-limited-login-user');
+    const app = await getTestApp();
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      await request(app)
+        .post('/api/auth/login')
+        .send({ username: user.username, password: 'wrong-password' })
+        .expect(400);
+    }
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({ username: user.username.toUpperCase(), password: 'password123' })
+      .expect(429);
+
+    expect(response.body).toEqual({
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many login attempts. Try again later.',
+    });
+    expect(response.headers['retry-after']).toBeDefined();
+  });
+
+  it('rate-limits repeated registration requests from one IP address', async () => {
+    const app = await getTestApp();
+
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      await request(app).post('/api/auth/register').send({ username: '', password: '', watchRegion: 'US' }).expect(400);
+    }
+
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'blocked-registration',
+        password: 'password123',
+        watchRegion: 'US',
+      })
+      .expect(429);
+
+    expect(response.body).toEqual({
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many registration attempts. Try again later.',
+    });
+    expect(response.headers['retry-after']).toBeDefined();
+  });
+
   it('refreshes access tokens from refresh cookies and logs out', async () => {
     await registerTestUser('refresh-login-user');
 
@@ -147,6 +212,22 @@ describe('auth edge cases', () => {
       code: 'UNAUTHORIZED',
       message: 'Unauthorized',
     });
+  });
+
+  it('rate-limits repeated session refresh requests from one IP address', async () => {
+    const app = await getTestApp();
+
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      await request(app).post('/api/auth/refresh').expect(401);
+    }
+
+    const response = await request(app).post('/api/auth/refresh').expect(429);
+
+    expect(response.body).toEqual({
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many session refresh attempts. Try again later.',
+    });
+    expect(response.headers['retry-after']).toBeDefined();
   });
 
   it('lets existing users create a first recovery code after reauthentication', async () => {

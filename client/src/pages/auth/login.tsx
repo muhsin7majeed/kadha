@@ -9,13 +9,14 @@ import { setAccessToken } from '@/lib/token-manager';
 import { useQueryClient } from '@tanstack/react-query';
 import { getMe } from '@/features/user/api/use-get-me';
 import { queryKeys } from '@/lib/query-keys';
+import { getApiErrorMessage } from '@/hooks/use-error-handler';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useLogin();
+  const { mutate, error, isPending } = useLogin();
 
   const from = (location.state as LocationState)?.from || '/app';
 
@@ -37,7 +38,7 @@ const Login = () => {
 
   return (
     <Box>
-      <AuthForm onSubmit={onSubmit} type="login" isLoading={isPending} />
+      <AuthForm apiError={getApiErrorMessage(error)} onSubmit={onSubmit} type="login" isLoading={isPending} />
 
       <Text mt={4} textStyle="supporting" color="fg.muted" textAlign="center">
         <ChakraLink asChild color="brand.fg">
@@ -47,13 +48,13 @@ const Login = () => {
         </ChakraLink>
       </Text>
 
-      <Text mt={4} textStyle="supporting" color="gray.500" textAlign="center">
+      <Text mt={4} textStyle="supporting" color="fg.muted" textAlign="center">
         Don't have an account?{' '}
-        <Text as="span" color="purple.400">
+        <ChakraLink asChild color="brand.fg">
           <Link to="/auth/register" state={{ from }}>
             Register
           </Link>
-        </Text>
+        </ChakraLink>
       </Text>
     </Box>
   );

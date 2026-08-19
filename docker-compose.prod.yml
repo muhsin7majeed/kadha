@@ -14,6 +14,7 @@ services:
       APP_NAME: ${APP_NAME:-Kadha}
       CLIENT_URL: ${CLIENT_URL}
       APP_URL: ${APP_URL:-https://kadha.org}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
     ports:
       - "127.0.0.1:5000:5000"
     restart: unless-stopped

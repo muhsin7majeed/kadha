@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-07-30
+Last reviewed: 2026-08-19
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -54,7 +54,8 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 #### P0 — Immediate
 
 - [x] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
-- [ ] Protect authentication endpoints with rate limits, stronger password requirements, and breached-password rejection.
+- [x] Protect login, registration, recovery, and session-refresh endpoints with targeted rate limits, require eight-character new passwords, and provide password-strength guidance.
+- [ ] Add breached-password rejection without sending complete passwords to a third party.
 - [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
 - [ ] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
 - [ ] Add authenticated self-service account deletion with session cleanup, a private support fallback, and documented backup handling.

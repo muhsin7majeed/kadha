@@ -20,7 +20,7 @@ export const getApiFieldError = (error: unknown, field: string) => {
   return fieldErrors[field];
 };
 
-const getErrorMessage = (error: unknown) => {
+export const getApiErrorMessage = (error: unknown) => {
   if (!isAxiosError<ApiErrorResponse>(error)) {
     return undefined;
   }
@@ -43,7 +43,7 @@ export const useErrorHandler = (error: unknown) => {
     }
   }
 
-  const message = getErrorMessage(error);
+  const message = getApiErrorMessage(error);
 
   if (message) {
     toaster.error({

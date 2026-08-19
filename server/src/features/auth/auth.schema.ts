@@ -10,23 +10,27 @@ const watchRegionSchema = z
 
 const usernameSchema = z.string({ required_error: 'Username is required' }).min(1, { message: 'Username is required' });
 
-export const passwordSchema = z
+const credentialPasswordSchema = z.string({ required_error: 'Password is required' }).min(1, {
+  message: 'Password is required',
+});
+
+export const newPasswordSchema = z
   .string({ required_error: 'Password is required' })
-  .min(6, { message: 'Password must be at least 6 characters long' });
+  .min(8, { message: 'Password must be at least 8 characters long' });
 
 export const registerSchema = z.object({
   username: usernameSchema,
-  password: passwordSchema,
+  password: newPasswordSchema,
   watchRegion: watchRegionSchema.default(DEFAULT_WATCH_REGION),
 });
 
 export const loginSchema = z.object({
   username: usernameSchema,
-  password: passwordSchema,
+  password: credentialPasswordSchema,
 });
 
 export const manageRecoveryCodeSchema = z.object({
-  currentPassword: passwordSchema,
+  currentPassword: credentialPasswordSchema,
 });
 
 export const recoverAccountSchema = z.object({
@@ -34,7 +38,7 @@ export const recoverAccountSchema = z.object({
   recoveryCode: z
     .string({ required_error: 'Recovery code is required' })
     .min(1, { message: 'Recovery code is required' }),
-  newPassword: passwordSchema,
+  newPassword: newPasswordSchema,
 });
 
 export type LoginBody = z.infer<typeof loginSchema>;

@@ -5,6 +5,7 @@ import cors from 'cors';
 import express, { Express } from 'express';
 
 import { getHealth, getRoot } from './app.controller';
+import { envConfig } from './config/env';
 import adminRoutes from './features/admin/admin.routes';
 import activityRoutes from './features/activity/activity.routes';
 import authRoutes from './features/auth/auth.routes';
@@ -21,6 +22,8 @@ import { requireAdmin } from './middlewares/requireAdmin';
 
 export function createApp(): Express {
   const app: Express = express();
+
+  app.set('trust proxy', envConfig.trustProxy);
 
   const corsOptions = {
     origin: process.env.CLIENT_URL || 'http://localhost:3000',

@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { REFRESH_TOKEN_EXPIRATION_SECONDS } from './auth.constants';
+import { clearFailedLogins, recordFailedLogin } from './auth-rate-limit';
 import { LoginBody, ManageRecoveryCodeBody, RecoverAccountBody, RegisterBody } from './auth.schema';
 import {
   createOrReplaceRecoveryCode,
@@ -52,9 +53,11 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
   const result = await loginUser(req.body);
 
   if (!result) {
+    recordFailedLogin(req.body.username);
     throw badRequest('Invalid username or password');
   }
 
+  clearFailedLogins(req.body.username);
   setRefreshTokenCookie(res, result.refreshToken);
 
   sendResponse(res, {

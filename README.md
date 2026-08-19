@@ -138,6 +138,13 @@ Frontend variables prefixed with `VITE_` are build-time values. If you change `V
 - `APP_URL` is the public app URL used for generated links and public server output.
 - `CLIENT_URL` is the frontend origin allowed by the API for CORS and authenticated cookie requests.
 
+### Trusted Reverse Proxy
+
+Authentication rate limits use the request IP address. Set `TRUST_PROXY=1` when exactly one trusted reverse proxy,
+such as Caddy or Nginx, sits between the browser and the Kadha server. Leave it unset when clients connect directly to
+the server. More complex deployments can use another Express-compatible trust proxy value, but should only trust
+known proxy hops or networks so clients cannot spoof forwarding headers.
+
 ## Account Recovery
 
 Kadha does not require an email address or phone number. Instead, new accounts receive a private recovery code during signup. Users should copy, download, or print the recovery kit and keep it somewhere outside Kadha.
@@ -220,6 +227,7 @@ services:
       APP_NAME: ${APP_NAME:-Kadha}
       CLIENT_URL: ${CLIENT_URL}
       APP_URL: ${APP_URL:-https://kadha.org}
+      TRUST_PROXY: ${TRUST_PROXY:-1}
     ports:
       - '127.0.0.1:5000:5000'
     restart: unless-stopped
@@ -239,6 +247,7 @@ TMDB_BEARER_TOKEN=your-tmdb-bearer-token
 APP_NAME=Kadha
 CLIENT_URL=https://kadha.org
 APP_URL=https://kadha.org
+TRUST_PROXY=1
 ```
 
 Start the backend:
