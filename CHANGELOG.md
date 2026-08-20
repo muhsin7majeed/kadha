@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.10
+
 ### Feature Changes
 
 #### Authentication Security
