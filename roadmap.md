@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-08-19
+Last reviewed: 2026-08-20
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -79,6 +79,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [ ] Define and enforce retention periods for obsolete activity, resolved notifications, old invitations, and operational logs.
 - [ ] Require recent reauthentication before account export, deletion, password changes, and other sensitive account actions.
 - [ ] Expand third-party transparency for TMDB search, media lookup, artwork, and hosting data flows.
+- [ ] Automate scheduled off-host replication of encrypted database backups with remote retention and failure reporting.
 
 ### Release And Beta Reliability
 

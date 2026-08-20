@@ -362,6 +362,16 @@ encrypted backups in separate secure locations: losing the database volume also 
 the key makes older backups unreadable. The separate backup volume protects against migration mistakes, but it is not
 a substitute for copying encrypted backups off the VPS.
 
+Display the generated key from the application directory on the VPS so it can be saved in a password manager or other
+encrypted off-host storage:
+
+```bash
+docker compose -f docker-compose.prod.yml exec -T server cat /app/db/.kadha-backup-key
+```
+
+Treat the output as a secret: do not commit it, paste it into logs or messages, or store it beside the only off-host
+copy of the encrypted backup.
+
 `DATABASE_BACKUP_RETENTION` changes the retained backup count, while `DATABASE_BACKUP_DIRECTORY` and
 `DATABASE_BACKUP_KEY_FILE` change their default locations.
 
