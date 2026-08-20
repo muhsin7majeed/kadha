@@ -1,11 +1,11 @@
 {
   "exceptions": [
     {
-      "workspace": "client",
-      "advisoryId": "1124282",
-      "package": "react-router",
+      "workspace": "server",
+      "advisoryId": "1145093",
+      "package": "deepmerge-ts",
       "expiresOn": "2026-10-31",
-      "reason": "Kadha is a client-rendered Vite SPA and does not use the affected React Server Components mode. React Router 8.3.0 requires Node 22.22, while Kadha currently supports Node 20."
+      "reason": "The affected deepmerge-ts version is pinned by Prisma configuration tooling and only merges repository-owned Prisma configuration during startup; Kadha does not pass user-controlled or recursive object graphs into this path. Review when Prisma supports deepmerge-ts 8."
     }
   ]
 }

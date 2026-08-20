@@ -11,6 +11,11 @@
 - Added backup verification and safe restore tooling that preserves the replaced database, plus operator guidance for
   keeping encrypted backups and their key off-host.
 
+#### Dependency Security
+
+- Updated the transitive URI parser to its patched release and documented a time-limited, configuration-only Prisma
+  advisory exception so production audit gates remain strict and reviewable.
+
 ## v0.1.9
 
 ### Feature Changes
