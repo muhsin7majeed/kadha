@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.9
+
 ### Feature Changes
 
 #### Authentication Security
@@ -37,6 +39,10 @@
 
 - Added privacy-conscious per-account login throttling, per-IP authentication limits, and configurable trusted-proxy handling for accurate client addresses behind a reverse proxy.
 - Added lazy-loaded zxcvbn password estimation and focused server and client coverage for authentication limits and form accessibility.
+
+#### Testing
+
+- Made TV progress coverage independent of the current calendar date so aired-episode checks remain reliable over time.
 
 #### Progressive Web App
 

@@ -27,6 +27,8 @@ const createProgressUser = (username: string) =>
     },
   });
 
+const unairedEpisodeDate = '2999-08-01';
+
 const createTvDetails = () => ({
   adult: false,
   backdrop_path: null,
@@ -56,7 +58,7 @@ const createTvDetails = () => ({
   name: 'Progress Show',
   networks: [],
   next_episode_to_air: {
-    air_date: '2026-08-01',
+    air_date: unairedEpisodeDate,
     episode_number: 2,
     id: 202,
     name: 'Future episode',
@@ -140,7 +142,7 @@ const createSeasonDetails = (seasonNumber: number) => ({
             vote_count: 0,
           },
           {
-            air_date: '2026-08-01',
+            air_date: unairedEpisodeDate,
             episode_number: 2,
             id: 202,
             name: 'Future episode',
