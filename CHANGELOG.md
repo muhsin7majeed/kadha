@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Engineering Changes
+
+#### Database Safety
+
+- Added encrypted, integrity-checked SQLite backups before production migrations, configurable retention, and a
+  separate persistent backup volume.
+- Added backup verification and safe restore tooling that preserves the replaced database, plus operator guidance for
+  keeping encrypted backups and their key off-host.
+
 ## v0.1.9
 
 ### Feature Changes

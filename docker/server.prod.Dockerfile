@@ -31,13 +31,13 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/src/prisma ./src/prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
-# Create db directory with correct permissions for node user
-RUN mkdir -p /app/db && chown -R node:node /app/db
+# Create persistent-data mount points with the correct permissions for the node user.
+RUN mkdir -p /app/db /app/backups && chown -R node:node /app/db /app/backups
 
 # Don't run as root
 USER node
 
 EXPOSE 5000
 
-# Run migrations then start server
-CMD npx prisma migrate deploy --schema=./src/prisma/schema.prisma && node dist/index.js
+# Back up the existing database before running migrations, then start the server.
+CMD node dist/scripts/database-backup.js backup && npx prisma migrate deploy --schema=./src/prisma/schema.prisma && node dist/index.js

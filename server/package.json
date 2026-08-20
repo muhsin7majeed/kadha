@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon --exec tsx src/index.ts",
     "admin:promote": "tsx src/scripts/promote-admin.ts",
+    "db:backup": "tsx src/scripts/database-backup.ts",
     "build": "prisma generate && tsc && tsc-alias",
     "test": "prisma generate && vitest run",
     "test:watch": "vitest",

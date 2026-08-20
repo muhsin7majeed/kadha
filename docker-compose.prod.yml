@@ -4,9 +4,14 @@ services:
     image: ${SERVER_IMAGE:-ghcr.io/muhsin7majeed/kadha-server:latest}
     volumes:
       - sqlite_data:/app/db
+      - sqlite_backups:/app/backups
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL:-file:/app/db/prod.db}
+      DATABASE_BACKUP_DIRECTORY: ${DATABASE_BACKUP_DIRECTORY:-/app/backups}
+      DATABASE_BACKUP_KEY: ${DATABASE_BACKUP_KEY:-}
+      DATABASE_BACKUP_KEY_FILE: ${DATABASE_BACKUP_KEY_FILE:-/app/db/.kadha-backup-key}
+      DATABASE_BACKUP_RETENTION: ${DATABASE_BACKUP_RETENTION:-4}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       TMDB_API_KEY: ${TMDB_API_KEY}
@@ -27,3 +32,4 @@ services:
 
 volumes:
   sqlite_data:
+  sqlite_backups:

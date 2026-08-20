@@ -328,22 +328,47 @@ Caddy automatically handles SSL via Let's Encrypt.
 
 SQLite database is persisted via Docker volume (`sqlite_data`). The database file lives at `/app/db/prod.db` inside the container.
 
-Back up the database:
+The production container creates an encrypted, transactionally consistent SQLite backup before every migration run. It
+checks the SQLite copy, encrypts it with AES-256-GCM, decrypts and checks it again, and only then continues to migrations.
+The latest four successful backups are retained by default in the separate `sqlite_backups` volume.
+
+Create an additional backup manually:
 
 ```bash
-docker compose -f docker-compose.prod.yml cp server:/app/db/prod.db ./backup.db
+docker compose -f docker-compose.prod.yml exec server node dist/scripts/database-backup.js backup
 ```
 
-Restore the database:
+List and verify backups:
 
 ```bash
-docker compose -f docker-compose.prod.yml cp ./backup.db server:/app/db/prod.db
-docker compose -f docker-compose.prod.yml restart server
+docker compose -f docker-compose.prod.yml exec server ls -1 /app/backups
+docker compose -f docker-compose.prod.yml exec server node dist/scripts/database-backup.js verify /app/backups/<backup-file>
 ```
 
-Run migrations manually:
+Restore a verified backup while the server is stopped:
 
 ```bash
+docker compose -f docker-compose.prod.yml stop server
+docker compose -f docker-compose.prod.yml run --rm --no-deps server node dist/scripts/database-backup.js restore /app/backups/<backup-file>
+docker compose -f docker-compose.prod.yml up -d server
+```
+
+Restore preserves the replaced database as a timestamped `.pre-restore-*` file. It refuses to proceed if SQLite WAL
+files indicate that the server may still be using the database.
+
+By default, Kadha creates `/app/db/.kadha-backup-key` with owner-only permissions and reuses it for future backups. You
+can instead provide `DATABASE_BACKUP_KEY` as a base64-encoded 32-byte secret. Keep an off-host copy of the key and the
+encrypted backups in separate secure locations: losing the database volume also loses the default key, and changing
+the key makes older backups unreadable. The separate backup volume protects against migration mistakes, but it is not
+a substitute for copying encrypted backups off the VPS.
+
+`DATABASE_BACKUP_RETENTION` changes the retained backup count, while `DATABASE_BACKUP_DIRECTORY` and
+`DATABASE_BACKUP_KEY_FILE` change their default locations.
+
+Run migrations manually only after a successful backup:
+
+```bash
+docker compose -f docker-compose.prod.yml exec server node dist/scripts/database-backup.js backup
 docker compose -f docker-compose.prod.yml exec server npx prisma migrate deploy
 ```
 
