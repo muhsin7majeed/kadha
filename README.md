@@ -72,6 +72,7 @@ TMDB_BEARER_TOKEN=your-tmdb-bearer-token
 APP_NAME=Kadha
 CLIENT_URL=http://localhost:3000
 APP_URL=http://localhost:3000
+AUTH_COOKIE_SAME_SITE=strict
 VITE_APP_NAME=Kadha
 VITE_APP_URL=http://localhost:3000
 VITE_API_URL=http://localhost:5000
@@ -136,7 +137,17 @@ Frontend variables prefixed with `VITE_` are build-time values. If you change `V
 `APP_URL` and `CLIENT_URL` often have the same value, but they are intentionally separate:
 
 - `APP_URL` is the public app URL used for generated links and public server output.
-- `CLIENT_URL` is the frontend origin allowed by the API for CORS and authenticated cookie requests.
+- `CLIENT_URL` is the exact trusted frontend origin used for CORS and authentication-request Origin validation.
+
+### Authentication Cookie Security
+
+`AUTH_COOKIE_SAME_SITE` defaults to `strict`. Keep that default when the frontend and API are on the same site; separate
+subdomains such as `kadha.org` and `api.kadha.org` are still same-site when both use HTTPS. Authentication requests must
+also use JSON, and browser requests from an Origin other than `CLIENT_URL` are rejected.
+
+Set `AUTH_COOKIE_SAME_SITE=none` only when the frontend and API must run on genuinely different sites. This permits the
+secure refresh cookie to travel cross-site, while Origin validation still limits authentication requests to
+`CLIENT_URL`. `lax` is also accepted for unusual deployments.
 
 ### Trusted Reverse Proxy
 
@@ -227,6 +238,7 @@ services:
       APP_NAME: ${APP_NAME:-Kadha}
       CLIENT_URL: ${CLIENT_URL}
       APP_URL: ${APP_URL:-https://kadha.org}
+      AUTH_COOKIE_SAME_SITE: ${AUTH_COOKIE_SAME_SITE:-strict}
       TRUST_PROXY: ${TRUST_PROXY:-1}
     ports:
       - '127.0.0.1:5000:5000'
@@ -247,6 +259,7 @@ TMDB_BEARER_TOKEN=your-tmdb-bearer-token
 APP_NAME=Kadha
 CLIENT_URL=https://kadha.org
 APP_URL=https://kadha.org
+AUTH_COOKIE_SAME_SITE=strict
 TRUST_PROXY=1
 ```
 

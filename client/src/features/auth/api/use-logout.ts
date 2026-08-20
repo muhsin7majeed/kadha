@@ -4,7 +4,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 
 const logout = async () => {
-  const response = await api.post('/api/auth/logout');
+  const response = await api.post('/api/auth/logout', {});
   return response.data;
 };
 

@@ -14,8 +14,11 @@ import {
 import { loginSchema, manageRecoveryCodeSchema, recoverAccountSchema, registerSchema } from './auth.schema';
 import { loginRateLimit, refreshRateLimit, registrationRateLimit } from './auth-rate-limit';
 import { recoveryRateLimit } from './recovery-rate-limit';
+import { requireJsonAuthRequest, validateAuthRequestOrigin } from './auth-request-security';
 
 const router = Router();
+
+router.use(validateAuthRequestOrigin, requireJsonAuthRequest);
 
 router.post('/register', registrationRateLimit, validate(registerSchema), register);
 router.post('/login', loginRateLimit, validate(loginSchema), login);

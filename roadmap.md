@@ -57,7 +57,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Protect login, registration, recovery, and session-refresh endpoints with targeted rate limits, require eight-character new passwords, and provide password-strength guidance.
 - [ ] Add breached-password rejection without sending complete passwords to a third party.
 - [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
-- [ ] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
+- [x] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
 - [ ] Add authenticated self-service account deletion with session cleanup, a private support fallback, and documented backup handling.
 - [ ] Complete account exports with episode-watch history and automated coverage for every user-owned data category.
 - [x] Automate encrypted, integrity-checked SQLite backups before migrations with retention and restore tooling.

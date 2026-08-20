@@ -2,7 +2,18 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Authentication Security
+
+- Blocked cross-origin browser authentication requests, required JSON for state-changing authentication requests, and
+  hardened refresh cookies to `SameSite=Strict` by default.
+
 ### Engineering Changes
+
+#### Authentication Security
+
+- Added deployment-aware refresh-cookie SameSite configuration and focused CSRF regression coverage.
 
 #### Database Safety
 

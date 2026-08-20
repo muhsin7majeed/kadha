@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { envConfig } from '@/config/env';
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { REFRESH_TOKEN_EXPIRATION_SECONDS } from './auth.constants';
@@ -18,7 +19,7 @@ import {
 const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
   res.cookie('jwt', refreshToken, {
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: envConfig.authCookieSameSite,
     secure: true,
     maxAge: REFRESH_TOKEN_EXPIRATION_SECONDS * 1000,
   });
@@ -27,7 +28,7 @@ const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
 const clearRefreshTokenCookie = (res: Response) => {
   res.clearCookie('jwt', {
     httpOnly: true,
-    sameSite: 'none',
+    sameSite: envConfig.authCookieSameSite,
     secure: true,
   });
 };

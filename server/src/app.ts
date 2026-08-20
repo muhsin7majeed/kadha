@@ -26,7 +26,7 @@ export function createApp(): Express {
   app.set('trust proxy', envConfig.trustProxy);
 
   const corsOptions = {
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: envConfig.clientOrigin,
     credentials: true,
     exposedHeaders: ['Content-Disposition'],
     optionsSuccessStatus: 200,

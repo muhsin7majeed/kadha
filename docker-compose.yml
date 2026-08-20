@@ -35,3 +35,4 @@ services:
       APP_NAME: ${APP_NAME:-Kadha}
       CLIENT_URL: ${CLIENT_URL}
       APP_URL: ${APP_URL:-http://localhost:3000}
+      AUTH_COOKIE_SAME_SITE: ${AUTH_COOKIE_SAME_SITE:-strict}

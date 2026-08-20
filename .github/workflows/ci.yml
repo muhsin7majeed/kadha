@@ -25,6 +25,7 @@ env:
   APP_NAME: Kadha
   CLIENT_URL: http://localhost:3000
   APP_URL: http://localhost:3000
+  AUTH_COOKIE_SAME_SITE: strict
   VITE_APP_NAME: Kadha
   VITE_APP_URL: http://localhost:3000
   VITE_API_URL: http://localhost:5000

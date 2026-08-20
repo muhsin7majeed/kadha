@@ -16,6 +16,7 @@ process.env.TMDB_API_KEY = 'test-tmdb-api-key';
 process.env.TMDB_BEARER_TOKEN = 'test-tmdb-bearer-token';
 process.env.CLIENT_URL = 'http://localhost:3000';
 process.env.APP_URL = 'http://localhost:3000';
+process.env.AUTH_COOKIE_SAME_SITE = 'strict';
 
 let prisma: PrismaClient;
 

@@ -37,6 +37,9 @@ export const notFound = (message = 'Not found') => new AppError(message, { statu
 export const tooManyRequests = (message = 'Too many requests') =>
   new AppError(message, { statusCode: 429, code: 'TOO_MANY_REQUESTS' });
 
+export const unsupportedMediaType = (message = 'Unsupported media type') =>
+  new AppError(message, { statusCode: 415, code: 'UNSUPPORTED_MEDIA_TYPE' });
+
 export const sendData = <T>(res: Response, data: T, statusCode = 200) => {
   return res.status(statusCode).json({ data });
 };

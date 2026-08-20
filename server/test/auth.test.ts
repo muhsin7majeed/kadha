@@ -9,6 +9,61 @@ import { getTestApp } from './helpers/app';
 import { authorization, getRefreshCookie, getRefreshToken, registerTestUser } from './helpers/auth';
 
 describe('auth edge cases', () => {
+  it('allows JSON authentication requests from the configured client origin', async () => {
+    await registerTestUser('allowed-origin-user');
+
+    await request(await getTestApp())
+      .post('/api/auth/login')
+      .set('Origin', 'http://localhost:3000')
+      .send({
+        username: 'allowed-origin-user',
+        password: 'password123',
+      })
+      .expect(200);
+  });
+
+  it('rejects authentication requests from another origin', async () => {
+    const response = await request(await getTestApp())
+      .post('/api/auth/login')
+      .set('Origin', 'https://malicious.example')
+      .send({
+        username: 'origin-rejected-user',
+        password: 'password123',
+      })
+      .expect(403);
+
+    expect(response.body).toEqual({
+      code: 'FORBIDDEN',
+      message: 'Request origin is not allowed',
+    });
+  });
+
+  it('rejects cross-site browser authentication requests without an Origin header', async () => {
+    const response = await request(await getTestApp())
+      .post('/api/auth/refresh')
+      .set('Sec-Fetch-Site', 'cross-site')
+      .send({})
+      .expect(403);
+
+    expect(response.body).toEqual({
+      code: 'FORBIDDEN',
+      message: 'Cross-site authentication requests are not allowed',
+    });
+  });
+
+  it('requires JSON for state-changing authentication requests', async () => {
+    const response = await request(await getTestApp())
+      .post('/api/auth/login')
+      .type('form')
+      .send({ username: 'form-user', password: 'password123' })
+      .expect(415);
+
+    expect(response.body).toEqual({
+      code: 'UNSUPPORTED_MEDIA_TYPE',
+      message: 'Authentication requests require application/json',
+    });
+  });
+
   it('requires at least eight characters for new passwords', async () => {
     const response = await request(await getTestApp())
       .post('/api/auth/register')
@@ -169,7 +224,7 @@ describe('auth edge cases', () => {
     expect(refreshCookie).toContain(`Max-Age=${REFRESH_TOKEN_EXPIRATION_SECONDS}`);
     expect(refreshCookie).toContain('HttpOnly');
     expect(refreshCookie).toContain('Secure');
-    expect(refreshCookie).toContain('SameSite=None');
+    expect(refreshCookie).toContain('SameSite=Strict');
 
     if (
       !refreshTokenPayload ||
@@ -186,6 +241,7 @@ describe('auth edge cases', () => {
     const refreshResponse = await request(await getTestApp())
       .post('/api/auth/refresh')
       .set('Cookie', [`jwt=${refreshToken}`])
+      .send({})
       .expect(200);
 
     expect(refreshResponse.body).toEqual({
@@ -195,6 +251,7 @@ describe('auth edge cases', () => {
     const logoutResponse = await request(await getTestApp())
       .post('/api/auth/logout')
       .set('Cookie', [`jwt=${refreshToken}`])
+      .send({})
       .expect(200);
 
     expect(logoutResponse.body).toEqual({
@@ -206,6 +263,7 @@ describe('auth edge cases', () => {
   it('rejects refresh requests without a refresh cookie', async () => {
     const response = await request(await getTestApp())
       .post('/api/auth/refresh')
+      .send({})
       .expect(401);
 
     expect(response.body).toEqual({
@@ -218,10 +276,10 @@ describe('auth edge cases', () => {
     const app = await getTestApp();
 
     for (let attempt = 0; attempt < 120; attempt += 1) {
-      await request(app).post('/api/auth/refresh').expect(401);
+      await request(app).post('/api/auth/refresh').send({}).expect(401);
     }
 
-    const response = await request(app).post('/api/auth/refresh').expect(429);
+    const response = await request(app).post('/api/auth/refresh').send({}).expect(429);
 
     expect(response.body).toEqual({
       code: 'TOO_MANY_REQUESTS',
@@ -342,6 +400,7 @@ describe('auth edge cases', () => {
     await request(await getTestApp())
       .post('/api/auth/refresh')
       .set('Cookie', [`jwt=${user.refreshToken}`])
+      .send({})
       .expect(401);
 
     await request(await getTestApp())

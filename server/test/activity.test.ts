@@ -32,6 +32,7 @@ describe('activity routes', () => {
     await request(await getTestApp())
       .post('/api/auth/logout')
       .set('Cookie', [`jwt=${user.refreshToken}`])
+      .send({})
       .expect(200);
 
     const response = await request(await getTestApp())
