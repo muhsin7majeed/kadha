@@ -5,6 +5,7 @@ import { LuCheck, LuCircle } from 'react-icons/lu';
 import { estimatePasswordStrength } from '@/features/auth/password-strength';
 
 interface PasswordGuidanceProps {
+  id?: string;
   password: string;
   username: string;
 }
@@ -30,7 +31,7 @@ const getStrengthPresentation = (score: number, passwordLength: number): Strengt
   return { colorPalette: 'red', label: 'Weak' };
 };
 
-const PasswordGuidance = ({ password, username }: PasswordGuidanceProps) => {
+const PasswordGuidance = ({ id = 'registration-password-guidance', password, username }: PasswordGuidanceProps) => {
   const [score, setScore] = useState(0);
   const [isEstimating, setIsEstimating] = useState(false);
 
@@ -85,7 +86,7 @@ const PasswordGuidance = ({ password, username }: PasswordGuidanceProps) => {
   const strength = getStrengthPresentation(score, password.length);
 
   return (
-    <Box id="registration-password-guidance" borderWidth="1px" borderColor="border" rounded="md" p={3}>
+    <Box id={id} borderWidth="1px" borderColor="border" rounded="md" p={3}>
       <HStack justify="space-between" gap={3} mb={2}>
         <Text textStyle="compactLabel">Make your password safer</Text>
         {password ? (

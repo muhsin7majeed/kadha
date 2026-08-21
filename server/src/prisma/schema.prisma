@@ -40,6 +40,7 @@ enum UserActivityType {
   RECOVERY_CODE_CREATED
   RECOVERY_CODE_REPLACED
   PASSWORD_RESET_WITH_RECOVERY_CODE
+  PASSWORD_CHANGED
   MEDIA_LIKED
   MEDIA_UNLIKED
   MEDIA_WATCHED
@@ -101,6 +102,7 @@ model User {
   collectionMemberships CollectionMember[] @relation("CollectionMemberUser")
   sentCollectionInvites CollectionInvite[] @relation("CollectionInviteInviter")
   receivedCollectionInvites CollectionInvite[] @relation("CollectionInviteInvitee")
+  addedCollectionItems CollectionItem[] @relation("CollectionItemAddedByUser")
 
   @@map("users")
 }
@@ -289,9 +291,11 @@ model CollectionItem {
 
   collection Collection    @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   media      MediaSnapshot @relation(fields: [media_id, media_type], references: [media_id, media_type], onDelete: Cascade)
+  addedBy    User?         @relation("CollectionItemAddedByUser", fields: [addedByUserId], references: [id], onDelete: SetNull)
 
   @@unique([collectionId, media_id, media_type]) // Prevent duplicates in same collection
   @@index([collectionId])
+  @@index([addedByUserId])
   @@index([media_id, media_type])
   @@map("collection_items")
 }

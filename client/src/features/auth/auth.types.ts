@@ -19,6 +19,12 @@ export interface ManageRecoveryCodeInputs {
   currentPassword: string;
 }
 
+export interface ChangePasswordInputs {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 export interface LoginResponse {
   message: string;
   accessToken: string;
@@ -46,4 +52,8 @@ export interface ManageRecoveryCodeResponse {
 export interface RecoverAccountResponse {
   message: string;
   recoveryCode: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
 }

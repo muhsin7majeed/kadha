@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 
-import { envConfig } from '@/config/env';
 import { badRequest, sendMessage, sendResponse, unauthorized } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
-import { REFRESH_TOKEN_EXPIRATION_SECONDS } from './auth.constants';
+import { clearRefreshTokenCookie, setRefreshTokenCookie } from './auth.cookies';
 import { clearFailedLogins, recordFailedLogin } from './auth-rate-limit';
-import { LoginBody, ManageRecoveryCodeBody, RecoverAccountBody, RegisterBody } from './auth.schema';
+import { ChangePasswordBody, LoginBody, ManageRecoveryCodeBody, RecoverAccountBody, RegisterBody } from './auth.schema';
 import {
+  changeUserPassword,
   createOrReplaceRecoveryCode,
   getRecoveryCodeStatus,
   loginUser,
@@ -15,23 +15,6 @@ import {
   refreshAccessToken,
   registerUser,
 } from './auth.service';
-
-const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
-  res.cookie('jwt', refreshToken, {
-    httpOnly: true,
-    sameSite: envConfig.authCookieSameSite,
-    secure: true,
-    maxAge: REFRESH_TOKEN_EXPIRATION_SECONDS * 1000,
-  });
-};
-
-const clearRefreshTokenCookie = (res: Response) => {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-    sameSite: envConfig.authCookieSameSite,
-    secure: true,
-  });
-};
 
 export const register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
   const result = await registerUser(req.body);
@@ -107,6 +90,22 @@ export const manageRecoveryCode = async (req: Request<{}, {}, ManageRecoveryCode
     recoveryCode: result.recoveryCode,
     createdAt: result.createdAt.toISOString(),
   });
+};
+
+export const changePassword = async (req: Request<{}, {}, ChangePasswordBody>, res: Response) => {
+  const user = requireAuthUser(req);
+  const result = await changeUserPassword(user.id, req.body.currentPassword, req.body.newPassword);
+
+  if (result === 'INVALID_CURRENT_PASSWORD') {
+    throw badRequest('Invalid current password', { currentPassword: 'Current password is incorrect' });
+  }
+
+  if (result === 'PASSWORD_UNCHANGED') {
+    throw badRequest('Choose a different password', { newPassword: 'New password must be different' });
+  }
+
+  clearRefreshTokenCookie(res);
+  sendMessage(res, 'Password changed successfully');
 };
 
 export const recoverAccount = async (req: Request<{}, {}, RecoverAccountBody>, res: Response) => {

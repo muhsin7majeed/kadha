@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import { validate } from '@/middlewares/validate';
 import {
+  deleteMe,
   exportMe,
   getUserInProgressTv,
   getMe,
@@ -16,12 +17,22 @@ import {
   searchUsers,
   updateMe,
 } from './user.controller';
-import { updateMeSchema } from './user.schema';
+import { deleteMeSchema, updateMeSchema } from './user.schema';
+import { sensitiveActionRateLimit } from '@/features/auth/auth-rate-limit';
+import { requireJsonAuthRequest, validateAuthRequestOrigin } from '@/features/auth/auth-request-security';
 
 const router = Router();
 
 router.get('/me', getMe);
 router.put('/me', validate(updateMeSchema), updateMe);
+router.delete(
+  '/me',
+  validateAuthRequestOrigin,
+  requireJsonAuthRequest,
+  sensitiveActionRateLimit,
+  validate(deleteMeSchema),
+  deleteMe,
+);
 router.get('/export', exportMe);
 
 router.get('/watchlist', getUserWatchlist);

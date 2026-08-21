@@ -1,4 +1,5 @@
 import { UserActivityType } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
@@ -50,6 +51,7 @@ export async function exportCurrentUserData(id: string) {
   const [
     account,
     media,
+    episodeWatches,
     collections,
     collectionMemberships,
     collectionInvites,
@@ -79,6 +81,12 @@ export async function exportCurrentUserData(id: string) {
       },
       orderBy: {
         updatedAt: 'desc',
+      },
+    }),
+    prisma.userEpisodeWatch.findMany({
+      where: { userId: id },
+      orderBy: {
+        watchedAt: 'desc',
       },
     }),
     prisma.collection.findMany({
@@ -215,6 +223,7 @@ export async function exportCurrentUserData(id: string) {
       ...item,
       media: mediaSnapshot,
     })),
+    episodeWatches,
     collections: collections.map(({ items, ...collection }) => ({
       ...collection,
       items: items.map(({ media: mediaSnapshot, ...item }) => ({
@@ -228,6 +237,46 @@ export async function exportCurrentUserData(id: string) {
     notifications,
     activity,
   };
+}
+
+export async function deleteCurrentUser(id: string, currentPassword: string) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      password: true,
+      role: true,
+    },
+  });
+
+  if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+    return 'INVALID_CURRENT_PASSWORD' as const;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    if (user.role === 'ADMIN') {
+      const administratorCount = await tx.user.count({
+        where: { role: 'ADMIN' },
+      });
+
+      if (administratorCount === 1) {
+        return 'LAST_ADMIN' as const;
+      }
+    }
+
+    await tx.notification.deleteMany({
+      where: { actorId: user.id },
+    });
+
+    const deleteResult = await tx.user.deleteMany({
+      where: {
+        id: user.id,
+        password: user.password,
+      },
+    });
+
+    return deleteResult.count === 1 ? ('DELETED' as const) : ('INVALID_CURRENT_PASSWORD' as const);
+  });
 }
 
 export async function getCurrentUser(id: string) {
@@ -583,10 +632,7 @@ export async function getUserCollectionsByUsername(viewerId: string, username: s
       ...(isOwner
         ? {}
         : {
-            OR: [
-              { privacy: DataPrivacy.Everyone },
-              ...(isFriend ? [{ privacy: DataPrivacy.Friends }] : []),
-            ],
+            OR: [{ privacy: DataPrivacy.Everyone }, ...(isFriend ? [{ privacy: DataPrivacy.Friends }] : [])],
           }),
     },
     include: {

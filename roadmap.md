@@ -38,7 +38,9 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 - [x] Docker-first local development and production deployment.
 - [x] Environment-based instance and public URL configuration.
-- [x] Account data export as JSON.
+- [x] Complete account data export as JSON, including episode-watch history.
+- [x] Authenticated self-service account deletion with session cleanup and documented backup handling.
+- [x] Authenticated password changes that revoke existing sessions.
 - [x] Contact-free password recovery using user-held, single-use recovery codes.
 - [x] Read-only admin dashboard with user search and instance metrics.
 - [x] Theme presets with independent light and dark modes.
@@ -58,8 +60,9 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [ ] Add breached-password rejection without sending complete passwords to a third party.
 - [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
 - [x] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
-- [ ] Add authenticated self-service account deletion with session cleanup, a private support fallback, and documented backup handling.
-- [ ] Complete account exports with episode-watch history and automated coverage for every user-owned data category.
+- [x] Add authenticated self-service account deletion with session cleanup and documented backup handling.
+- [ ] Add a configurable private support channel for account and privacy requests that cannot be completed in-product.
+- [x] Complete account exports with episode-watch history and automated coverage for every user-owned data category.
 - [x] Automate encrypted, integrity-checked SQLite backups before migrations with retention and restore tooling.
 - [ ] Complete a production restore drill using an off-host backup and separately stored encryption key.
 - [ ] Complete the hosted privacy notice with operator contact, purposes, retention, recipients, user rights, cookies, and deletion details.
@@ -72,7 +75,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
 - [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
 - [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
-- [ ] Add authenticated password changes that revoke existing sessions.
+- [x] Add authenticated password changes that revoke existing sessions.
 
 #### P2 — Follow-Up Hardening
 

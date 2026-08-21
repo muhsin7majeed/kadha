@@ -4,10 +4,29 @@
 
 ### Feature Changes
 
+#### Account Security And Control
+
+- Added authenticated password changes that sign users out on every device.
+- Added permanent self-service account deletion protected by the current password and an explicit irreversible-action
+  confirmation phrase.
+
+#### Data Ownership
+
+- Completed account exports with TV episode-watch history and added an export option to the account-deletion flow.
+
 #### Media Tracking
 
 - Added owner-only tracking summaries to media detail pages and personal-details dialogs to media cards, with direct
   editing for saved ratings, watched dates, and action-specific private notes.
+
+### Engineering Changes
+
+#### Account Security And Data Integrity
+
+- Added focused rate limiting for sensitive authenticated account actions, guarded deletion of the final administrator,
+  and made collection-item attribution clear automatically when its contributing user is deleted.
+- Added server and client coverage for password-change session revocation, account-deletion cascades, irreversible-action
+  confirmation, shared-record preservation, and complete account exports.
 
 ## v0.1.10
 

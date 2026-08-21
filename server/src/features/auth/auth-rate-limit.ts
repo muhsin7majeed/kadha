@@ -21,6 +21,9 @@ const loginAccountFailures = new Map<string, AttemptWindow>();
 const loginIpRequests = new Map<string, AttemptWindow>();
 const registrationIpRequests = new Map<string, AttemptWindow>();
 const refreshIpRequests = new Map<string, AttemptWindow>();
+const sensitiveActionRequests = new Map<string, AttemptWindow>();
+const SENSITIVE_ACTION_WINDOW_MS = 15 * 60 * 1000;
+const MAX_SENSITIVE_ACTION_REQUESTS = 10;
 
 const hashIdentifier = (value: string) => createHash('sha256').update(value).digest('hex');
 
@@ -162,6 +165,25 @@ export const refreshRateLimit = createIpRateLimit(
   'Too many session refresh attempts. Try again later.',
 );
 
+export const sensitiveActionRateLimit = (req: Request, res: Response, next: NextFunction) => {
+  const now = Date.now();
+  const accountId = req.user?.id ?? 'unauthenticated';
+  const key = hashIdentifier(`${accountId}:${getClientIp(req)}`);
+  const resetAt = consumeRequest(
+    sensitiveActionRequests,
+    key,
+    MAX_SENSITIVE_ACTION_REQUESTS,
+    SENSITIVE_ACTION_WINDOW_MS,
+    now,
+  );
+
+  if (resetAt) {
+    return rejectRateLimitedRequest(res, next, resetAt, 'Too many sensitive account requests. Try again later.');
+  }
+
+  return next();
+};
+
 export const resetAuthRateLimitsForTests = () => {
   if (process.env.NODE_ENV !== 'test') {
     return;
@@ -171,4 +193,5 @@ export const resetAuthRateLimitsForTests = () => {
   loginIpRequests.clear();
   registrationIpRequests.clear();
   refreshIpRequests.clear();
+  sensitiveActionRequests.clear();
 };

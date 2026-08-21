@@ -164,6 +164,16 @@ Existing users can create a recovery code from **Settings → Security → Accou
 
 Kadha stores only a one-way verifier for the code and cannot reveal it later. If a user loses both their password and recovery code, the account cannot be recovered through the product or support. Instance operators with direct server and database control retain the technical capabilities and responsibilities inherent in self-hosting.
 
+## Password Changes And Account Deletion
+
+Signed-in users can change their password from **Settings → Security** after confirming their current password. A
+successful change revokes every access and refresh session, including the current device.
+
+Users can export their account data and permanently delete their account from **Settings → Data**. Deletion requires
+the current password and the exact irreversible-action confirmation phrase shown in the dialog. It removes the user
+and user-owned data from the live database; collections owned by that user are also removed for collaborators. The
+final administrator account cannot delete itself until another administrator has been promoted.
+
 ## Manual Builds
 
 Docker Compose is the easiest local development path. Use these commands when you want to build the frontend or server directly.
@@ -369,6 +379,11 @@ docker compose -f docker-compose.prod.yml up -d server
 Restore preserves the replaced database as a timestamped `.pre-restore-*` file. It refuses to proceed if SQLite WAL
 files indicate that the server may still be using the database.
 
+An older backup can contain accounts or records deleted after that backup was created. Kadha does not maintain a
+deletion ledger outside the database, so before reopening a restored instance, operators must reconcile later account
+deletions from an external operational record or other authoritative source. Delete obsolete encrypted backups in
+accordance with the instance's disclosed retention policy.
+
 By default, Kadha creates `/app/db/.kadha-backup-key` with owner-only permissions and reuses it for future backups. You
 can instead provide `DATABASE_BACKUP_KEY` as a base64-encoded 32-byte secret. Keep an off-host copy of the key and the
 encrypted backups in separate secure locations: losing the database volume also loses the default key, and changing
@@ -386,7 +401,9 @@ Treat the output as a secret: do not commit it, paste it into logs or messages, 
 copy of the encrypted backup.
 
 `DATABASE_BACKUP_RETENTION` changes the retained backup count, while `DATABASE_BACKUP_DIRECTORY` and
-`DATABASE_BACKUP_KEY_FILE` change their default locations.
+`DATABASE_BACKUP_KEY_FILE` change their default locations. Count-based retention does not guarantee deletion after a
+fixed number of days when backups are created only around migrations; operators that promise a time-based retention
+period must schedule backups or separately remove expired backup files.
 
 Run migrations manually only after a successful backup:
 

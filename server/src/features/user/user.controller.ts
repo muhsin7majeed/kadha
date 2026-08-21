@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 
-import { badRequest, notFound, sendResponse } from '@/lib/http';
+import { badRequest, conflict, notFound, sendMessage, sendResponse } from '@/lib/http';
 import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import {
+  deleteCurrentUser,
   exportCurrentUserData,
   getCurrentUser,
   getCurrentUserInProgressTv,
@@ -17,9 +18,14 @@ import {
   searchUsersByUsername,
   updateCurrentUser,
 } from './user.service';
-import { UpdateMePayload } from './user.schema';
+import { DeleteMePayload, UpdateMePayload } from './user.schema';
+import { clearRefreshTokenCookie } from '@/features/auth/auth.cookies';
 
-const formatExportFilenamePart = (value: string) => value.toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+const formatExportFilenamePart = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '-')
+    .replace(/^-|-$/g, '');
 
 export const getMe = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
@@ -58,6 +64,22 @@ export const updateMe = async (req: Request, res: Response) => {
   }
 
   sendResponse(res, result);
+};
+
+export const deleteMe = async (req: Request<{}, {}, DeleteMePayload>, res: Response) => {
+  const { id } = requireAuthUser(req);
+  const result = await deleteCurrentUser(id, req.body.currentPassword);
+
+  if (result === 'INVALID_CURRENT_PASSWORD') {
+    throw badRequest('Invalid current password', { currentPassword: 'Current password is incorrect' });
+  }
+
+  if (result === 'LAST_ADMIN') {
+    throw conflict('Promote another administrator before deleting the final administrator account');
+  }
+
+  clearRefreshTokenCookie(res);
+  sendMessage(res, 'Account deleted successfully');
 };
 
 export const searchUsers = async (req: Request, res: Response) => {

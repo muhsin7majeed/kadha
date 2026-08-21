@@ -32,6 +32,8 @@ export const unauthorized = (message = 'Unauthorized') =>
 
 export const forbidden = (message = 'Forbidden') => new AppError(message, { statusCode: 403, code: 'FORBIDDEN' });
 
+export const conflict = (message = 'Conflict') => new AppError(message, { statusCode: 409, code: 'CONFLICT' });
+
 export const notFound = (message = 'Not found') => new AppError(message, { statusCode: 404, code: 'NOT_FOUND' });
 
 export const tooManyRequests = (message = 'Too many requests') =>

@@ -33,6 +33,11 @@ export const manageRecoveryCodeSchema = z.object({
   currentPassword: credentialPasswordSchema,
 });
 
+export const changePasswordSchema = z.object({
+  currentPassword: credentialPasswordSchema,
+  newPassword: newPasswordSchema,
+});
+
 export const recoverAccountSchema = z.object({
   username: usernameSchema,
   recoveryCode: z
@@ -42,6 +47,7 @@ export const recoverAccountSchema = z.object({
 });
 
 export type LoginBody = z.infer<typeof loginSchema>;
+export type ChangePasswordBody = z.infer<typeof changePasswordSchema>;
 export type ManageRecoveryCodeBody = z.infer<typeof manageRecoveryCodeSchema>;
 export type RecoverAccountBody = z.infer<typeof recoverAccountSchema>;
 export type RegisterBody = z.infer<typeof registerSchema>;

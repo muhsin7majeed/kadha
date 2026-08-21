@@ -235,6 +235,60 @@ export async function createOrReplaceRecoveryCode(userId: string, currentPasswor
   };
 }
 
+export async function changeUserPassword(userId: string, currentPassword: string, newPassword: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+      password: true,
+    },
+  });
+
+  if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
+    return 'INVALID_CURRENT_PASSWORD' as const;
+  }
+
+  if (await bcrypt.compare(newPassword, user.password)) {
+    return 'PASSWORD_UNCHANGED' as const;
+  }
+
+  const newPasswordHash = await bcrypt.hash(newPassword, 10);
+  const changed = await prisma.$transaction(async (tx) => {
+    const updateResult = await tx.user.updateMany({
+      where: {
+        id: user.id,
+        password: user.password,
+      },
+      data: {
+        password: newPasswordHash,
+        sessionVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    if (updateResult.count !== 1) {
+      return false;
+    }
+
+    await createUserActivity(
+      {
+        userId: user.id,
+        type: UserActivityType.PASSWORD_CHANGED,
+        metadata: {
+          title: user.username,
+        },
+      },
+      tx,
+    );
+
+    return true;
+  });
+
+  return changed ? ('CHANGED' as const) : ('INVALID_CURRENT_PASSWORD' as const);
+}
+
 export async function recoverUserAccount({ username, recoveryCode, newPassword }: RecoverAccountBody) {
   const user = await prisma.user.findUnique({
     where: { username },

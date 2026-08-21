@@ -5,6 +5,7 @@ import { getTestApp } from './helpers/app';
 import { authorization, registerTestUser } from './helpers/auth';
 import { createTestCollection } from './helpers/collection';
 import { updateUserMediaFlag } from './helpers/user-media';
+import { prisma } from '@/lib/prisma';
 
 describe('user data export', () => {
   it('exports the current user account, media, collections, social, notifications, and activity data', async () => {
@@ -12,6 +13,17 @@ describe('user data export', () => {
     const sender = await registerTestUser('export-sender');
 
     await updateUserMediaFlag(user, 'liked', true, 885101);
+    await prisma.userEpisodeWatch.create({
+      data: {
+        userId: user.userId,
+        media_id: 885102,
+        media_type: 'tv',
+        seasonNumber: 1,
+        episodeNumber: 2,
+        episodeId: 1002,
+        note: 'Exported episode note',
+      },
+    });
     await createTestCollection(user, 'Export collection');
     await request(await getTestApp())
       .post('/api/friendship/send-friend-request')
@@ -48,6 +60,16 @@ describe('user data export', () => {
         title: 'Test Movie 885101',
       },
     });
+    expect(exported.episodeWatches).toEqual([
+      expect.objectContaining({
+        userId: user.userId,
+        media_id: 885102,
+        media_type: 'tv',
+        seasonNumber: 1,
+        episodeNumber: 2,
+        note: 'Exported episode note',
+      }),
+    ]);
     expect(exported.collections).toHaveLength(1);
     expect(exported.collections[0]).toMatchObject({
       userId: user.userId,

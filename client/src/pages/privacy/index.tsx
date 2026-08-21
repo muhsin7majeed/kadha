@@ -73,8 +73,8 @@ const Privacy = () => {
                 </List.Item>
               </List.Root>
               <Text>
-                Usernames remain searchable unless one user blocks the other. People who can see shared data may copy
-                or disclose it outside Kadha, which Kadha cannot prevent.
+                Usernames remain searchable unless one user blocks the other. People who can see shared data may copy or
+                disclose it outside Kadha, which Kadha cannot prevent.
               </Text>
             </Section>
 
@@ -125,8 +125,8 @@ const Privacy = () => {
               <Text>
                 The hosted operator can technically access the application database, private account content, and any
                 backups. The operator does not routinely inspect private content. Human access should occur only when
-                necessary for support requested by a user, security or abuse investigation, maintenance or recovery,
-                or legal obligations.
+                necessary for support requested by a user, security or abuse investigation, maintenance or recovery, or
+                legal obligations.
               </Text>
               <Text>
                 This is an operational promise, not a cryptographic guarantee. Kadha does not currently protect hosted
@@ -170,18 +170,29 @@ const Privacy = () => {
                 Kadha. If you lose both your password and recovery code, the account cannot be recovered through the
                 product or support.
               </Text>
+              <Text>
+                You can change your password from Settings after entering your current password. A successful change
+                immediately signs out every existing session, including the device used to make the change.
+              </Text>
             </Section>
 
             <Section title="Data Export And Deletion">
               <Text>
                 You can download a JSON export from Settings containing account settings, saved media, collections,
-                sharing, friendships, notifications, and activity. Episode-watch history is not included yet, so the
-                current export is not a complete copy of all account data.
+                episode-watch history, sharing, friendships, notifications, and activity.
               </Text>
               <Text>
-                Self-service deletion and a private deletion-request channel are not currently available. Do not post
-                your username, recovery code, or account data in a public GitHub issue. Account data is otherwise kept
-                while the account exists; formal deletion and backup-retention periods are still being defined.
+                You can permanently delete your account from Settings after entering your current password and an
+                explicit confirmation phrase. Deletion removes the account and its owned data from the live database,
+                including collections you own; collaborators will lose access to those collections. The action signs out
+                all existing sessions and cannot be reversed through account recovery.
+              </Text>
+              <Text>
+                Encrypted database backups can retain deleted data until the instance operator rotates those backups.
+                Backup retention is count-based, and a restored older backup can temporarily reintroduce data that was
+                deleted after that backup was created. Operators are responsible for reconciling later deletions after a
+                restore. Formal time-based backup-retention periods and a private support channel are not currently
+                available. Do not post your username, recovery code, or account data in a public GitHub issue.
               </Text>
             </Section>
 
