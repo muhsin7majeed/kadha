@@ -1,5 +1,5 @@
 import { Box, Button, Container, Heading, HStack, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LuArrowLeft, LuRefreshCw } from 'react-icons/lu';
 import { useNavigate, useParams } from 'react-router';
 
@@ -8,6 +8,8 @@ import useMediaDetails from '@/features/media/api/use-media-details';
 import TvEpisodeProgressDialog from '@/features/user-media/components/tv-episode-progress-dialog';
 import useMarkNextEpisodeWatched from '@/features/user-media/api/use-mark-next-episode-watched';
 import useTvProgress from '@/features/user-media/api/use-tv-progress';
+import MediaTrackingSection from '@/features/user-media/components/media-tracking-section';
+import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { toaster } from '@/components/ui/toaster-store';
 import HeroSection from './components/hero-section';
 import OverviewSection from './components/overview-section';
@@ -30,6 +32,7 @@ const MediaDetails = () => {
   const tvMediaId = data?.media_type === 'tv' ? data.media_id : undefined;
   const tvProgress = useTvProgress(tvMediaId, { enabled: Boolean(tvMediaId) });
   const markNextEpisodeWatched = useMarkNextEpisodeWatched(tvMediaId ?? 0);
+  const mediaPayload = useMemo(() => (data ? buildUserMediaPayload(data) : null), [data]);
 
   useEffect(() => {
     if (hasValidParams) return;
@@ -131,6 +134,8 @@ const MediaDetails = () => {
       {/* Main Content */}
       <Container maxW="6xl" py={8}>
         <VStack gap={10} align="stretch">
+          {mediaPayload && <MediaTrackingSection media={mediaPayload} trackingState={data} />}
+
           {/* Overview */}
           <OverviewSection overview={data.overview} />
 

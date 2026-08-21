@@ -1,6 +1,6 @@
 import { IconButton, VStack } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
 
 import { Tooltip } from '@/components/ui/tooltip';
@@ -9,6 +9,7 @@ import { MediaCardModel } from '@/features/media/media-card-model';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
+import MediaTrackingDetailsDialog from '@/features/user-media/components/media-tracking-details-dialog';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
 import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
@@ -76,7 +77,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const watchedLabel = getMediaActionLabel('watched', Boolean(media.watched));
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
   const collectionLabel = 'Add to collection';
-  const collectionMedia = buildUserMediaPayload(media);
+  const mediaPayload = useMemo(() => buildUserMediaPayload(media), [media]);
 
   const handleWatchlist = async () => {
     if (isAddingToWatchList) return;
@@ -109,7 +110,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   return (
     <>
       <AddToCollectionDialog
-        media={collectionMedia}
+        media={mediaPayload}
         open={showAddToCollectionDialog}
         onOpenChange={setShowAddToCollectionDialog}
       />
@@ -158,6 +159,8 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
         >
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </MediaActionIconButton>
+
+        <MediaTrackingDetailsDialog media={mediaPayload} trackingState={media} size={size} />
 
         <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
           <LuPlus />

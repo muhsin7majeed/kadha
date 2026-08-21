@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Media Tracking
+
+- Added owner-only tracking summaries to media detail pages and personal-details dialogs to media cards, with direct
+  editing for saved ratings, watched dates, and action-specific private notes.
+
 ## v0.1.10
 
 ### Feature Changes
