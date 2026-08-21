@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseCollectionInviteMetadata } from './notification-metadata';
+import { parseCollectionInviteMetadata, parseSystemNotificationMetadata } from './notification-metadata';
 
 describe('parseCollectionInviteMetadata', () => {
   it('returns empty metadata for missing or invalid JSON input', () => {
@@ -21,5 +21,19 @@ describe('parseCollectionInviteMetadata', () => {
       collectionName: undefined,
       role: undefined,
     });
+  });
+});
+
+describe('parseSystemNotificationMetadata', () => {
+  it('reads surviving collection names and aggregate counts', () => {
+    expect(parseSystemNotificationMetadata('{"collectionName":"Weekend Watchlist","count":3}')).toEqual({
+      collectionName: 'Weekend Watchlist',
+      count: 3,
+    });
+  });
+
+  it('falls back safely for malformed or future metadata', () => {
+    expect(parseSystemNotificationMetadata('invalid')).toEqual({ count: 1 });
+    expect(parseSystemNotificationMetadata('{"count":"many","extra":true}')).toEqual({ count: 1 });
   });
 });

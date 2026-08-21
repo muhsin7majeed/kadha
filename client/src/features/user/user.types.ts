@@ -16,11 +16,6 @@ export type UpdateUserPayload = Pick<
   'username' | 'profilePrivacy' | 'watchedPrivacy' | 'likedPrivacy' | 'watchlistPrivacy' | 'watchRegion'
 >;
 
-export interface DeleteAccountInputs {
-  currentPassword: string;
-  confirmation: string;
-}
-
 export interface DeleteAccountResponse {
   message: string;
 }

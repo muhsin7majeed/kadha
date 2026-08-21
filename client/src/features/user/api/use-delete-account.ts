@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { DeleteAccountInputs, DeleteAccountResponse } from '@/features/user/user.types';
-import { useErrorHandler } from '@/hooks/use-error-handler';
+import { DeleteAccountPayload } from '@/features/user/account-deletion.types';
+import { DeleteAccountResponse } from '@/features/user/user.types';
 import api from '@/lib/axios-instance';
 
-const deleteAccount = async (data: DeleteAccountInputs) => {
+const deleteAccount = async (data: DeleteAccountPayload) => {
   const response = await api.delete<DeleteAccountResponse>('/api/user/me', {
     data,
   });
@@ -13,9 +13,8 @@ const deleteAccount = async (data: DeleteAccountInputs) => {
 };
 
 const useDeleteAccount = () =>
-  useMutation<DeleteAccountResponse, unknown, DeleteAccountInputs>({
+  useMutation<DeleteAccountResponse, unknown, DeleteAccountPayload>({
     mutationFn: deleteAccount,
-    onError: useErrorHandler,
   });
 
 export default useDeleteAccount;

@@ -13,7 +13,18 @@ import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-a
 import PaginationControls from '@/components/pagination-controls';
 import { useState } from 'react';
 import useRespondToCollectionInvite from '@/features/collections/api/use-respond-to-collection-invite';
-import { parseCollectionInviteMetadata } from '@/features/notifications/utils/notification-metadata';
+import {
+  parseCollectionInviteMetadata,
+  parseSystemNotificationMetadata,
+} from '@/features/notifications/utils/notification-metadata';
+import CollectionDetailsDialog from '@/features/collections/components/collection-details-dialog';
+import { useQueryClient } from '@tanstack/react-query';
+import { invalidateCollection, invalidateCollections } from '@/features/collections/api/invalidate-collection-queries';
+
+interface SelectedCollection {
+  id: string;
+  name: string;
+}
 
 const getNotificationMessage = (notification: Notification) => {
   switch (notification.type) {
@@ -35,12 +46,59 @@ const getNotificationMessage = (notification: Notification) => {
 
 const Notifications = () => {
   const [page, setPage] = useState(1);
+  const [selectedCollection, setSelectedCollection] = useState<SelectedCollection | null>(null);
+  const queryClient = useQueryClient();
   const { data, isLoading, isError, isFetching, refetch } = useNotifications(page);
   const markNotificationRead = useMarkNotificationRead();
   const markAllNotificationsRead = useMarkAllNotificationsRead();
   const respondToCollectionInvite = useRespondToCollectionInvite();
   const notifications = data?.data ?? [];
   const hasUnreadNotifications = notifications.some((notification) => !notification.read);
+
+  const renderMessage = (notification: Notification) => {
+    const metadata = parseSystemNotificationMetadata(notification.metadata);
+    const collectionButton =
+      notification.entityId && metadata.collectionName ? (
+        <Button
+          variant="plain"
+          colorPalette="brand"
+          h="auto"
+          minW="0"
+          p="0"
+          verticalAlign="baseline"
+          textDecoration="underline"
+          onClick={() => {
+            void invalidateCollection(queryClient, notification.entityId!);
+            void invalidateCollections(queryClient);
+            setSelectedCollection({ id: notification.entityId!, name: metadata.collectionName! });
+            if (!notification.read) markNotificationRead.mutate(notification.id);
+          }}
+        >
+          “{metadata.collectionName}”
+        </Button>
+      ) : null;
+
+    switch (notification.type) {
+      case NotificationType.CollectionOwnershipReceived:
+        return collectionButton ? (
+          <>You now own {collectionButton} because its previous owner is no longer available.</>
+        ) : (
+          'You now own a collection because its previous owner is no longer available.'
+        );
+      case NotificationType.CollectionOwnershipChanged:
+        return collectionButton ? <>{collectionButton} has a new owner.</> : 'A shared collection has a new owner.';
+      case NotificationType.SharedCollectionsRemoved:
+        return metadata.count === 1
+          ? 'A shared collection is no longer available because its owner deleted their account.'
+          : `${metadata.count} shared collections are no longer available because their owner deleted their account.`;
+      case NotificationType.CollectionCollaboratorDeparted:
+        return metadata.count === 1
+          ? 'A collaborator is no longer available and was removed from your collection.'
+          : `A collaborator is no longer available and was removed from ${metadata.count} of your collections.`;
+      default:
+        return getNotificationMessage(notification);
+    }
+  };
 
   return (
     <>
@@ -89,7 +147,9 @@ const Notifications = () => {
 
                   {notification.actor?.username && <UserLink username={notification.actor?.username} />}
 
-                  <Text my="2">{getNotificationMessage(notification)}</Text>
+                  <Text as="div" my="2">
+                    {renderMessage(notification)}
+                  </Text>
                 </Box>
 
                 <HStack gap="2" alignSelf={{ base: 'stretch', md: 'center' }} justifyContent="flex-end" flexWrap="wrap">
@@ -153,6 +213,15 @@ const Notifications = () => {
 
           <PaginationControls pagination={data?.pagination} onPageChange={setPage} isDisabled={isFetching} />
         </Stack>
+      )}
+
+      {selectedCollection && (
+        <CollectionDetailsDialog
+          collectionId={selectedCollection.id}
+          collectionName={selectedCollection.name}
+          open
+          onClose={() => setSelectedCollection(null)}
+        />
       )}
     </>
   );

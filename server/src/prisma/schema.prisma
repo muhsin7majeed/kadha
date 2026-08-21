@@ -31,6 +31,10 @@ enum NotificationType {
   FRIEND_REQUEST_RECEIVED
   FRIEND_REQUEST_ACCEPTED
   COLLECTION_INVITE
+  COLLECTION_OWNERSHIP_RECEIVED
+  COLLECTION_OWNERSHIP_CHANGED
+  SHARED_COLLECTIONS_REMOVED
+  COLLECTION_COLLABORATOR_DEPARTED
 }
 
 enum UserActivityType {
@@ -314,6 +318,7 @@ model CollectionMember {
   @@unique([collectionId, userId])
   @@index([userId])
   @@index([collectionId, role])
+  @@index([collectionId, createdAt, id])
   @@map("collection_members")
 }
 

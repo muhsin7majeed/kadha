@@ -28,6 +28,14 @@ export const getApiErrorMessage = (error: unknown) => {
   return error.response?.data.message;
 };
 
+export const getApiErrorCode = (error: unknown) => {
+  if (!isAxiosError<ApiErrorResponse>(error)) {
+    return undefined;
+  }
+
+  return error.response?.data.code;
+};
+
 export const useErrorHandler = (error: unknown) => {
   const fieldErrors = getApiFieldErrors(error);
 

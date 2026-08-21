@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   changePassword: vi.fn(),
   deleteAccount: vi.fn(),
   exportUserData: vi.fn(),
+  refetchImpact: vi.fn(),
 }));
 
 vi.mock('@/features/auth/api/use-change-password', () => ({
@@ -49,11 +50,39 @@ vi.mock('@/features/user/api/use-export-user-data', () => ({
   }),
 }));
 
+vi.mock('@/features/user/api/use-deletion-impact', () => ({
+  default: () => ({
+    data: {
+      impactFingerprint: 'impact-fingerprint',
+      isFinalAdministrator: false,
+      ownedCollectionCount: 0,
+      unsharedOwnedCollectionCount: 0,
+      membershipsToLeaveCount: 0,
+      sharedOwnedCollections: [],
+    },
+    isLoading: false,
+    isError: false,
+    isFetching: false,
+    refetch: mocks.refetchImpact,
+  }),
+}));
+
 const renderInRouter = (component: React.ReactElement) => renderWithProviders(<MemoryRouter>{component}</MemoryRouter>);
 
 describe('sensitive account settings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.refetchImpact.mockResolvedValue({
+      data: {
+        impactFingerprint: 'impact-fingerprint',
+        isFinalAdministrator: false,
+        ownedCollectionCount: 0,
+        unsharedOwnedCollectionCount: 0,
+        membershipsToLeaveCount: 0,
+        sharedOwnedCollections: [],
+      },
+      isError: false,
+    });
   });
 
   it('submits a password change without sending the confirmation field', async () => {
@@ -102,6 +131,11 @@ describe('sensitive account settings', () => {
         {
           currentPassword: 'password123',
           confirmation: DELETE_ACCOUNT_CONFIRMATION,
+          impactFingerprint: 'impact-fingerprint',
+          ownershipPlan: {
+            automaticallyTransferEligibleCollections: false,
+            overrides: [],
+          },
         },
         expect.objectContaining({ onSuccess: expect.any(Function) }),
       );

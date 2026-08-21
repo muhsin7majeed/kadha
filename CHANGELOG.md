@@ -9,6 +9,15 @@
 - Added authenticated password changes that sign users out on every device.
 - Added permanent self-service account deletion protected by the current password and an explicit irreversible-action
   confirmation phrase.
+- Added collaboration-impact previews and per-collection ownership choices to account deletion, including an opt-in
+  automatic transfer to each shared collection's earliest-added accepted member.
+
+#### Collaboration
+
+- Preserved explicitly transferred collections, membership roles, and items when an owner deletes their account.
+- Added anonymous system notifications for ownership changes, removed shared collections, and departed collaborators,
+  with surviving collection details available directly from transfer notifications.
+- Added recovery states that clear stale collection data when a collection is removed or access changes.
 
 #### Data Ownership
 
@@ -27,6 +36,8 @@
   and made collection-item attribution clear automatically when its contributing user is deleted.
 - Added server and client coverage for password-change session revocation, account-deletion cascades, irreversible-action
   confirmation, shared-record preservation, and complete account exports.
+- Made ownership transfer, notification creation, and account deletion one transaction protected by an opaque
+  collaboration-impact fingerprint.
 
 ## v0.1.10
 

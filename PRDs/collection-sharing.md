@@ -140,7 +140,8 @@ Can:
 - Remove members.
 - Change member roles.
 - Delete collection.
-- Leave impossible: owner cannot leave their own collection unless ownership transfer is supported later.
+- Leave impossible: owner cannot leave their own collection. Ownership transfer is currently available only as part of
+  permanent account deletion.
 
 ### Editor
 
@@ -857,7 +858,8 @@ Options:
 
 ### Ownership Transfer
 
-Allow owner to transfer ownership to another accepted member.
+Account deletion can transfer ownership to another accepted member before the original owner is removed. A standalone
+transfer action in collection sharing remains planned.
 
 Useful if the original owner leaves the project/app.
 
@@ -951,7 +953,7 @@ Allow users to copy a shared collection into their own collections.
 ### Phase 5: Advanced Collaboration
 
 - Comments.
-- Ownership transfer.
+- Standalone ownership transfer outside account deletion.
 - Invite expiration.
 - Email invites.
 - Collection cloning/forking.

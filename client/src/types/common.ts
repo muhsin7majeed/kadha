@@ -44,6 +44,7 @@ export interface BaseInfoResponse {
 export type ApiFieldErrors = string[] | Record<string, string | undefined>;
 
 export interface ApiErrorResponse {
+  code?: string;
   fieldErrors?: ApiFieldErrors;
   message?: string;
 }

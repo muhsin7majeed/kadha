@@ -85,6 +85,8 @@ packages/contracts/
 - New Express app middleware and route mounting belongs in `server/src/app.ts`.
 - New server feature code belongs in `server/src/features/<feature-name>`.
 - New server business logic should live in feature services, not controllers.
+- Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated
+  `account-deletion.service.ts`; reusable collection ownership invariants live in the collection feature.
 - New server controllers should stay focused on HTTP request and response handling.
 - New client route declarations belong in `client/src/app/routes.tsx`.
 - Route-level screens should be lazy-loaded from `client/src/app/routes.tsx` when practical to keep production chunks small.

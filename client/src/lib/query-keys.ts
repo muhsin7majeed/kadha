@@ -78,6 +78,7 @@ export const searchQueryKeys = {
 };
 
 export const userQueryKeys = {
+  deletionImpact: ['user', 'deletion-impact'] as const,
   userProfiles: ['user-profile'] as const,
   userProfile: (username?: string) => ['user-profile', username] as const,
   userWatchedRoot: ['user-watched'] as const,

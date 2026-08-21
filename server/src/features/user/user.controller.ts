@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 
-import { badRequest, conflict, notFound, sendMessage, sendResponse } from '@/lib/http';
+import { AppError, badRequest, conflict, notFound, sendMessage, sendResponse } from '@/lib/http';
 import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import {
-  deleteCurrentUser,
   exportCurrentUserData,
   getCurrentUser,
   getCurrentUserInProgressTv,
@@ -20,6 +19,7 @@ import {
 } from './user.service';
 import { DeleteMePayload, UpdateMePayload } from './user.schema';
 import { clearRefreshTokenCookie } from '@/features/auth/auth.cookies';
+import { deleteCurrentUserWithPlan, getDeletionImpact } from './account-deletion.service';
 
 const formatExportFilenamePart = (value: string) =>
   value
@@ -68,18 +68,37 @@ export const updateMe = async (req: Request, res: Response) => {
 
 export const deleteMe = async (req: Request<{}, {}, DeleteMePayload>, res: Response) => {
   const { id } = requireAuthUser(req);
-  const result = await deleteCurrentUser(id, req.body.currentPassword);
+  const result = await deleteCurrentUserWithPlan(
+    id,
+    req.body.currentPassword,
+    req.body.impactFingerprint,
+    req.body.ownershipPlan,
+  );
 
   if (result === 'INVALID_CURRENT_PASSWORD') {
-    throw badRequest('Invalid current password', { currentPassword: 'Current password is incorrect' });
+    throw badRequest('Invalid current password', {
+      currentPassword: 'Current password is incorrect',
+    });
   }
 
   if (result === 'LAST_ADMIN') {
     throw conflict('Promote another administrator before deleting the final administrator account');
   }
 
+  if (result === 'DELETION_IMPACT_CHANGED') {
+    throw new AppError('Your collection or membership impact changed. Review the updated deletion plan.', {
+      statusCode: 409,
+      code: 'DELETION_IMPACT_CHANGED',
+    });
+  }
+
   clearRefreshTokenCookie(res);
   sendMessage(res, 'Account deleted successfully');
+};
+
+export const getMyDeletionImpact = async (req: Request, res: Response) => {
+  const { id } = requireAuthUser(req);
+  sendResponse(res, { data: await getDeletionImpact(id) });
 };
 
 export const searchUsers = async (req: Request, res: Response) => {

@@ -1,5 +1,4 @@
 import { UserActivityType } from '@prisma/client';
-import bcrypt from 'bcrypt';
 
 import { createUserActivity } from '@/features/activity/activity.service';
 import { flattenMediaSnapshot } from '@/features/media/media-snapshot.service';
@@ -40,7 +39,9 @@ const privacyFieldByFlag = {
   watchlist: 'watchlistPrivacy',
 } as const satisfies Record<UserMediaFlag, 'watchedPrivacy' | 'likedPrivacy' | 'watchlistPrivacy'>;
 
-const usernameAlreadyExists = { fieldErrors: { username: 'Username already exists' } };
+const usernameAlreadyExists = {
+  fieldErrors: { username: 'Username already exists' },
+};
 
 const publicUserSelect = {
   id: true,
@@ -237,46 +238,6 @@ export async function exportCurrentUserData(id: string) {
     notifications,
     activity,
   };
-}
-
-export async function deleteCurrentUser(id: string, currentPassword: string) {
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      password: true,
-      role: true,
-    },
-  });
-
-  if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
-    return 'INVALID_CURRENT_PASSWORD' as const;
-  }
-
-  return prisma.$transaction(async (tx) => {
-    if (user.role === 'ADMIN') {
-      const administratorCount = await tx.user.count({
-        where: { role: 'ADMIN' },
-      });
-
-      if (administratorCount === 1) {
-        return 'LAST_ADMIN' as const;
-      }
-    }
-
-    await tx.notification.deleteMany({
-      where: { actorId: user.id },
-    });
-
-    const deleteResult = await tx.user.deleteMany({
-      where: {
-        id: user.id,
-        password: user.password,
-      },
-    });
-
-    return deleteResult.count === 1 ? ('DELETED' as const) : ('INVALID_CURRENT_PASSWORD' as const);
-  });
 }
 
 export async function getCurrentUser(id: string) {
@@ -517,7 +478,11 @@ export async function getUserProfileByUsername(viewerId: string, username: strin
     isRequestSender: relationship.isRequestSender,
     access: {
       canView: canViewProfile,
-      ...(canViewProfile ? {} : { lockedReason: getLockedReason(user.profilePrivacy as DataPrivacy) }),
+      ...(canViewProfile
+        ? {}
+        : {
+            lockedReason: getLockedReason(user.profilePrivacy as DataPrivacy),
+          }),
     },
     sections,
   };

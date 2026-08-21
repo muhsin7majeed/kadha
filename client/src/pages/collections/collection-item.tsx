@@ -1,15 +1,18 @@
 import { Collection } from '@/features/collections/collections.types';
-import { AbsoluteCenter, Accordion, Box, HStack, Separator, SimpleGrid, Span, Stack, Text } from '@chakra-ui/react';
+import { AbsoluteCenter, Accordion, Box, HStack, Span, Stack, Text } from '@chakra-ui/react';
 import useCollection from '@/features/collections/api/use-collection';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import ErrorState from '@/components/info-states/error-state';
-import EmptyState from '@/components/info-states/empty-state';
 import SyncSpinner from '@/components/spinners/sync-spinner';
-import MediaCard from '@/components/media-card';
 import CollectionMenu from '@/features/collections/components/collection-menu';
 import CollectionSharingMeta, { CollectionSharedIcon } from '@/features/collections/components/collection-sharing-meta';
-import CollectionMembersDialog from '@/features/collections/components/collection-members-dialog';
-import { collectionMediaToMediaCardModel } from '@/features/collections/utils/collection-media';
+import CollectionDetailsContent from '@/features/collections/components/collection-details-content';
+import {
+  clearUnavailableCollection,
+  isUnavailableCollectionError,
+} from '@/features/collections/utils/collection-query-errors';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
 
 interface CollectionItemProps {
   collection: Collection;
@@ -18,6 +21,8 @@ interface CollectionItemProps {
 }
 
 const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOpened }) => {
+  const queryClient = useQueryClient();
+  const handledUnavailable = useRef(false);
   const {
     data: collectionData,
     isLoading,
@@ -25,6 +30,13 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
     error,
     refetch,
   } = useCollection({ collectionId: collection.id, enabled: isOpened });
+  const unavailable = isUnavailableCollectionError(error);
+
+  useEffect(() => {
+    if (!unavailable || handledUnavailable.current) return;
+    handledUnavailable.current = true;
+    void clearUnavailableCollection(queryClient, collection.id);
+  }, [collection.id, queryClient, unavailable]);
 
   return (
     <>
@@ -70,44 +82,19 @@ const CollectionItem: React.FC<CollectionItemProps> = ({ collection, index, isOp
           <Accordion.ItemBody>
             {isLoading ? (
               <CommonSpinner />
+            ) : unavailable ? (
+              <Stack gap="3" align="flex-start">
+                <Text role="status" textStyle="body">
+                  This collection is no longer available. It may have been removed by its owner or your access may have
+                  changed.
+                </Text>
+              </Stack>
             ) : error ? (
               <ErrorState title="Error" description="Error fetching collection" onRetry={refetch} />
             ) : collectionData ? (
-              <Box>
-                <Stack gap="2" mb="4">
-                  {collectionData.description && (
-                    <Text color="fg.muted" textStyle="supporting">
-                      {collectionData.description}
-                    </Text>
-                  )}
-
-                  <HStack gap="2" flexWrap="wrap">
-                    <CollectionSharingMeta collection={collectionData} />
-                  </HStack>
-
-                  <CollectionMembersDialog collection={collectionData} />
-                </Stack>
-
-                <HStack my="4">
-                  <Separator flex="1" />
-                  <Text flexShrink="0" color="fg.muted" textStyle="supporting">
-                    In this collection
-                  </Text>
-                  <Separator flex="1" />
-                </HStack>
-
-                {collectionData.media?.length > 0 ? (
-                  <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
-                    {collectionData.media?.map((media) => (
-                      <MediaCard key={media.media_id} media={collectionMediaToMediaCardModel(media)} />
-                    ))}
-                  </SimpleGrid>
-                ) : (
-                  <EmptyState title="No media" description="Woah, such wasted potential!" />
-                )}
-              </Box>
+              <CollectionDetailsContent collection={collectionData} />
             ) : (
-              <EmptyState title="No collection" description="No collection found" />
+              <Text color="fg.muted">No collection found</Text>
             )}
           </Accordion.ItemBody>
         </Accordion.ItemContent>

@@ -70,6 +70,8 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 #### P1 — Next Security And Privacy Release
 
 - [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
+- [x] Add collaboration-safe account deletion with impact previews, optional collection ownership transfer, anonymous
+  system notifications, and stale-resource handling.
 - [x] Make newly registered profiles, activity sections, and collections private by default.
 - [ ] Evaluate opt-in username discovery.
 - [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.

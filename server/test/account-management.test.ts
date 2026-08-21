@@ -15,6 +15,26 @@ import { updateUserMediaFlag } from './helpers/user-media';
 
 const deletionConfirmation = 'I understand this account cannot be recovered';
 
+const getDeletionPayload = async (
+  user: Awaited<ReturnType<typeof registerTestUser>>,
+  confirmation = deletionConfirmation,
+) => {
+  const impact = await request(await getTestApp())
+    .get('/api/user/deletion-impact')
+    .set('Authorization', authorization(user))
+    .expect(200);
+
+  return {
+    currentPassword: 'password123',
+    confirmation,
+    impactFingerprint: impact.body.data.impactFingerprint as string,
+    ownershipPlan: {
+      automaticallyTransferEligibleCollections: false,
+      overrides: [],
+    },
+  };
+};
+
 describe('authenticated account management', () => {
   it('changes the password, records activity, and revokes every existing session', async () => {
     const user = await registerTestUser('password-change-user');
@@ -65,16 +85,23 @@ describe('authenticated account management', () => {
     const incorrectResponse = await request(app)
       .post('/api/auth/password')
       .set('Authorization', authorization(user))
-      .send({ currentPassword: 'incorrect-password', newPassword: 'new-password-456' })
+      .send({
+        currentPassword: 'incorrect-password',
+        newPassword: 'new-password-456',
+      })
       .expect(400);
-    expect(incorrectResponse.body.fieldErrors).toEqual({ currentPassword: 'Current password is incorrect' });
+    expect(incorrectResponse.body.fieldErrors).toEqual({
+      currentPassword: 'Current password is incorrect',
+    });
 
     const reusedResponse = await request(app)
       .post('/api/auth/password')
       .set('Authorization', authorization(user))
       .send({ currentPassword: 'password123', newPassword: 'password123' })
       .expect(400);
-    expect(reusedResponse.body.fieldErrors).toEqual({ newPassword: 'New password must be different' });
+    expect(reusedResponse.body.fieldErrors).toEqual({
+      newPassword: 'New password must be different',
+    });
 
     const shortResponse = await request(app)
       .post('/api/auth/password')
@@ -88,11 +115,12 @@ describe('authenticated account management', () => {
 
   it('requires the exact irreversible-action phrase before deleting an account', async () => {
     const user = await registerTestUser('delete-confirmation-user');
+    const payload = await getDeletionPayload(user, 'I understand');
 
     const response = await request(await getTestApp())
       .delete('/api/user/me')
       .set('Authorization', authorization(user))
-      .send({ currentPassword: 'password123', confirmation: 'I understand' })
+      .send(payload)
       .expect(400);
 
     expect(response.body.fieldErrors).toEqual({
@@ -131,7 +159,7 @@ describe('authenticated account management', () => {
       .delete('/api/user/me')
       .set('Authorization', authorization(user))
       .set('Cookie', [`jwt=${user.refreshToken}`])
-      .send({ currentPassword: 'password123', confirmation: deletionConfirmation })
+      .send(await getDeletionPayload(user))
       .expect(200);
 
     expect(response.body).toEqual({ message: 'Account deleted successfully' });
@@ -148,27 +176,42 @@ describe('authenticated account management', () => {
     expect(await prisma.userEpisodeWatch.count({ where: { userId: user.userId } })).toBe(0);
     expect(await prisma.userActivity.count({ where: { userId: user.userId } })).toBe(0);
     expect(
-      await prisma.friendship.count({ where: { OR: [{ senderId: user.userId }, { receiverId: user.userId }] } }),
+      await prisma.friendship.count({
+        where: { OR: [{ senderId: user.userId }, { receiverId: user.userId }] },
+      }),
     ).toBe(0);
     expect(await prisma.collection.findUnique({ where: { id: ownedCollection.id } })).toBeNull();
-    expect(await prisma.collection.findUnique({ where: { id: sharedCollection.id } })).not.toBeNull();
+    expect(
+      await prisma.collection.findUnique({
+        where: { id: sharedCollection.id },
+      }),
+    ).not.toBeNull();
 
     const survivingItem = await prisma.collectionItem.findFirstOrThrow({
       where: { collectionId: sharedCollection.id, media_id: 997701 },
     });
     expect(survivingItem.addedByUserId).toBeNull();
     expect(await prisma.notification.count({ where: { actorId: user.userId } })).toBe(0);
-    expect(await prisma.notification.count({ where: { userId: survivor.userId } })).toBe(0);
+    expect(
+      await prisma.notification.count({
+        where: {
+          userId: survivor.userId,
+          type: 'COLLECTION_COLLABORATOR_DEPARTED',
+          actorId: null,
+        },
+      }),
+    ).toBe(1);
   });
 
   it('prevents deletion of the final administrator account', async () => {
     const admin = await registerTestUser('final-admin-delete-user');
     await promoteTestUserToAdmin(admin);
+    const payload = await getDeletionPayload(admin);
 
     const response = await request(await getTestApp())
       .delete('/api/user/me')
       .set('Authorization', authorization(admin))
-      .send({ currentPassword: 'password123', confirmation: deletionConfirmation })
+      .send(payload)
       .expect(409);
 
     expect(response.body).toEqual({

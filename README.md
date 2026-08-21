@@ -170,9 +170,11 @@ Signed-in users can change their password from **Settings → Security** after c
 successful change revokes every access and refresh session, including the current device.
 
 Users can export their account data and permanently delete their account from **Settings → Data**. Deletion requires
-the current password and the exact irreversible-action confirmation phrase shown in the dialog. It removes the user
-and user-owned data from the live database; collections owned by that user are also removed for collaborators. The
-final administrator account cannot delete itself until another administrator has been promoted.
+the current password and the exact irreversible-action confirmation phrase shown in the dialog. Before deleting, users
+can review the collaboration impact and explicitly transfer shared collections to accepted members. Untransferred
+collections are removed, while transferred collections keep their items and remaining memberships under the new owner.
+Affected collaborators receive anonymous in-app system notifications. The final administrator account cannot delete
+itself until another administrator has been promoted.
 
 ## Manual Builds
 

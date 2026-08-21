@@ -4,6 +4,7 @@ import { validate } from '@/middlewares/validate';
 import {
   deleteMe,
   exportMe,
+  getMyDeletionImpact,
   getUserInProgressTv,
   getMe,
   getUserCollectionsByUsernameController,
@@ -24,6 +25,7 @@ import { requireJsonAuthRequest, validateAuthRequestOrigin } from '@/features/au
 const router = Router();
 
 router.get('/me', getMe);
+router.get('/deletion-impact', getMyDeletionImpact);
 router.put('/me', validate(updateMeSchema), updateMe);
 router.delete(
   '/me',

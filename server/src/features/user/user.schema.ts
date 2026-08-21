@@ -25,6 +25,38 @@ export const deleteMeSchema = z.object({
     .refine((value) => value === DELETE_ACCOUNT_CONFIRMATION, {
       message: `Type “${DELETE_ACCOUNT_CONFIRMATION}” exactly`,
     }),
+  impactFingerprint: z.string({ required_error: 'Deletion impact is required' }).min(1, 'Deletion impact is required'),
+  ownershipPlan: z.object({
+    automaticallyTransferEligibleCollections: z.boolean(),
+    overrides: z
+      .array(
+        z.discriminatedUnion('action', [
+          z.object({
+            collectionId: z.string().uuid(),
+            action: z.literal('delete'),
+          }),
+          z.object({
+            collectionId: z.string().uuid(),
+            action: z.literal('transfer'),
+            newOwnerUserId: z.string().uuid(),
+          }),
+        ]),
+      )
+      .superRefine((overrides, context) => {
+        const collectionIds = new Set<string>();
+
+        overrides.forEach((override, index) => {
+          if (collectionIds.has(override.collectionId)) {
+            context.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [index, 'collectionId'],
+              message: 'Duplicate collection override',
+            });
+          }
+          collectionIds.add(override.collectionId);
+        });
+      }),
+  }),
 });
 
 export type UpdateMePayload = z.infer<typeof updateMeSchema>;

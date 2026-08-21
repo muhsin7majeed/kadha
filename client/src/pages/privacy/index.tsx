@@ -183,9 +183,12 @@ const Privacy = () => {
               </Text>
               <Text>
                 You can permanently delete your account from Settings after entering your current password and an
-                explicit confirmation phrase. Deletion removes the account and its owned data from the live database,
-                including collections you own; collaborators will lose access to those collections. The action signs out
-                all existing sessions and cannot be reversed through account recovery.
+                explicit confirmation phrase. Before deletion, Kadha shows how collaboration will be affected. You may
+                explicitly transfer a shared collection to one of its accepted members; its metadata, items, and other
+                memberships then remain under the new owner. Collections you do not transfer are removed from the live
+                database. Affected users receive anonymous system notifications that do not retain the deleted username
+                or link to deleted collections. The action signs out all existing sessions and cannot be reversed
+                through account recovery.
               </Text>
               <Text>
                 Encrypted database backups can retain deleted data until the instance operator rotates those backups.
