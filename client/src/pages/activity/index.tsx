@@ -22,6 +22,7 @@ import NavLink from '@/components/nav-link';
 import PageHeader from '@/components/page-header';
 import PaginationControls from '@/components/pagination-controls';
 import CommonSpinner from '@/components/spinners/common-spinner';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import useActivity from '@/features/activity/api/use-activity';
 import { ActivityMetadata, UserActivity, UserActivityType } from '@/features/activity/activity.types';
 import { parseActivityMetadata } from '@/features/activity/utils/activity-metadata';
@@ -194,7 +195,7 @@ const ActivityThumbnail = ({ activity, metadata }: { activity: UserActivity; met
   if (metadata.poster_path) {
     return (
       <Image
-        src={`https://image.tmdb.org/t/p/w185${metadata.poster_path}`}
+        src={getTmdbImageUrl('w185', metadata.poster_path)}
         alt={`${metadata.title ?? 'Media'} poster`}
         w="14"
         h="20"

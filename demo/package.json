@@ -1,0 +1,11 @@
+{
+  "name": "kadha-product-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node src/capture.mjs"
+  },
+  "dependencies": {
+    "playwright": "1.62.1"
+  }
+}

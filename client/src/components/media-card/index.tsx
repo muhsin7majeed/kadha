@@ -3,6 +3,7 @@ import type { BoxProps } from '@chakra-ui/react';
 import { LuStar } from 'react-icons/lu';
 
 import { useGenreAtom } from '@/atoms/genre-atom';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import { MediaCardModel } from '@/features/media/media-card-model';
 import { formatDate } from '@/utils/date';
 import NavLink from '../nav-link';
@@ -28,7 +29,7 @@ const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }:
       flexShrink={0}
     >
       <Image
-        src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
+        src={getTmdbImageUrl('w500', media.poster_path ?? '')}
         alt={`${media.title} poster`}
         onError={(e) => {
           e.currentTarget.src = '/assets/images/image-placeholder.svg';

@@ -17,7 +17,7 @@ const isTmdbAxiosError = (error: unknown): error is TmdbAxiosError => {
 };
 
 const api = axios.create({
-  baseURL: 'https://api.themoviedb.org/3',
+  baseURL: envConfig.tmdbApiBaseUrl,
   timeout: 10000, // 10 seconds
 });
 

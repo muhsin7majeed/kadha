@@ -1,5 +1,6 @@
 import { Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuDollarSign, LuTrendingUp, LuFilm } from 'react-icons/lu';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import type { MovieDetailsWithMeta } from '@/features/media/media.types';
 import InfoCard from './info-card';
 
@@ -73,7 +74,7 @@ const MovieInfo = ({ data }: MovieInfoProps) => {
             <HStack gap={0} align="stretch">
               {data.belongs_to_collection.poster_path && (
                 <Image
-                  src={`https://image.tmdb.org/t/p/w200${data.belongs_to_collection.poster_path}`}
+                  src={getTmdbImageUrl('w200', data.belongs_to_collection.poster_path)}
                   alt={data.belongs_to_collection.name}
                   width="120px"
                   height="180px"

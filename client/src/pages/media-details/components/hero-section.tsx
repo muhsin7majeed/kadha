@@ -13,6 +13,7 @@ import {
 import { useState } from 'react';
 
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
@@ -150,7 +151,7 @@ const HeroSection = ({
           >
             {data.backdrop_path ? (
               <Image
-                src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+                src={getTmdbImageUrl('original', data.backdrop_path)}
                 alt=""
                 width="100%"
                 height="100%"
@@ -180,7 +181,7 @@ const HeroSection = ({
           <Box flexShrink={0}>
             {data.poster_path ? (
               <Image
-                src={`https://image.tmdb.org/t/p/w500${data.poster_path}`}
+                src={getTmdbImageUrl('w500', data.poster_path)}
                 alt={`${title} poster`}
                 width={{ base: '200px', md: '280px' }}
                 height={{ base: '300px', md: '420px' }}

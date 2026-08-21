@@ -28,3 +28,6 @@ server/sqlite file path
 
 # Others
 temp/
+
+# Generated product demo artifacts
+demo/output/

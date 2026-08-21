@@ -108,6 +108,23 @@ The server test setup creates a temporary SQLite database for each run and does 
 
 CI runs the same Docker Compose-backed server build/tests and client lint/tests/build on pushes and pull requests to `master`.
 
+## Product Demo
+
+Generate the one-minute Kadha product showcase without recording or editing it by hand:
+
+```bash
+./scripts/render-product-demo.sh
+```
+
+The script starts a separate Docker Compose project, seeds disposable demo accounts and media activity, captures the
+scripted browser journey with Playwright, and assembles the final 1080p MP4 with FFmpeg. It uses a local TMDB fixture
+service and generated demo artwork, so the result is repeatable and does not depend on the normal development database
+or an external API during capture.
+
+Requirements are Docker with Compose, Node.js 20.19+, and FFmpeg. The finished video is written to
+`demo/output/kadha-product-showcase.mp4`; intermediate capture files remain in `demo/output/` for review and are ignored
+by Git.
+
 ## Configuration
 
 ### Custom Instance Name
@@ -131,6 +148,9 @@ CLIENT_URL=https://watch.example.com
 ```
 
 Frontend variables prefixed with `VITE_` are build-time values. If you change `VITE_APP_NAME`, `VITE_APP_URL`, or `VITE_API_URL`, rebuild the frontend for the change to appear in the browser.
+
+`TMDB_API_BASE_URL` and `VITE_TMDB_IMAGE_BASE_URL` optionally override TMDB's API and image origins. They are intended
+for deterministic testing and demo capture; normal deployments should use their defaults.
 
 ### App URL And Client URL
 

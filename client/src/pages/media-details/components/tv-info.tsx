@@ -1,6 +1,7 @@
 import { Badge, Box, Button, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuCalendar, LuChevronDown, LuChevronUp, LuFilm, LuPlay, LuTv, LuUser } from 'react-icons/lu';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import type { TvDetailsWithMeta } from '@/features/media/media.types';
 import useUpdateSeasonWatch from '@/features/user-media/api/use-update-season-watch';
 import TvProgressSummary from '@/features/user-media/components/tv-progress-summary';
@@ -77,7 +78,7 @@ const TvInfo = ({
                   <HStack gap={3}>
                     {creator.profile_path ? (
                       <Image
-                        src={`https://image.tmdb.org/t/p/w200${creator.profile_path}`}
+                        src={getTmdbImageUrl('w200', creator.profile_path)}
                         alt={creator.name}
                         width="50px"
                         height="50px"
@@ -119,7 +120,7 @@ const TvInfo = ({
                   <HStack gap={3}>
                     {network.logo_path ? (
                       <Image
-                        src={`https://image.tmdb.org/t/p/w200${network.logo_path}`}
+                        src={getTmdbImageUrl('w200', network.logo_path)}
                         alt={`${network.name} logo`}
                         height="30px"
                         objectFit="contain"
@@ -228,7 +229,7 @@ const TvInfo = ({
                 <Card.Root key={season.id} variant="outline" overflow="hidden">
                   {season.poster_path ? (
                     <Image
-                      src={`https://image.tmdb.org/t/p/w300${season.poster_path}`}
+                      src={getTmdbImageUrl('w300', season.poster_path)}
                       alt={season.name}
                       width="100%"
                       height="200px"

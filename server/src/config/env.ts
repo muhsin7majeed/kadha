@@ -71,4 +71,5 @@ export const envConfig = {
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || '',
   tmdbApiKey: process.env.TMDB_API_KEY || '',
   tmdbBearerToken: process.env.TMDB_BEARER_TOKEN || '',
+  tmdbApiBaseUrl: process.env.TMDB_API_BASE_URL || 'https://api.themoviedb.org/3',
 };

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Engineering Changes
+
+#### Product Demo
+
+- Added a deterministic, isolated Playwright and FFmpeg pipeline that seeds a disposable Kadha instance, captures its
+  key product flows, and renders a one-minute cinematic showcase with fixture-backed metadata and artwork.
+
 ## v0.1.10
 
 ### Feature Changes

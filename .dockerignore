@@ -4,6 +4,7 @@
 # Build outputs
 **/dist
 **/build
+demo/output
 
 # Git
 .git

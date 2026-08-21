@@ -81,6 +81,17 @@ packages/contracts/
 
 ## Current Rules
 
+### Product Demo Automation
+
+- Keep the reusable capture journey, deterministic fixtures, and video composition in `demo/`.
+- Keep the isolated runtime definition in `docker-compose.demo.yml` and its browser image in
+  `docker/demo.Dockerfile`.
+- Keep the root entry point at `scripts/render-product-demo.sh`; generated captures and renders belong in
+  `demo/output/` and must not be committed.
+- Demo seeding belongs in a guarded server script and must never target the normal development or production database.
+
+### Application Code
+
 - New server process wiring belongs in `server/src/index.ts`.
 - New Express app middleware and route mounting belongs in `server/src/app.ts`.
 - New server feature code belongs in `server/src/features/<feature-name>`.

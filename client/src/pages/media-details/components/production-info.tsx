@@ -1,5 +1,6 @@
 import { Badge, Box, Card, Heading, HStack, Image, SimpleGrid, Text, VStack } from '@chakra-ui/react';
 import { LuBuilding2, LuGlobe, LuLanguages } from 'react-icons/lu';
+import { getTmdbImageUrl } from '@/config/tmdb-images';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 
 interface ProductionInfoProps {
@@ -35,7 +36,7 @@ const ProductionInfo = ({ data }: ProductionInfoProps) => {
                         justifyContent="center"
                       >
                         <Image
-                          src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                          src={getTmdbImageUrl('w200', company.logo_path)}
                           alt={company.name}
                           maxHeight="40px"
                           objectFit="contain"

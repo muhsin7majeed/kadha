@@ -1,0 +1,49 @@
+services:
+  client:
+    ports: !reset []
+    environment:
+      VITE_APP_NAME: Kadha
+      VITE_APP_URL: http://client:3000
+      VITE_API_URL: http://server:5000
+      VITE_TMDB_IMAGE_BASE_URL: http://tmdb:4400/images
+      __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS: client
+
+  server:
+    ports: !reset []
+    depends_on:
+      - tmdb
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: file:/tmp/kadha-demo.db
+      CLIENT_URL: http://client:3000
+      APP_URL: http://client:3000
+      AUTH_COOKIE_SAME_SITE: strict
+      KADHA_DEMO_SEED: "true"
+      TMDB_API_BASE_URL: http://tmdb:4400
+    command: >-
+      sh -c "npx prisma generate --schema=./src/prisma/schema.prisma &&
+      npx prisma migrate deploy --schema=./src/prisma/schema.prisma &&
+      npm run demo:seed &&
+      npm run dev"
+
+  demo:
+    build:
+      context: .
+      dockerfile: docker/demo.Dockerfile
+    depends_on:
+      - client
+      - server
+    environment:
+      KADHA_DEMO_APP_URL: http://client:3000
+      KADHA_DEMO_API_URL: http://server:5000
+    user: "${KADHA_DEMO_UID:-1000}:${KADHA_DEMO_GID:-1000}"
+    init: true
+    ipc: host
+    volumes:
+      - ./demo/output:/demo/output
+
+  tmdb:
+    image: node:20-alpine
+    command: node /demo/src/tmdb-mock.mjs
+    volumes:
+      - ./demo:/demo:ro
