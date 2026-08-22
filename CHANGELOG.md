@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.11
+
 ### Feature Changes
 
 #### Account Security And Control
