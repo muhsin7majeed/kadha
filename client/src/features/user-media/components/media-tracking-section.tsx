@@ -1,11 +1,12 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { MediaMeta } from '@/types/common';
 import type { MediaAction, UserMediaPayload } from '../user-media.types';
-import { hasMediaTrackingDetails } from '../utils/media-tracking-details';
+import { hasActiveMediaTracking, type MediaTrackingDetailsUpdate } from '../utils/media-tracking-details';
 import MediaTrackingDetails from './media-tracking-details';
 import MediaTrackingDialog from './media-tracking-dialog';
+import RemoveWatchedDialog from './remove-watched-dialog';
 
 interface MediaTrackingSectionProps {
   media: UserMediaPayload;
@@ -14,8 +15,16 @@ interface MediaTrackingSectionProps {
 
 const MediaTrackingSection = ({ media, trackingState }: MediaTrackingSectionProps) => {
   const [editAction, setEditAction] = useState<MediaAction | null>(null);
+  const [removeWatchedOpen, setRemoveWatchedOpen] = useState(false);
+  const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
+  const currentMedia: UserMediaPayload = { ...media, ...savedDetails };
+  const currentTrackingState: MediaMeta = { ...trackingState, ...savedDetails };
 
-  if (!hasMediaTrackingDetails(trackingState)) return null;
+  useEffect(() => {
+    setSavedDetails({});
+  }, [media.media_id, media.media_type]);
+
+  if (!hasActiveMediaTracking(currentTrackingState)) return null;
 
   return (
     <>
@@ -23,16 +32,23 @@ const MediaTrackingSection = ({ media, trackingState }: MediaTrackingSectionProp
         <Heading as="h2" textStyle="sectionTitle" mb="4">
           Your tracking
         </Heading>
-        <MediaTrackingDetails media={trackingState} onEdit={setEditAction} />
+        <MediaTrackingDetails
+          media={currentTrackingState}
+          onEdit={setEditAction}
+          onRemoveWatched={() => setRemoveWatchedOpen(true)}
+        />
       </Box>
+
+      <RemoveWatchedDialog media={currentMedia} open={removeWatchedOpen} onOpenChange={setRemoveWatchedOpen} />
 
       {editAction && (
         <MediaTrackingDialog
           action={editAction}
           context="detail-pre-action"
-          media={media}
-          currentState={trackingState}
+          media={currentMedia}
+          currentState={currentTrackingState}
           open
+          onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
           onOpenChange={(open) => {
             if (!open) setEditAction(null);
           }}

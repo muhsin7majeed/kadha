@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Media Tracking
+
+- Kept personal tracking management available on cards and media detail pages for liked, watched, and watchlisted
+  titles even when no rating, watched date, or private note has been added yet.
+- Changed active watched controls to open tracking management instead of immediately removing watched status, and moved
+  removal behind an explicit confirmation that explains which personal details remain saved.
+- Fixed liked and watched detail editors so newly saved ratings, watched dates, and private notes remain populated when
+  the editor is reopened, including on cards whose source data has not refreshed yet.
+
 ## v0.1.11
 
 ### Feature Changes

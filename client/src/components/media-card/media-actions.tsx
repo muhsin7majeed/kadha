@@ -1,6 +1,6 @@
 import { IconButton, VStack } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
 
 import { Tooltip } from '@/components/ui/tooltip';
@@ -14,6 +14,7 @@ import MediaTrackingDialog from '@/features/user-media/components/media-tracking
 import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
+import type { MediaTrackingDetailsUpdate } from '@/features/user-media/utils/media-tracking-details';
 
 interface MediaActionsProps {
   media: MediaCardModel;
@@ -55,7 +56,12 @@ const MediaActionIconButton = ({
 
 const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
-  const [trackingDialog, setTrackingDialog] = useState<{ action: MediaAction; media: UserMediaPayload } | null>(null);
+  const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
+  const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
+  const [trackingDialog, setTrackingDialog] = useState<{
+    action: MediaAction;
+    media: UserMediaPayload;
+  } | null>(null);
   const getDetailsToastAction = (action: MediaAction, label: string) => (payload: UserMediaPayload) =>
     payload[action]
       ? {
@@ -74,15 +80,20 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
     getToastAction: getDetailsToastAction('liked', 'Add details'),
   });
   const likeLabel = getMediaActionLabel('liked', Boolean(media.liked));
-  const watchedLabel = getMediaActionLabel('watched', Boolean(media.watched));
+  const watchedLabel = media.watched ? 'Manage watched tracking' : getMediaActionLabel('watched', false);
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
   const collectionLabel = 'Add to collection';
-  const mediaPayload = useMemo(() => buildUserMediaPayload(media), [media]);
+  const currentMedia = useMemo(() => ({ ...media, ...savedDetails }), [media, savedDetails]);
+  const mediaPayload = useMemo(() => buildUserMediaPayload(currentMedia), [currentMedia]);
+
+  useEffect(() => {
+    setSavedDetails({});
+  }, [media.media_id, media.media_type]);
 
   const handleWatchlist = async () => {
     if (isAddingToWatchList) return;
 
-    const payload = buildUserMediaPayload(media, 'watchlist');
+    const payload = buildUserMediaPayload(currentMedia, 'watchlist');
 
     await addToWatchList(payload);
   };
@@ -90,7 +101,12 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const handleWatched = async () => {
     if (isAddingToWatched) return;
 
-    const payload = buildUserMediaPayload(media, 'watched');
+    if (media.watched) {
+      setTrackingDetailsOpen(true);
+      return;
+    }
+
+    const payload = buildUserMediaPayload(currentMedia, 'watched');
 
     await addToWatched(payload);
   };
@@ -98,7 +114,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const handleLike = async () => {
     if (isAddingToLiked) return;
 
-    const payload = buildUserMediaPayload(media, 'liked');
+    const payload = buildUserMediaPayload(currentMedia, 'liked');
 
     await addToLiked(payload);
   };
@@ -118,9 +134,10 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
         <MediaTrackingDialog
           action={trackingDialog.action}
           context="card-post-action"
-          media={trackingDialog.media}
-          currentState={{ ...media, ...trackingDialog.media }}
+          media={{ ...trackingDialog.media, ...savedDetails }}
+          currentState={{ ...currentMedia, ...trackingDialog.media }}
           open
+          onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
           onOpenChange={(open) => {
             if (!open) {
               setTrackingDialog(null);
@@ -160,7 +177,14 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </MediaActionIconButton>
 
-        <MediaTrackingDetailsDialog media={mediaPayload} trackingState={media} size={size} />
+        <MediaTrackingDetailsDialog
+          media={mediaPayload}
+          trackingState={media}
+          size={size}
+          open={trackingDetailsOpen}
+          onOpenChange={setTrackingDetailsOpen}
+          onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
+        />
 
         <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
           <LuPlus />

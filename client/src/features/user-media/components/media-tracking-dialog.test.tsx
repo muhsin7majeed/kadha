@@ -64,6 +64,7 @@ describe('MediaTrackingDialog', () => {
   it('submits watched details with a 5-star half-step rating', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
+    const onSaved = vi.fn();
 
     renderWithProviders(
       <MediaTrackingDialog
@@ -73,6 +74,7 @@ describe('MediaTrackingDialog', () => {
         currentState={{ liked: false, watched: false }}
         open
         onOpenChange={onOpenChange}
+        onSaved={onSaved}
       />,
     );
 
@@ -92,6 +94,11 @@ describe('MediaTrackingDialog', () => {
         watchedNote: 'Great pacing.',
       }),
     );
+    expect(onSaved).toHaveBeenCalledWith({
+      rating: 9,
+      watchedOn: '2026-01-15',
+      watchedNote: 'Great pacing.',
+    });
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 

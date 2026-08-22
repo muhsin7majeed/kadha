@@ -5,11 +5,12 @@ import { LuBookmark, LuCalendar, LuEye, LuHeart, LuLock, LuPencil, LuStar } from
 import type { MediaMeta } from '@/types/common';
 import { formatDate } from '@/utils/date';
 import type { MediaAction } from '../user-media.types';
-import { getMediaTrackingNote } from '../utils/media-tracking-details';
+import { getMediaTrackingNote, hasMediaTrackingDetails } from '../utils/media-tracking-details';
 
 interface MediaTrackingDetailsProps {
   media: MediaMeta;
   onEdit: (action: MediaAction) => void;
+  onRemoveWatched?: () => void;
 }
 
 interface TrackingActionConfig {
@@ -22,7 +23,12 @@ interface TrackingActionConfig {
 const trackingActions: TrackingActionConfig[] = [
   { action: 'liked', colorPalette: 'red', icon: LuHeart, label: 'Liked' },
   { action: 'watched', colorPalette: 'blue', icon: LuEye, label: 'Watched' },
-  { action: 'watchlist', colorPalette: 'green', icon: LuBookmark, label: 'Watchlist' },
+  {
+    action: 'watchlist',
+    colorPalette: 'green',
+    icon: LuBookmark,
+    label: 'Watchlist',
+  },
 ];
 
 const getActiveActions = (media: MediaMeta) => trackingActions.filter(({ action }) => Boolean(media[action]));
@@ -33,10 +39,13 @@ const formatRating = (rating: number) => {
   return `${Number.isInteger(stars) ? stars.toFixed(0) : stars.toFixed(1)} out of 5`;
 };
 
-const MediaTrackingDetails = ({ media, onEdit }: MediaTrackingDetailsProps) => {
+const MediaTrackingDetails = ({ media, onEdit, onRemoveWatched }: MediaTrackingDetailsProps) => {
   const activeActions = getActiveActions(media);
   const notes = activeActions
-    .map((config) => ({ ...config, note: getMediaTrackingNote(media, config.action) }))
+    .map((config) => ({
+      ...config,
+      note: getMediaTrackingNote(media, config.action),
+    }))
     .filter(({ note }) => Boolean(note));
 
   return (
@@ -54,6 +63,12 @@ const MediaTrackingDetails = ({ media, onEdit }: MediaTrackingDetailsProps) => {
           </Badge>
         ))}
       </HStack>
+
+      {!hasMediaTrackingDetails(media) && (
+        <Text textStyle="body" color="fg.muted">
+          Add a rating, watched date, or private note.
+        </Text>
+      )}
 
       {(media.rating != null || (media.watched && media.watchedOn)) && (
         <SimpleGrid columns={{ base: 1, sm: 2 }} gap="3">
@@ -109,6 +124,11 @@ const MediaTrackingDetails = ({ media, onEdit }: MediaTrackingDetailsProps) => {
             Edit {label.toLowerCase()} details
           </Button>
         ))}
+        {media.watched && onRemoveWatched && (
+          <Button size="sm" variant="outline" colorPalette="red" onClick={onRemoveWatched}>
+            Mark unwatched
+          </Button>
+        )}
       </Stack>
     </Stack>
   );

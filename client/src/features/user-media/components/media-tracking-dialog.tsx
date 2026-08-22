@@ -7,6 +7,7 @@ import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import { MediaMeta } from '@/types/common';
+import { getMediaTrackingDetailsUpdate, type MediaTrackingDetailsUpdate } from '../utils/media-tracking-details';
 import RatingInput from './rating-input';
 
 type TrackingContext = 'card-post-action' | 'detail-pre-action';
@@ -19,6 +20,7 @@ interface MediaTrackingDialogProps {
   media: UserMediaPayload;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSaved?: (details: MediaTrackingDetailsUpdate) => void;
 }
 
 const noteFieldByAction: Record<MediaAction, NoteField> = {
@@ -72,6 +74,7 @@ const MediaTrackingDialog = ({
   media,
   open,
   onOpenChange,
+  onSaved,
 }: MediaTrackingDialogProps) => {
   const formId = useId();
   const today = getLocalDateOnly();
@@ -147,6 +150,7 @@ const MediaTrackingDialog = ({
 
     try {
       await mutation.mutateAsync(payload);
+      onSaved?.(getMediaTrackingDetailsUpdate(payload));
       onOpenChange(false);
     } catch {
       return;

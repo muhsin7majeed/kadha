@@ -1,18 +1,23 @@
 import { IconButton } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuNotebookPen } from 'react-icons/lu';
 
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import { Tooltip } from '@/components/ui/tooltip';
 import type { MediaMeta } from '@/types/common';
 import type { MediaAction, UserMediaPayload } from '../user-media.types';
-import { hasMediaTrackingDetails } from '../utils/media-tracking-details';
+import { hasActiveMediaTracking, type MediaTrackingDetailsUpdate } from '../utils/media-tracking-details';
 import MediaTrackingDetails from './media-tracking-details';
 import MediaTrackingDialog from './media-tracking-dialog';
+import RemoveWatchedDialog from './remove-watched-dialog';
 
 interface MediaTrackingDetailsDialogProps {
   media: UserMediaPayload;
+  onOpenChange?: (open: boolean) => void;
+  onSaved?: (details: MediaTrackingDetailsUpdate) => void;
+  open?: boolean;
+  showTrigger?: boolean;
   size?: IconButtonProps['size'];
   trackingState: MediaMeta;
 }
@@ -23,41 +28,93 @@ interface EditRequest {
   trackingState: MediaMeta;
 }
 
-const MediaTrackingDetailsDialog = ({ media, size, trackingState }: MediaTrackingDetailsDialogProps) => {
-  const [open, setOpen] = useState(false);
+const MediaTrackingDetailsDialog = ({
+  media,
+  onOpenChange,
+  onSaved,
+  open: controlledOpen,
+  showTrigger = true,
+  size,
+  trackingState,
+}: MediaTrackingDetailsDialogProps) => {
+  const [internalOpen, setInternalOpen] = useState(false);
   const [editRequest, setEditRequest] = useState<EditRequest | null>(null);
+  const [removeWatchedOpen, setRemoveWatchedOpen] = useState(false);
+  const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
+  const open = controlledOpen ?? internalOpen;
+  const currentMedia: UserMediaPayload = { ...media, ...savedDetails };
+  const currentTrackingState: MediaMeta = { ...trackingState, ...savedDetails };
+  const setOpen = (nextOpen: boolean) => {
+    if (controlledOpen === undefined) {
+      setInternalOpen(nextOpen);
+    }
 
-  if (!hasMediaTrackingDetails(trackingState)) return null;
+    onOpenChange?.(nextOpen);
+  };
+
+  useEffect(() => {
+    setSavedDetails({});
+  }, [media.media_id, media.media_type]);
+
+  if (!hasActiveMediaTracking(currentTrackingState)) return null;
 
   const handleEdit = (action: MediaAction) => {
-    setEditRequest({ action, media, trackingState });
+    setOpen(false);
+    setEditRequest({ action, media: currentMedia, trackingState: currentTrackingState });
+  };
+
+  const handleSaved = (details: MediaTrackingDetailsUpdate) => {
+    setSavedDetails((current) => ({ ...current, ...details }));
+    onSaved?.(details);
   };
 
   return (
     <>
-      <Tooltip content="Personal tracking details" showArrow>
-        <IconButton
-          aria-label="View personal tracking details"
-          title="View personal tracking details"
-          size={size}
-          variant="subtle"
-          borderRadius="full"
-          colorPalette="gray"
-          onClick={() => setOpen(true)}
-        >
-          <LuNotebookPen />
-        </IconButton>
-      </Tooltip>
+      {showTrigger && (
+        <Tooltip content="Manage personal tracking" showArrow>
+          <IconButton
+            aria-label="Manage personal tracking"
+            title="Manage personal tracking"
+            size={size}
+            variant="subtle"
+            borderRadius="full"
+            colorPalette="gray"
+            onClick={() => setOpen(true)}
+          >
+            <LuNotebookPen />
+          </IconButton>
+        </Tooltip>
+      )}
 
       <SimpleDialog
         open={open}
         onOpenChange={(details) => setOpen(details.open)}
         title="Your tracking"
         closeButton
-        contentProps={{ width: { base: 'calc(100vw - 2rem)', md: 'lg' }, maxW: 'lg' }}
+        contentProps={{
+          width: { base: 'calc(100vw - 2rem)', md: 'lg' },
+          maxW: 'lg',
+        }}
       >
-        <MediaTrackingDetails media={trackingState} onEdit={handleEdit} />
+        <MediaTrackingDetails
+          media={currentTrackingState}
+          onEdit={handleEdit}
+          onRemoveWatched={() => {
+            setOpen(false);
+            setRemoveWatchedOpen(true);
+          }}
+        />
       </SimpleDialog>
+
+      <RemoveWatchedDialog
+        media={currentMedia}
+        open={removeWatchedOpen}
+        onOpenChange={(nextOpen) => {
+          setRemoveWatchedOpen(nextOpen);
+          if (!nextOpen) setOpen(true);
+        }}
+        onRemoved={() => setOpen(false)}
+      />
 
       {editRequest && (
         <MediaTrackingDialog
@@ -66,8 +123,12 @@ const MediaTrackingDetailsDialog = ({ media, size, trackingState }: MediaTrackin
           media={editRequest.media}
           currentState={editRequest.trackingState}
           open
+          onSaved={handleSaved}
           onOpenChange={(nextOpen) => {
-            if (!nextOpen) setEditRequest(null);
+            if (!nextOpen) {
+              setEditRequest(null);
+              setOpen(true);
+            }
           }}
         />
       )}

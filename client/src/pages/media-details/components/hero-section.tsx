@@ -10,17 +10,18 @@ import {
   LuPlus,
   LuStar,
 } from 'react-icons/lu';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
 import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
-import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import type { MediaAction, TvProgressResponse } from '@/features/user-media/user-media.types';
+import MediaTrackingDetailsDialog from '@/features/user-media/components/media-tracking-details-dialog';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionStateLabel } from '@/features/user-media/utils/media-action-copy';
+import type { MediaTrackingDetailsUpdate } from '@/features/user-media/utils/media-tracking-details';
 import { getTvProgressPrimaryActionLabel } from '@/features/user-media/utils/tv-progress';
 import { formatDate, minutesToHours } from '@/utils/date';
 
@@ -43,6 +44,8 @@ const HeroSection = ({
 }: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingAction, setTrackingAction] = useState<MediaAction | null>(null);
+  const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
+  const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
   const isMovie = data.media_type === 'movie';
   const title = data.media_type === 'movie' ? data.title : data.name;
   const releaseDate = data.media_type === 'movie' ? data.release_date : data.first_air_date;
@@ -50,11 +53,15 @@ const HeroSection = ({
   const releaseYear = releaseDate ? formatDate(releaseDate, 'YYYY') : null;
   const mutedTextColor = 'fg.muted';
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
-  const { mutateAsync: addToWatched, isPending: isAddingToWatched } = useAddToWatched();
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
-  const mediaPayload = buildUserMediaPayload(data);
+  const currentData = { ...data, ...savedDetails } as MovieDetailsWithMeta | TvDetailsWithMeta;
+  const mediaPayload = buildUserMediaPayload(currentData);
 
-  const getActionPayload = (action: MediaAction) => buildUserMediaPayload(data, action);
+  useEffect(() => {
+    setSavedDetails({});
+  }, [data.media_id, data.media_type]);
+
+  const getActionPayload = (action: MediaAction) => buildUserMediaPayload(currentData, action);
 
   const handleLike = async () => {
     if (isAddingToLiked) return;
@@ -67,7 +74,6 @@ const HeroSection = ({
   };
 
   const handleWatched = async () => {
-    if (isAddingToWatched) return;
     if (!isMovie) {
       if (tvProgress?.status === 'in_progress' && tvProgress.nextEpisode) {
         onMarkNextEpisode?.();
@@ -83,7 +89,7 @@ const HeroSection = ({
       return;
     }
 
-    await addToWatched(getActionPayload('watched'));
+    setTrackingDetailsOpen(true);
   };
 
   const handleWatchlist = async () => {
@@ -112,8 +118,9 @@ const HeroSection = ({
           action={trackingAction}
           context="detail-pre-action"
           media={mediaPayload}
-          currentState={data}
+          currentState={currentData}
           open
+          onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
           onOpenChange={(open) => {
             if (!open) {
               setTrackingAction(null);
@@ -121,6 +128,14 @@ const HeroSection = ({
           }}
         />
       )}
+      <MediaTrackingDetailsDialog
+        media={mediaPayload}
+        trackingState={currentData}
+        open={trackingDetailsOpen}
+        onOpenChange={setTrackingDetailsOpen}
+        onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
+        showTrigger={false}
+      />
 
       <Box position="relative" overflow="hidden" bg="bg">
         {/* Backdrop Image */}
@@ -317,7 +332,7 @@ const HeroSection = ({
                 variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : data.watched ? 'solid' : 'outline'}
                 colorPalette="blue"
                 onClick={handleWatched}
-                loading={isMovie ? isAddingToWatched : isTvProgressLoading || isMarkingNextEpisode}
+                loading={!isMovie && (isTvProgressLoading || isMarkingNextEpisode)}
               >
                 <LuCheck />
                 {isMovie
