@@ -42,7 +42,7 @@ beforeEach(async () => {
     prisma.notification.deleteMany(),
     prisma.friendship.deleteMany(),
     prisma.userActivity.deleteMany(),
-    prisma.userEpisodeWatch.deleteMany(),
+    prisma.watchEvent.deleteMany(),
     prisma.userMedia.deleteMany(),
     prisma.mediaMetadataJob.deleteMany(),
     prisma.mediaCredit.deleteMany(),

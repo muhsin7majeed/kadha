@@ -2,7 +2,12 @@ import { Request, Response } from 'express';
 
 import { sendData, sendMessage } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
-import { EpisodeWatchPayload, UserMediaPayload } from './user-media.schema';
+import {
+  EpisodeWatchPayload,
+  UserMediaPayload,
+  WatchEventCreatePayload,
+  WatchEventUpdatePayload,
+} from './user-media.schema';
 import {
   clearEpisodeWatched,
   clearSeasonWatched,
@@ -13,6 +18,7 @@ import {
   markSeasonWatched,
 } from './tv-progress.service';
 import { upsertUserMedia } from './user-media.service';
+import { createWatchEvent, deleteWatchEvent, listWatchEvents, updateWatchEvent } from './watch-event.service';
 
 export const addToLiked = async (req: Request, res: Response) => {
   const payload = req.body as UserMediaPayload;
@@ -53,8 +59,7 @@ export const addToWatchlist = async (req: Request, res: Response) => {
 };
 
 export const getTvProgressController = async (req: Request, res: Response) => {
-  const selectedSeasonNumber =
-    typeof req.query.seasonNumber === 'string' ? Number(req.query.seasonNumber) : undefined;
+  const selectedSeasonNumber = typeof req.query.seasonNumber === 'string' ? Number(req.query.seasonNumber) : undefined;
   const includeSpecials = req.query.includeSpecials === 'true';
   const data = await getTvProgress(requireAuthUser(req).id, req.params.mediaId, {
     selectedSeasonNumber,
@@ -65,11 +70,7 @@ export const getTvProgressController = async (req: Request, res: Response) => {
 };
 
 export const markEpisodeWatchedController = async (req: Request, res: Response) => {
-  const data = await markEpisodeWatched(
-    requireAuthUser(req).id,
-    req.params.mediaId,
-    req.body as EpisodeWatchPayload,
-  );
+  const data = await markEpisodeWatched(requireAuthUser(req).id, req.params.mediaId, req.body as EpisodeWatchPayload);
 
   return sendData(res, data);
 };
@@ -105,6 +106,30 @@ export const markAllAiredWatchedController = async (req: Request, res: Response)
 
 export const markNextEpisodeWatchedController = async (req: Request, res: Response) => {
   const data = await markNextEpisodeWatched(requireAuthUser(req).id, req.params.mediaId);
+
+  return sendData(res, data);
+};
+
+export const listWatchEventsController = async (req: Request, res: Response) => {
+  const data = await listWatchEvents(requireAuthUser(req).id, req.params.mediaId, req.params.mediaType);
+
+  return sendData(res, data);
+};
+
+export const createWatchEventController = async (req: Request, res: Response) => {
+  const data = await createWatchEvent(requireAuthUser(req).id, req.body as WatchEventCreatePayload);
+
+  return sendData(res, data, 201);
+};
+
+export const updateWatchEventController = async (req: Request, res: Response) => {
+  const data = await updateWatchEvent(requireAuthUser(req).id, req.params.eventId, req.body as WatchEventUpdatePayload);
+
+  return sendData(res, data);
+};
+
+export const deleteWatchEventController = async (req: Request, res: Response) => {
+  const data = await deleteWatchEvent(requireAuthUser(req).id, req.params.eventId);
 
   return sendData(res, data);
 };

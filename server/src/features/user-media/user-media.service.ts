@@ -138,6 +138,53 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
       },
     });
 
+    if (typeof flagUpdate.watched === 'boolean') {
+      if (!flagUpdate.watched) {
+        await tx.watchEvent.deleteMany({
+          where: {
+            userId,
+            media_id: payload.media_id,
+            media_type: mediaType,
+            seasonNumber: null,
+            episodeNumber: null,
+          },
+        });
+      } else {
+        const latestEvent = await tx.watchEvent.findFirst({
+          where: {
+            userId,
+            media_id: payload.media_id,
+            media_type: mediaType,
+            seasonNumber: null,
+            episodeNumber: null,
+          },
+          orderBy: [{ watchedAt: 'desc' }, { createdAt: 'desc' }],
+          select: { id: true },
+        });
+        const eventDetails = {
+          watchedOn: updatedMedia.watchedOn,
+          note: updatedMedia.watchedNote,
+        };
+
+        if (!latestEvent) {
+          await tx.watchEvent.create({
+            data: {
+              userId,
+              media_id: payload.media_id,
+              media_type: mediaType,
+              watchedAt: updatedMedia.watchedAt ?? now,
+              ...eventDetails,
+            },
+          });
+        } else if (existingMedia?.watched) {
+          await tx.watchEvent.update({
+            where: { id: latestEvent.id },
+            data: eventDetails,
+          });
+        }
+      }
+    }
+
     const activityEntries = Object.entries(flagUpdate).filter(
       (entry): entry is [UserMediaFlag, boolean] => typeof entry[1] === 'boolean',
     );

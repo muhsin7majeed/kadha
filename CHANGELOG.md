@@ -12,6 +12,19 @@
   removal behind an explicit confirmation that explains which personal details remain saved.
 - Fixed liked and watched detail editors so newly saved ratings, watched dates, and private notes remain populated when
   the editor is reopened, including on cards whose source data has not refreshed yet.
+- Added repeatable, private watch-history records for movies and TV episodes, including per-viewing dates, ratings,
+  notes, and retry-safe creation without blocking intentional same-day rewatches.
+- Included the complete watch-event history in account exports while retaining the existing episode-watch export field
+  for compatibility.
+
+### Engineering Changes
+
+#### Media Tracking
+
+- Migrated existing watched titles and episode progress into a unified watch-event model while preserving current
+  watched lists, TV progress, insights, and title-level tracking details.
+- Added authenticated APIs to list, create, edit, and delete individual watch events, with ownership isolation and
+  derived watch-count and last-watched summaries.
 
 ## v0.1.11
 

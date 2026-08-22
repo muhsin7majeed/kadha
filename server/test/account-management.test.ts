@@ -140,7 +140,7 @@ describe('authenticated account management', () => {
     await acceptCollectionInvite(user, invite.id);
     await addMovieToCollection(user, sharedCollection.id, 997701);
     await updateUserMediaFlag(user, 'watched', true, 997702);
-    await prisma.userEpisodeWatch.create({
+    await prisma.watchEvent.create({
       data: {
         userId: user.userId,
         media_id: 997703,
@@ -173,7 +173,7 @@ describe('authenticated account management', () => {
 
     expect(await prisma.user.findUnique({ where: { id: user.userId } })).toBeNull();
     expect(await prisma.userMedia.count({ where: { userId: user.userId } })).toBe(0);
-    expect(await prisma.userEpisodeWatch.count({ where: { userId: user.userId } })).toBe(0);
+    expect(await prisma.watchEvent.count({ where: { userId: user.userId } })).toBe(0);
     expect(await prisma.userActivity.count({ where: { userId: user.userId } })).toBe(0);
     expect(
       await prisma.friendship.count({

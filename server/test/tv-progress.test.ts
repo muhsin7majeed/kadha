@@ -235,7 +235,7 @@ describe('TV progress service', () => {
     const user = await createProgressUser('tv-season-user');
 
     const progress = await markSeasonWatched(user.id, '887101', '2');
-    const rows = await prisma.userEpisodeWatch.findMany({
+    const rows = await prisma.watchEvent.findMany({
       where: {
         userId: user.id,
         media_id: 887101,
@@ -281,7 +281,7 @@ describe('TV progress service', () => {
     });
     await clearEpisodeWatched(viewer.id, '887101', '1', '1');
 
-    const rows = await prisma.userEpisodeWatch.findMany({
+    const rows = await prisma.watchEvent.findMany({
       where: {
         userId: owner.id,
         media_id: 887101,

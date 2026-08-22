@@ -89,22 +89,22 @@ enum MediaMetadataStatus {
 }
 
 model User {
-  id                   String             @id @default(uuid())
-  username             String             @unique
-  role                 UserRole           @default(USER)
-  profilePrivacy       DataPrivacy        @default(ONLY_ME)
-  watchedPrivacy       DataPrivacy        @default(ONLY_ME)
-  likedPrivacy         DataPrivacy        @default(ONLY_ME)
-  watchlistPrivacy     DataPrivacy        @default(ONLY_ME)
-  watchRegion          String             @default("US")
+  id                   String       @id @default(uuid())
+  username             String       @unique
+  role                 UserRole     @default(USER)
+  profilePrivacy       DataPrivacy  @default(ONLY_ME)
+  watchedPrivacy       DataPrivacy  @default(ONLY_ME)
+  likedPrivacy         DataPrivacy  @default(ONLY_ME)
+  watchlistPrivacy     DataPrivacy  @default(ONLY_ME)
+  watchRegion          String       @default("US")
   password             String
   recoveryCodeHash     String?
   recoveryCodeIssuedAt DateTime?
-  sessionVersion       Int                @default(0)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
+  sessionVersion       Int          @default(0)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
   user_media           UserMedia[]
-  episodeWatches       UserEpisodeWatch[]
+  watchEvents          WatchEvent[]
   collections          Collection[]
 
   // Friend relationships
@@ -205,28 +205,30 @@ model UserMedia {
   @@map("user_media")
 }
 
-model UserEpisodeWatch {
-  id            String    @id @default(uuid())
-  userId        String
-  media_id      Int
-  media_type    MediaType
-  seasonNumber  Int
-  episodeNumber Int
-  episodeId     Int?
-  watchedAt     DateTime  @default(now())
-  watchedOn     DateTime?
-  rating        Int?
-  note          String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model WatchEvent {
+  id              String    @id @default(uuid())
+  userId          String
+  media_id        Int
+  media_type      MediaType
+  seasonNumber    Int?
+  episodeNumber   Int?
+  episodeId       Int?
+  clientRequestId String?
+  watchedAt       DateTime  @default(now())
+  watchedOn       DateTime?
+  rating          Int?
+  note            String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, media_id, media_type, seasonNumber, episodeNumber])
+  @@unique([userId, clientRequestId])
   @@index([userId, media_id, media_type])
+  @@index([userId, media_id, media_type, seasonNumber, episodeNumber])
   @@index([userId, watchedAt])
   @@index([media_id, media_type])
-  @@map("user_episode_watches")
+  @@map("watch_events")
 }
 
 model MediaSnapshot {

@@ -52,7 +52,7 @@ export async function exportCurrentUserData(id: string) {
   const [
     account,
     media,
-    episodeWatches,
+    watchEvents,
     collections,
     collectionMemberships,
     collectionInvites,
@@ -84,7 +84,7 @@ export async function exportCurrentUserData(id: string) {
         updatedAt: 'desc',
       },
     }),
-    prisma.userEpisodeWatch.findMany({
+    prisma.watchEvent.findMany({
       where: { userId: id },
       orderBy: {
         watchedAt: 'desc',
@@ -224,7 +224,8 @@ export async function exportCurrentUserData(id: string) {
       ...item,
       media: mediaSnapshot,
     })),
-    episodeWatches,
+    watchEvents,
+    episodeWatches: watchEvents.filter((event) => event.seasonNumber !== null && event.episodeNumber !== null),
     collections: collections.map(({ items, ...collection }) => ({
       ...collection,
       items: items.map(({ media: mediaSnapshot, ...item }) => ({
@@ -630,10 +631,12 @@ export const getCurrentUserMediaByFlag = async (id: string, flag: UserMediaFlag,
 };
 
 export async function getCurrentUserInProgressTv(id: string, page: number, limit: number, sort: InProgressTvSort) {
-  const episodeWatches = await prisma.userEpisodeWatch.findMany({
+  const episodeWatches = await prisma.watchEvent.findMany({
     where: {
       userId: id,
       media_type: 'tv',
+      seasonNumber: { not: null },
+      episodeNumber: { not: null },
     },
     orderBy: {
       watchedAt: 'desc',

@@ -1,11 +1,17 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { prisma } from '@/lib/prisma';
 import { getTestApp } from './helpers/app';
 import { authorization } from './helpers/auth';
 import { registerTestUser } from './helpers/auth';
 import { updateUserPrivacy } from './helpers/user';
-import { buildTestMediaPayload, getCurrentUserMediaList, getUserMediaListByUsername, updateUserMediaFlag } from './helpers/user-media';
+import {
+  buildTestMediaPayload,
+  getCurrentUserMediaList,
+  getUserMediaListByUsername,
+  updateUserMediaFlag,
+} from './helpers/user-media';
 
 describe('user media routes', () => {
   it('adds and removes liked media for the current user', async () => {
@@ -132,6 +138,21 @@ describe('user media routes', () => {
       watchedNote: 'A sharp rewatch.',
     });
     expect(watchedList.data[0]?.ratedAt).toEqual(expect.any(String));
+
+    await updateUserMediaFlag(user, 'watched', true, mediaId, {
+      liked: true,
+      rating: 9,
+      watchedOn: '2026-01-16',
+      watchedNote: 'Updated without logging another watch.',
+    });
+
+    const events = await prisma.watchEvent.findMany({ where: { userId: user.userId, media_id: mediaId } });
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      watchedOn: new Date('2026-01-16T00:00:00.000Z'),
+      note: 'Updated without logging another watch.',
+      rating: null,
+    });
   });
 
   it('keeps ratedAt stable when the rating is unchanged and clears it with the rating', async () => {

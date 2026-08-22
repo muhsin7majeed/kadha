@@ -57,7 +57,7 @@ interface RatingCounterValue extends CounterValue {
 const getMediaTypeWhere = (mediaType: InsightMediaType): Prisma.UserMediaWhereInput =>
   mediaType === 'all' ? {} : { media_type: mediaType as MediaType };
 
-const getEpisodeMediaTypeWhere = (mediaType: InsightMediaType): Prisma.UserEpisodeWatchWhereInput =>
+const getEpisodeMediaTypeWhere = (mediaType: InsightMediaType): Prisma.WatchEventWhereInput =>
   mediaType === 'movie' ? { media_type: MediaType.movie } : { media_type: MediaType.tv };
 
 const incrementCounter = (counter: Map<string, CounterValue>, id: string, label: string, imagePath?: string | null) => {
@@ -171,18 +171,33 @@ const getLanguageLabel = (language: string) => {
 };
 
 export const getViewingInsights = async (userId: string, mediaType: InsightMediaType): Promise<ViewingInsights> => {
-  const episodeGroups = await prisma.userEpisodeWatch.groupBy({
-    by: ['media_id', 'media_type'],
+  const episodeEvents = await prisma.watchEvent.findMany({
     where: {
       userId,
       ...getEpisodeMediaTypeWhere(mediaType),
+      seasonNumber: { not: null },
+      episodeNumber: { not: null },
     },
-    _count: { _all: true },
+    select: {
+      media_id: true,
+      media_type: true,
+      seasonNumber: true,
+      episodeNumber: true,
+    },
   });
+  const episodeKeysByMedia = new Map<string, Set<string>>();
+
+  episodeEvents.forEach((event) => {
+    const mediaKey = `${event.media_type}:${event.media_id}`;
+    const episodeKeys = episodeKeysByMedia.get(mediaKey) ?? new Set<string>();
+    episodeKeys.add(`${event.seasonNumber}:${event.episodeNumber}`);
+    episodeKeysByMedia.set(mediaKey, episodeKeys);
+  });
+
   const watchedEpisodesByMedia = new Map(
-    episodeGroups.map((group) => [`${group.media_type}:${group.media_id}`, group._count._all]),
+    [...episodeKeysByMedia].map(([mediaKey, episodeKeys]) => [mediaKey, episodeKeys.size]),
   );
-  const episodeMediaIds = episodeGroups.map((group) => group.media_id);
+  const episodeMediaIds = [...new Set(episodeEvents.map((event) => event.media_id))];
   const mediaRows = await prisma.userMedia.findMany({
     where: {
       userId,

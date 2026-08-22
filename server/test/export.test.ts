@@ -13,7 +13,7 @@ describe('user data export', () => {
     const sender = await registerTestUser('export-sender');
 
     await updateUserMediaFlag(user, 'liked', true, 885101);
-    await prisma.userEpisodeWatch.create({
+    await prisma.watchEvent.create({
       data: {
         userId: user.userId,
         media_id: 885102,
@@ -70,6 +70,7 @@ describe('user data export', () => {
         note: 'Exported episode note',
       }),
     ]);
+    expect(exported.watchEvents).toEqual(exported.episodeWatches);
     expect(exported.collections).toHaveLength(1);
     expect(exported.collections[0]).toMatchObject({
       userId: user.userId,

@@ -18,10 +18,7 @@ import {
 
 const TV_MEDIA_TYPE = MediaType.tv;
 
-type ProgressDb = Pick<
-  Prisma.TransactionClient,
-  'mediaMetadataJob' | 'mediaSnapshot' | 'userMedia' | 'userEpisodeWatch'
->;
+type ProgressDb = Pick<Prisma.TransactionClient, 'mediaMetadataJob' | 'mediaSnapshot' | 'userMedia' | 'watchEvent'>;
 type EpisodeWatchRow = {
   seasonNumber: number;
   episodeNumber: number;
@@ -264,7 +261,9 @@ const buildSelectedSeason = async (
 ): Promise<TvProgressSelectedSeason> => {
   const seasonDetails = await fetchTvSeasonDetails(mediaId, seasonNumber);
   const watchedMap = getWatchedEpisodeMap(watches);
-  const seasonSummary = buildSeasonSummaries(details, watches, true).find((season) => season.seasonNumber === seasonNumber);
+  const seasonSummary = buildSeasonSummaries(details, watches, true).find(
+    (season) => season.seasonNumber === seasonNumber,
+  );
 
   return {
     seasonNumber: seasonDetails.season_number,
@@ -300,7 +299,7 @@ export async function getTvProgress(userId: string, mediaIdValue: string, option
 
   const details = await getTvDetails(mediaId);
 
-  const [userMedia, watches] = await prisma.$transaction([
+  const [userMedia, watchRows] = await prisma.$transaction([
     prisma.userMedia.findUnique({
       where: {
         userId_media_id_media_type: {
@@ -313,13 +312,15 @@ export async function getTvProgress(userId: string, mediaIdValue: string, option
         watchlist: true,
       },
     }),
-    prisma.userEpisodeWatch.findMany({
+    prisma.watchEvent.findMany({
       where: {
         userId,
         media_id: mediaId,
         media_type: TV_MEDIA_TYPE,
+        seasonNumber: { not: null },
+        episodeNumber: { not: null },
       },
-      orderBy: [{ seasonNumber: 'asc' }, { episodeNumber: 'asc' }],
+      orderBy: [{ watchedAt: 'asc' }],
       select: {
         seasonNumber: true,
         episodeNumber: true,
@@ -331,6 +332,11 @@ export async function getTvProgress(userId: string, mediaIdValue: string, option
       },
     }),
   ]);
+  const watches = watchRows.map((row) => ({
+    ...row,
+    seasonNumber: row.seasonNumber as number,
+    episodeNumber: row.episodeNumber as number,
+  }));
 
   const seasons = buildSeasonSummaries(details, watches, options.includeSpecials);
   const watchedEpisodeCount = getWatchedAiredEpisodeCount(seasons);
@@ -363,18 +369,17 @@ const getAiredEpisodesForSeason = async (mediaId: number, details: TMDBTvDetails
   return seasonDetails.episodes.filter((episode) => isEpisodeAired(episode, seasonSummary.airedCount));
 };
 
-const upsertEpisodeWatch = (
+const upsertEpisodeWatch = async (
   tx: ProgressDb,
   userId: string,
   mediaId: number,
   episode: Pick<TMDBTvSeasonEpisode, 'episode_number' | 'id' | 'season_number'>,
   payload: Partial<Pick<EpisodeWatchPayload, 'rating' | 'note' | 'watchedOn'>> = {},
 ) => {
-  const updateData: Prisma.UserEpisodeWatchUncheckedUpdateInput = {
+  const updateData: Prisma.WatchEventUncheckedUpdateInput = {
     episodeId: episode.id,
-    watchedAt: new Date(),
   };
-  const createData: Prisma.UserEpisodeWatchUncheckedCreateInput = {
+  const createData: Prisma.WatchEventUncheckedCreateInput = {
     userId,
     media_id: mediaId,
     media_type: TV_MEDIA_TYPE,
@@ -399,19 +404,21 @@ const upsertEpisodeWatch = (
     createData.note = normalizeNote(payload.note);
   }
 
-  return tx.userEpisodeWatch.upsert({
+  const existing = await tx.watchEvent.findFirst({
     where: {
-      userId_media_id_media_type_seasonNumber_episodeNumber: {
-        userId,
-        media_id: mediaId,
-        media_type: TV_MEDIA_TYPE,
-        seasonNumber: episode.season_number,
-        episodeNumber: episode.episode_number,
-      },
+      userId,
+      media_id: mediaId,
+      media_type: TV_MEDIA_TYPE,
+      seasonNumber: episode.season_number,
+      episodeNumber: episode.episode_number,
     },
-    update: updateData,
-    create: createData,
+    orderBy: { watchedAt: 'desc' },
+    select: { id: true },
   });
+
+  return existing
+    ? tx.watchEvent.update({ where: { id: existing.id }, data: updateData })
+    : tx.watchEvent.create({ data: createData });
 };
 
 export async function markEpisodeWatched(userId: string, mediaIdValue: string, payload: EpisodeWatchPayload) {
@@ -429,7 +436,9 @@ export async function markEpisodeWatched(userId: string, mediaIdValue: string, p
     await upsertEpisodeWatch(tx, userId, mediaId, episode, payload);
   });
 
-  return getTvProgress(userId, mediaIdValue, { selectedSeasonNumber: payload.seasonNumber });
+  return getTvProgress(userId, mediaIdValue, {
+    selectedSeasonNumber: payload.seasonNumber,
+  });
 }
 
 export async function clearEpisodeWatched(
@@ -442,7 +451,7 @@ export async function clearEpisodeWatched(
   const seasonNumber = parseSeasonNumber(seasonNumberValue);
   const episodeNumber = parseEpisodeNumber(episodeNumberValue);
 
-  await prisma.userEpisodeWatch.deleteMany({
+  await prisma.watchEvent.deleteMany({
     where: {
       userId,
       media_id: mediaId,
@@ -452,7 +461,9 @@ export async function clearEpisodeWatched(
     },
   });
 
-  return getTvProgress(userId, mediaIdValue, { selectedSeasonNumber: seasonNumber });
+  return getTvProgress(userId, mediaIdValue, {
+    selectedSeasonNumber: seasonNumber,
+  });
 }
 
 export async function markSeasonWatched(userId: string, mediaIdValue: string, seasonNumberValue: string) {
@@ -469,14 +480,16 @@ export async function markSeasonWatched(userId: string, mediaIdValue: string, se
     }
   });
 
-  return getTvProgress(userId, mediaIdValue, { selectedSeasonNumber: seasonNumber });
+  return getTvProgress(userId, mediaIdValue, {
+    selectedSeasonNumber: seasonNumber,
+  });
 }
 
 export async function clearSeasonWatched(userId: string, mediaIdValue: string, seasonNumberValue: string) {
   const mediaId = parsePositiveInt(mediaIdValue, 'Media ID');
   const seasonNumber = parseSeasonNumber(seasonNumberValue);
 
-  await prisma.userEpisodeWatch.deleteMany({
+  await prisma.watchEvent.deleteMany({
     where: {
       userId,
       media_id: mediaId,
@@ -485,7 +498,9 @@ export async function clearSeasonWatched(userId: string, mediaIdValue: string, s
     },
   });
 
-  return getTvProgress(userId, mediaIdValue, { selectedSeasonNumber: seasonNumber });
+  return getTvProgress(userId, mediaIdValue, {
+    selectedSeasonNumber: seasonNumber,
+  });
 }
 
 export async function markAllAiredWatched(userId: string, mediaIdValue: string) {
@@ -498,27 +513,28 @@ export async function markAllAiredWatched(userId: string, mediaIdValue: string) 
 
     for (const season of seasons) {
       for (let episodeNumber = 1; episodeNumber <= season.airedCount; episodeNumber += 1) {
-        await tx.userEpisodeWatch.upsert({
+        const existing = await tx.watchEvent.findFirst({
           where: {
-            userId_media_id_media_type_seasonNumber_episodeNumber: {
-              userId,
-              media_id: mediaId,
-              media_type: TV_MEDIA_TYPE,
-              seasonNumber: season.seasonNumber,
-              episodeNumber,
-            },
-          },
-          update: {
-            watchedAt: new Date(),
-          },
-          create: {
             userId,
             media_id: mediaId,
             media_type: TV_MEDIA_TYPE,
             seasonNumber: season.seasonNumber,
             episodeNumber,
           },
+          select: { id: true },
         });
+
+        if (!existing) {
+          await tx.watchEvent.create({
+            data: {
+              userId,
+              media_id: mediaId,
+              media_type: TV_MEDIA_TYPE,
+              seasonNumber: season.seasonNumber,
+              episodeNumber,
+            },
+          });
+        }
       }
     }
   });
