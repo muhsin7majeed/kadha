@@ -4,6 +4,12 @@
 
 An open-source, self-hostable web app for movie and TV tracking.
 
+## Screenshots
+<img width="1856" height="907" alt="image" src="https://github.com/user-attachments/assets/d5304b28-7e39-4e60-ace8-fdc573d9da19" />
+<img width="1855" height="911" alt="image" src="https://github.com/user-attachments/assets/efee748c-d8b8-4b33-b9ee-b2dc7bb0b4e6" />
+
+
+
 ## License
 
 Kadha is open-source software licensed under the [MIT License](LICENSE). You may use, copy, modify, distribute,
