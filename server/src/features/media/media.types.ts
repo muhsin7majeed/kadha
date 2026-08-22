@@ -71,6 +71,62 @@ export interface TMDBCreatedBy {
   profile_path: string | null;
 }
 
+export interface TMDBCreditPerson {
+  id: number;
+  name: string;
+  profile_path: string | null;
+  known_for_department?: string;
+}
+
+export interface TMDBMovieCastCredit extends TMDBCreditPerson {
+  cast_id?: number;
+  character: string;
+  credit_id: string;
+  order: number;
+}
+
+export interface TMDBMovieCrewCredit extends TMDBCreditPerson {
+  credit_id: string;
+  department: string;
+  job: string;
+}
+
+export interface TMDBMovieCredits {
+  id: number;
+  cast: TMDBMovieCastCredit[];
+  crew: TMDBMovieCrewCredit[];
+}
+
+export interface TMDBTvAggregateCastRole {
+  credit_id: string;
+  character: string;
+  episode_count: number;
+}
+
+export interface TMDBTvAggregateCrewJob {
+  credit_id: string;
+  job: string;
+  episode_count: number;
+}
+
+export interface TMDBTvAggregateCastCredit extends TMDBCreditPerson {
+  order: number;
+  roles: TMDBTvAggregateCastRole[];
+  total_episode_count: number;
+}
+
+export interface TMDBTvAggregateCrewCredit extends TMDBCreditPerson {
+  department: string;
+  jobs: TMDBTvAggregateCrewJob[];
+  total_episode_count: number;
+}
+
+export interface TMDBTvAggregateCredits {
+  id: number;
+  cast: TMDBTvAggregateCastCredit[];
+  crew: TMDBTvAggregateCrewCredit[];
+}
+
 export interface TMDBLastEpisodeToAir {
   id: number;
   name: string;
@@ -240,14 +296,24 @@ export interface MediaMeta {
   watchlistNote?: string | null;
 }
 
-export type TMDBMovieWithMediaId = Omit<NormalizedTMDBMovie, 'id'> & { media_id: number };
-export type TMDBTvWithMediaId = Omit<NormalizedTMDBTv, 'id'> & { media_id: number };
+export type TMDBMovieWithMediaId = Omit<NormalizedTMDBMovie, 'id'> & {
+  media_id: number;
+};
+export type TMDBTvWithMediaId = Omit<NormalizedTMDBTv, 'id'> & {
+  media_id: number;
+};
 
 export type TMDBMovieWithMeta = TMDBMovieWithMediaId & MediaMeta;
 export type TMDBTvWithMeta = TMDBTvWithMediaId & MediaMeta;
 
-export type TMDBMovieDetailsWithMediaId = Omit<TMDBMovieDetails, 'id'> & { media_id: number; media_type: 'movie' };
-export type TMDBTvDetailsWithMediaId = Omit<TMDBTvDetails, 'id'> & { media_id: number; media_type: 'tv' };
+export type TMDBMovieDetailsWithMediaId = Omit<TMDBMovieDetails, 'id'> & {
+  media_id: number;
+  media_type: 'movie';
+};
+export type TMDBTvDetailsWithMediaId = Omit<TMDBTvDetails, 'id'> & {
+  media_id: number;
+  media_type: 'tv';
+};
 
 export type TMDBMovieDetailsWithMeta = TMDBMovieDetailsWithMediaId & MediaMeta;
 export type TMDBTvDetailsWithMeta = TMDBTvDetailsWithMediaId & MediaMeta;

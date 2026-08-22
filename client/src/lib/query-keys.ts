@@ -89,6 +89,8 @@ export const userQueryKeys = {
   userWatchList: (username?: string, page = 1) => ['user-watch-list', username, page] as const,
   userCollectionsRoot: ['user-collections'] as const,
   userCollections: (username?: string) => ['user-collections', username] as const,
+  viewingInsightsRoot: ['viewing-insights'] as const,
+  viewingInsights: (mediaType: 'all' | MediaType = 'all') => ['viewing-insights', mediaType] as const,
 };
 
 export const userMediaQueryKeys = {

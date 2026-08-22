@@ -28,6 +28,14 @@
 - Added owner-only tracking summaries to media detail pages and personal-details dialogs to media cards, with direct
   editing for saved ratings, watched dates, and action-specific private notes.
 
+#### Viewing Insights
+
+- Added a private Overview tab to My Profile with all-time watched-title and episode totals, personal rating summaries,
+  movie and TV filtering, and ranked genre, cast, movie-director, TV-creator, liked-genre, release-decade, and
+  original-language insights.
+- Added intentional small-library, empty, loading, error, and partial-metadata states with accessible exact values
+  alongside every visual ranking.
+
 ### Engineering Changes
 
 #### Account Security And Data Integrity
@@ -38,6 +46,15 @@
   confirmation, shared-record preservation, and complete account exports.
 - Made ownership transfer, notification creation, and account deletion one transaction protected by an opaque
   collaboration-impact fingerprint.
+
+#### Viewing Insights And Media Metadata
+
+- Added canonical shared genre, person, and media-credit storage with durable asynchronous TMDB enrichment, retryable
+  backfill jobs, freshness tracking, and partial-coverage reporting.
+- Added a versioned, chart-ready owner insights API that derives current results without per-user score tables and
+  preserves distinct-title semantics for a future multi-watch event history.
+- Added server and client coverage for insight calculations, privacy isolation, shared metadata enrichment, responsive
+  rendering, media filtering, and tracking-driven cache invalidation.
 
 ## v0.1.10
 

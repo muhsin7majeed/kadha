@@ -5,7 +5,9 @@ import {
   MovieDBMovieResponse,
   MovieDBTvResponse,
   TMDBMovieDetails,
+  TMDBMovieCredits,
   TMDBTvDetails,
+  TMDBTvAggregateCredits,
   TMDBTvSeasonDetails,
   TMDBWatchProvidersResponse,
 } from './media.types';
@@ -20,6 +22,7 @@ const CACHE_TTL = {
   search: ONE_MINUTE,
   seasonDetails: 6 * ONE_HOUR,
   watchProviders: 24 * ONE_HOUR,
+  credits: 24 * ONE_HOUR,
 };
 
 interface CacheEntry<T> {
@@ -107,6 +110,20 @@ export async function fetchTopRatedTvs() {
 export async function fetchMediaDetails(mediaType: 'movie' | 'tv', id: number) {
   return getCached(`details:${mediaType}:${id}`, CACHE_TTL.details, async () => {
     const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
+    return response.data;
+  });
+}
+
+export async function fetchMovieCredits(movieId: number) {
+  return getCached(`credits:movie:${movieId}`, CACHE_TTL.credits, async () => {
+    const response = await api.get<TMDBMovieCredits>(`/movie/${movieId}/credits`);
+    return response.data;
+  });
+}
+
+export async function fetchTvAggregateCredits(tvId: number) {
+  return getCached(`credits:tv:${tvId}`, CACHE_TTL.credits, async () => {
+    const response = await api.get<TMDBTvAggregateCredits>(`/tv/${tvId}/aggregate_credits`);
     return response.data;
   });
 }

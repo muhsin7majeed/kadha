@@ -18,7 +18,10 @@ import {
 
 const TV_MEDIA_TYPE = MediaType.tv;
 
-type ProgressDb = Pick<Prisma.TransactionClient, 'mediaSnapshot' | 'userMedia' | 'userEpisodeWatch'>;
+type ProgressDb = Pick<
+  Prisma.TransactionClient,
+  'mediaMetadataJob' | 'mediaSnapshot' | 'userMedia' | 'userEpisodeWatch'
+>;
 type EpisodeWatchRow = {
   seasonNumber: number;
   episodeNumber: number;

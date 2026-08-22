@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-08-21
+Last reviewed: 2026-08-22
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -114,9 +114,11 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ### Insights And Statistics
 
+- [x] Add a private profile overview with watched-title and episode totals, personal rating summaries, and ranked genre,
+  cast, movie-director, TV-creator, liked-genre, release-decade, and original-language insights.
 - [ ] Add watch-history totals and trends.
 - [ ] Add time-watched estimates.
-- [ ] Add genre and media-type breakdowns.
+- [x] Add genre and media-type breakdowns.
 - [ ] Add TV progress and viewing-pattern insights.
 
 ### Integrations

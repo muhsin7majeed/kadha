@@ -2,7 +2,11 @@ import { MediaType, Prisma } from '@prisma/client';
 
 import { prisma } from '@/lib/prisma';
 
-type MediaSnapshotDelegate = Pick<typeof prisma, 'mediaSnapshot'> | Pick<Prisma.TransactionClient, 'mediaSnapshot'>;
+type MediaSnapshotDelegate =
+  | Pick<typeof prisma, 'mediaMetadataJob' | 'mediaSnapshot'>
+  | Pick<Prisma.TransactionClient, 'mediaMetadataJob' | 'mediaSnapshot'>;
+
+const METADATA_REFRESH_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
 
 export interface MediaSnapshotPayload {
   media_id: number;
@@ -45,11 +49,11 @@ const getSnapshotData = (payload: MediaSnapshotPayload) => ({
   status: payload.status,
 });
 
-export const upsertMediaSnapshot = (payload: MediaSnapshotPayload, db: MediaSnapshotDelegate = prisma) => {
+export const upsertMediaSnapshot = async (payload: MediaSnapshotPayload, db: MediaSnapshotDelegate = prisma) => {
   const mediaType = payload.media_type as MediaType;
   const snapshotData = getSnapshotData(payload);
 
-  return db.mediaSnapshot.upsert({
+  const snapshot = await db.mediaSnapshot.upsert({
     where: {
       media_id_media_type: {
         media_id: payload.media_id,
@@ -63,6 +67,22 @@ export const upsertMediaSnapshot = (payload: MediaSnapshotPayload, db: MediaSnap
       ...snapshotData,
     },
   });
+
+  const metadataIsStale =
+    snapshot.creditsUpdatedAt === null ||
+    snapshot.creditsUpdatedAt.getTime() < Date.now() - METADATA_REFRESH_INTERVAL_MS;
+
+  if (snapshot.metadataStatus !== 'READY' || metadataIsStale) {
+    await db.mediaMetadataJob.upsert({
+      where: { mediaSnapshotId: snapshot.id },
+      update: {},
+      create: {
+        mediaSnapshotId: snapshot.id,
+      },
+    });
+  }
+
+  return snapshot;
 };
 
 export const parseSnapshotGenreIds = (genreIds: string | number[] | null | undefined): number[] => {

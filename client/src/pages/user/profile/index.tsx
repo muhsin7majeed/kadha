@@ -74,7 +74,7 @@ const UserProfile = () => {
             <ProfileHeader profile={profile} isOwner={isMyProfile} />
 
             {profile.access.canView ? (
-              <OtherUserData username={username!} profile={profile} />
+              <OtherUserData username={username!} profile={profile} isOwner={isMyProfile} />
             ) : (
               <LockedProfileState lockedReason={profile.access.lockedReason} />
             )}

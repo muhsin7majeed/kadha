@@ -9,6 +9,7 @@ const invalidateTvProgress = (queryClient: QueryClient, mediaId: number) =>
     queryClient.invalidateQueries({ queryKey: queryKeys.mediaDetails }),
     queryClient.invalidateQueries({ queryKey: queryKeys.watchList }),
     queryClient.invalidateQueries({ queryKey: queryKeys.userWatchListRoot }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.viewingInsightsRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.mediaDetailsById('tv', String(mediaId)) }),
   ]);
 

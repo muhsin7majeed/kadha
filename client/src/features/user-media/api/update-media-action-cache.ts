@@ -49,7 +49,11 @@ export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapsh
 };
 
 export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
-  Promise.all(mediaDiscoveryQueryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
+  Promise.all(
+    [...mediaDiscoveryQueryKeys, queryKeys.viewingInsightsRoot].map((queryKey) =>
+      queryClient.invalidateQueries({ queryKey }),
+    ),
+  );
 
 const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): MediaMeta => {
   const trackingMeta = getTrackingMetaUpdate(payload);

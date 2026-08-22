@@ -1,13 +1,19 @@
 import SimpleTabs, { TabItem } from '@/components/simple-tabs';
 import { Box } from '@chakra-ui/react';
-import { LuBookmark, LuCheck, LuFolder, LuHeart } from 'react-icons/lu';
+import { LuBookmark, LuChartNoAxesColumnIncreasing, LuCheck, LuFolder, LuHeart } from 'react-icons/lu';
 import { Outlet, useNavigate } from 'react-router';
 import { useLocation } from 'react-router';
 import { UserProfileResponse } from '@/features/user/user.types';
 import { useEffect, useMemo } from 'react';
 import EmptyState from '@/components/info-states/empty-state';
 
-export type OtherUserDataTabs = 'watched' | 'liked' | 'collections' | 'watchlist';
+export type OtherUserDataTabs = 'overview' | 'watched' | 'liked' | 'collections' | 'watchlist';
+
+const overviewTab: TabItem<OtherUserDataTabs> = {
+  value: 'overview',
+  label: 'Overview',
+  icon: <LuChartNoAxesColumnIncreasing />,
+};
 
 const tabs: TabItem<OtherUserDataTabs>[] = [
   {
@@ -35,12 +41,19 @@ const tabs: TabItem<OtherUserDataTabs>[] = [
 interface OtherUserDataProps {
   username: string;
   profile: UserProfileResponse;
+  isOwner: boolean;
 }
 
-const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile }) => {
+const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile, isOwner }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const visibleTabs = useMemo(() => tabs.filter((tab) => profile.sections[tab.value]), [profile.sections]);
+  const visibleTabs = useMemo(
+    () => [
+      ...(isOwner ? [overviewTab] : []),
+      ...tabs.filter((tab) => tab.value !== 'overview' && profile.sections[tab.value]),
+    ],
+    [isOwner, profile.sections],
+  );
 
   // Extract the current tab from the pathname (e.g., /app/profile/username/watched -> watched).
   const pathSegments = location.pathname.split('/');
@@ -58,7 +71,9 @@ const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile }) => {
   }, [hasCurrentTab, navigate, username, visibleTabs]);
 
   if (visibleTabs.length === 0) {
-    return <EmptyState title="No visible activity" description="This user is not sharing any profile sections right now." />;
+    return (
+      <EmptyState title="No visible activity" description="This user is not sharing any profile sections right now." />
+    );
   }
 
   return (

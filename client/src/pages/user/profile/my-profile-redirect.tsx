@@ -9,7 +9,7 @@ const MyProfileRedirect = () => {
     return null;
   }
 
-  return <Navigate to={`/app/profile/${auth.user.username}`} replace />;
+  return <Navigate to={`/app/profile/${auth.user.username}/overview`} replace />;
 };
 
 export default MyProfileRedirect;

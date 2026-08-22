@@ -44,7 +44,12 @@ beforeEach(async () => {
     prisma.userActivity.deleteMany(),
     prisma.userEpisodeWatch.deleteMany(),
     prisma.userMedia.deleteMany(),
+    prisma.mediaMetadataJob.deleteMany(),
+    prisma.mediaCredit.deleteMany(),
+    prisma.mediaGenre.deleteMany(),
     prisma.mediaSnapshot.deleteMany(),
+    prisma.person.deleteMany(),
+    prisma.genre.deleteMany(),
     prisma.user.deleteMany(),
   ]);
 });
