@@ -99,7 +99,7 @@ const MediaTrackingDialog = ({
   const showRating = action === 'liked' || action === 'watched';
   const showWatchedOn = action === 'watched';
   const showLikeToo = action === 'watched';
-  const showAlsoMarkWatched = action === 'liked' && !isAlreadyWatched;
+  const showAlsoMarkWatched = action === 'liked' && media.media_type !== 'movie' && !isAlreadyWatched;
 
   useEffect(() => {
     if (!open) return;

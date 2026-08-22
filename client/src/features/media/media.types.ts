@@ -8,6 +8,7 @@ interface MediaMeta {
   likedNote?: string | null;
   watchedNote?: string | null;
   watchlistNote?: string | null;
+  watchCount?: number;
 }
 
 interface BaseMedia {

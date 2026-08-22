@@ -251,6 +251,7 @@ describe('user media routes', () => {
       rating: 10,
       likedNote: 'Private taste note.',
     });
+    await updateUserMediaFlag(owner, 'watched', true, mediaId, { liked: true });
 
     const ownerLiked = await getCurrentUserMediaList(owner, 'liked');
     const publicLiked = await getUserMediaListByUsername(viewer, owner.username, 'liked');
@@ -265,5 +266,6 @@ describe('user media routes', () => {
     });
     expect(publicLiked.data[0]).not.toHaveProperty('rating');
     expect(publicLiked.data[0]).not.toHaveProperty('likedNote');
+    expect(publicLiked.data[0]).not.toHaveProperty('watchCount');
   });
 });

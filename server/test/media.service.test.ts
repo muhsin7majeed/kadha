@@ -79,7 +79,11 @@ const createTv = (id: number) => ({
   original_name: `TV ${id}`,
 });
 
-const createInteraction = async (user: User, mediaId: number, flags: Partial<{ liked: boolean; watched: boolean; watchlist: boolean }>) => {
+const createInteraction = async (
+  user: User,
+  mediaId: number,
+  flags: Partial<{ liked: boolean; watched: boolean; watchlist: boolean }>,
+) => {
   await prisma.mediaSnapshot.create({
     data: {
       media_id: mediaId,
@@ -108,6 +112,12 @@ describe('media service', () => {
     const user = await createMediaUser('media-list-user');
 
     await createInteraction(user, 886101, { liked: true });
+    await prisma.watchEvent.createMany({
+      data: [
+        { userId: user.id, media_id: 886101, media_type: 'movie' },
+        { userId: user.id, media_id: 886101, media_type: 'movie' },
+      ],
+    });
     tmdbClient.fetchTrendingMovies.mockResolvedValue({
       page: 1,
       total_pages: 1,
@@ -125,6 +135,7 @@ describe('media service', () => {
         liked: true,
         watched: false,
         watchlist: false,
+        watchCount: 2,
       }),
     ]);
   });
@@ -152,6 +163,7 @@ describe('media service', () => {
     const user = await createMediaUser('media-details-user');
 
     await createInteraction(user, 886201, { watched: true });
+    await prisma.watchEvent.create({ data: { userId: user.id, media_id: 886201, media_type: 'movie' } });
     tmdbClient.fetchMediaDetails.mockResolvedValue(createMovieDetails(886201));
 
     const details = await mediaService.getMediaDetails(user.id, 'movie', '886201');
@@ -163,6 +175,7 @@ describe('media service', () => {
       liked: false,
       watchlist: false,
       title: 'Movie 886201',
+      watchCount: 1,
     });
 
     await expect(mediaService.getMediaDetails(user.id, 'book', '886201')).rejects.toMatchObject({

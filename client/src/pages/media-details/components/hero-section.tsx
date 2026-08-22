@@ -17,8 +17,9 @@ import type { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/m
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import useAddToWatchList from '@/features/user-media/api/use-add-to-watch-list';
 import type { MediaAction, TvProgressResponse } from '@/features/user-media/user-media.types';
-import MediaTrackingDetailsDialog from '@/features/user-media/components/media-tracking-details-dialog';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
+import WatchEventDialog from '@/features/user-media/components/watch-event-dialog';
+import useWatchEvents from '@/features/user-media/api/use-watch-events';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionStateLabel } from '@/features/user-media/utils/media-action-copy';
 import type { MediaTrackingDetailsUpdate } from '@/features/user-media/utils/media-tracking-details';
@@ -44,7 +45,7 @@ const HeroSection = ({
 }: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingAction, setTrackingAction] = useState<MediaAction | null>(null);
-  const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
+  const [watchEventOpen, setWatchEventOpen] = useState(false);
   const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
   const isMovie = data.media_type === 'movie';
   const title = data.media_type === 'movie' ? data.title : data.name;
@@ -54,8 +55,10 @@ const HeroSection = ({
   const mutedTextColor = 'fg.muted';
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
+  const watchHistory = useWatchEvents('movie', data.media_id, isMovie);
   const currentData = { ...data, ...savedDetails } as MovieDetailsWithMeta | TvDetailsWithMeta;
-  const mediaPayload = buildUserMediaPayload(currentData);
+  const watchCount = watchHistory.data?.watchCount ?? data.watchCount ?? (data.watched ? 1 : 0);
+  const mediaPayload = buildUserMediaPayload({ ...currentData, watched: watchCount > 0, watchCount });
 
   useEffect(() => {
     setSavedDetails({});
@@ -84,12 +87,7 @@ const HeroSection = ({
       return;
     }
 
-    if (!data.watched) {
-      setTrackingAction('watched');
-      return;
-    }
-
-    setTrackingDetailsOpen(true);
+    setWatchEventOpen(true);
   };
 
   const handleWatchlist = async () => {
@@ -128,14 +126,7 @@ const HeroSection = ({
           }}
         />
       )}
-      <MediaTrackingDetailsDialog
-        media={mediaPayload}
-        trackingState={currentData}
-        open={trackingDetailsOpen}
-        onOpenChange={setTrackingDetailsOpen}
-        onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
-        showTrigger={false}
-      />
+      {isMovie && <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />}
 
       <Box position="relative" overflow="hidden" bg="bg">
         {/* Backdrop Image */}
@@ -329,14 +320,16 @@ const HeroSection = ({
                 {getMediaActionStateLabel('liked', Boolean(data.liked))}
               </Button>
               <Button
-                variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : data.watched ? 'solid' : 'outline'}
+                variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : watchCount > 0 ? 'solid' : 'outline'}
                 colorPalette="blue"
                 onClick={handleWatched}
                 loading={!isMovie && (isTvProgressLoading || isMarkingNextEpisode)}
               >
-                <LuCheck />
+                {isMovie && watchCount > 0 ? <LuPlus /> : <LuCheck />}
                 {isMovie
-                  ? getMediaActionStateLabel('watched', Boolean(data.watched))
+                  ? watchCount > 0
+                    ? 'Log a rewatch'
+                    : 'Mark watched'
                   : getTvProgressPrimaryActionLabel(tvProgress)}
               </Button>
               <Button

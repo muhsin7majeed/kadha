@@ -13,6 +13,7 @@ import MediaTrackingDialog from './media-tracking-dialog';
 import RemoveWatchedDialog from './remove-watched-dialog';
 
 interface MediaTrackingDetailsDialogProps {
+  excludedActions?: MediaAction[];
   media: UserMediaPayload;
   onOpenChange?: (open: boolean) => void;
   onSaved?: (details: MediaTrackingDetailsUpdate) => void;
@@ -30,6 +31,7 @@ interface EditRequest {
 
 const MediaTrackingDetailsDialog = ({
   media,
+  excludedActions = [],
   onOpenChange,
   onSaved,
   open: controlledOpen,
@@ -56,7 +58,14 @@ const MediaTrackingDetailsDialog = ({
     setSavedDetails({});
   }, [media.media_id, media.media_type]);
 
-  if (!hasActiveMediaTracking(currentTrackingState)) return null;
+  const hasVisibleTracking =
+    Boolean(
+      (currentTrackingState.liked && !excludedActions.includes('liked')) ||
+      (currentTrackingState.watched && !excludedActions.includes('watched')) ||
+      (currentTrackingState.watchlist && !excludedActions.includes('watchlist')),
+    ) || currentTrackingState.rating != null;
+
+  if (!hasActiveMediaTracking(currentTrackingState) || !hasVisibleTracking) return null;
 
   const handleEdit = (action: MediaAction) => {
     setOpen(false);
@@ -97,12 +106,17 @@ const MediaTrackingDetailsDialog = ({
         }}
       >
         <MediaTrackingDetails
+          excludedActions={excludedActions}
           media={currentTrackingState}
           onEdit={handleEdit}
-          onRemoveWatched={() => {
-            setOpen(false);
-            setRemoveWatchedOpen(true);
-          }}
+          onRemoveWatched={
+            excludedActions.includes('watched')
+              ? undefined
+              : () => {
+                  setOpen(false);
+                  setRemoveWatchedOpen(true);
+                }
+          }
         />
       </SimpleDialog>
 

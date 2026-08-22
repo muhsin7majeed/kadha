@@ -10,6 +10,7 @@ const buildTrackingDetailsPayload = (media: UserMediaPayloadSource): Partial<Use
   ...(media.likedNote !== undefined ? { likedNote: media.likedNote } : {}),
   ...(media.watchedNote !== undefined ? { watchedNote: media.watchedNote } : {}),
   ...(media.watchlistNote !== undefined ? { watchlistNote: media.watchlistNote } : {}),
+  ...(media.watchCount !== undefined ? { watchCount: media.watchCount } : {}),
 });
 
 const buildBasePayload = (media: UserMediaPayloadSource): UserMediaPayload => {

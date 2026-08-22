@@ -16,6 +16,10 @@
   notes, and retry-safe creation without blocking intentional same-day rewatches.
 - Included the complete watch-event history in account exports while retaining the existing episode-watch export field
   for compatibility.
+- Added a private movie watch-history experience with first-watch and rewatch logging, per-viewing dates and notes,
+  watch counts, latest-watch summaries, and individual editing or removal.
+- Added compact watch-count badges and direct watch-history management to movie cards, while keeping overall ratings
+  title-level instead of duplicating them across rewatches.
 
 ### Engineering Changes
 

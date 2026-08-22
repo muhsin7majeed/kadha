@@ -41,11 +41,19 @@ describe('watch event routes', () => {
       ],
     });
 
+    await request(app)
+      .patch(`/api/user-media/watch-events/${response.body.data.events[1].id}`)
+      .set('Authorization', authorization(user))
+      .send({ watchedOn: '2026-01-14', note: 'Corrected first viewing.', rating: 7 })
+      .expect(200);
+
     const watched = await getCurrentUserMediaList(user, 'watched');
     expect(watched.data[0]).toMatchObject({
       media_id: mediaId,
       watched: true,
       watchlist: false,
+      watchCount: 2,
+      rating: 7,
       watchedOn: '2026-01-15',
       watchedNote: 'Immediate rewatch.',
     });

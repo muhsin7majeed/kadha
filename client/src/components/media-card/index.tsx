@@ -69,6 +69,12 @@ const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }:
             <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
               {media.media_type === 'movie' ? 'Movie' : 'TV'}
             </Badge>
+
+            {media.media_type === 'movie' && Boolean(media.watchCount) && (
+              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="solid" colorPalette="blue">
+                Watched ×{media.watchCount}
+              </Badge>
+            )}
           </VStack>
 
           <MediaActions media={media} size={{ mdDown: 'xs', md: 'md' }} />

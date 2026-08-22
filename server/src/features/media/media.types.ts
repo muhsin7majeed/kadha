@@ -294,6 +294,7 @@ export interface MediaMeta {
   likedNote?: string | null;
   watchedNote?: string | null;
   watchlistNote?: string | null;
+  watchCount?: number;
 }
 
 export type TMDBMovieWithMediaId = Omit<NormalizedTMDBMovie, 'id'> & {

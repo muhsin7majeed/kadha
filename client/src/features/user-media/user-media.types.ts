@@ -93,3 +93,38 @@ export interface TvInProgressSummary {
 export interface TvInProgressItem extends UserMedia {
   tvProgress: TvInProgressSummary;
 }
+
+export interface WatchEvent {
+  id: string;
+  media_id: number;
+  media_type: MediaType;
+  seasonNumber: number | null;
+  episodeNumber: number | null;
+  episodeId: number | null;
+  watchedAt: string;
+  watchedOn: string | null;
+  rating: number | null;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WatchHistory {
+  events: WatchEvent[];
+  watchCount: number;
+  lastWatchedAt: string | null;
+  lastWatchedOn: string | null;
+}
+
+export interface WatchEventDetails {
+  watchedOn: string | null;
+  note: string | null;
+  rating?: number | null;
+}
+
+export type CreateWatchEventPayload = UserMediaPayload &
+  WatchEventDetails & {
+    clientRequestId: string;
+  };
+
+export type UpdateWatchEventPayload = WatchEventDetails;

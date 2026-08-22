@@ -515,12 +515,32 @@ export async function getUserMediaByFlag(
     }),
     prisma.userMedia.count({ where }),
   ]);
+  const watchCounts = includePrivateTrackingDetails
+    ? await prisma.watchEvent.groupBy({
+        by: ['media_id', 'media_type'],
+        where: {
+          userId: id,
+          media_id: { in: data.map((item) => item.media_id) },
+          seasonNumber: null,
+          episodeNumber: null,
+        },
+        _count: { _all: true },
+      })
+    : [];
+  const watchCountByMedia = new Map(
+    watchCounts.map((item) => [`${item.media_type}:${item.media_id}`, item._count._all]),
+  );
 
   return {
     data: data.map((item) => {
       const formatted = formatUserMediaTrackingDetails(flattenMediaSnapshot(item));
 
-      return includePrivateTrackingDetails ? formatted : stripPrivateUserMediaTrackingDetails(formatted);
+      return includePrivateTrackingDetails
+        ? {
+            ...formatted,
+            watchCount: watchCountByMedia.get(`${item.media_type}:${item.media_id}`) ?? 0,
+          }
+        : stripPrivateUserMediaTrackingDetails(formatted);
     }),
     pagination: createPaginationMeta(page, limit, total),
   };

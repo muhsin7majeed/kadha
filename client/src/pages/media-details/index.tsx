@@ -9,6 +9,7 @@ import TvEpisodeProgressDialog from '@/features/user-media/components/tv-episode
 import useMarkNextEpisodeWatched from '@/features/user-media/api/use-mark-next-episode-watched';
 import useTvProgress from '@/features/user-media/api/use-tv-progress';
 import MediaTrackingSection from '@/features/user-media/components/media-tracking-section';
+import MovieWatchHistorySection from '@/features/user-media/components/movie-watch-history-section';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { toaster } from '@/components/ui/toaster-store';
 import HeroSection from './components/hero-section';
@@ -134,7 +135,10 @@ const MediaDetails = () => {
       {/* Main Content */}
       <Container maxW="6xl" py={8}>
         <VStack gap={10} align="stretch">
-          {mediaPayload && <MediaTrackingSection media={mediaPayload} trackingState={data} />}
+          {mediaPayload && data.media_type === 'movie' && <MovieWatchHistorySection media={mediaPayload} />}
+          {mediaPayload && (
+            <MediaTrackingSection media={mediaPayload} trackingState={data} hideWatched={data.media_type === 'movie'} />
+          )}
 
           {/* Overview */}
           <OverviewSection overview={data.overview} />

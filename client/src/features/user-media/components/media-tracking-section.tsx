@@ -9,11 +9,12 @@ import MediaTrackingDialog from './media-tracking-dialog';
 import RemoveWatchedDialog from './remove-watched-dialog';
 
 interface MediaTrackingSectionProps {
+  hideWatched?: boolean;
   media: UserMediaPayload;
   trackingState: MediaMeta;
 }
 
-const MediaTrackingSection = ({ media, trackingState }: MediaTrackingSectionProps) => {
+const MediaTrackingSection = ({ hideWatched = false, media, trackingState }: MediaTrackingSectionProps) => {
   const [editAction, setEditAction] = useState<MediaAction | null>(null);
   const [removeWatchedOpen, setRemoveWatchedOpen] = useState(false);
   const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
@@ -24,7 +25,12 @@ const MediaTrackingSection = ({ media, trackingState }: MediaTrackingSectionProp
     setSavedDetails({});
   }, [media.media_id, media.media_type]);
 
-  if (!hasActiveMediaTracking(currentTrackingState)) return null;
+  const hasVisibleTracking =
+    Boolean(
+      currentTrackingState.liked || currentTrackingState.watchlist || (!hideWatched && currentTrackingState.watched),
+    ) || currentTrackingState.rating != null;
+
+  if (!hasActiveMediaTracking(currentTrackingState) || !hasVisibleTracking) return null;
 
   return (
     <>
@@ -33,6 +39,7 @@ const MediaTrackingSection = ({ media, trackingState }: MediaTrackingSectionProp
           Your tracking
         </Heading>
         <MediaTrackingDetails
+          excludedActions={hideWatched ? ['watched'] : []}
           media={currentTrackingState}
           onEdit={setEditAction}
           onRemoveWatched={() => setRemoveWatchedOpen(true)}

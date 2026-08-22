@@ -101,7 +101,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ### Media Tracking
 
-- [ ] Add movie watch-history management to the media details experience, including explicit rewatch logging and
+- [x] Add movie watch-history management to the media details experience, including explicit rewatch logging and
   individual event editing and removal.
 
 ### Social

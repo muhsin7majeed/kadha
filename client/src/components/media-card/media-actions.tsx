@@ -11,6 +11,8 @@ import useAddToWatched from '@/features/user-media/api/use-add-to-watched';
 import useAddToLiked from '@/features/user-media/api/use-add-to-liked';
 import MediaTrackingDetailsDialog from '@/features/user-media/components/media-tracking-details-dialog';
 import MediaTrackingDialog from '@/features/user-media/components/media-tracking-dialog';
+import MovieWatchHistoryDialog from '@/features/user-media/components/movie-watch-history-dialog';
+import WatchEventDialog from '@/features/user-media/components/watch-event-dialog';
 import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
@@ -57,6 +59,8 @@ const MediaActionIconButton = ({
 const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
+  const [watchHistoryOpen, setWatchHistoryOpen] = useState(false);
+  const [watchEventOpen, setWatchEventOpen] = useState(false);
   const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
   const [trackingDialog, setTrackingDialog] = useState<{
     action: MediaAction;
@@ -80,7 +84,14 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
     getToastAction: getDetailsToastAction('liked', 'Add details'),
   });
   const likeLabel = getMediaActionLabel('liked', Boolean(media.liked));
-  const watchedLabel = media.watched ? 'Manage watched tracking' : getMediaActionLabel('watched', false);
+  const watchedLabel =
+    media.media_type === 'movie'
+      ? media.watchCount || media.watched
+        ? 'Manage watch history'
+        : 'Mark watched'
+      : media.watched
+        ? 'Manage watched tracking'
+        : getMediaActionLabel('watched', false);
   const watchlistLabel = getMediaActionLabel('watchlist', Boolean(media.watchlist));
   const collectionLabel = 'Add to collection';
   const currentMedia = useMemo(() => ({ ...media, ...savedDetails }), [media, savedDetails]);
@@ -100,6 +111,15 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
 
   const handleWatched = async () => {
     if (isAddingToWatched) return;
+
+    if (media.media_type === 'movie') {
+      if (media.watchCount || media.watched) {
+        setWatchHistoryOpen(true);
+      } else {
+        setWatchEventOpen(true);
+      }
+      return;
+    }
 
     if (media.watched) {
       setTrackingDetailsOpen(true);
@@ -145,6 +165,12 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
           }}
         />
       )}
+      {media.media_type === 'movie' && (
+        <>
+          <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />
+          <MovieWatchHistoryDialog media={mediaPayload} open={watchHistoryOpen} onOpenChange={setWatchHistoryOpen} />
+        </>
+      )}
 
       <VStack gap={{ base: 0.5, md: 1 }} backdropFilter="blur(10px)" p={{ base: 0.5, md: 1 }} borderRadius="full">
         <MediaActionIconButton
@@ -162,9 +188,13 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
           colorPalette="blue"
           size={size}
           onClick={handleWatched}
-          loading={isAddingToWatched}
+          loading={media.media_type === 'tv' && isAddingToWatched}
         >
-          {media.watched ? <LuCheck fill="blue" /> : <LuEye />}
+          {media.watched || Boolean(media.watchCount) ? (
+            <LuCheck fill="blue" />
+          ) : (
+            <LuEye />
+          )}
         </MediaActionIconButton>
 
         <MediaActionIconButton
@@ -178,6 +208,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
         </MediaActionIconButton>
 
         <MediaTrackingDetailsDialog
+          excludedActions={media.media_type === 'movie' ? ['watched'] : []}
           media={mediaPayload}
           trackingState={media}
           size={size}

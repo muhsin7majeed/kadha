@@ -22,9 +22,28 @@ vi.mock('@/features/collections/components/add-to-collection-dialog', () => ({
 }));
 
 const mutationMocks = vi.hoisted(() => ({
+  createEvent: vi.fn(),
+  deleteEvent: vi.fn(),
   liked: vi.fn(),
+  updateEvent: vi.fn(),
   watched: vi.fn(),
   watchlist: vi.fn(),
+}));
+
+vi.mock('@/features/user-media/api/use-watch-events', () => ({
+  default: () => ({
+    data: { events: [], watchCount: 1, lastWatchedAt: null, lastWatchedOn: null },
+    isError: false,
+    isFetching: false,
+    isLoading: false,
+    refetch: vi.fn(),
+  }),
+}));
+
+vi.mock('@/features/user-media/api/use-watch-event-mutations', () => ({
+  useCreateWatchEvent: () => ({ mutateAsync: mutationMocks.createEvent, isPending: false }),
+  useDeleteWatchEvent: () => ({ mutateAsync: mutationMocks.deleteEvent, isPending: false }),
+  useUpdateWatchEvent: () => ({ mutateAsync: mutationMocks.updateEvent, isPending: false }),
 }));
 
 vi.mock('@/features/user-media/api/use-add-to-liked', () => ({
@@ -130,16 +149,16 @@ describe('MediaTrackingDetails', () => {
     expect(await screen.findByRole('dialog', { name: 'Your tracking' })).toBeInTheDocument();
   });
 
-  it('opens management instead of removing watched status from a media card', async () => {
+  it('opens watch history instead of removing watched status from a movie card', async () => {
     const user = userEvent.setup();
     const trackingState = createPayload({ watched: true });
 
     renderWithProviders(<MediaActions media={trackingState} />);
 
-    await user.click(screen.getByRole('button', { name: 'Manage watched tracking' }));
+    await user.click(screen.getByRole('button', { name: 'Manage watch history' }));
 
     expect(mutationMocks.watched).not.toHaveBeenCalled();
-    expect(screen.getByRole('dialog', { name: 'Your tracking' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Watch history' })).toBeInTheDocument();
   });
 
   it('requires confirmation before removing watched status', async () => {

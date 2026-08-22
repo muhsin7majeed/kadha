@@ -8,9 +8,23 @@ import { renderWithProviders } from '@/test/render';
 import HeroSection from './hero-section';
 
 const mutationMocks = vi.hoisted(() => ({
+  createEvent: vi.fn(),
   liked: vi.fn(),
+  updateEvent: vi.fn(),
   watched: vi.fn(),
   watchlist: vi.fn(),
+}));
+
+vi.mock('@/features/user-media/api/use-watch-events', () => ({
+  default: () => ({
+    data: { events: [], watchCount: 1, lastWatchedAt: '2026-08-20T10:00:00.000Z', lastWatchedOn: '2026-08-20' },
+    isLoading: false,
+  }),
+}));
+
+vi.mock('@/features/user-media/api/use-watch-event-mutations', () => ({
+  useCreateWatchEvent: () => ({ mutateAsync: mutationMocks.createEvent, isPending: false }),
+  useUpdateWatchEvent: () => ({ mutateAsync: mutationMocks.updateEvent, isPending: false }),
 }));
 
 vi.mock('@/features/collections/components/add-to-collection-dialog', () => ({
@@ -119,15 +133,15 @@ describe('HeroSection watched action', () => {
     vi.clearAllMocks();
   });
 
-  it('opens tracking management for an already watched movie', async () => {
+  it('opens the rewatch form for an already watched movie', async () => {
     const user = userEvent.setup();
 
     renderWithProviders(<HeroSection data={movie} />);
 
-    await user.click(screen.getByRole('button', { name: 'Watched' }));
+    await user.click(screen.getByRole('button', { name: 'Log a rewatch' }));
 
     expect(mutationMocks.watched).not.toHaveBeenCalled();
-    expect(screen.getByRole('dialog', { name: 'Your tracking' })).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Log a rewatch' })).toBeInTheDocument();
   });
 
   it('keeps the mark-next-episode behavior for TV progress', async () => {

@@ -5,9 +5,10 @@ import { LuBookmark, LuCalendar, LuEye, LuHeart, LuLock, LuPencil, LuStar } from
 import type { MediaMeta } from '@/types/common';
 import { formatDate } from '@/utils/date';
 import type { MediaAction } from '../user-media.types';
-import { getMediaTrackingNote, hasMediaTrackingDetails } from '../utils/media-tracking-details';
+import { getMediaTrackingNote } from '../utils/media-tracking-details';
 
 interface MediaTrackingDetailsProps {
+  excludedActions?: MediaAction[];
   media: MediaMeta;
   onEdit: (action: MediaAction) => void;
   onRemoveWatched?: () => void;
@@ -39,14 +40,19 @@ const formatRating = (rating: number) => {
   return `${Number.isInteger(stars) ? stars.toFixed(0) : stars.toFixed(1)} out of 5`;
 };
 
-const MediaTrackingDetails = ({ media, onEdit, onRemoveWatched }: MediaTrackingDetailsProps) => {
-  const activeActions = getActiveActions(media);
+const MediaTrackingDetails = ({ excludedActions = [], media, onEdit, onRemoveWatched }: MediaTrackingDetailsProps) => {
+  const activeActions = getActiveActions(media).filter(({ action }) => !excludedActions.includes(action));
+  const showWatchedDetails = !excludedActions.includes('watched');
   const notes = activeActions
     .map((config) => ({
       ...config,
       note: getMediaTrackingNote(media, config.action),
     }))
     .filter(({ note }) => Boolean(note));
+  const hasVisibleDetails =
+    (media.rating != null && (media.liked || media.watched)) ||
+    Boolean(showWatchedDetails && media.watched && media.watchedOn) ||
+    notes.length > 0;
 
   return (
     <Stack gap="5">
@@ -64,13 +70,13 @@ const MediaTrackingDetails = ({ media, onEdit, onRemoveWatched }: MediaTrackingD
         ))}
       </HStack>
 
-      {!hasMediaTrackingDetails(media) && (
+      {!hasVisibleDetails && (
         <Text textStyle="body" color="fg.muted">
           Add a rating, watched date, or private note.
         </Text>
       )}
 
-      {(media.rating != null || (media.watched && media.watchedOn)) && (
+      {(media.rating != null || (showWatchedDetails && media.watched && media.watchedOn)) && (
         <SimpleGrid columns={{ base: 1, sm: 2 }} gap="3">
           {media.rating != null && (media.liked || media.watched) && (
             <VStack align="start" gap="1" p="4" bg="bg.subtle" borderRadius="lg">
@@ -86,7 +92,7 @@ const MediaTrackingDetails = ({ media, onEdit, onRemoveWatched }: MediaTrackingD
             </VStack>
           )}
 
-          {media.watched && media.watchedOn && (
+          {showWatchedDetails && media.watched && media.watchedOn && (
             <VStack align="start" gap="1" p="4" bg="bg.subtle" borderRadius="lg">
               <Text textStyle="compactLabel" color="fg.muted">
                 Watched on
@@ -124,7 +130,7 @@ const MediaTrackingDetails = ({ media, onEdit, onRemoveWatched }: MediaTrackingD
             Edit {label.toLowerCase()} details
           </Button>
         ))}
-        {media.watched && onRemoveWatched && (
+        {showWatchedDetails && media.watched && onRemoveWatched && (
           <Button size="sm" variant="outline" colorPalette="red" onClick={onRemoveWatched}>
             Mark unwatched
           </Button>

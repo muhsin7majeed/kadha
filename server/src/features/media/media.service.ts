@@ -107,8 +107,22 @@ const enrichMediaWithUserInteractions = async (
       media_type: { in: mediaTypes },
     },
   });
+  const watchEventCounts = await prisma.watchEvent.groupBy({
+    by: ['media_id', 'media_type'],
+    where: {
+      userId,
+      media_id: { in: mediaIds },
+      media_type: { in: mediaTypes },
+      seasonNumber: null,
+      episodeNumber: null,
+    },
+    _count: { _all: true },
+  });
 
   const map = new Map<string, (typeof interactions)[number]>();
+  const watchCountMap = new Map(
+    watchEventCounts.map((item) => [interactionKey(item.media_type, item.media_id), item._count._all]),
+  );
 
   interactions.forEach((i) => {
     map.set(interactionKey(i.media_type, i.media_id), i);
@@ -124,6 +138,8 @@ const enrichMediaWithUserInteractions = async (
       liked: interaction?.liked ?? false,
       watched: interaction?.watched ?? false,
       watchlist: interaction?.watchlist ?? false,
+      watchCount: watchCountMap.get(interactionKey(m.media_type, id)) ?? 0,
+      ...pickUserMediaTrackingDetails(interaction),
     };
   });
 
@@ -165,13 +181,24 @@ export async function getMediaDetails(userId: string, mediaType: string, id: str
   const mediaId = parseMediaId(id);
   const response = await fetchMediaDetails(validMediaType, mediaId);
 
-  const interactions = await prisma.userMedia.findFirst({
-    where: {
-      userId,
-      media_id: mediaId,
-      media_type: validMediaType,
-    },
-  });
+  const [interactions, watchCount] = await prisma.$transaction([
+    prisma.userMedia.findFirst({
+      where: {
+        userId,
+        media_id: mediaId,
+        media_type: validMediaType,
+      },
+    }),
+    prisma.watchEvent.count({
+      where: {
+        userId,
+        media_id: mediaId,
+        media_type: validMediaType,
+        seasonNumber: null,
+        episodeNumber: null,
+      },
+    }),
+  ]);
 
   const { id: responseMediaId, ...rest } = response;
 
@@ -182,6 +209,7 @@ export async function getMediaDetails(userId: string, mediaType: string, id: str
     liked: interactions?.liked ?? false,
     watched: interactions?.watched ?? false,
     watchlist: interactions?.watchlist ?? false,
+    watchCount,
     ...pickUserMediaTrackingDetails(interactions),
   } as TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta;
 }

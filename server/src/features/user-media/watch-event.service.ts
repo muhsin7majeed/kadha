@@ -229,7 +229,7 @@ export async function updateWatchEvent(userId: string, eventId: string, payload:
       });
       const isLatest = latest?.id === eventId;
 
-      if (isLatest) {
+      if (isLatest || hasKey(payload, 'rating')) {
         await tx.userMedia.update({
           where: {
             userId_media_id_media_type: {
@@ -239,8 +239,7 @@ export async function updateWatchEvent(userId: string, eventId: string, payload:
             },
           },
           data: {
-            watchedOn,
-            watchedNote: note,
+            ...(isLatest ? { watchedOn, watchedNote: note } : {}),
             ...(hasKey(payload, 'rating')
               ? {
                   rating: payload.rating ?? null,

@@ -31,6 +31,7 @@ const getTrackingMeta = (media: MediaMeta): MediaMeta => ({
   likedNote: media.likedNote,
   watchedNote: media.watchedNote,
   watchlistNote: media.watchlistNote,
+  watchCount: media.watchCount,
 });
 
 export const movieToMediaCardModel = (movie: MovieWithMeta): MediaCardModel => ({

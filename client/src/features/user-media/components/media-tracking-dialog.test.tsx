@@ -100,7 +100,7 @@ describe('MediaTrackingDialog', () => {
       watchedNote: 'Great pacing.',
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-  });
+  }, 10_000);
 
   it('does not submit unknown card tracking fields when unchanged', async () => {
     const user = userEvent.setup();

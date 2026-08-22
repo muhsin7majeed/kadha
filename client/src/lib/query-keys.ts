@@ -102,6 +102,8 @@ export const userMediaQueryKeys = {
     ['tv-progress', mediaId, seasonNumber, includeSpecials] as const,
   watched: ['watched'] as const,
   watchList: ['watch-list'] as const,
+  watchEvents: ['watch-events'] as const,
+  watchEventsByMedia: (mediaType?: MediaType, mediaId?: number) => ['watch-events', mediaType, mediaId] as const,
 };
 
 export const queryKeys = {
