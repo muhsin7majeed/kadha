@@ -1,4 +1,4 @@
-import { LuBrain, LuChartBar, LuDownload, LuLink, LuSparkles, LuUsers } from 'react-icons/lu';
+import { LuBrain, LuChartBar, LuDownload, LuSparkles, LuUsers } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
   {
@@ -21,22 +21,16 @@ const UPCOMING_FEATURES = [
     badge: 'Social',
   },
   {
-    icon: LuLink,
-    title: 'Public Collection Links',
-    description: 'Share selected collections with public links while keeping private lists private.',
-    badge: 'Sharing',
-  },
-  {
     icon: LuDownload,
     title: 'Data Import',
     description:
-      'Bring your existing history into Kadha. A JSON export is available today; episode-history export is still planned.',
+      'Bring your existing history into Kadha with validation, preview, idempotency, and conflict handling.',
     badge: 'Data',
   },
   {
     icon: LuChartBar,
-    title: 'Watch Statistics',
-    description: 'See your viewing habits. How many hours of your life went to TV? Find out (if you dare).',
+    title: 'Watch Trends',
+    description: 'Add watch-history totals, time-watched estimates, and deeper TV viewing-pattern insights.',
     badge: 'Insights',
   },
 ];

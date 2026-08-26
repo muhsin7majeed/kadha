@@ -1,4 +1,15 @@
-import { LuBookmark, LuCheck, LuClapperboard, LuHeart, LuLock, LuSparkles, LuServer, LuUsers } from 'react-icons/lu';
+import {
+  LuBookmark,
+  LuChartBar,
+  LuCheck,
+  LuClapperboard,
+  LuHeart,
+  LuLink,
+  LuLock,
+  LuSparkles,
+  LuServer,
+  LuUsers,
+} from 'react-icons/lu';
 
 const CURRENT_FEATURES = [
   {
@@ -27,6 +38,18 @@ const CURRENT_FEATURES = [
     title: 'Custom Collections',
     description: 'Create themed lists like "Comfort Movies", "Date Night", or anything else you want to organize.',
     badge: 'Organization',
+  },
+  {
+    icon: LuLink,
+    title: 'Public Collection Links',
+    description: 'Share selected collections with read-only public links while keeping private lists private.',
+    badge: 'Sharing',
+  },
+  {
+    icon: LuChartBar,
+    title: 'Viewing Insights',
+    description: 'Review private profile insights for watched totals, ratings, genres, people, and media breakdowns.',
+    badge: 'Insights',
   },
   {
     icon: LuServer,

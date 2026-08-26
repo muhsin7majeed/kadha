@@ -12,6 +12,10 @@
   respect the collection owner's visibility setting.
 - Added native device sharing from collection access dialogs while keeping copy-link available.
 
+#### Product Information
+
+- Updated the landing page feature lists so shipped public collection links and viewing insights are listed as available today.
+
 #### Media Tracking
 
 - Kept personal tracking management available on cards and media detail pages for liked, watched, and watchlisted
