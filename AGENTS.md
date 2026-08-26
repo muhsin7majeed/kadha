@@ -92,7 +92,6 @@ server/src/features/media/
 
 - Before making changes, read `CHANGELOG.md` when it exists so you understand the latest user-facing and engineering changes.
 - Update `CHANGELOG.md` for user-visible feature changes, engineering-significant changes, dependency or deployment changes, database migrations, and behavior fixes that end users or maintainers should know about.
-- When `CHANGELOG.md` changes, run `cd client && npm run sync:changelog` so the in-app changelog stays current.
 - Keep the top changelog section focused on end-user feature changes, then include engineering notes below it.
 - Keep `README.md` aligned with setup, deployment, and operations changes.
 - Keep `docs/project-structure.md` aligned when changing architectural boundaries or placement rules.
@@ -107,8 +106,8 @@ server/src/features/media/
 - Do not cut a release without explicit user approval.
 - When cutting a release:
   - Run `node scripts/prepare-release.mjs X.Y.Z` from the repository root, using a SemVer version without a leading `v`.
-  - The release script renames the current `## Unreleased` content to `## vX.Y.Z`, creates a fresh `## Unreleased` section, bumps client and server package versions and lockfile root versions, and syncs the generated in-app changelog.
-  - Review the generated diff before committing and make sure `CHANGELOG.md`, `client/src/generated/changelog.ts`, and client/server package files are consistent.
+  - The release script renames the current `## Unreleased` content to `## vX.Y.Z`, creates a fresh `## Unreleased` section, and bumps client and server package versions and lockfile root versions.
+  - Review the generated diff before committing and make sure `CHANGELOG.md` and client/server package files are consistent.
   - Run the relevant build, lint, or test commands.
   - Commit the version and changelog updates as a release commit, such as `Release vX.Y.Z`.
   - Tag the release commit as `vX.Y.Z` and push `master` with tags. The GitHub Release workflow creates a release from the matching `CHANGELOG.md` section when the tag is pushed.

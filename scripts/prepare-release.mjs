@@ -1,5 +1,4 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -68,18 +67,6 @@ const updateChangelog = () => {
   writeFileSync(paths.changelog, updated);
 };
 
-const syncChangelog = () => {
-  const result = spawnSync('npm', ['run', 'sync:changelog'], {
-    cwd: path.join(repoRoot, 'client'),
-    stdio: 'inherit',
-    shell: false,
-  });
-
-  if (result.status !== 0) {
-    throw new Error('Failed to sync the client changelog.');
-  }
-};
-
 for (const filePath of Object.values(paths)) {
   if (!existsSync(filePath)) {
     throw new Error(`Expected file not found: ${path.relative(repoRoot, filePath)}`);
@@ -91,6 +78,5 @@ setPackageLockVersion(paths.clientLock);
 setPackageVersion(paths.serverPackage);
 setPackageLockVersion(paths.serverLock);
 updateChangelog();
-syncChangelog();
 
 console.log(`Prepared Kadha v${version}. Review the diff, then commit and tag the release.`);

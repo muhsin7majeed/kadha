@@ -5,8 +5,6 @@ import useLogout from '@/features/auth/api/use-logout';
 import { useState } from 'react';
 import ConfirmationDialog from '../dialogs/confirmation-dialog';
 import { LuBell, LuLayoutDashboard, LuLogOut, LuUser, LuUsers } from 'react-icons/lu';
-import { APP_CONFIG } from '@/config/app-config';
-import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import UtilityMenuItems, { MenuSectionSeparator } from './utility-menu-items';
 import { UserRole } from '@/types/common';
 import { useAuth } from '@/features/auth/use-auth';
@@ -14,7 +12,6 @@ import { clearSession } from '@/features/auth/session';
 
 const ProfileMenu = () => {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
-  const [showChangelog, setShowChangelog] = useState(false);
 
   const auth = useAuth();
   const isAdmin = auth.user?.role === UserRole.Admin;
@@ -50,8 +47,6 @@ const ProfileMenu = () => {
         cancelButtonText="Cancel"
         confirmButtonProps={{ colorPalette: 'red' }}
       />
-
-      <ChangelogDialog version={APP_CONFIG.version} open={showChangelog} onOpenChange={setShowChangelog} />
 
       <Menu.Root>
         <Menu.Trigger asChild>
@@ -91,7 +86,7 @@ const ProfileMenu = () => {
 
               <MenuSectionSeparator />
 
-              <UtilityMenuItems onOpenChangelog={() => setShowChangelog(true)} settingsPath="/app/settings" />
+              <UtilityMenuItems settingsPath="/app/settings" />
 
               <MenuSectionSeparator />
 

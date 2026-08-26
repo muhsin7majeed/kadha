@@ -15,6 +15,7 @@
 #### Product Information
 
 - Updated the landing page feature lists so shipped public collection links and viewing insights are listed as available today.
+- Replaced the in-app changelog dialog with a GitHub Releases link from the version menu item.
 
 #### Media Tracking
 
@@ -34,6 +35,10 @@
   title-level instead of duplicating them across rewatches.
 
 ### Engineering Changes
+
+#### Release Workflow
+
+- Removed the generated client changelog sync step from local development, builds, and release preparation.
 
 #### Media Tracking
 

@@ -1,9 +1,7 @@
-import { useState } from 'react';
 import { Box, Button, Container, Flex, Heading, HStack, Icon, IconButton, Menu, Portal } from '@chakra-ui/react';
 import { LuMenu, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { APP_CONFIG } from '@/config/app-config';
-import ChangelogDialog from '@/features/changelog/changelog-dialog';
 import GlobalSearchDialog from '@/features/search/global-search-dialog';
 import { useAuth } from '@/features/auth/use-auth';
 
@@ -12,28 +10,22 @@ import ProfileMenu from './profile-menu';
 import UtilityMenuItems from './utility-menu-items';
 
 const UtilityMenu = () => {
-  const [showChangelog, setShowChangelog] = useState(false);
-
   return (
-    <>
-      <ChangelogDialog version={APP_CONFIG.version} open={showChangelog} onOpenChange={setShowChangelog} />
+    <Menu.Root>
+      <Menu.Trigger asChild>
+        <IconButton variant="ghost" size="sm" aria-label="Open menu">
+          <LuMenu />
+        </IconButton>
+      </Menu.Trigger>
 
-      <Menu.Root>
-        <Menu.Trigger asChild>
-          <IconButton variant="ghost" size="sm" aria-label="Open menu">
-            <LuMenu />
-          </IconButton>
-        </Menu.Trigger>
-
-        <Portal>
-          <Menu.Positioner>
-            <Menu.Content>
-              <UtilityMenuItems onOpenChangelog={() => setShowChangelog(true)} />
-            </Menu.Content>
-          </Menu.Positioner>
-        </Portal>
-      </Menu.Root>
-    </>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content>
+            <UtilityMenuItems />
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu.Root>
   );
 };
 

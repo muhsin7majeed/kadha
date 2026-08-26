@@ -481,7 +481,7 @@ Keep upcoming changes under `## Unreleased` in `CHANGELOG.md`. When you are read
 node scripts/prepare-release.mjs 0.1.5
 ```
 
-The script updates the client and server package versions, lockfile root versions, the frontend fallback app version, `CHANGELOG.md`, and the generated in-app changelog. Review the diff, run the relevant Docker Compose build, lint, or test commands, then commit and tag:
+The script updates the client and server package versions, lockfile root versions, the frontend fallback app version, and `CHANGELOG.md`. Review the diff, run the relevant Docker Compose build, lint, or test commands, then commit and tag:
 
 ```bash
 git add CHANGELOG.md client server scripts README.md

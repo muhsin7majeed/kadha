@@ -7,13 +7,12 @@ import { useColorMode } from '@/components/ui/color-mode-hooks';
 import PwaInstallMenuItem from '@/features/pwa/pwa-install-menu-item';
 
 interface UtilityMenuItemsProps {
-  onOpenChangelog: () => void;
   settingsPath?: string;
 }
 
 export const MenuSectionSeparator = () => <Box borderTopWidth="1px" borderColor="border" my={1} />;
 
-const UtilityMenuItems = ({ onOpenChangelog, settingsPath = '/settings' }: UtilityMenuItemsProps) => {
+const UtilityMenuItems = ({ settingsPath = '/settings' }: UtilityMenuItemsProps) => {
   const { toggleColorMode, colorMode } = useColorMode();
 
   return (
@@ -31,12 +30,10 @@ const UtilityMenuItems = ({ onOpenChangelog, settingsPath = '/settings' }: Utili
 
       <PwaInstallMenuItem />
 
-      <Menu.Item
-        value="changelog"
-        onClick={onOpenChangelog}
-        aria-label={`View changelog for Kadha version ${APP_CONFIG.version}`}
-      >
-        <LuInfo /> Version v{APP_CONFIG.version}
+      <Menu.Item value="release-notes" asChild>
+        <a href={`${APP_CONFIG.githubUrl}/releases`} target="_blank" rel="noopener noreferrer">
+          <LuInfo /> Version v{APP_CONFIG.version}
+        </a>
       </Menu.Item>
 
       <Menu.Item value="github" asChild>

@@ -92,7 +92,6 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [ ] Add end-to-end smoke coverage for authentication, media tracking, collection permissions, and privacy.
 - [ ] Document and verify upgrades from existing SQLite databases.
 - [ ] Measure client startup and home-page performance, then set a practical bundle budget.
-- [ ] Make CI verify that the root and generated in-app changelogs are synchronized.
 
 ### Data Ownership
 
