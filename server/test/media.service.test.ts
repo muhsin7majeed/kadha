@@ -188,6 +188,22 @@ describe('media service', () => {
     });
   });
 
+  it('returns media details without interaction state for anonymous viewers', async () => {
+    tmdbClient.fetchMediaDetails.mockResolvedValue(createMovieDetails(886202));
+
+    const details = await mediaService.getMediaDetails(undefined, 'movie', '886202');
+
+    expect(details).toMatchObject({
+      media_id: 886202,
+      media_type: 'movie',
+      watched: false,
+      liked: false,
+      watchlist: false,
+      title: 'Movie 886202',
+      watchCount: 0,
+    });
+  });
+
   it('normalizes watch providers using the user watch region', async () => {
     const user = await createMediaUser('watch-provider-user', 'GB');
 

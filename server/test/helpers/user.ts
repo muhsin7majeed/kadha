@@ -3,7 +3,7 @@ import request from 'supertest';
 import { getTestApp } from './app';
 import { authorization, TestUser } from './auth';
 
-export type TestDataPrivacy = 'ONLY_ME' | 'FRIENDS' | 'EVERYONE';
+export type TestDataPrivacy = 'ONLY_ME' | 'FRIENDS' | 'KADHA_USERS' | 'PUBLIC';
 
 interface UpdateUserPrivacyOptions {
   profilePrivacy?: TestDataPrivacy;
@@ -19,7 +19,7 @@ export interface UserProfileResponseBody {
   friendshipStatus: string;
   access: {
     canView: boolean;
-    lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY';
+    lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY' | 'SIGN_IN_REQUIRED';
   };
   sections: {
     watched: boolean;
@@ -35,7 +35,7 @@ export const updateUserPrivacy = async (user: TestUser, options: UpdateUserPriva
     .set('Authorization', authorization(user))
     .send({
       username: user.username,
-      profilePrivacy: options.profilePrivacy ?? 'EVERYONE',
+      profilePrivacy: options.profilePrivacy ?? 'KADHA_USERS',
       watchedPrivacy: options.watchedPrivacy ?? 'FRIENDS',
       likedPrivacy: options.likedPrivacy ?? 'FRIENDS',
       watchlistPrivacy: options.watchlistPrivacy ?? 'ONLY_ME',

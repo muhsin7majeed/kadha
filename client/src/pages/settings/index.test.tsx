@@ -28,7 +28,7 @@ const me: User = {
   id: 'user-1',
   username: 'movie-fan',
   role: UserRole.User,
-  profilePrivacy: DataPrivacy.Everyone,
+  profilePrivacy: DataPrivacy.KadhaUsers,
   watchedPrivacy: DataPrivacy.Friends,
   likedPrivacy: DataPrivacy.Friends,
   watchlistPrivacy: DataPrivacy.OnlyMe,

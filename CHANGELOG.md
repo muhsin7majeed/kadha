@@ -4,6 +4,14 @@
 
 ### Feature Changes
 
+#### Privacy And Sharing
+
+- Added owner-controlled public read visibility with separate options for anyone on the web, signed-in Kadha users,
+  friends, and only me.
+- Added public read-only profile, media detail, and collection routes, including shareable collection links that still
+  respect the collection owner's visibility setting.
+- Added native device sharing from collection access dialogs while keeping copy-link available.
+
 #### Media Tracking
 
 - Kept personal tracking management available on cards and media detail pages for liked, watched, and watchlisted

@@ -30,19 +30,15 @@ const isAccessTokenPayload = (value: string | jwt.JwtPayload): value is AccessTo
   );
 };
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-
-  // Check if Authorization header exists and follows Bearer token format
+const getUserFromAuthHeader = async (authHeader?: string) => {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(unauthorized());
+    return null;
   }
 
-  // Extract token from "Bearer <token>" format (standard RFC 6750)
   const token = authHeader.split(' ')[1];
 
   if (!token) {
-    return next(unauthorized());
+    return null;
   }
 
   let decoded: string | jwt.JwtPayload;
@@ -50,11 +46,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   try {
     decoded = jwt.verify(token, envConfig.jwtAccessSecret);
   } catch {
-    return next(unauthorized());
+    return null;
   }
 
   if (!isAccessTokenPayload(decoded)) {
-    return next(unauthorized());
+    return null;
   }
 
   const user = await prisma.user.findUnique({
@@ -67,13 +63,33 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   });
 
   if (!user || (decoded.sessionVersion ?? 0) !== user.sessionVersion) {
-    return next(unauthorized());
+    return null;
   }
 
-  req.user = {
+  return {
     id: user.id,
     username: user.username,
   };
+};
+
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  const user = await getUserFromAuthHeader(req.headers.authorization);
+
+  if (!user) {
+    return next(unauthorized());
+  }
+
+  req.user = user;
+
+  return next();
+};
+
+export const optionalAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  const user = await getUserFromAuthHeader(req.headers.authorization);
+
+  if (user) {
+    req.user = user;
+  }
 
   return next();
 };

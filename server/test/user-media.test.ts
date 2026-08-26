@@ -244,8 +244,8 @@ describe('user media routes', () => {
     const mediaId = 881801;
 
     await updateUserPrivacy(owner, {
-      profilePrivacy: 'EVERYONE',
-      likedPrivacy: 'EVERYONE',
+      profilePrivacy: 'KADHA_USERS',
+      likedPrivacy: 'KADHA_USERS',
     });
     await updateUserMediaFlag(owner, 'liked', true, mediaId, {
       rating: 10,

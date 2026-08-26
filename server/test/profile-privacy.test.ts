@@ -1,9 +1,11 @@
+import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
 import { registerTestUser } from './helpers/auth';
 import { createAcceptedFriendship } from './helpers/friendship';
 import { getUserProfile, updateUserPrivacy } from './helpers/user';
 import { getUserMediaListByUsername, updateUserMediaFlag } from './helpers/user-media';
+import { getTestApp } from './helpers/app';
 
 describe('profile privacy routes', () => {
   it('lets owners view their own private profile and media', async () => {
@@ -133,14 +135,14 @@ describe('profile privacy routes', () => {
     });
   });
 
-  it('lets anyone view everyone-visible profile and media', async () => {
+  it('lets signed-in Kadha users view Kadha-users-visible profile and media', async () => {
     const owner = await registerTestUser('everyone-owner');
     const viewer = await registerTestUser('everyone-viewer');
     const mediaId = 882501;
 
     await updateUserPrivacy(owner, {
-      profilePrivacy: 'EVERYONE',
-      likedPrivacy: 'EVERYONE',
+      profilePrivacy: 'KADHA_USERS',
+      likedPrivacy: 'KADHA_USERS',
     });
     await updateUserMediaFlag(owner, 'liked', true, mediaId);
 
@@ -158,6 +160,61 @@ describe('profile privacy routes', () => {
     expect(liked.access).toEqual({ canView: true });
     expect(liked.pagination.total).toBe(1);
     expect(liked.data[0]).toMatchObject({
+      media_id: mediaId,
+      liked: true,
+    });
+  });
+
+  it('requires anonymous viewers to sign in for Kadha-users-visible media', async () => {
+    const owner = await registerTestUser('kadha-users-public-owner');
+
+    await updateUserPrivacy(owner, {
+      profilePrivacy: 'KADHA_USERS',
+      likedPrivacy: 'KADHA_USERS',
+    });
+
+    const profile = await request(await getTestApp()).get(`/api/public/users/${owner.username}/profile`).expect(200);
+
+    expect(profile.body.access).toEqual({
+      canView: false,
+      lockedReason: 'SIGN_IN_REQUIRED',
+    });
+
+    const liked = await request(await getTestApp()).get(`/api/public/users/${owner.username}/liked`).expect(200);
+
+    expect(liked.body).toMatchObject({
+      data: [],
+      access: {
+        canView: false,
+        lockedReason: 'SIGN_IN_REQUIRED',
+      },
+    });
+  });
+
+  it('lets anonymous viewers read public profile media', async () => {
+    const owner = await registerTestUser('web-public-owner');
+    const mediaId = 882601;
+
+    await updateUserPrivacy(owner, {
+      profilePrivacy: 'PUBLIC',
+      likedPrivacy: 'PUBLIC',
+    });
+    await updateUserMediaFlag(owner, 'liked', true, mediaId);
+
+    const profile = await request(await getTestApp()).get(`/api/public/users/${owner.username}/profile`).expect(200);
+
+    expect(profile.body).toMatchObject({
+      access: { canView: true },
+      sections: {
+        liked: true,
+      },
+    });
+
+    const liked = await request(await getTestApp()).get(`/api/public/users/${owner.username}/liked`).expect(200);
+
+    expect(liked.body.access).toEqual({ canView: true });
+    expect(liked.body.pagination.total).toBe(1);
+    expect(liked.body.data[0]).toMatchObject({
       media_id: mediaId,
       liked: true,
     });

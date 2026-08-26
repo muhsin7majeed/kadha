@@ -11,10 +11,18 @@ import MediaActions from './media-actions';
 interface MediaCardProps {
   media: MediaCardModel;
   onNavigate?: () => void;
+  detailsPathPrefix?: string;
+  showActions?: boolean;
   width?: BoxProps['width'];
 }
 
-const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }: MediaCardProps) => {
+const MediaCard = ({
+  media,
+  detailsPathPrefix = '/app/media',
+  onNavigate,
+  showActions = true,
+  width = { base: '150px', md: '100%' },
+}: MediaCardProps) => {
   const genreMap = useGenreAtom();
 
   return (
@@ -77,7 +85,7 @@ const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }:
             )}
           </VStack>
 
-          <MediaActions media={media} size={{ mdDown: 'xs', md: 'md' }} />
+          {showActions && <MediaActions media={media} size={{ mdDown: 'xs', md: 'md' }} />}
         </Flex>
 
         <Box
@@ -89,7 +97,7 @@ const MediaCard = ({ media, onNavigate, width = { base: '150px', md: '100%' } }:
           w="100%"
         >
           <NavLink
-            to={`/app/media/${media.media_type}/${media.media_id}`}
+            to={`${detailsPathPrefix}/${media.media_type}/${media.media_id}`}
             textStyle="cardTitle"
             lineClamp={2}
             onClick={onNavigate}

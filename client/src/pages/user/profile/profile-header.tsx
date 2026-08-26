@@ -13,7 +13,8 @@ interface ProfileHeaderProps {
 }
 
 const profilePrivacyLabel: Record<DataPrivacy, string> = {
-  [DataPrivacy.Everyone]: 'Public profile',
+  [DataPrivacy.Public]: 'Public profile',
+  [DataPrivacy.KadhaUsers]: 'Kadha users profile',
   [DataPrivacy.Friends]: 'Friends-only profile',
   [DataPrivacy.OnlyMe]: 'Private profile',
 };

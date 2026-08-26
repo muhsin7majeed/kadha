@@ -15,7 +15,7 @@ const createCollection = (overrides: Partial<Collection> = {}): Collection => ({
   description: '',
   id: 'collection-1',
   name: 'Favorites',
-  privacy: DataPrivacy.Everyone,
+  privacy: DataPrivacy.KadhaUsers,
   updated_at: new Date('2025-01-01T00:00:00.000Z'),
   userId: 'user-1',
   ...overrides,

@@ -32,10 +32,10 @@ const makeUser = (role: UserRole): User => ({
   id: role === UserRole.Admin ? 'admin-1' : 'user-1',
   username: role === UserRole.Admin ? 'admin' : 'member',
   role,
-  profilePrivacy: DataPrivacy.Everyone,
-  watchedPrivacy: DataPrivacy.Everyone,
-  likedPrivacy: DataPrivacy.Everyone,
-  watchlistPrivacy: DataPrivacy.Everyone,
+  profilePrivacy: DataPrivacy.KadhaUsers,
+  watchedPrivacy: DataPrivacy.KadhaUsers,
+  likedPrivacy: DataPrivacy.KadhaUsers,
+  watchlistPrivacy: DataPrivacy.KadhaUsers,
   watchRegion: 'US',
 });
 

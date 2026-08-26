@@ -5,7 +5,7 @@ import { queryKeys } from '@/lib/query-keys';
 import { UserProfileResponse } from '@/features/user/user.types';
 
 const fetchUserProfile = async (username: string) => {
-  const response = await api.get<UserProfileResponse>(`/api/users/${username}/profile`);
+  const response = await api.get<UserProfileResponse>(`/api/public/users/${username}/profile`);
   return response.data;
 };
 

@@ -419,7 +419,7 @@ export async function searchUsersByUsername(currentUserId: string, query: string
   };
 }
 
-export async function getUserProfileByUsername(viewerId: string, username: string) {
+export async function getUserProfileByUsername(viewerId: string | undefined, username: string) {
   const user = await prisma.user.findUnique({
     where: { username },
     select: {
@@ -436,13 +436,13 @@ export async function getUserProfileByUsername(viewerId: string, username: strin
     return null;
   }
 
-  const relationship = await getViewerRelationship(viewerId, user.id);
+  const relationship = viewerId ? await getViewerRelationship(viewerId, user.id) : null;
 
-  if (isBlockingRelationship(relationship.friendshipStatus)) {
+  if (relationship && isBlockingRelationship(relationship.friendshipStatus)) {
     return { blocked: true as const };
   }
 
-  const areFriends = relationship.friendshipStatus === 'ACCEPTED';
+  const areFriends = relationship?.friendshipStatus === 'ACCEPTED';
   const canViewProfile = canViewByPrivacy({
     viewerId,
     ownerId: user.id,
@@ -475,14 +475,14 @@ export async function getUserProfileByUsername(viewerId: string, username: strin
     id: user.id,
     username: user.username,
     profilePrivacy: user.profilePrivacy,
-    friendshipStatus: relationship.friendshipStatus,
-    isRequestSender: relationship.isRequestSender,
+    friendshipStatus: relationship?.friendshipStatus ?? 'NONE',
+    isRequestSender: relationship?.isRequestSender ?? false,
     access: {
       canView: canViewProfile,
       ...(canViewProfile
         ? {}
         : {
-            lockedReason: getLockedReason(user.profilePrivacy as DataPrivacy),
+            lockedReason: getLockedReason(user.profilePrivacy as DataPrivacy, viewerId),
           }),
     },
     sections,
@@ -547,7 +547,7 @@ export async function getUserMediaByFlag(
 }
 
 export async function getUserMediaByUsername(
-  viewerId: string,
+  viewerId: string | undefined,
   username: string,
   flag: UserMediaFlag,
   page: number,
@@ -567,9 +567,9 @@ export async function getUserMediaByUsername(
     return null;
   }
 
-  const relationship = await getViewerRelationship(viewerId, owner.id);
+  const relationship = viewerId ? await getViewerRelationship(viewerId, owner.id) : null;
 
-  if (isBlockingRelationship(relationship.friendshipStatus)) {
+  if (relationship && isBlockingRelationship(relationship.friendshipStatus)) {
     return { blocked: true as const };
   }
 
@@ -578,11 +578,11 @@ export async function getUserMediaByUsername(
     viewerId,
     ownerId: owner.id,
     privacy,
-    areFriends: relationship.friendshipStatus === 'ACCEPTED',
+    areFriends: relationship?.friendshipStatus === 'ACCEPTED',
   });
 
   if (!canView) {
-    return lockedResource(getLockedReason(privacy));
+    return lockedResource(getLockedReason(privacy, viewerId));
   }
 
   const result = await getUserMediaByFlag(owner.id, flag, page, limit, false);
@@ -593,7 +593,7 @@ export async function getUserMediaByUsername(
   };
 }
 
-export async function getUserCollectionsByUsername(viewerId: string, username: string) {
+export async function getUserCollectionsByUsername(viewerId: string | undefined, username: string) {
   const owner = await prisma.user.findUnique({
     where: { username },
     select: { id: true },
@@ -603,14 +603,14 @@ export async function getUserCollectionsByUsername(viewerId: string, username: s
     return null;
   }
 
-  const relationship = await getViewerRelationship(viewerId, owner.id);
+  const relationship = viewerId ? await getViewerRelationship(viewerId, owner.id) : null;
 
-  if (isBlockingRelationship(relationship.friendshipStatus)) {
+  if (relationship && isBlockingRelationship(relationship.friendshipStatus)) {
     return { blocked: true as const };
   }
 
   const isOwner = viewerId === owner.id;
-  const isFriend = relationship.friendshipStatus === 'ACCEPTED';
+  const isFriend = relationship?.friendshipStatus === 'ACCEPTED';
 
   const collections = await prisma.collection.findMany({
     where: {
@@ -618,7 +618,11 @@ export async function getUserCollectionsByUsername(viewerId: string, username: s
       ...(isOwner
         ? {}
         : {
-            OR: [{ privacy: DataPrivacy.Everyone }, ...(isFriend ? [{ privacy: DataPrivacy.Friends }] : [])],
+            OR: [
+              { privacy: DataPrivacy.Public },
+              ...(viewerId ? [{ privacy: DataPrivacy.KadhaUsers }] : []),
+              ...(isFriend ? [{ privacy: DataPrivacy.Friends }] : []),
+            ],
           }),
     },
     include: {

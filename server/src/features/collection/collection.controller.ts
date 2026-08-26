@@ -15,6 +15,7 @@ import {
   createCollectionInvite,
   createUserCollection,
   deleteUserCollection,
+  getPublicCollection,
   getUserCollection,
   getUserCollections,
   leaveSharedCollection,
@@ -48,6 +49,16 @@ export const getCollection = async (req: Request, res: Response) => {
   const data = await getUserCollection(requireAuthUser(req).id, req.params.id);
 
   sendData(res, data);
+};
+
+export const getPublicCollectionById = async (req: Request, res: Response) => {
+  const result = await getPublicCollection(req.params.id, req.user?.id);
+
+  if (!result) {
+    return sendData(res, null, 404);
+  }
+
+  return sendResponse(res, result, result.access.canView ? 200 : 403);
 };
 
 export const updateCollection = async (req: Request, res: Response) => {

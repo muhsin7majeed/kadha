@@ -8,7 +8,7 @@ import { ResourceAccessResponse } from '@/types/common';
 type UserCollectionsResponse = ResourceAccessResponse<CollectionDetails[]>;
 
 const getUserCollections = async (username: string) => {
-  const response = await api.get<UserCollectionsResponse>(`/api/users/${username}/collections`);
+  const response = await api.get<UserCollectionsResponse>(`/api/public/users/${username}/collections`);
   return response.data;
 };
 

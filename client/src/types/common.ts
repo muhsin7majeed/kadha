@@ -26,7 +26,7 @@ export interface PaginatedResponse<T> extends BaseResponse<T> {
   pagination: PaginationMeta;
 }
 
-export type LockedReason = 'PRIVATE' | 'FRIENDS_ONLY';
+export type LockedReason = 'PRIVATE' | 'FRIENDS_ONLY' | 'SIGN_IN_REQUIRED';
 
 export interface ResourceAccess {
   canView: boolean;
@@ -67,7 +67,8 @@ export interface MediaMeta {
 }
 
 export enum DataPrivacy {
-  Everyone = 'EVERYONE',
+  Public = 'PUBLIC',
+  KadhaUsers = 'KADHA_USERS',
   Friends = 'FRIENDS',
   OnlyMe = 'ONLY_ME',
 }

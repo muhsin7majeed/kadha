@@ -50,7 +50,7 @@ export interface UserMediaAccessResponseBody {
   };
   access: {
     canView: boolean;
-    lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY';
+    lockedReason?: 'PRIVATE' | 'FRIENDS_ONLY' | 'SIGN_IN_REQUIRED';
   };
 }
 

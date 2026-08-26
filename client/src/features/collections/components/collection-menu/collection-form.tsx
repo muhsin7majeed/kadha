@@ -85,8 +85,8 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
                 <Field.Root>
                   <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
                   <Field.HelperText>
-                    All users means anyone signed in to this Kadha instance. Collection members retain their invited
-                    access.
+                    Anyone on the web does not require a Kadha account. Kadha users means signed-in users on this
+                    instance. Collection members retain their invited access.
                   </Field.HelperText>
                 </Field.Root>
               )}

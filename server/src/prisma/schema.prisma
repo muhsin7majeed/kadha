@@ -17,7 +17,8 @@ enum MediaType {
 enum DataPrivacy {
   ONLY_ME
   FRIENDS
-  EVERYONE
+  KADHA_USERS
+  PUBLIC
 }
 
 enum FriendStatus {

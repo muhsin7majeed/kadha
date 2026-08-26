@@ -33,6 +33,7 @@ interface HeroSectionProps {
   isMarkingNextEpisode?: boolean;
   onMarkNextEpisode?: () => void;
   onOpenTvProgress?: () => void;
+  readOnly?: boolean;
 }
 
 const HeroSection = ({
@@ -42,6 +43,7 @@ const HeroSection = ({
   isMarkingNextEpisode,
   onMarkNextEpisode,
   onOpenTvProgress,
+  readOnly = false,
 }: HeroSectionProps) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingAction, setTrackingAction] = useState<MediaAction | null>(null);
@@ -55,7 +57,7 @@ const HeroSection = ({
   const mutedTextColor = 'fg.muted';
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
-  const watchHistory = useWatchEvents('movie', data.media_id, isMovie);
+  const watchHistory = useWatchEvents('movie', data.media_id, isMovie && !readOnly);
   const currentData = { ...data, ...savedDetails } as MovieDetailsWithMeta | TvDetailsWithMeta;
   const watchCount = watchHistory.data?.watchCount ?? data.watchCount ?? (data.watched ? 1 : 0);
   const mediaPayload = buildUserMediaPayload({ ...currentData, watched: watchCount > 0, watchCount });
@@ -106,12 +108,14 @@ const HeroSection = ({
 
   return (
     <>
-      <AddToCollectionDialog
-        media={mediaPayload}
-        open={showAddToCollectionDialog}
-        onOpenChange={setShowAddToCollectionDialog}
-      />
-      {trackingAction && (
+      {!readOnly && (
+        <AddToCollectionDialog
+          media={mediaPayload}
+          open={showAddToCollectionDialog}
+          onOpenChange={setShowAddToCollectionDialog}
+        />
+      )}
+      {!readOnly && trackingAction && (
         <MediaTrackingDialog
           action={trackingAction}
           context="detail-pre-action"
@@ -126,7 +130,7 @@ const HeroSection = ({
           }}
         />
       )}
-      {isMovie && <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />}
+      {isMovie && !readOnly && <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />}
 
       <Box position="relative" overflow="hidden" bg="bg">
         {/* Backdrop Image */}
@@ -309,43 +313,45 @@ const HeroSection = ({
               </Text>
             )}
 
-            <Stack direction={{ base: 'column', sm: 'row' }} gap={3} mt={2} width={{ base: 'full', sm: 'auto' }}>
-              <Button
-                variant={data.liked ? 'solid' : 'outline'}
-                colorPalette="red"
-                onClick={handleLike}
-                loading={isAddingToLiked}
-              >
-                <LuHeart fill={data.liked ? 'currentColor' : 'none'} />
-                {getMediaActionStateLabel('liked', Boolean(data.liked))}
-              </Button>
-              <Button
-                variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : watchCount > 0 ? 'solid' : 'outline'}
-                colorPalette="blue"
-                onClick={handleWatched}
-                loading={!isMovie && (isTvProgressLoading || isMarkingNextEpisode)}
-              >
-                {isMovie && watchCount > 0 ? <LuPlus /> : <LuCheck />}
-                {isMovie
-                  ? watchCount > 0
-                    ? 'Log a rewatch'
-                    : 'Mark watched'
-                  : getTvProgressPrimaryActionLabel(tvProgress)}
-              </Button>
-              <Button
-                variant={data.watchlist ? 'solid' : 'outline'}
-                colorPalette="green"
-                onClick={handleWatchlist}
-                loading={isAddingToWatchList}
-              >
-                {data.watchlist ? <LuBookmark fill="currentColor" /> : <LuBookmarkPlus />}
-                {getMediaActionStateLabel('watchlist', Boolean(data.watchlist))}
-              </Button>
-              <Button variant="outline" colorPalette="brand" onClick={handleCollection}>
-                <LuPlus />
-                Add to collection
-              </Button>
-            </Stack>
+            {!readOnly && (
+              <Stack direction={{ base: 'column', sm: 'row' }} gap={3} mt={2} width={{ base: 'full', sm: 'auto' }}>
+                <Button
+                  variant={data.liked ? 'solid' : 'outline'}
+                  colorPalette="red"
+                  onClick={handleLike}
+                  loading={isAddingToLiked}
+                >
+                  <LuHeart fill={data.liked ? 'currentColor' : 'none'} />
+                  {getMediaActionStateLabel('liked', Boolean(data.liked))}
+                </Button>
+                <Button
+                  variant={!isMovie && tvProgress?.watchedEpisodeCount ? 'solid' : watchCount > 0 ? 'solid' : 'outline'}
+                  colorPalette="blue"
+                  onClick={handleWatched}
+                  loading={!isMovie && (isTvProgressLoading || isMarkingNextEpisode)}
+                >
+                  {isMovie && watchCount > 0 ? <LuPlus /> : <LuCheck />}
+                  {isMovie
+                    ? watchCount > 0
+                      ? 'Log a rewatch'
+                      : 'Mark watched'
+                    : getTvProgressPrimaryActionLabel(tvProgress)}
+                </Button>
+                <Button
+                  variant={data.watchlist ? 'solid' : 'outline'}
+                  colorPalette="green"
+                  onClick={handleWatchlist}
+                  loading={isAddingToWatchList}
+                >
+                  {data.watchlist ? <LuBookmark fill="currentColor" /> : <LuBookmarkPlus />}
+                  {getMediaActionStateLabel('watchlist', Boolean(data.watchlist))}
+                </Button>
+                <Button variant="outline" colorPalette="brand" onClick={handleCollection}>
+                  <LuPlus />
+                  Add to collection
+                </Button>
+              </Stack>
+            )}
 
             {/* Action Buttons */}
             <HStack gap={3} flexWrap="wrap" justify={{ base: 'center', md: 'flex-start' }}>

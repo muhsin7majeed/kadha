@@ -23,7 +23,7 @@ const me = {
   id: 'user-1',
   username: 'movie-fan',
   role: UserRole.User,
-  profilePrivacy: DataPrivacy.Everyone,
+  profilePrivacy: DataPrivacy.KadhaUsers,
   watchedPrivacy: DataPrivacy.Friends,
   likedPrivacy: DataPrivacy.Friends,
   watchlistPrivacy: DataPrivacy.OnlyMe,
@@ -50,7 +50,7 @@ describe('user settings sections', () => {
       expect(updateMeMock.mutateAsync).toHaveBeenCalledWith({
         username: 'cinema-fan',
         watchRegion: 'US',
-        profilePrivacy: DataPrivacy.Everyone,
+        profilePrivacy: DataPrivacy.KadhaUsers,
         watchedPrivacy: DataPrivacy.Friends,
         likedPrivacy: DataPrivacy.Friends,
         watchlistPrivacy: DataPrivacy.OnlyMe,

@@ -147,4 +147,81 @@ describe('collection permissions', () => {
       },
     });
   });
+
+  it('lets anonymous viewers read public collection links', async () => {
+    const owner = await registerTestUser('public-collection-owner');
+    const collection = await createTestCollection(owner, 'Public collection list');
+
+    await request(await getTestApp())
+      .put(`/api/collection/${collection.id}`)
+      .set('Authorization', authorization(owner))
+      .send({
+        name: collection.name,
+        description: 'Movies and shows to check later',
+        privacy: 'PUBLIC',
+      })
+      .expect(200);
+    await addMovieToCollection(owner, collection.id, 991401);
+
+    const response = await request(await getTestApp()).get(`/api/public/collections/${collection.id}`).expect(200);
+
+    expect(response.body).toMatchObject({
+      access: { canView: true },
+      data: {
+        id: collection.id,
+        name: collection.name,
+        access: {
+          relationship: 'viewer',
+          canEditItems: false,
+          canManageSharing: false,
+        },
+      },
+    });
+    expect(response.body.data.members).toEqual([]);
+    expect(response.body.data.memberCount).toBeUndefined();
+    expect(response.body.data.media[0]).toMatchObject({ media_id: 991401 });
+    expect(response.body.data.media[0].addedByUserId).toBeUndefined();
+  });
+
+  it('requires anonymous viewers to sign in for Kadha-users collection links', async () => {
+    const owner = await registerTestUser('kadha-users-collection-owner');
+    const viewer = await registerTestUser('kadha-users-collection-viewer');
+    const collection = await createTestCollection(owner, 'Kadha users collection list');
+
+    await request(await getTestApp())
+      .put(`/api/collection/${collection.id}`)
+      .set('Authorization', authorization(owner))
+      .send({
+        name: collection.name,
+        description: 'Movies and shows to check later',
+        privacy: 'KADHA_USERS',
+      })
+      .expect(200);
+
+    const anonymousResponse = await request(await getTestApp()).get(`/api/public/collections/${collection.id}`).expect(403);
+
+    expect(anonymousResponse.body).toEqual({
+      data: null,
+      access: {
+        canView: false,
+        lockedReason: 'SIGN_IN_REQUIRED',
+      },
+    });
+
+    const signedInResponse = await request(await getTestApp())
+      .get(`/api/public/collections/${collection.id}`)
+      .set('Authorization', authorization(viewer))
+      .expect(200);
+
+    expect(signedInResponse.body).toMatchObject({
+      access: { canView: true },
+      data: {
+        id: collection.id,
+        access: {
+          relationship: 'viewer',
+          canEditItems: false,
+        },
+      },
+    });
+  });
 });

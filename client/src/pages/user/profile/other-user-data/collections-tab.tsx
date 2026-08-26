@@ -5,10 +5,12 @@ import MediaCard from '@/components/media-card';
 import useUserCollections from '@/features/collections/api/use-user-collections';
 import { collectionMediaToMediaCardModel } from '@/features/collections/utils/collection-media';
 import { Accordion, Box, HStack, Separator, SimpleGrid, Span, Text } from '@chakra-ui/react';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 
 const OtherUserCollectionsTab = () => {
   const { username = '' } = useParams();
+  const location = useLocation();
+  const isPublicRead = location.pathname.startsWith('/u/');
   const { data, isLoading, error, refetch } = useUserCollections(username);
 
   if (isLoading) {
@@ -61,7 +63,9 @@ const OtherUserCollectionsTab = () => {
                     {collection.media.map((media) => (
                       <MediaCard
                         key={`${media.media_type}-${media.media_id}`}
+                        detailsPathPrefix={isPublicRead ? '/media' : undefined}
                         media={collectionMediaToMediaCardModel(media)}
+                        showActions={!isPublicRead}
                       />
                     ))}
                   </SimpleGrid>

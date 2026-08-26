@@ -17,7 +17,7 @@ const profile: UserProfileResponse = {
   username: 'movie-fan',
   friendshipStatus: FriendStatus.None,
   isRequestSender: false,
-  profilePrivacy: DataPrivacy.Everyone,
+  profilePrivacy: DataPrivacy.KadhaUsers,
   access: {
     canView: true,
   },

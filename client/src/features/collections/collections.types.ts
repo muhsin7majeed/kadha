@@ -29,7 +29,7 @@ export interface UserSummary {
 }
 
 export interface CollectionAccess {
-  relationship: 'owner' | 'member';
+  relationship: 'owner' | 'member' | 'viewer';
   role: CollectionAccessRole;
   canView: boolean;
   canEditItems: boolean;

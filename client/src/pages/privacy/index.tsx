@@ -60,12 +60,13 @@ const Privacy = () => {
               </Text>
               <List.Root ps={5}>
                 <List.Item>
-                  Only me means other users cannot access that profile section or collection through Kadha.
+                  Anyone on the web means people can read that profile section or collection without creating a Kadha
+                  account.
                 </List.Item>
+                <List.Item>Kadha users means signed-in users on the same Kadha instance can access it.</List.Item>
                 <List.Item>Friends means accepted friends can access it.</List.Item>
                 <List.Item>
-                  Everyone means every signed-in user on the same Kadha instance can access it; it does not currently
-                  mean the public internet.
+                  Only me means other users cannot access that profile section or collection through Kadha.
                 </List.Item>
                 <List.Item>
                   Collection members can access content intentionally shared with them, according to their viewer or

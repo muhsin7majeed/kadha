@@ -176,29 +176,31 @@ export async function getTopRatedTvs(userId: string) {
   return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
 }
 
-export async function getMediaDetails(userId: string, mediaType: string, id: string) {
+export async function getMediaDetails(userId: string | undefined, mediaType: string, id: string) {
   const validMediaType = assertMediaType(mediaType);
   const mediaId = parseMediaId(id);
   const response = await fetchMediaDetails(validMediaType, mediaId);
 
-  const [interactions, watchCount] = await prisma.$transaction([
-    prisma.userMedia.findFirst({
-      where: {
-        userId,
-        media_id: mediaId,
-        media_type: validMediaType,
-      },
-    }),
-    prisma.watchEvent.count({
-      where: {
-        userId,
-        media_id: mediaId,
-        media_type: validMediaType,
-        seasonNumber: null,
-        episodeNumber: null,
-      },
-    }),
-  ]);
+  const [interactions, watchCount] = userId
+    ? await prisma.$transaction([
+        prisma.userMedia.findFirst({
+          where: {
+            userId,
+            media_id: mediaId,
+            media_type: validMediaType,
+          },
+        }),
+        prisma.watchEvent.count({
+          where: {
+            userId,
+            media_id: mediaId,
+            media_type: validMediaType,
+            seasonNumber: null,
+            episodeNumber: null,
+          },
+        }),
+      ])
+    : [null, 0];
 
   const { id: responseMediaId, ...rest } = response;
 
@@ -215,14 +217,14 @@ export async function getMediaDetails(userId: string, mediaType: string, id: str
 }
 
 export async function getWatchProviders(
-  userId: string,
+  userId: string | undefined,
   mediaType: string,
   id: string,
   requestedRegion?: string,
 ): Promise<WatchProvidersResponse> {
   const validMediaType = assertMediaType(mediaType);
   const mediaId = parseMediaId(id);
-  const userRegion = requestedRegion
+  const userRegion = requestedRegion || !userId
     ? undefined
     : await prisma.user.findUnique({ where: { id: userId }, select: { watchRegion: true } });
   const region = assertWatchRegion(requestedRegion ?? userRegion?.watchRegion ?? DEFAULT_WATCH_REGION);

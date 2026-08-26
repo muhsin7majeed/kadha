@@ -60,15 +60,17 @@ const OtherUserData: React.FC<OtherUserDataProps> = ({ username, profile, isOwne
   const currentTab = (pathSegments[pathSegments.length - 1] as OtherUserDataTabs) || 'watched';
   const hasCurrentTab = visibleTabs.some((tab) => tab.value === currentTab);
 
+  const profileBasePath = location.pathname.startsWith('/u/') ? `/u/${username}` : `/app/profile/${username}`;
+
   const handleTabChange = (value: OtherUserDataTabs) => {
-    navigate(`/app/profile/${username}/${value}`);
+    navigate(`${profileBasePath}/${value}`);
   };
 
   useEffect(() => {
     if (visibleTabs.length > 0 && !hasCurrentTab) {
-      navigate(`/app/profile/${username}/${visibleTabs[0].value}`, { replace: true });
+      navigate(`${profileBasePath}/${visibleTabs[0].value}`, { replace: true });
     }
-  }, [hasCurrentTab, navigate, username, visibleTabs]);
+  }, [hasCurrentTab, navigate, profileBasePath, visibleTabs]);
 
   if (visibleTabs.length === 0) {
     return (

@@ -12,8 +12,9 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { LuChevronDown, LuChevronRight, LuUserPlus } from 'react-icons/lu';
+import { LuChevronDown, LuChevronRight, LuCopy, LuShare2, LuUserPlus } from 'react-icons/lu';
 
+import { toaster } from '@/components/ui/toaster-store';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
@@ -50,6 +51,10 @@ const roleOptions = Object.entries(ROLE_LABELS).map(([value, label]) => ({
   label,
 }));
 
+type NavigatorWithOptionalShare = Omit<Navigator, 'share'> & {
+  share?: (data?: ShareData) => Promise<void>;
+};
+
 const getUserStateLabel = (user: CollectionInviteUserSearchResult) => {
   if (user.state === 'pending') return 'Pending';
   if (user.state === 'member') return user.currentRole === 'editor' ? 'Editor' : 'Viewer';
@@ -74,6 +79,8 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
   const revokeInvite = useRevokeCollectionInvite();
 
   const collectionData = collectionQuery.data;
+  const shareUrl = `${window.location.origin}/share/collections/${collection.id}`;
+  const nativeShare = (navigator as NavigatorWithOptionalShare).share;
   const searchResults = usersQuery.data ?? [];
   const pendingInvites = invitesQuery.data ?? [];
 
@@ -95,6 +102,33 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
       inviteId: inviteToRevoke.id,
     });
     setInviteToRevoke(null);
+  };
+
+  const handleCopyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toaster.success({ title: 'Collection link copied' });
+    } catch {
+      toaster.error({ title: 'Could not copy collection link' });
+    }
+  };
+
+  const handleShareLink = async () => {
+    if (!nativeShare) {
+      await handleCopyShareLink();
+      return;
+    }
+
+    try {
+      await nativeShare({
+        title: collection.name,
+        text: collection.description || `View ${collection.name} on Kadha`,
+        url: shareUrl,
+      });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      toaster.error({ title: 'Could not open the share menu' });
+    }
   };
 
   return (
@@ -202,6 +236,29 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
             </Stack>
           </>
         )}
+
+        <Separator />
+
+        <Stack gap="3">
+          <Text fontWeight="medium">Collection link</Text>
+          <Text color="fg.muted" textStyle="supporting">
+            Anyone with this link can open the collection page, but the collection visibility setting decides whether
+            they can see its contents.
+          </Text>
+          <Stack direction={{ base: 'column', md: 'row' }} gap="2">
+            <Input value={shareUrl} readOnly />
+            {nativeShare && (
+              <Button colorPalette="brand" onClick={handleShareLink}>
+                <LuShare2 />
+                Share
+              </Button>
+            )}
+            <Button colorPalette="gray" variant="outline" onClick={handleCopyShareLink}>
+              <LuCopy />
+              Copy link
+            </Button>
+          </Stack>
+        </Stack>
 
         <Separator />
 

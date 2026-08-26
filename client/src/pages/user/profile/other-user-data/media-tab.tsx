@@ -5,7 +5,7 @@ import useWatched from '@/features/user-media/api/use-watched';
 import useWatchList from '@/features/user-media/api/use-watch-list';
 import { Box, Text } from '@chakra-ui/react';
 import { LuBookmark, LuCheck, LuHeart } from 'react-icons/lu';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
 type MediaTabType = 'watched' | 'liked' | 'watchlist';
@@ -49,6 +49,8 @@ const meta = {
 
 const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
   const { username = '' } = useParams();
+  const location = useLocation();
+  const isPublicRead = location.pathname.startsWith('/u/');
   const [page, setPage] = useState(1);
   const watched = useWatched(username, { enabled: type === 'watched', page });
   const liked = useLiked(username, { enabled: type === 'liked', page });
@@ -61,11 +63,18 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
   }, [type, username]);
 
   if (query.data?.access.canView === false) {
+    const signInRequired = query.data.access.lockedReason === 'SIGN_IN_REQUIRED';
+    const friendsOnly = query.data.access.lockedReason === 'FRIENDS_ONLY';
+
     return (
       <Box py="10">
         <EmptyState
-          title={query.data.access.lockedReason === 'FRIENDS_ONLY' ? 'Friends only' : 'Private'}
-          description="This activity is not visible to you."
+          title={signInRequired ? 'Sign in required' : friendsOnly ? 'Friends only' : 'Private'}
+          description={
+            signInRequired
+              ? 'Sign in to check whether this activity is visible to you.'
+              : 'This activity is not visible to you.'
+          }
         />
       </Box>
     );
@@ -78,6 +87,8 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
         title={tabMeta.title}
         description={tabMeta.description}
         data={query.data?.data}
+        detailsPathPrefix={isPublicRead ? '/media' : undefined}
+        showActions={!isPublicRead}
         isLoading={query.isLoading}
         isFetching={query.isFetching}
         error={query.error}

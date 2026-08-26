@@ -14,11 +14,12 @@ import friendshipRoutes from './features/friendship/friendship.routes';
 import insightsRoutes from './features/insights/insights.routes';
 import mediaRoutes from './features/media/media.routes';
 import notificationRoutes from './features/notification/notification.routes';
+import publicRoutes from './features/public/public.routes';
 import userRoutes from './features/user/user.routes';
 import userMediaRoutes from './features/user-media/user-media.routes';
 import { notFoundHandler } from './lib/http';
 import { errorHandler } from './middlewares/errorHandler';
-import { authMiddleware } from './middlewares/auth';
+import { authMiddleware, optionalAuthMiddleware } from './middlewares/auth';
 import { requireAdmin } from './middlewares/requireAdmin';
 
 export function createApp(): Express {
@@ -39,6 +40,7 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
 
   app.use('/api/auth', authRoutes);
+  app.use('/api/public', optionalAuthMiddleware, publicRoutes);
   app.use('/api/admin', authMiddleware, requireAdmin, adminRoutes);
   app.use('/api/user/activity', authMiddleware, activityRoutes);
   app.use('/api/user/insights', authMiddleware, insightsRoutes);

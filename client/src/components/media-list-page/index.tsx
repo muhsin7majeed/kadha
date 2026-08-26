@@ -26,7 +26,9 @@ interface MediaListPageProps {
   errorDescription: string;
   loadingText: string;
   spinnerColor?: string;
+  detailsPathPrefix?: string;
   pagination?: PaginationMeta;
+  showActions?: boolean;
   onPageChange?: (page: number) => void;
 }
 
@@ -41,8 +43,10 @@ const MediaListPage = ({
   emptyState,
   errorDescription,
   loadingText,
+  detailsPathPrefix,
   spinnerColor = 'brand.solid',
   pagination,
+  showActions,
   onPageChange,
 }: MediaListPageProps) => {
   return (
@@ -81,7 +85,9 @@ const MediaListPage = ({
             {data?.map((media) => (
               <MediaCard
                 key={`${media.media_type}:${media.media_id}`}
+                detailsPathPrefix={detailsPathPrefix}
                 media={toMediaCardModel(media)}
+                showActions={showActions}
                 width="100%"
               />
             ))}

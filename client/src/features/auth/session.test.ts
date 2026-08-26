@@ -12,10 +12,10 @@ const user: User = {
   id: 'user-1',
   username: 'member',
   role: UserRole.User,
-  profilePrivacy: DataPrivacy.Everyone,
-  watchedPrivacy: DataPrivacy.Everyone,
-  likedPrivacy: DataPrivacy.Everyone,
-  watchlistPrivacy: DataPrivacy.Everyone,
+  profilePrivacy: DataPrivacy.KadhaUsers,
+  watchedPrivacy: DataPrivacy.KadhaUsers,
+  likedPrivacy: DataPrivacy.KadhaUsers,
+  watchlistPrivacy: DataPrivacy.KadhaUsers,
   watchRegion: 'US',
 };
 

@@ -13,13 +13,14 @@ import { WATCH_PROVIDER_GROUPS } from './watch-provider-groups';
 interface WatchProvidersSectionProps {
   mediaType: MediaType;
   id: string;
+  publicRead?: boolean;
   title: string;
 }
 
-const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionProps) => {
-  const { data: me, isLoading: isLoadingMe } = useGetMe();
+const WatchProvidersSection = ({ mediaType, id, publicRead = false, title }: WatchProvidersSectionProps) => {
+  const { data: me, isLoading: isLoadingMe } = useGetMe({ enabled: !publicRead });
   const region = me?.watchRegion ?? DEFAULT_WATCH_REGION;
-  const { data, isError, isLoading, refetch } = useWatchProviders(mediaType, id, region);
+  const { data, isError, isLoading, refetch } = useWatchProviders(mediaType, id, region, { publicRead });
 
   if (isLoadingMe || isLoading) {
     return (
@@ -61,8 +62,8 @@ const WatchProvidersSection = ({ mediaType, id, title }: WatchProvidersSectionPr
             Where to Watch
           </Heading>
           <HStack gap={2} color="fg.muted" flexWrap="wrap">
-            <Text textStyle="supporting">Based on your region: {data.region.name}</Text>
-            <WatchRegionDialog currentRegion={data.region.code} me={me ?? undefined} />
+            <Text textStyle="supporting">Based on {publicRead ? 'the default' : 'your'} region: {data.region.name}</Text>
+            {!publicRead && <WatchRegionDialog currentRegion={data.region.code} me={me ?? undefined} />}
           </HStack>
         </Box>
 

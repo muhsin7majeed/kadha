@@ -1,7 +1,7 @@
 import { Box, Button, Container, Heading, HStack, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import { LuArrowLeft, LuRefreshCw } from 'react-icons/lu';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { MediaType } from '@/types/common';
 import useMediaDetails from '@/features/media/api/use-media-details';
@@ -21,17 +21,20 @@ import WatchProvidersSection from './components/watch-providers-section';
 
 const MediaDetails = () => {
   const { mediaType, id } = useParams<{ mediaType: MediaType; id: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const [tvProgressDialogOpen, setTvProgressDialogOpen] = useState(false);
   const [tvProgressDialogSeason, setTvProgressDialogSeason] = useState<number | undefined>();
+  const isPublicRead = location.pathname.startsWith('/media/');
   const isValidMediaType = mediaType === 'movie' || mediaType === 'tv';
   const hasValidParams = isValidMediaType && Boolean(id);
   const { data, isError, isLoading, isFetching, refetch } = useMediaDetails(
     isValidMediaType ? mediaType : undefined,
     id,
+    { publicRead: isPublicRead },
   );
   const tvMediaId = data?.media_type === 'tv' ? data.media_id : undefined;
-  const tvProgress = useTvProgress(tvMediaId, { enabled: Boolean(tvMediaId) });
+  const tvProgress = useTvProgress(tvMediaId, { enabled: Boolean(tvMediaId) && !isPublicRead });
   const markNextEpisodeWatched = useMarkNextEpisodeWatched(tvMediaId ?? 0);
   const mediaPayload = useMemo(() => (data ? buildUserMediaPayload(data) : null), [data]);
 
@@ -121,9 +124,10 @@ const MediaDetails = () => {
         isMarkingNextEpisode={markNextEpisodeWatched.isPending}
         onMarkNextEpisode={() => markNextEpisodeWatched.mutate()}
         onOpenTvProgress={openTvProgressDialog}
+        readOnly={isPublicRead}
       />
 
-      {tvMediaId && (
+      {tvMediaId && !isPublicRead && (
         <TvEpisodeProgressDialog
           mediaId={tvMediaId}
           initialSeasonNumber={tvProgressDialogSeason}
@@ -135,15 +139,15 @@ const MediaDetails = () => {
       {/* Main Content */}
       <Container maxW="6xl" py={8}>
         <VStack gap={10} align="stretch">
-          {mediaPayload && data.media_type === 'movie' && <MovieWatchHistorySection media={mediaPayload} />}
-          {mediaPayload && (
+          {mediaPayload && data.media_type === 'movie' && !isPublicRead && <MovieWatchHistorySection media={mediaPayload} />}
+          {mediaPayload && !isPublicRead && (
             <MediaTrackingSection media={mediaPayload} trackingState={data} hideWatched={data.media_type === 'movie'} />
           )}
 
           {/* Overview */}
           <OverviewSection overview={data.overview} />
 
-          <WatchProvidersSection mediaType={validMediaType} id={validId} title={title} />
+          <WatchProvidersSection mediaType={validMediaType} id={validId} publicRead={isPublicRead} title={title} />
 
           {/* Media-specific Info */}
           {data.media_type === 'movie' ? (

@@ -2,15 +2,19 @@ import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { useQuery } from '@tanstack/react-query';
 
-import { UserMediaAccessResponse } from './use-watched';
+import { getAccessResponseFromError, UserMediaAccessResponse } from './use-watched';
 
 const fetchWatchList = async (username?: string, page = 1): Promise<UserMediaAccessResponse> => {
-  const response = await api.get<UserMediaAccessResponse>(
-    username ? `/api/users/${username}/watchlist` : '/api/user/watchlist',
-    { params: { page } },
-  );
+  try {
+    const response = await api.get<UserMediaAccessResponse>(
+      username ? `/api/public/users/${username}/watchlist` : '/api/user/watchlist',
+      { params: { page } },
+    );
 
-  return response.data;
+    return response.data;
+  } catch (error) {
+    return getAccessResponseFromError<UserMediaAccessResponse>(error);
+  }
 };
 
 const useWatchList = (username?: string, options: { enabled?: boolean; page?: number } = {}) => {

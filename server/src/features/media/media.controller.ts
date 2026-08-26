@@ -59,10 +59,28 @@ export const getMediaDetails = async (
   sendData(res, data);
 };
 
+export const getPublicMediaDetails = async (
+  req: Request,
+  res: Response<BaseResponse<TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta>>,
+) => {
+  const { mediaType, id } = req.params;
+  const data = await mediaService.getMediaDetails(req.user?.id, mediaType, id);
+
+  sendData(res, data);
+};
+
 export const getWatchProviders = async (req: Request, res: Response<BaseResponse<WatchProvidersResponse>>) => {
   const { mediaType, id } = req.params;
   const region = typeof req.query.region === 'string' ? req.query.region : undefined;
   const data = await mediaService.getWatchProviders(requireAuthUser(req).id, mediaType, id, region);
+
+  sendData(res, data);
+};
+
+export const getPublicWatchProviders = async (req: Request, res: Response<BaseResponse<WatchProvidersResponse>>) => {
+  const { mediaType, id } = req.params;
+  const region = typeof req.query.region === 'string' ? req.query.region : undefined;
+  const data = await mediaService.getWatchProviders(req.user?.id, mediaType, id, region);
 
   sendData(res, data);
 };

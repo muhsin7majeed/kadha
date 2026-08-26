@@ -7,10 +7,11 @@ import {
   notificationDedupeKeys,
   resolveNotificationsByEntity,
 } from '@/features/notification/notification.service';
-import { enrichUserWithFriendship, getFriendshipStatusMap } from '@/lib/friendship-utils';
+import { enrichUserWithFriendship, getFriendshipStatusMap, getViewerRelationship } from '@/lib/friendship-utils';
 import { badRequest, forbidden, notFound } from '@/lib/http';
 import { prisma } from '@/lib/prisma';
-import { NotificationType } from '@/types/common';
+import { canViewByPrivacy, getLockedReason, isBlockingRelationship } from '@/lib/privacy-utils';
+import { DataPrivacy, LockedReason, NotificationType } from '@/types/common';
 import {
   CollectionPayload,
   CreateCollectionInvitePayload,
@@ -27,6 +28,13 @@ type CollectionAccess =
       role: 'viewer' | 'editor';
       canView: true;
       canEditItems: boolean;
+      canManageSharing: false;
+    }
+  | {
+      relationship: 'viewer';
+      role: 'viewer';
+      canView: true;
+      canEditItems: false;
       canManageSharing: false;
     };
 
@@ -79,7 +87,9 @@ const collectionDetailsInclude = {
 type CollectionWithListData = Prisma.CollectionGetPayload<{ include: typeof collectionListInclude }>;
 type CollectionWithDetailsData = Prisma.CollectionGetPayload<{ include: typeof collectionDetailsInclude }>;
 
-const getCollectionAccessFromMembers = (collection: CollectionWithListData | CollectionWithDetailsData, userId: string) => {
+const getCollectionMemberAccess = (collection: CollectionWithListData | CollectionWithDetailsData, userId?: string) => {
+  if (!userId) return null;
+
   if (collection.userId === userId) {
     return {
       relationship: 'owner',
@@ -107,8 +117,39 @@ const getCollectionAccessFromMembers = (collection: CollectionWithListData | Col
   } satisfies CollectionAccess;
 };
 
+const getCollectionReadAccess = async (collection: CollectionWithListData | CollectionWithDetailsData, viewerId?: string) => {
+  const memberAccess = getCollectionMemberAccess(collection, viewerId);
+
+  if (memberAccess) return memberAccess;
+
+  const relationship = viewerId ? await getViewerRelationship(viewerId, collection.userId) : null;
+
+  if (relationship && isBlockingRelationship(relationship.friendshipStatus)) {
+    return { lockedReason: 'PRIVATE' as LockedReason };
+  }
+
+  const canView = canViewByPrivacy({
+    viewerId,
+    ownerId: collection.userId,
+    privacy: collection.privacy as DataPrivacy,
+    areFriends: relationship?.friendshipStatus === 'ACCEPTED',
+  });
+
+  if (!canView) {
+    return { lockedReason: getLockedReason(collection.privacy as DataPrivacy, viewerId) };
+  }
+
+  return {
+    relationship: 'viewer',
+    role: 'viewer',
+    canView: true,
+    canEditItems: false,
+    canManageSharing: false,
+  } satisfies CollectionAccess;
+};
+
 const serializeCollectionListItem = (collection: CollectionWithListData, userId: string) => {
-  const access = getCollectionAccessFromMembers(collection, userId);
+  const access = getCollectionMemberAccess(collection, userId);
 
   if (!access) return null;
 
@@ -132,33 +173,54 @@ const serializeCollectionListItem = (collection: CollectionWithListData, userId:
   };
 };
 
-const serializeCollectionDetails = async (collection: CollectionWithDetailsData, userId: string) => {
-  const access = getCollectionAccessFromMembers(collection, userId);
+const serializeCollectionDetails = async (collection: CollectionWithDetailsData, userId?: string) => {
+  const access = await getCollectionReadAccess(collection, userId);
 
-  if (!access) return null;
+  if ('lockedReason' in access) {
+    return {
+      data: null,
+      access: {
+        canView: false,
+        lockedReason: access.lockedReason,
+      },
+    };
+  }
 
   const { user, members, items, _count, ...rest } = collection;
-  const relatedUserIds = [user.id, ...members.map((member) => member.userId)].filter((id) => id !== userId);
-  const friendshipStatusMap = await getFriendshipStatusMap(userId, relatedUserIds);
-  const owner = user.id === userId ? user : enrichUserWithFriendship(user, friendshipStatusMap);
+  const relatedUserIds = userId ? [user.id, ...members.map((member) => member.userId)].filter((id) => id !== userId) : [];
+  const friendshipStatusMap = userId ? await getFriendshipStatusMap(userId, relatedUserIds) : new Map();
+  const owner = user.id === userId || !userId ? user : enrichUserWithFriendship(user, friendshipStatusMap);
+  const canSeeSharingDetails = access.relationship === 'owner' || access.relationship === 'member';
 
   return {
-    ...rest,
-    owner,
-    members: members.map((member) => ({
-      id: member.id,
-      userId: member.userId,
-      role: roleToApi(member.role),
-      createdAt: member.createdAt,
-      updatedAt: member.updatedAt,
-      user: member.userId === userId ? member.user : enrichUserWithFriendship(member.user, friendshipStatusMap),
-    })),
-    memberCount: _count.members + 1,
-    access,
-    media: items.map((item) => ({
-      ...flattenMediaSnapshot(item),
-      addedByUserId: item.addedByUserId,
-    })),
+    data: {
+      ...rest,
+      owner,
+      members: canSeeSharingDetails
+        ? members.map((member) => ({
+            id: member.id,
+            userId: member.userId,
+            role: roleToApi(member.role),
+            createdAt: member.createdAt,
+            updatedAt: member.updatedAt,
+            user:
+              member.userId === userId || !userId ? member.user : enrichUserWithFriendship(member.user, friendshipStatusMap),
+          }))
+        : [],
+      memberCount: canSeeSharingDetails ? _count.members + 1 : undefined,
+      access,
+      media: items.map((item) => {
+        const { addedByUserId, ...media } = flattenMediaSnapshot(item);
+
+        return {
+          ...media,
+          ...(canSeeSharingDetails ? { addedByUserId } : {}),
+        };
+      }),
+    },
+    access: {
+      canView: true,
+    },
   };
 };
 
@@ -176,7 +238,7 @@ const requireCollectionAccess = async (userId: string, collectionId: string) => 
     throw notFound('Collection not found');
   }
 
-  const access = getCollectionAccessFromMembers(collection, userId);
+  const access = getCollectionMemberAccess(collection, userId);
 
   if (!access) {
     throw forbidden('You do not have access to this collection');
@@ -328,8 +390,23 @@ export async function createUserCollection(userId: string, payload: CollectionPa
 
 export async function getUserCollection(userId: string, collectionId: string) {
   const { collection } = await requireCollectionAccess(userId, collectionId);
+  const result = await serializeCollectionDetails(collection, userId);
 
-  return serializeCollectionDetails(collection, userId);
+  if (!result.data) {
+    throw forbidden('You do not have access to this collection');
+  }
+
+  return result.data;
+}
+
+export async function getPublicCollection(collectionId: string, viewerId?: string) {
+  const collection = await getCollectionForAccess(collectionId);
+
+  if (!collection) {
+    return null;
+  }
+
+  return serializeCollectionDetails(collection, viewerId);
 }
 
 export async function updateUserCollection(userId: string, collectionId: string, payload: CollectionPayload) {

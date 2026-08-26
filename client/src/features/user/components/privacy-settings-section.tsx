@@ -31,7 +31,7 @@ const privacySettings: PrivacySetting[] = [
   {
     name: 'profilePrivacy',
     label: 'Profile',
-    description: 'Controls who can open your profile. All users means anyone signed in to this Kadha instance.',
+    description: 'Controls who can open your profile. Anyone on the web does not require a Kadha account.',
     options: PROFILE_PRIVACY_OPTIONS,
   },
   {
@@ -81,7 +81,7 @@ const PrivacyRadioGroup = ({
     onBlur={onBlur}
     onValueChange={(details) => onChange(details.value as DataPrivacy)}
   >
-    <SimpleGrid columns={3} gap="2">
+    <SimpleGrid columns={{ base: 2, md: 4 }} gap="2">
       {options.map((option) => {
         const isSelected = value === option.value;
 

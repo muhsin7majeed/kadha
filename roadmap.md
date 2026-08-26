@@ -29,7 +29,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 ### Social And Privacy
 
 - [x] Friend requests, unfriend, block, and unblock flows.
-- [x] Profile, watched, liked, watchlist, and collection privacy controls.
+- [x] Profile, watched, liked, watchlist, and collection privacy controls, including owner-approved anonymous read access.
 - [x] Private-profile and locked-content states for unauthorized viewers.
 - [x] Private collection invitations with viewer and editor roles.
 - [x] Shared collection membership, role management, and collaboration.
@@ -107,7 +107,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 ### Social
 
 - [ ] Add a privacy-aware friends activity feed.
-- [ ] Add opt-in public collection links.
+- [x] Add opt-in public collection links.
 - [ ] Add a full ghost mode with no public profile footprint.
 
 ## Later Product Work
