@@ -61,7 +61,7 @@ const MediaCarousel = ({ title, data, isLoading, isFetching }: MediaCarouselProp
   }
 
   return (
-    <Box>
+    <Box mb="4">
       <Flex justifyContent="space-between" alignItems="center" mb={4}>
         <PageHeader isFetching={isFetching}>{title}</PageHeader>
 
