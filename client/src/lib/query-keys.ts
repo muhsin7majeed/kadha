@@ -64,6 +64,12 @@ export const mediaQueryKeys = {
   topRatedTvs: ['top-rated-tvs'] as const,
   popularMovies: ['popular-movies'] as const,
   popularTvs: ['popular-tvs'] as const,
+  nowPlayingMovies: ['now-playing-movies'] as const,
+  upcomingMovies: ['upcoming-movies'] as const,
+  onTheAirTvs: ['on-the-air-tvs'] as const,
+  mediaRecommendations: ['media-recommendations'] as const,
+  mediaRecommendationsById: (mediaType: MediaType, id: string, page = 1) =>
+    ['media-recommendations', mediaType, id, page] as const,
 };
 
 export const notificationQueryKeys = {

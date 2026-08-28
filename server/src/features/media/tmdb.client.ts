@@ -20,6 +20,7 @@ const CACHE_TTL = {
   details: 6 * ONE_HOUR,
   genres: 24 * ONE_HOUR,
   search: ONE_MINUTE,
+  recommendations: 10 * ONE_MINUTE,
   seasonDetails: 6 * ONE_HOUR,
   watchProviders: 24 * ONE_HOUR,
   credits: 24 * ONE_HOUR,
@@ -93,6 +94,27 @@ export async function fetchPopularTvs() {
   });
 }
 
+export async function fetchNowPlayingMovies() {
+  return getCached('now-playing:movie', CACHE_TTL.lists, async () => {
+    const response = await api.get<MovieDBMovieResponse>('/movie/now_playing');
+    return response.data;
+  });
+}
+
+export async function fetchUpcomingMovies() {
+  return getCached('upcoming:movie', CACHE_TTL.lists, async () => {
+    const response = await api.get<MovieDBMovieResponse>('/movie/upcoming');
+    return response.data;
+  });
+}
+
+export async function fetchOnTheAirTvs() {
+  return getCached('on-the-air:tv', CACHE_TTL.lists, async () => {
+    const response = await api.get<MovieDBTvResponse>('/tv/on_the_air');
+    return response.data;
+  });
+}
+
 export async function fetchTopRatedMovies() {
   return getCached('top-rated:movie', CACHE_TTL.lists, async () => {
     const response = await api.get<MovieDBMovieResponse>('/movie/top_rated');
@@ -110,6 +132,21 @@ export async function fetchTopRatedTvs() {
 export async function fetchMediaDetails(mediaType: 'movie' | 'tv', id: number) {
   return getCached(`details:${mediaType}:${id}`, CACHE_TTL.details, async () => {
     const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
+    return response.data;
+  });
+}
+
+export function fetchMediaRecommendations(
+  mediaType: 'movie',
+  id: number,
+  page: number,
+): Promise<MovieDBMovieResponse>;
+export function fetchMediaRecommendations(mediaType: 'tv', id: number, page: number): Promise<MovieDBTvResponse>;
+export function fetchMediaRecommendations(mediaType: 'movie' | 'tv', id: number, page: number) {
+  return getCached(`recommendations:${mediaType}:${id}:${page}`, CACHE_TTL.recommendations, async () => {
+    const response = await api.get<MovieDBMovieResponse | MovieDBTvResponse>(`/${mediaType}/${id}/recommendations`, {
+      params: { page },
+    });
     return response.data;
   });
 }

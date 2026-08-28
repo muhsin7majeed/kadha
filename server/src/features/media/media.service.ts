@@ -26,7 +26,10 @@ import {
 } from './media.types';
 import {
   fetchMediaDetails,
+  fetchMediaRecommendations,
   fetchMovieGenres,
+  fetchNowPlayingMovies,
+  fetchOnTheAirTvs,
   fetchPopularMovies,
   fetchPopularTvs,
   fetchTopRatedMovies,
@@ -34,6 +37,7 @@ import {
   fetchTrendingMovies,
   fetchTrendingTvs,
   fetchTvGenres,
+  fetchUpcomingMovies,
   fetchWatchProviders,
   searchMediaByType,
 } from './tmdb.client';
@@ -166,6 +170,21 @@ export async function getPopularTvs(userId: string) {
   return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
 }
 
+export async function getNowPlayingMovies(userId: string) {
+  const response = await fetchNowPlayingMovies();
+  return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
+}
+
+export async function getUpcomingMovies(userId: string) {
+  const response = await fetchUpcomingMovies();
+  return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
+}
+
+export async function getOnTheAirTvs(userId: string) {
+  const response = await fetchOnTheAirTvs();
+  return enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId) as Promise<TMDBTvWithMeta[]>;
+}
+
 export async function getTopRatedMovies(userId: string) {
   const response = await fetchTopRatedMovies();
   return enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId) as Promise<TMDBMovieWithMeta[]>;
@@ -214,6 +233,33 @@ export async function getMediaDetails(userId: string | undefined, mediaType: str
     watchCount,
     ...pickUserMediaTrackingDetails(interactions),
   } as TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta;
+}
+
+export async function getMediaRecommendations(userId: string, mediaType: string, id: string, page: number) {
+  const validMediaType = assertMediaType(mediaType);
+  const mediaId = parseMediaId(id);
+
+  if (validMediaType === 'movie') {
+    const response = await fetchMediaRecommendations('movie', mediaId, page);
+    const data = (await enrichMediaWithUserInteractions(response.results.map(normalizeMovie), userId)) as
+      | TMDBMovieWithMeta[]
+      | TMDBTvWithMeta[];
+
+    return {
+      data,
+      pagination: createPaginationMeta(page, 20, response.total_results),
+    };
+  }
+
+  const response = await fetchMediaRecommendations('tv', mediaId, page);
+  const data = (await enrichMediaWithUserInteractions(response.results.map(normalizeTv), userId)) as
+    | TMDBMovieWithMeta[]
+    | TMDBTvWithMeta[];
+
+  return {
+    data,
+    pagination: createPaginationMeta(page, 20, response.total_results),
+  };
 }
 
 export async function getWatchProviders(

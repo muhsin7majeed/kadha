@@ -17,6 +17,11 @@
 - Updated the landing page feature lists so shipped public collection links and viewing insights are listed as available today.
 - Replaced the in-app changelog dialog with a GitHub Releases link from the version menu item.
 
+#### Discovery
+
+- Added more TMDB-powered discovery rows on Home, including popular titles, now-playing movies, upcoming movies, currently-airing TV, and top-rated titles.
+- Added TMDB recommendations to media detail pages so each title can show related movies or shows.
+
 #### Media Tracking
 
 - Kept personal tracking management available on cards and media detail pages for liked, watched, and watchlisted

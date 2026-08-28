@@ -17,6 +17,7 @@ import OverviewSection from './components/overview-section';
 import MovieInfo from './components/movie-info';
 import TvInfo from './components/tv-info';
 import ProductionInfo from './components/production-info';
+import RecommendationsSection from './components/recommendations-section';
 import WatchProvidersSection from './components/watch-providers-section';
 
 const MediaDetails = () => {
@@ -148,6 +149,8 @@ const MediaDetails = () => {
           <OverviewSection overview={data.overview} />
 
           <WatchProvidersSection mediaType={validMediaType} id={validId} publicRead={isPublicRead} title={title} />
+
+          {!isPublicRead && <RecommendationsSection mediaType={validMediaType} id={validId} />}
 
           {/* Media-specific Info */}
           {data.media_type === 'movie' ? (
