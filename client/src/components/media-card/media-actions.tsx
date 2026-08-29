@@ -145,13 +145,11 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
 
   return (
     <>
-      {showAddToCollectionDialog && (
-        <AddToCollectionDialog
-          media={mediaPayload}
-          open={showAddToCollectionDialog}
-          onOpenChange={setShowAddToCollectionDialog}
-        />
-      )}
+      <AddToCollectionDialog
+        media={mediaPayload}
+        open={showAddToCollectionDialog}
+        onOpenChange={setShowAddToCollectionDialog}
+      />
       {trackingDialog && (
         <MediaTrackingDialog
           action={trackingDialog.action}
@@ -167,11 +165,11 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
           }}
         />
       )}
-      {media.media_type === 'movie' && watchEventOpen && (
-        <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />
-      )}
-      {media.media_type === 'movie' && watchHistoryOpen && (
-        <MovieWatchHistoryDialog media={mediaPayload} open={watchHistoryOpen} onOpenChange={setWatchHistoryOpen} />
+      {media.media_type === 'movie' && (
+        <>
+          <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />
+          <MovieWatchHistoryDialog media={mediaPayload} open={watchHistoryOpen} onOpenChange={setWatchHistoryOpen} />
+        </>
       )}
 
       <VStack gap={{ base: 0.5, md: 1 }} backdropFilter="blur(10px)" p={{ base: 0.5, md: 1 }} borderRadius="full">

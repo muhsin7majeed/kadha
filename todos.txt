@@ -1,3 +1,2 @@
 - Public profile link / sharing.
 - "Who can see this collection?" should be a dropdown for better UI.
-- Homescreen performance optimization.

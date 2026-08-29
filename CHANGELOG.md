@@ -20,7 +20,6 @@
 #### Discovery
 
 - Added more TMDB-powered discovery rows on Home, including popular titles, now-playing movies, upcoming movies, currently-airing TV, and top-rated titles.
-- Improved Home navigation responsiveness by deferring per-card collection and watch-history dialogs until they are opened.
 - Added TMDB recommendations to media detail pages so each title can show related movies or shows.
 
 #### Media Tracking
