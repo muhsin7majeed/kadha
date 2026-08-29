@@ -7,6 +7,7 @@ import { MediaAction, UserMedia, UserMediaPayload } from '../user-media.types';
 
 type MediaIdentity = Pick<UserMediaPayload, 'media_id' | 'media_type'>;
 type MediaDetailsCache = MovieDetailsWithMeta | TvDetailsWithMeta;
+type MediaDiscoveryCache = MediaIdentity[] | PaginatedResponse<MediaIdentity[]>;
 type SavedMediaCache = ResourceAccessResponse<UserMedia[]> & Partial<PaginatedResponse<UserMedia[]>>;
 export type MediaActionCacheSnapshot = Array<[QueryKey, unknown]>;
 
@@ -20,6 +21,7 @@ const mediaDiscoveryQueryKeys: QueryKey[] = [
   queryKeys.topRatedTvs,
   queryKeys.popularMovies,
   queryKeys.popularTvs,
+  queryKeys.nowPlayingMovies,
 ];
 
 const savedListQueryKeys: Record<MediaAction, QueryKey[]> = {
@@ -29,7 +31,7 @@ const savedListQueryKeys: Record<MediaAction, QueryKey[]> = {
 };
 
 const savedMediaQueryKeys: QueryKey[] = [queryKeys.liked, queryKeys.watched, queryKeys.watchList];
-const optimisticMediaQueryKeys: QueryKey[] = [...mediaContentQueryKeys, ...savedMediaQueryKeys];
+const optimisticMediaQueryKeys: QueryKey[] = [...mediaContentQueryKeys, ...mediaDiscoveryQueryKeys, ...savedMediaQueryKeys];
 
 const queryKeyStartsWith = (queryKey: QueryKey, prefix: QueryKey) =>
   prefix.every((keyPart, index) => queryKey[index] === keyPart);
@@ -123,6 +125,23 @@ const patchMediaDetailsData = (
   payload: UserMediaPayload,
   meta: MediaMeta,
 ): MediaDetailsCache | undefined => (oldData ? patchMediaItem(oldData, payload, meta) : oldData);
+
+const patchMediaDiscoveryData = (
+  oldData: MediaDiscoveryCache | undefined,
+  payload: UserMediaPayload,
+  meta: MediaMeta,
+): MediaDiscoveryCache | undefined => {
+  if (!oldData) return oldData;
+
+  if (Array.isArray(oldData)) {
+    return patchMediaList(oldData, payload, meta);
+  }
+
+  return {
+    ...oldData,
+    data: patchMediaList(oldData.data, payload, meta),
+  };
+};
 
 const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): UserMedia => ({
   media_id: payload.media_id,
@@ -230,6 +249,12 @@ export const updateMediaActionCache = (queryClient: QueryClient, action: MediaAc
   mediaContentQueryKeys.forEach((queryKey) => {
     queryClient.setQueriesData<MediaDetailsCache>({ queryKey }, (oldData) =>
       patchMediaDetailsData(oldData, payload, meta),
+    );
+  });
+
+  mediaDiscoveryQueryKeys.forEach((queryKey) => {
+    queryClient.setQueriesData<MediaDiscoveryCache>({ queryKey }, (oldData) =>
+      patchMediaDiscoveryData(oldData, payload, meta),
     );
   });
 

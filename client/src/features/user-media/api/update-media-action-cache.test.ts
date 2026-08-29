@@ -142,6 +142,25 @@ describe('updateMediaActionCache', () => {
     });
   });
 
+  it('patches now-playing movie cache entries without waiting for a refresh', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ liked: true, media_id: 15, title: 'Now Playing Movie' });
+
+    queryClient.setQueryData(queryKeys.nowPlayingMovies, [
+      {
+        ...createUserMedia({ media_id: 15, liked: false, title: 'Now Playing Movie' }),
+        video: false,
+      },
+    ]);
+
+    updateMediaActionCache(queryClient, 'liked', payload);
+
+    expect(queryClient.getQueryData<Array<{ liked?: boolean; media_id: number }>>(queryKeys.nowPlayingMovies)?.[0]).toMatchObject({
+      liked: true,
+      media_id: 15,
+    });
+  });
+
   it('updates watched and watchlist caches when liking also marks watched', () => {
     const queryClient = new QueryClient();
     const payload = createPayload({

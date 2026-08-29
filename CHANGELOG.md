@@ -38,6 +38,7 @@
   watch counts, latest-watch summaries, and individual editing or removal.
 - Added compact watch-count badges and direct watch-history management to movie cards, while keeping overall ratings
   title-level instead of duplicating them across rewatches.
+- Fixed now-playing movie cards so liked and unliked state updates immediately without refreshing the page.
 
 ### Engineering Changes
 
