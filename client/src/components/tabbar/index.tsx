@@ -9,7 +9,7 @@ import {
   LuHeart,
   LuHouse,
   LuListChecks,
-  LuSparkles,
+  LuWandSparkles,
 } from 'react-icons/lu';
 import { Link, useLocation } from 'react-router';
 
@@ -27,7 +27,7 @@ const PRIMARY_ITEMS: NavigationItem[] = [
   },
   {
     label: 'For You',
-    icon: LuSparkles,
+    icon: LuWandSparkles,
     to: '/app/recommendations',
   },
   {

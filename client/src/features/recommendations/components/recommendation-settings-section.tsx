@@ -127,9 +127,8 @@ const RecommendationSettingsSection = () => {
             <Heading as="h3" textStyle="subsectionTitle">
               Recommendation inputs
             </Heading>
-            <Text color="fg.muted" textStyle="supporting">
-              Choose which private tracking signals Kadha can use for recommendations. These settings affect only your
-              own account.
+            <Text color="fg.muted" textStyle="supporting" mb="2">
+              Choose which private tracking signals Kadha can use for recommendations.
             </Text>
           </Card.Header>
 
