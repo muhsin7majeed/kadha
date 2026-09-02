@@ -15,6 +15,7 @@ import insightsRoutes from './features/insights/insights.routes';
 import mediaRoutes from './features/media/media.routes';
 import notificationRoutes from './features/notification/notification.routes';
 import publicRoutes from './features/public/public.routes';
+import recommendationsRoutes from './features/recommendations/recommendations.routes';
 import userRoutes from './features/user/user.routes';
 import userMediaRoutes from './features/user-media/user-media.routes';
 import { notFoundHandler } from './lib/http';
@@ -47,6 +48,7 @@ export function createApp(): Express {
   app.use('/api/user', authMiddleware, userRoutes);
   app.use('/api/users', authMiddleware, userRoutes);
   app.use('/api/media', authMiddleware, mediaRoutes);
+  app.use('/api/recommendations', authMiddleware, recommendationsRoutes);
   app.use('/api/user-media', authMiddleware, userMediaRoutes);
   app.use('/api/collection', authMiddleware, collectionRoutes);
   app.use('/api/friendship', authMiddleware, friendshipRoutes);
