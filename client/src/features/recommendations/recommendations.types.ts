@@ -1,5 +1,5 @@
 import type { MediaType, PaginationMeta } from '@/types/common';
-import type { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
+import type { MediaCardModel } from '@/features/media/media-card-model';
 
 export interface RecommendationSettings {
   useLiked: boolean;
@@ -19,7 +19,7 @@ export interface RecommendationReason {
 }
 
 export interface RecommendationItem {
-  media: MovieWithMeta | TvWithMeta;
+  media: MediaCardModel;
   score: number;
   reasons: RecommendationReason[];
 }

@@ -1,6 +1,16 @@
 import { Box, Button, Flex, Icon, Menu, Portal, Text } from '@chakra-ui/react';
 import type { IconType } from 'react-icons';
-import { LuActivity, LuBookmark, LuCheck, LuEllipsis, LuFolder, LuHeart, LuHouse, LuListChecks } from 'react-icons/lu';
+import {
+  LuActivity,
+  LuBookmark,
+  LuCheck,
+  LuEllipsis,
+  LuFolder,
+  LuHeart,
+  LuHouse,
+  LuListChecks,
+  LuSparkles,
+} from 'react-icons/lu';
 import { Link, useLocation } from 'react-router';
 
 interface NavigationItem {
@@ -14,6 +24,11 @@ const PRIMARY_ITEMS: NavigationItem[] = [
     label: 'Home',
     icon: LuHouse,
     to: '/app',
+  },
+  {
+    label: 'For You',
+    icon: LuSparkles,
+    to: '/app/recommendations',
   },
   {
     label: 'Watchlist',

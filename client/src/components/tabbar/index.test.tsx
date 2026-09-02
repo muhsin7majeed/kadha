@@ -20,6 +20,7 @@ describe('TabBar', () => {
 
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'For You' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Watchlist' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Collections' })).toBeInTheDocument();

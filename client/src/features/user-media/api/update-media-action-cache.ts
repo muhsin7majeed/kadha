@@ -52,7 +52,7 @@ export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapsh
 
 export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
   Promise.all(
-    [...mediaDiscoveryQueryKeys, queryKeys.viewingInsightsRoot].map((queryKey) =>
+    [...mediaDiscoveryQueryKeys, queryKeys.viewingInsightsRoot, queryKeys.recommendationsRoot].map((queryKey) =>
       queryClient.invalidateQueries({ queryKey }),
     ),
   );

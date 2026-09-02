@@ -28,6 +28,7 @@ const invalidateWatchHistoryDependents = (
     queryClient.invalidateQueries({ queryKey: queryKeys.userWatchedRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.userWatchListRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.viewingInsightsRoot }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.recommendationsRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.searchMedia }),
     queryClient.invalidateQueries({ queryKey: queryKeys.trendingMovies }),
     queryClient.invalidateQueries({ queryKey: queryKeys.popularMovies }),
