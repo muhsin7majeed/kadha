@@ -21,6 +21,8 @@
 
 - Added more TMDB-powered discovery rows on Home, including popular titles, now-playing movies, upcoming movies, currently-airing TV, and top-rated titles.
 - Added TMDB recommendations to media detail pages so each title can show related movies or shows.
+- Added a private For You recommendations page that scores suggestions from each user's own allowed liked, rating,
+  watched, rewatch, and optional watchlist signals, with visible match scores, explanations, and more/less/hide tuning.
 
 #### Media Tracking
 
@@ -45,6 +47,11 @@
 #### Release Workflow
 
 - Removed the generated client changelog sync step from local development, builds, and release preparation.
+
+#### Recommendations
+
+- Added user-owned recommendation settings and feedback storage, export coverage, authenticated recommendation APIs,
+  and regression coverage that keeps recommendation signals isolated to the current account.
 
 #### Media Tracking
 

@@ -113,8 +113,9 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ### Recommendations
 
-- [ ] Add genre-based and similar-title recommendations using TMDB.
-- [ ] Add recommendations based on a user's saved and watched media.
+- [x] Add private recommendations based on a user's own allowed liked, rating, watched, rewatch, and optional watchlist signals.
+- [x] Add user-controlled recommendation settings, visible scores and explanations, and more/less/hide tuning feedback.
+- [x] Add genre-based and similar-title candidate generation using TMDB without collaborative user-data pooling.
 - [ ] Evaluate optional bring-your-own-key or local AI recommendations without server-side data training.
 
 ### Insights And Statistics

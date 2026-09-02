@@ -23,8 +23,10 @@ is pseudonymous rather than anonymous.
 
 The hosted service is not end-to-end encrypted. The application server and instance operator can technically access
 stored data. The hosted operator does not routinely inspect private content, and Kadha does not sell or rent personal
-data, target advertising from it, or train AI models on it. Self-hosting gives the instance operator control of the
-server, database, logs, backups, and access policies.
+data, target advertising from it, or train AI models on it. Private recommendations are calculated from each user's own
+allowed tracking signals and tuning feedback; one user's preferences or location do not affect another user's
+recommendations. Self-hosting gives the instance operator control of the server, database, logs, backups, and access
+policies.
 
 ## Architecture
 
