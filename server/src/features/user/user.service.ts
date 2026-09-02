@@ -59,6 +59,8 @@ export async function exportCurrentUserData(id: string) {
     friendships,
     notifications,
     activity,
+    recommendationSettings,
+    recommendationFeedback,
   ] = await prisma.$transaction([
     prisma.user.findUnique({
       where: { id },
@@ -211,6 +213,18 @@ export async function exportCurrentUserData(id: string) {
         createdAt: 'desc',
       },
     }),
+    prisma.recommendationSettings.findUnique({
+      where: { userId: id },
+    }),
+    prisma.recommendationFeedback.findMany({
+      where: { userId: id },
+      include: {
+        media: true,
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
+    }),
   ]);
 
   return {
@@ -238,6 +252,11 @@ export async function exportCurrentUserData(id: string) {
     friendships,
     notifications,
     activity,
+    recommendationSettings,
+    recommendationFeedback: recommendationFeedback.map(({ media: mediaSnapshot, ...item }) => ({
+      ...item,
+      media: mediaSnapshot,
+    })),
   };
 }
 

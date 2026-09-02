@@ -13,6 +13,20 @@ describe('user data export', () => {
     const sender = await registerTestUser('export-sender');
 
     await updateUserMediaFlag(user, 'liked', true, 885101);
+    await prisma.recommendationSettings.create({
+      data: {
+        userId: user.userId,
+        useWatchlist: true,
+      },
+    });
+    await prisma.recommendationFeedback.create({
+      data: {
+        userId: user.userId,
+        media_id: 885101,
+        media_type: 'movie',
+        type: 'MORE_LIKE_THIS',
+      },
+    });
     await prisma.watchEvent.create({
       data: {
         userId: user.userId,
@@ -79,5 +93,25 @@ describe('user data export', () => {
     expect(exported.friendships).toHaveLength(1);
     expect(exported.notifications).toHaveLength(1);
     expect(exported.activity.length).toBeGreaterThanOrEqual(3);
+    expect(exported.recommendationSettings).toMatchObject({
+      userId: user.userId,
+      useLiked: true,
+      useRatings: true,
+      useWatched: true,
+      useRewatchHistory: true,
+      useWatchlist: true,
+      excludeWatched: true,
+    });
+    expect(exported.recommendationFeedback).toEqual([
+      expect.objectContaining({
+        userId: user.userId,
+        media_id: 885101,
+        media_type: 'movie',
+        type: 'MORE_LIKE_THIS',
+        media: expect.objectContaining({
+          title: 'Test Movie 885101',
+        }),
+      }),
+    ]);
   });
 });
