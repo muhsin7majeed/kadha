@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Center, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { LuSparkles } from 'react-icons/lu';
@@ -30,7 +30,11 @@ const Recommendations = () => {
         </Center>
       ) : error ? (
         <Box py={10}>
-          <ErrorState title="Recommendations unavailable" description="Failed to load recommendations." onRetry={refetch} />
+          <ErrorState
+            title="Recommendations unavailable"
+            description="Failed to load recommendations."
+            onRetry={refetch}
+          />
         </Box>
       ) : response?.status === 'NO_SIGNALS' ? (
         <Box py={10}>
@@ -55,17 +59,6 @@ const Recommendations = () => {
         </Box>
       ) : (
         <Stack gap="5">
-          <Alert.Root status="info">
-            <Alert.Indicator />
-            <Alert.Content>
-              <Alert.Title>Private to your account</Alert.Title>
-              <Alert.Description>
-                These suggestions are scored from your own allowed tracking data. Other users' preferences and locations do
-                not affect this list.
-              </Alert.Description>
-            </Alert.Content>
-          </Alert.Root>
-
           <Stack gap="4">
             {response?.items.map((item) => (
               <RecommendationListItem key={`${item.media.media_type}:${item.media.media_id}`} item={item} />

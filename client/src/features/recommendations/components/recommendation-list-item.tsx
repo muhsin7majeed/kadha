@@ -36,7 +36,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
     <Card.Root variant="outline">
       <Card.Body>
         <Flex direction={{ base: 'column', sm: 'row' }} gap="4" align={{ base: 'stretch', sm: 'flex-start' }}>
-          <Box alignSelf={{ base: 'center', sm: 'flex-start' }} flexShrink={0} w={{ base: '11rem', sm: '9rem' }}>
+          <Box alignSelf={{ base: 'center', sm: 'flex-start' }}>
             <MediaCard media={item.media} width="100%" />
           </Box>
 
@@ -63,8 +63,15 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 </Text>
                 <List.Root gap="1" ps="4">
                   {item.reasons.map((reason) => (
-                    <List.Item key={`${reason.type}:${reason.label}:${reason.score}`} color="fg.muted" textStyle="supporting">
-                      {reason.label} <Text as="span" color="fg.subtle">(+{reason.score})</Text>
+                    <List.Item
+                      key={`${reason.type}:${reason.label}:${reason.score}`}
+                      color="fg.muted"
+                      textStyle="supporting"
+                    >
+                      {reason.label}{' '}
+                      <Text as="span" color="fg.subtle">
+                        (+{reason.score})
+                      </Text>
                     </List.Item>
                   ))}
                 </List.Root>
