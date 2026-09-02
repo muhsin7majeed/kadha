@@ -78,6 +78,12 @@ export const notificationQueryKeys = {
   unreadNotificationsCount: ['notifications', 'unread-count'] as const,
 };
 
+export const recommendationQueryKeys = {
+  recommendationsRoot: ['recommendations'] as const,
+  recommendations: (page = 1, limit = 20) => ['recommendations', page, limit] as const,
+  recommendationSettings: ['recommendations', 'settings'] as const,
+};
+
 export const searchQueryKeys = {
   searchUsers: ['search-users'] as const,
   searchUsersByQuery: (query: string, page = 1) => ['search-users', query, page] as const,
@@ -120,6 +126,7 @@ export const queryKeys = {
   ...friendshipQueryKeys,
   ...mediaQueryKeys,
   ...notificationQueryKeys,
+  ...recommendationQueryKeys,
   ...searchQueryKeys,
   ...userQueryKeys,
   ...userMediaQueryKeys,
