@@ -44,6 +44,10 @@
 
 ### Engineering Changes
 
+#### Security Audit
+
+- Updated server dependency overrides for Prisma-sourced transitive `fast-uri` and `mysql2` advisories so the production dependency audit remains actionable.
+
 #### Release Workflow
 
 - Removed the generated client changelog sync step from local development, builds, and release preparation.
