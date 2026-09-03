@@ -14,7 +14,7 @@ export interface RecommendationSettingsResponse {
 export type RecommendationFeedbackValue = RecommendationFeedbackType;
 
 export interface RecommendationReason {
-  type: 'genre' | 'language' | 'decade' | 'rating' | 'liked' | 'rewatch' | 'feedback' | 'popularity';
+  type: 'genre' | 'person' | 'language' | 'decade' | 'rating' | 'liked' | 'rewatch' | 'feedback' | 'popularity';
   label: string;
   score: number;
 }

@@ -13,7 +13,7 @@ export interface RecommendationSettings {
 export type RecommendationFeedbackType = 'MORE_LIKE_THIS' | 'LESS_LIKE_THIS' | 'HIDE';
 
 export interface RecommendationReason {
-  type: 'genre' | 'language' | 'decade' | 'rating' | 'liked' | 'rewatch' | 'feedback' | 'popularity';
+  type: 'genre' | 'person' | 'language' | 'decade' | 'rating' | 'liked' | 'rewatch' | 'feedback' | 'popularity';
   label: string;
   score: number;
 }

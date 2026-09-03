@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MediaCreditKind } from '@prisma/client';
 
 const tmdbClient = vi.hoisted(() => ({
   fetchMediaRecommendations: vi.fn(),
@@ -54,6 +55,53 @@ const seedGenres = async () => {
       { id: 27, name: 'Horror' },
       { id: 53, name: 'Thriller' },
     ],
+  });
+};
+
+const addCreditMetadata = async (mediaId: number, personId: number, personName: string) => {
+  const snapshot = await prisma.mediaSnapshot.findUniqueOrThrow({
+    where: {
+      media_id_media_type: {
+        media_id: mediaId,
+        media_type: 'movie',
+      },
+    },
+  });
+
+  await prisma.person.upsert({
+    where: { id: personId },
+    update: { name: personName },
+    create: { id: personId, name: personName, knownForDepartment: 'Acting' },
+  });
+  await prisma.mediaCredit.create({
+    data: {
+      mediaSnapshotId: snapshot.id,
+      personId,
+      creditKey: `CAST:${personId}:${mediaId}`,
+      kind: MediaCreditKind.CAST,
+      billingOrder: 0,
+    },
+  });
+};
+
+const createCandidateSnapshot = async (mediaId: number, genreIds = [18]) => {
+  await prisma.mediaSnapshot.create({
+    data: {
+      media_id: mediaId,
+      media_type: 'movie',
+      title: `Candidate ${mediaId}`,
+      original_title: `Candidate ${mediaId}`,
+      overview: `Overview ${mediaId}`,
+      poster_path: null,
+      backdrop_path: null,
+      vote_average: 8,
+      vote_count: 100,
+      popularity: 20,
+      adult: false,
+      genre_ids: JSON.stringify(genreIds),
+      release_date: '2026-03-01',
+      original_language: 'en',
+    },
   });
 };
 
@@ -245,5 +293,44 @@ describe('recommendations', () => {
     const resetRecommendations = await getRecommendations(user);
 
     expect(resetRecommendations.items).toHaveLength(1);
+  });
+
+  it('normalizes broad genre and language signals so reasons stay human-sized', async () => {
+    await seedGenres();
+    const user = await registerTestUser('recommendation-normalized-user');
+
+    for (let mediaId = 891000; mediaId < 891020; mediaId += 1) {
+      await updateUserMediaFlag(user, 'liked', true, mediaId);
+    }
+    mockCandidatePools([movie(891101, [18], 'Broad drama candidate')]);
+
+    const recommendations = await getRecommendations(user);
+    const reasons = recommendations.items[0].reasons as Array<{ type: string; score: number }>;
+    const dramaReason = reasons.find((reason) => reason.type === 'genre');
+
+    expect(dramaReason?.score).toBeLessThanOrEqual(12);
+    expect(reasons.some((reason) => reason.type === 'language')).toBe(false);
+  });
+
+  it('uses local cast and crew metadata to rank specific matches above generic genre matches', async () => {
+    await seedGenres();
+    const user = await registerTestUser('recommendation-person-user');
+
+    await updateUserMediaFlag(user, 'liked', true, 891201);
+    await addCreditMetadata(891201, 991201, 'Specific Actor');
+    await createCandidateSnapshot(891301);
+    await createCandidateSnapshot(891302);
+    await addCreditMetadata(891302, 991201, 'Specific Actor');
+    mockCandidatePools([movie(891301, [18], 'Generic drama'), movie(891302, [18], 'Specific actor drama')]);
+
+    const recommendations = await getRecommendations(user);
+
+    expect(recommendations.items[0].media.media_id).toBe(891302);
+    expect(
+      recommendations.items[0].reasons.some(
+        (reason: { type: string; label: string }) =>
+          reason.type === 'person' && reason.label.includes('Specific Actor'),
+      ),
+    ).toBe(true);
   });
 });

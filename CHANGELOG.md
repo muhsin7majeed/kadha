@@ -23,6 +23,7 @@
 - Added TMDB recommendations to media detail pages so each title can show related movies or shows.
 - Added a private For You recommendations page that scores suggestions from each user's own allowed liked, rating,
   watched, rewatch, and optional watchlist signals, with visible match scores, explanations, and more/less/hide tuning.
+- Improved recommendation scoring so broad genres and common languages do not overwhelm more specific taste signals.
 
 #### Media Tracking
 

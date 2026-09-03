@@ -1,4 +1,4 @@
-import { RecommendationFeedbackType } from '@prisma/client';
+import { MediaCreditKind, RecommendationFeedbackType } from '@prisma/client';
 
 import { createPaginationMeta } from '@/lib/pagination';
 import { badRequest } from '@/lib/http';
@@ -35,7 +35,21 @@ const MAX_SEEDS = 6;
 const REWATCH_SIGNAL_CAP = 3;
 const FEEDBACK_FEATURE_WEIGHT = 2;
 const LESS_LIKE_THIS_FEATURE_PENALTY = -0.5;
-const DIRECT_LESS_LIKE_THIS_PENALTY = -2;
+const DIRECT_LESS_LIKE_THIS_PENALTY = -0.75;
+const MAX_CAST_CREDITS = 5;
+const FEATURE_CAPS = {
+  genre: 12,
+  person: 10,
+  language: 2,
+  decade: 3,
+  quality: 2,
+};
+const FEATURE_MULTIPLIERS = {
+  genre: 1,
+  person: 0.8,
+  language: 0.15,
+  decade: 0.25,
+};
 
 const mediaKey = (mediaType: string, mediaId: number) => `${mediaType}:${mediaId}`;
 
@@ -84,6 +98,38 @@ const getReleaseDecade = (releaseDate: string | null | undefined) => {
 const addWeight = <T>(map: Map<T, number>, key: T | null | undefined, weight: number) => {
   if (key === null || key === undefined || weight === 0) return;
   map.set(key, (map.get(key) ?? 0) + weight);
+};
+
+interface FeatureStat {
+  total: number;
+  count: number;
+}
+
+const addFeatureStat = <T>(map: Map<T, FeatureStat>, key: T | null | undefined, weight: number) => {
+  if (key === null || key === undefined || weight === 0) return;
+
+  const existing = map.get(key);
+  map.set(key, {
+    total: (existing?.total ?? 0) + weight,
+    count: (existing?.count ?? 0) + 1,
+  });
+};
+
+const normalizeFeatureStats = <T>(stats: Map<T, FeatureStat>, multiplier: number, cap: number) => {
+  const weights = new Map<T, number>();
+
+  for (const [key, stat] of stats) {
+    const averageWeight = stat.total / stat.count;
+    const confidence = Math.min(1, Math.sqrt(stat.count) / 3);
+    const normalizedWeight = averageWeight * confidence * multiplier;
+    const cappedWeight = Math.max(-cap, Math.min(cap, normalizedWeight));
+
+    if (cappedWeight !== 0) {
+      weights.set(key, Number(cappedWeight.toFixed(2)));
+    }
+  }
+
+  return weights;
 };
 
 const toSettingsResponse = (settings: RecommendationSettingsResponse): RecommendationSettingsResponse => ({
@@ -229,37 +275,72 @@ const getSignalWeight = (
 
 const addMediaFeatureWeights = (
   weights: {
-    genres: Map<number, number>;
-    languages: Map<string, number>;
-    decades: Map<string, number>;
+    genres: Map<number, FeatureStat>;
+    people: Map<number, FeatureStat>;
+    languages: Map<string, FeatureStat>;
+    decades: Map<string, FeatureStat>;
   },
   media: {
     genre_ids: string | number[] | null;
     original_language: string | null;
     release_date: string | null;
+    credits?: Array<{
+      personId: number;
+      kind: MediaCreditKind;
+      job: string | null;
+      billingOrder: number | null;
+    }>;
   },
   weight: number,
 ) => {
   for (const genreId of parseSnapshotGenreIds(media.genre_ids)) {
-    addWeight(weights.genres, genreId, weight);
+    addFeatureStat(weights.genres, genreId, weight);
   }
 
-  addWeight(weights.languages, media.original_language, weight * 0.5);
-  addWeight(weights.decades, getReleaseDecade(media.release_date), weight * 0.35);
+  for (const credit of getRecommendationCredits(media.credits ?? [])) {
+    addFeatureStat(weights.people, credit.personId, weight);
+  }
+
+  addFeatureStat(weights.languages, media.original_language, weight);
+  addFeatureStat(weights.decades, getReleaseDecade(media.release_date), weight);
+};
+
+const getRecommendationCredits = <T extends { kind: MediaCreditKind; job: string | null; billingOrder: number | null }>(
+  credits: T[],
+) => {
+  const cast = credits
+    .filter((credit) => credit.kind === MediaCreditKind.CAST && (credit.billingOrder ?? Number.MAX_SAFE_INTEGER) < MAX_CAST_CREDITS)
+    .sort((first, second) => (first.billingOrder ?? Number.MAX_SAFE_INTEGER) - (second.billingOrder ?? Number.MAX_SAFE_INTEGER));
+  const authors = credits.filter(
+    (credit) =>
+      credit.kind === MediaCreditKind.CREATOR ||
+      (credit.kind === MediaCreditKind.CREW && credit.job?.toLowerCase() === 'director'),
+  );
+
+  return [...cast, ...authors];
 };
 
 const getCandidateScore = (
   candidate: RecommendationCandidate,
   weights: {
     genres: Map<number, number>;
+    people: Map<number, number>;
     languages: Map<string, number>;
     decades: Map<string, number>;
   },
   genreNames: Map<number, string>,
+  personNames: Map<number, string>,
+  candidateCredits: Array<{
+    personId: number;
+    kind: MediaCreditKind;
+    job: string | null;
+    billingOrder: number | null;
+  }>,
   directFeedback: RecommendationFeedbackType | undefined,
 ) => {
   const reasons: RecommendationReason[] = [];
   let score = 0;
+  let genreTotal = 0;
 
   for (const genreId of candidate.genre_ids) {
     const genreScore = weights.genres.get(genreId) ?? 0;
@@ -272,11 +353,28 @@ const getCandidateScore = (
       });
     }
 
-    score += genreScore;
+    genreTotal += genreScore;
   }
+  score += Math.max(-FEATURE_CAPS.genre, Math.min(FEATURE_CAPS.genre, genreTotal));
+
+  let personTotal = 0;
+  for (const credit of getRecommendationCredits(candidateCredits)) {
+    const personScore = weights.people.get(credit.personId) ?? 0;
+
+    if (personScore > 0) {
+      reasons.push({
+        type: 'person',
+        label: `Matches your interest in ${personNames.get(credit.personId) ?? 'this cast or crew member'}`,
+        score: Number(personScore.toFixed(2)),
+      });
+    }
+
+    personTotal += personScore;
+  }
+  score += Math.max(-FEATURE_CAPS.person, Math.min(FEATURE_CAPS.person, personTotal));
 
   const languageScore = weights.languages.get(candidate.original_language ?? '') ?? 0;
-  if (languageScore > 0) {
+  if (languageScore > 0 && (candidate.original_language !== 'en' || languageScore >= 1.5)) {
     reasons.push({ type: 'language', label: `Matches ${candidate.original_language?.toUpperCase()} language preference`, score: Number(languageScore.toFixed(2)) });
   }
   score += languageScore;
@@ -297,15 +395,14 @@ const getCandidateScore = (
     score += DIRECT_LESS_LIKE_THIS_PENALTY;
   }
 
-  const qualityScore = Math.min(candidate.vote_average, 10) * 0.4;
-  const popularityScore = Math.min(candidate.popularity / 100, 1.5);
-  score += qualityScore + popularityScore;
+  const qualityScore = Math.min(FEATURE_CAPS.quality, Math.min(candidate.vote_average, 10) * 0.18 + Math.min(candidate.popularity / 100, 0.5));
+  score += qualityScore;
 
-  if (qualityScore + popularityScore > 3) {
+  if (qualityScore > 1.5) {
     reasons.push({
       type: 'popularity',
       label: 'Has a strong TMDB rating/popularity signal',
-      score: Number((qualityScore + popularityScore).toFixed(2)),
+      score: Number(qualityScore.toFixed(2)),
     });
   }
 
@@ -410,7 +507,11 @@ export async function getRecommendations(userId: string, page: number, limit: nu
         OR: [{ liked: true }, { watched: true }, { watchlist: true }, { rating: { not: null } }],
       },
       include: {
-        media: true,
+        media: {
+          include: {
+            credits: true,
+          },
+        },
       },
     }),
     prisma.watchEvent.groupBy({
@@ -426,7 +527,11 @@ export async function getRecommendations(userId: string, page: number, limit: nu
     prisma.recommendationFeedback.findMany({
       where: { userId },
       include: {
-        media: true,
+        media: {
+          include: {
+            credits: true,
+          },
+        },
       },
     }),
   ]);
@@ -439,9 +544,10 @@ export async function getRecommendations(userId: string, page: number, limit: nu
     mediaRows.filter((item) => item.watched).map((item) => mediaKey(item.media_type, item.media_id)),
   );
   const weights = {
-    genres: new Map<number, number>(),
-    languages: new Map<string, number>(),
-    decades: new Map<string, number>(),
+    genres: new Map<number, FeatureStat>(),
+    people: new Map<number, FeatureStat>(),
+    languages: new Map<string, FeatureStat>(),
+    decades: new Map<string, FeatureStat>(),
   };
   const weightedSignals = mediaRows
     .map((row) => ({
@@ -489,12 +595,36 @@ export async function getRecommendations(userId: string, page: number, limit: nu
 
   const candidates = await getCandidateMedia(seeds);
   const candidateGenreIds = [...new Set(candidates.flatMap((candidate) => candidate.genre_ids))];
-  const genres = await prisma.genre.findMany({
-    where: {
-      id: { in: candidateGenreIds },
-    },
-  });
+  const [genres, candidateSnapshots] = await prisma.$transaction([
+    prisma.genre.findMany({
+      where: {
+        id: { in: candidateGenreIds },
+      },
+    }),
+    prisma.mediaSnapshot.findMany({
+      where: {
+        OR: candidates.map((candidate) => ({ media_id: candidate.media_id, media_type: candidate.media_type })),
+      },
+      include: {
+        credits: {
+          include: {
+            person: true,
+          },
+        },
+      },
+    }),
+  ]);
   const genreNames = new Map(genres.map((genre) => [genre.id, genre.name]));
+  const candidateSnapshotMap = new Map(candidateSnapshots.map((snapshot) => [mediaKey(snapshot.media_type, snapshot.media_id), snapshot]));
+  const personNames = new Map(
+    candidateSnapshots.flatMap((snapshot) => snapshot.credits.map((credit) => [credit.personId, credit.person.name] as const)),
+  );
+  const normalizedWeights = {
+    genres: normalizeFeatureStats(weights.genres, FEATURE_MULTIPLIERS.genre, FEATURE_CAPS.genre),
+    people: normalizeFeatureStats(weights.people, FEATURE_MULTIPLIERS.person, FEATURE_CAPS.person),
+    languages: normalizeFeatureStats(weights.languages, FEATURE_MULTIPLIERS.language, FEATURE_CAPS.language),
+    decades: normalizeFeatureStats(weights.decades, FEATURE_MULTIPLIERS.decade, FEATURE_CAPS.decade),
+  };
 
   const scoredItems = candidates
     .filter((candidate) => !hiddenKeys.has(mediaKey(candidate.media_type, candidate.media_id)))
@@ -502,8 +632,10 @@ export async function getRecommendations(userId: string, page: number, limit: nu
     .map((candidate) => {
       const { score, reasons } = getCandidateScore(
         candidate,
-        weights,
+        normalizedWeights,
         genreNames,
+        personNames,
+        candidateSnapshotMap.get(mediaKey(candidate.media_type, candidate.media_id))?.credits ?? [],
         feedbackMap.get(mediaKey(candidate.media_type, candidate.media_id)),
       );
 
