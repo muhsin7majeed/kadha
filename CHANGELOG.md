@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.12
+
 ### Feature Changes
 
 #### Privacy And Sharing
