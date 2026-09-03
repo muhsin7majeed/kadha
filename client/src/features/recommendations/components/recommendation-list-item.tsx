@@ -34,19 +34,27 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
   const { mutate: saveFeedback, isPending } = useSaveRecommendationFeedback();
   const [pendingFeedback, setPendingFeedback] = useState<RecommendationFeedbackType | null>(null);
   const [selectedFeedback, setSelectedFeedback] = useState<RecommendationFeedbackType | null>(null);
+  const [isHidden, setIsHidden] = useState(false);
 
   const handleFeedback = (type: RecommendationFeedbackType) => {
     if (selectedFeedback === type) return;
 
     setPendingFeedback(type);
+    if (type === 'HIDE') setIsHidden(true);
+
     saveFeedback(toFeedbackPayload(item, type), {
       onSuccess: () => setSelectedFeedback(type),
+      onError: () => {
+        if (type === 'HIDE') setIsHidden(false);
+      },
       onSettled: () => setPendingFeedback(null),
     });
   };
 
   const isButtonDisabled = (type: RecommendationFeedbackType) =>
     isPending || pendingFeedback !== null || selectedFeedback === type;
+
+  if (isHidden) return null;
 
   return (
     <Card.Root variant="outline">
@@ -96,7 +104,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
 
             <Stack direction={{ base: 'column', md: 'row' }} gap="2">
               <Button
-                variant="outline"
+                variant={selectedFeedback === 'MORE_LIKE_THIS' ? 'solid' : 'outline'}
                 colorPalette="brand"
                 size="sm"
                 loading={pendingFeedback === 'MORE_LIKE_THIS'}
@@ -105,10 +113,10 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 onClick={() => handleFeedback('MORE_LIKE_THIS')}
               >
                 <LuThumbsUp />
-                {selectedFeedback === 'MORE_LIKE_THIS' ? 'More like this saved' : 'More like this'}
+                More like this
               </Button>
               <Button
-                variant="outline"
+                variant={selectedFeedback === 'LESS_LIKE_THIS' ? 'solid' : 'outline'}
                 colorPalette="gray"
                 size="sm"
                 loading={pendingFeedback === 'LESS_LIKE_THIS'}
@@ -117,10 +125,10 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 onClick={() => handleFeedback('LESS_LIKE_THIS')}
               >
                 <LuThumbsDown />
-                {selectedFeedback === 'LESS_LIKE_THIS' ? 'Less like this saved' : 'Less like this'}
+                Less like this
               </Button>
               <Button
-                variant="ghost"
+                variant={selectedFeedback === 'HIDE' ? 'solid' : 'ghost'}
                 colorPalette="gray"
                 size="sm"
                 loading={pendingFeedback === 'HIDE'}
@@ -129,7 +137,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 onClick={() => handleFeedback('HIDE')}
               >
                 <LuEyeOff />
-                {selectedFeedback === 'HIDE' ? 'Hidden' : 'Hide'}
+                Hide
               </Button>
             </Stack>
           </Stack>

@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
 
 type MutationOptions = {
   onSuccess?: () => void;
+  onError?: () => void;
   onSettled?: () => void;
 };
 
@@ -50,11 +51,11 @@ describe('RecommendationListItem', () => {
     mocks.mutate.mockReset();
   });
 
-  it('loads only the clicked feedback button and keeps successful feedback selected', async () => {
+  it('loads only the clicked feedback button, keeps labels stable, and allows switching feedback', async () => {
     const user = userEvent.setup();
-    let mutationOptions: MutationOptions | undefined;
+    const mutationOptions: MutationOptions[] = [];
     mocks.mutate.mockImplementation((_: RecommendationFeedbackPayload, options: MutationOptions) => {
-      mutationOptions = options;
+      mutationOptions.push(options);
     });
 
     renderWithProviders(<RecommendationListItem item={item} />);
@@ -70,13 +71,46 @@ describe('RecommendationListItem', () => {
     expect(screen.getByRole('button', { name: 'Hide' })).toBeDisabled();
 
     act(() => {
-      mutationOptions?.onSuccess?.();
+      mutationOptions[0].onSuccess?.();
+      mutationOptions[0].onSettled?.();
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'More like this' })).toBeDisabled());
+    expect(screen.queryByRole('button', { name: 'More like this saved' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'More like this' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Less like this' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Hide' })).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Less like this' }));
+
+    act(() => {
+      mutationOptions[1].onSuccess?.();
+      mutationOptions[1].onSettled?.();
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Less like this' })).toHaveAttribute('aria-pressed', 'true'));
+    expect(screen.getByRole('button', { name: 'More like this' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'More like this' })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('removes hidden recommendations optimistically and restores them if saving fails', async () => {
+    const user = userEvent.setup();
+    let mutationOptions: MutationOptions | undefined;
+    mocks.mutate.mockImplementation((_: RecommendationFeedbackPayload, options: MutationOptions) => {
+      mutationOptions = options;
+    });
+
+    renderWithProviders(<RecommendationListItem item={item} />);
+
+    await user.click(screen.getByRole('button', { name: 'Hide' }));
+
+    expect(screen.queryByRole('heading', { name: 'A Better Match' })).not.toBeInTheDocument();
+
+    act(() => {
+      mutationOptions?.onError?.();
       mutationOptions?.onSettled?.();
     });
 
-    await waitFor(() => expect(screen.getByRole('button', { name: 'More like this saved' })).toBeDisabled());
-    expect(screen.getByRole('button', { name: 'More like this saved' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Less like this' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Hide' })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'A Better Match' })).toBeInTheDocument());
   });
 });
