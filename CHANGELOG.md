@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Discovery
+
+- Fixed recommendation feedback buttons so only the clicked action shows loading and successful feedback remains visibly selected.
+
 ## v0.1.12
 
 ### Feature Changes

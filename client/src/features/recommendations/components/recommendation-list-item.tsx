@@ -1,15 +1,16 @@
 import { Badge, Box, Button, Card, Flex, Heading, HStack, List, Stack, Text } from '@chakra-ui/react';
+import { useState } from 'react';
 import { LuEyeOff, LuThumbsDown, LuThumbsUp } from 'react-icons/lu';
 
 import MediaCard from '@/components/media-card';
 import useSaveRecommendationFeedback from '@/features/recommendations/api/use-save-recommendation-feedback';
-import type { RecommendationItem } from '@/features/recommendations/recommendations.types';
+import type { RecommendationFeedbackType, RecommendationItem } from '@/features/recommendations/recommendations.types';
 
 interface RecommendationListItemProps {
   item: RecommendationItem;
 }
 
-const toFeedbackPayload = (item: RecommendationItem, type: 'MORE_LIKE_THIS' | 'LESS_LIKE_THIS' | 'HIDE') => ({
+const toFeedbackPayload = (item: RecommendationItem, type: RecommendationFeedbackType) => ({
   media_id: item.media.media_id,
   media_type: item.media.media_type,
   type,
@@ -31,6 +32,21 @@ const toFeedbackPayload = (item: RecommendationItem, type: 'MORE_LIKE_THIS' | 'L
 
 const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
   const { mutate: saveFeedback, isPending } = useSaveRecommendationFeedback();
+  const [pendingFeedback, setPendingFeedback] = useState<RecommendationFeedbackType | null>(null);
+  const [selectedFeedback, setSelectedFeedback] = useState<RecommendationFeedbackType | null>(null);
+
+  const handleFeedback = (type: RecommendationFeedbackType) => {
+    if (selectedFeedback === type) return;
+
+    setPendingFeedback(type);
+    saveFeedback(toFeedbackPayload(item, type), {
+      onSuccess: () => setSelectedFeedback(type),
+      onSettled: () => setPendingFeedback(null),
+    });
+  };
+
+  const isButtonDisabled = (type: RecommendationFeedbackType) =>
+    isPending || pendingFeedback !== null || selectedFeedback === type;
 
   return (
     <Card.Root variant="outline">
@@ -83,34 +99,37 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 variant="outline"
                 colorPalette="brand"
                 size="sm"
-                loading={isPending}
-                disabled={isPending}
-                onClick={() => saveFeedback(toFeedbackPayload(item, 'MORE_LIKE_THIS'))}
+                loading={pendingFeedback === 'MORE_LIKE_THIS'}
+                disabled={isButtonDisabled('MORE_LIKE_THIS')}
+                aria-pressed={selectedFeedback === 'MORE_LIKE_THIS'}
+                onClick={() => handleFeedback('MORE_LIKE_THIS')}
               >
                 <LuThumbsUp />
-                More like this
+                {selectedFeedback === 'MORE_LIKE_THIS' ? 'More like this saved' : 'More like this'}
               </Button>
               <Button
                 variant="outline"
                 colorPalette="gray"
                 size="sm"
-                loading={isPending}
-                disabled={isPending}
-                onClick={() => saveFeedback(toFeedbackPayload(item, 'LESS_LIKE_THIS'))}
+                loading={pendingFeedback === 'LESS_LIKE_THIS'}
+                disabled={isButtonDisabled('LESS_LIKE_THIS')}
+                aria-pressed={selectedFeedback === 'LESS_LIKE_THIS'}
+                onClick={() => handleFeedback('LESS_LIKE_THIS')}
               >
                 <LuThumbsDown />
-                Less like this
+                {selectedFeedback === 'LESS_LIKE_THIS' ? 'Less like this saved' : 'Less like this'}
               </Button>
               <Button
                 variant="ghost"
                 colorPalette="gray"
                 size="sm"
-                loading={isPending}
-                disabled={isPending}
-                onClick={() => saveFeedback(toFeedbackPayload(item, 'HIDE'))}
+                loading={pendingFeedback === 'HIDE'}
+                disabled={isButtonDisabled('HIDE')}
+                aria-pressed={selectedFeedback === 'HIDE'}
+                onClick={() => handleFeedback('HIDE')}
               >
                 <LuEyeOff />
-                Hide
+                {selectedFeedback === 'HIDE' ? 'Hidden' : 'Hide'}
               </Button>
             </Stack>
           </Stack>
