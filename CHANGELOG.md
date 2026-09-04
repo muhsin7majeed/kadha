@@ -8,6 +8,12 @@
 
 - Fixed recommendation feedback buttons so only the clicked action shows loading and successful feedback remains visibly selected.
 
+### Engineering Changes
+
+#### Planning
+
+- Rebalanced roadmap priorities around Kadha's current small-app stage, keeping account and privacy regression protections high while moving hosted-operations maturity work later.
+
 ## v0.1.12
 
 ### Feature Changes

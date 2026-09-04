@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-08-22
+Last reviewed: 2026-09-04
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -52,51 +52,61 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ## Near-Term Priorities
 
-### Privacy And Security Hardening
+These priorities are calibrated for Kadha as a small, niche, privacy-focused app rather than an enterprise product. Work
+that prevents obvious account compromise, private-data exposure, or privacy-regression bugs stays high priority. Hosted
+operations, compliance maturity, and abuse-monitoring work move later unless the hosted service grows enough to need them.
 
-#### P0 — Immediate
+### Privacy, Reliability, And Product Priorities
+
+#### P0 — Trust Baseline And Regression Protection
 
 - [x] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
 - [x] Protect login, registration, recovery, and session-refresh endpoints with targeted rate limits, require eight-character new passwords, and provide password-strength guidance.
-- [ ] Add breached-password rejection without sending complete passwords to a third party.
-- [ ] Add rotated, revocable refresh sessions with reuse detection, logout invalidation, and a log-out-everywhere action.
+- [ ] Add rotated, revocable refresh sessions with logout invalidation, log-out-everywhere, and reuse detection.
+- [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
+- [ ] Require recent reauthentication before account export, deletion, password changes, recovery-code replacement, and other sensitive account actions.
+- [ ] Add end-to-end smoke coverage for authentication, media tracking, collection permissions, and privacy visibility.
 - [x] Close authentication CSRF exposure with hosted-instance `SameSite=Strict` cookies, JSON-only auth requests, and Origin validation.
 - [x] Add authenticated self-service account deletion with session cleanup and documented backup handling.
-- [ ] Add a configurable private support channel for account and privacy requests that cannot be completed in-product.
 - [x] Complete account exports with episode-watch history and automated coverage for every user-owned data category.
 - [x] Automate encrypted, integrity-checked SQLite backups before migrations with retention and restore tooling.
-- [ ] Complete a production restore drill using an off-host backup and separately stored encryption key.
-- [ ] Complete the hosted privacy notice with operator contact, purposes, retention, recipients, user rights, cookies, and deletion details.
 
-#### P1 — Next Security And Privacy Release
-
-- [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
-- [x] Add collaboration-safe account deletion with impact previews, optional collection ownership transfer, anonymous
-  system notifications, and stale-resource handling.
-- [x] Make newly registered profiles, activity sections, and collections private by default.
-- [ ] Evaluate opt-in username discovery.
-- [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
-- [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
-- [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
-- [x] Add authenticated password changes that revoke existing sessions.
-
-#### P2 — Follow-Up Hardening
-
-- [ ] Define and enforce retention periods for obsolete activity, resolved notifications, old invitations, and operational logs.
-- [ ] Require recent reauthentication before account export, deletion, password changes, and other sensitive account actions.
-- [ ] Expand third-party transparency for TMDB search, media lookup, artwork, and hosting data flows.
-- [ ] Automate scheduled off-host replication of encrypted database backups with remote retention and failure reporting.
-
-### Release And Beta Reliability
-
-- [ ] Add end-to-end smoke coverage for authentication, media tracking, collection permissions, and privacy.
-- [ ] Document and verify upgrades from existing SQLite databases.
-- [ ] Measure client startup and home-page performance, then set a practical bundle budget.
-
-### Data Ownership
+#### P1 — Portability, Useful Privacy, And Product Reliability
 
 - [ ] Add versioned JSON import with validation, preview, idempotency, and conflict handling.
 - [ ] Add supported import adapters for services such as Letterboxd or Trakt.
+- [ ] Add watch-history totals and trends.
+- [ ] Add breached-password rejection without sending complete passwords to a third party.
+- [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
+- [ ] Complete the hosted privacy notice with operator contact, purposes, retention, recipients, user rights, cookies, and deletion details before broader hosted use.
+- [ ] Document and verify upgrades from existing SQLite databases.
+- [ ] Measure client startup and home-page performance, then set a practical bundle budget.
+- [x] Add collaboration-safe account deletion with impact previews, optional collection ownership transfer, anonymous
+  system notifications, and stale-resource handling.
+- [x] Make newly registered profiles, activity sections, and collections private by default.
+- [x] Gate production deployments on successful CI and security checks, deploy immutable image versions, and retain a rollback path.
+- [x] Add authenticated password changes that revoke existing sessions.
+
+#### P2 — Hosted Operations And Social Expansion
+
+- [ ] Complete a production restore drill using an off-host backup and separately stored encryption key.
+- [ ] Add privacy-conscious security logging and alerts for authentication abuse, session reuse, admin access, exports, deletion, and backup failures.
+- [ ] Define and enforce retention periods for obsolete activity, resolved notifications, old invitations, and operational logs.
+- [ ] Expand third-party transparency for TMDB search, media lookup, artwork, and hosting data flows.
+- [ ] Automate scheduled off-host replication of encrypted database backups with remote retention and failure reporting.
+- [ ] Add a configurable private support channel for account and privacy requests that cannot be completed in-product.
+- [ ] Evaluate opt-in username discovery.
+- [ ] Add a privacy-aware friends activity feed.
+- [ ] Add a full ghost mode with no public profile footprint.
+
+### Release And Beta Reliability
+
+- [ ] Keep core Docker Compose build, lint, and test checks green before releases.
+- [ ] Expand smoke coverage as privacy-sensitive product flows are added.
+
+### Data Ownership
+
+- [ ] Keep export and import formats documented as they evolve.
 
 ### Media Tracking
 
@@ -105,9 +115,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 ### Social
 
-- [ ] Add a privacy-aware friends activity feed.
 - [x] Add opt-in public collection links.
-- [ ] Add a full ghost mode with no public profile footprint.
 
 ## Later Product Work
 
@@ -122,7 +130,6 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 
 - [x] Add a private profile overview with watched-title and episode totals, personal rating summaries, and ranked genre,
   cast, movie-director, TV-creator, liked-genre, release-decade, and original-language insights.
-- [ ] Add watch-history totals and trends.
 - [ ] Add time-watched estimates.
 - [x] Add genre and media-type breakdowns.
 - [ ] Add TV progress and viewing-pattern insights.
