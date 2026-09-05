@@ -5,6 +5,7 @@
 - Always confirm with the user before making code changes.
 - Write readable, reliable, maintainable, and scalable code and solutions.
 - Keep changes focused on the requested behavior and avoid unrelated refactors.
+- When discussing features, bugs, polish, or product behavior, suggest small opportunities for easter eggs or humor when they fit naturally. Keep them subtle, genuine, and grounded in a solo developer's voice; avoid jokes, wording, or surprises that feel forced, distracting, or like they are trying too hard.
 - Add code comments only when they are actually useful. Do not add comments for the sake of adding comments.
 - Avoid using `any` in TypeScript. Prefer precise types, `unknown` with narrowing, generics, or existing domain types.
 - Ask before adding production dependencies or changing deployment/runtime assumptions.
