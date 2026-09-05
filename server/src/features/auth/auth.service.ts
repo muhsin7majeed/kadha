@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'node:crypto';
 import { DataPrivacy, UserActivityType } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -11,19 +12,56 @@ import { LoginBody, RecoverAccountBody, RegisterBody } from './auth.schema';
 import { createRecoveryCode, verifyRecoveryCode } from './recovery-code';
 
 interface RefreshTokenPayload {
+  sessionId: string;
+  tokenId: string;
   username: string;
   userId: string;
   sessionVersion?: number;
 }
 
-export function getTokens(username: string, userId: string, sessionVersion: number) {
-  const payload = { username, userId, sessionVersion };
-  const accessToken = jwt.sign(payload, envConfig.jwtAccessSecret, {
+const hashRefreshTokenId = (tokenId: string) => createHash('sha256').update(tokenId).digest('hex');
+
+const createAccessToken = (username: string, userId: string, sessionVersion: number) => {
+  return jwt.sign({ username, userId, sessionVersion }, envConfig.jwtAccessSecret, {
     expiresIn: ACCESS_TOKEN_EXPIRATION_SECONDS,
   });
-  const refreshToken = jwt.sign(payload, envConfig.jwtRefreshSecret, {
-    expiresIn: REFRESH_TOKEN_EXPIRATION_SECONDS,
+};
+
+const revokeAllRefreshSessions = async (userId: string) => {
+  await prisma.refreshSession.updateMany({
+    where: {
+      userId,
+      revokedAt: null,
+    },
+    data: {
+      revokedAt: new Date(),
+    },
   });
+};
+
+export async function getTokens(username: string, userId: string, sessionVersion: number) {
+  const accessToken = createAccessToken(username, userId, sessionVersion);
+  const tokenId = randomBytes(32).toString('hex');
+  const refreshSession = await prisma.refreshSession.create({
+    data: {
+      userId,
+      tokenHash: hashRefreshTokenId(tokenId),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000),
+    },
+  });
+  const refreshToken = jwt.sign(
+    {
+      sessionId: refreshSession.id,
+      tokenId,
+      username,
+      userId,
+      sessionVersion,
+    },
+    envConfig.jwtRefreshSecret,
+    {
+      expiresIn: REFRESH_TOKEN_EXPIRATION_SECONDS,
+    },
+  );
 
   return { accessToken, refreshToken };
 }
@@ -68,7 +106,7 @@ export async function registerUser({ username, password, watchRegion }: Register
   });
 
   return {
-    ...getTokens(newUser.username, newUser.id, newUser.sessionVersion),
+    ...(await getTokens(newUser.username, newUser.id, newUser.sessionVersion)),
     recoveryCode,
     userId: newUser.id,
   };
@@ -96,37 +134,87 @@ export async function loginUser({ username, password }: LoginBody) {
   });
 
   return {
-    ...getTokens(user.username, user.id, user.sessionVersion),
+    ...(await getTokens(user.username, user.id, user.sessionVersion)),
     userId: user.id,
   };
 }
 
 export async function refreshAccessToken(refreshToken: string) {
   const decoded = jwt.verify(refreshToken, envConfig.jwtRefreshSecret) as RefreshTokenPayload;
-  const user = await prisma.user.findUnique({
-    where: { id: decoded.userId },
-    select: {
-      id: true,
-      username: true,
-      sessionVersion: true,
-    },
-  });
+  const [session, user] = await Promise.all([
+    prisma.refreshSession.findUnique({
+      where: { id: decoded.sessionId },
+      select: {
+        id: true,
+        userId: true,
+        tokenHash: true,
+        expiresAt: true,
+        revokedAt: true,
+      },
+    }),
+    prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        sessionVersion: true,
+      },
+    }),
+  ]);
 
-  if (!user || (decoded.sessionVersion ?? 0) !== user.sessionVersion) {
+  if (!user || !session || session.userId !== user.id || (decoded.sessionVersion ?? 0) !== user.sessionVersion) {
     throw new Error('Refresh session is no longer valid');
   }
 
-  return jwt.sign(
+  const tokenHash = hashRefreshTokenId(decoded.tokenId);
+
+  if (session.revokedAt || session.tokenHash !== tokenHash) {
+    await revokeAllRefreshSessions(user.id);
+    throw new Error('Refresh session is no longer valid');
+  }
+
+  if (session.expiresAt.getTime() <= Date.now()) {
+    throw new Error('Refresh session is no longer valid');
+  }
+
+  const nextTokenId = randomBytes(32).toString('hex');
+  const nextExpiresAt = new Date(Date.now() + REFRESH_TOKEN_EXPIRATION_SECONDS * 1000);
+  const rotateResult = await prisma.refreshSession.updateMany({
+    where: {
+      id: session.id,
+      tokenHash,
+      revokedAt: null,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    data: {
+      tokenHash: hashRefreshTokenId(nextTokenId),
+      expiresAt: nextExpiresAt,
+    },
+  });
+
+  if (rotateResult.count !== 1) {
+    await revokeAllRefreshSessions(user.id);
+    throw new Error('Refresh session is no longer valid');
+  }
+
+  const accessToken = createAccessToken(user.username, user.id, user.sessionVersion);
+  const nextRefreshToken = jwt.sign(
     {
+      sessionId: session.id,
+      tokenId: nextTokenId,
       username: user.username,
       userId: user.id,
       sessionVersion: user.sessionVersion,
     },
-    envConfig.jwtAccessSecret,
+    envConfig.jwtRefreshSecret,
     {
-      expiresIn: ACCESS_TOKEN_EXPIRATION_SECONDS,
+      expiresIn: REFRESH_TOKEN_EXPIRATION_SECONDS,
     },
   );
+
+  return { accessToken, refreshToken: nextRefreshToken };
 }
 
 export async function recordLogoutActivity(refreshToken?: string) {
@@ -139,6 +227,7 @@ export async function recordLogoutActivity(refreshToken?: string) {
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: {
+        id: true,
         sessionVersion: true,
       },
     });
@@ -147,16 +236,77 @@ export async function recordLogoutActivity(refreshToken?: string) {
       return;
     }
 
-    await createUserActivity({
-      userId: decoded.userId,
-      type: UserActivityType.ACCOUNT_LOGGED_OUT,
-      metadata: {
-        title: decoded.username,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.refreshSession.updateMany({
+        where: {
+          id: decoded.sessionId,
+          userId: user.id,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: new Date(),
+        },
+      });
+      await createUserActivity(
+        {
+          userId: decoded.userId,
+          type: UserActivityType.ACCOUNT_LOGGED_OUT,
+          metadata: {
+            title: decoded.username,
+          },
+        },
+        tx,
+      );
     });
   } catch {
     return;
   }
+}
+
+export async function logoutEverywhere(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+    },
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: {
+        sessionVersion: {
+          increment: 1,
+        },
+      },
+    });
+    await tx.refreshSession.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+    await createUserActivity(
+      {
+        userId: user.id,
+        type: UserActivityType.ACCOUNT_LOGGED_OUT,
+        metadata: {
+          title: user.username,
+        },
+      },
+      tx,
+    );
+  });
+
+  return true;
 }
 
 export async function getRecoveryCodeStatus(userId: string) {
@@ -272,6 +422,16 @@ export async function changeUserPassword(userId: string, currentPassword: string
       return false;
     }
 
+    await tx.refreshSession.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+
     await createUserActivity(
       {
         userId: user.id,
@@ -326,6 +486,16 @@ export async function recoverUserAccount({ username, recoveryCode, newPassword }
     if (updateResult.count !== 1) {
       return false;
     }
+
+    await tx.refreshSession.updateMany({
+      where: {
+        userId: user.id,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
 
     await createUserActivity(
       {

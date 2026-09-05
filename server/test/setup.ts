@@ -42,6 +42,7 @@ beforeEach(async () => {
     prisma.notification.deleteMany(),
     prisma.friendship.deleteMany(),
     prisma.userActivity.deleteMany(),
+    prisma.refreshSession.deleteMany(),
     prisma.recommendationFeedback.deleteMany(),
     prisma.recommendationSettings.deleteMany(),
     prisma.watchEvent.deleteMany(),

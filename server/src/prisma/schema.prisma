@@ -114,6 +114,7 @@ model User {
   watchEvents            WatchEvent[]
   recommendationSettings RecommendationSettings?
   recommendationFeedback RecommendationFeedback[]
+  refreshSessions        RefreshSession[]
   collections            Collection[]
 
   // Friend relationships
@@ -130,6 +131,22 @@ model User {
   addedCollectionItems      CollectionItem[]   @relation("CollectionItemAddedByUser")
 
   @@map("users")
+}
+
+model RefreshSession {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_sessions")
 }
 
 model Friendship {

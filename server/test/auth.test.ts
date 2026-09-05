@@ -243,14 +243,22 @@ describe('auth edge cases', () => {
       .set('Cookie', [`jwt=${refreshToken}`])
       .send({})
       .expect(200);
+    const rotatedRefreshToken = getRefreshToken(refreshResponse);
 
     expect(refreshResponse.body).toEqual({
       accessToken: expect.any(String),
     });
+    expect(rotatedRefreshToken).not.toBe(refreshToken);
+
+    await request(await getTestApp())
+      .post('/api/auth/refresh')
+      .set('Cookie', [`jwt=${refreshToken}`])
+      .send({})
+      .expect(401);
 
     const logoutResponse = await request(await getTestApp())
       .post('/api/auth/logout')
-      .set('Cookie', [`jwt=${refreshToken}`])
+      .set('Cookie', [`jwt=${rotatedRefreshToken}`])
       .send({})
       .expect(200);
 
@@ -258,6 +266,64 @@ describe('auth edge cases', () => {
       message: 'User logged out successfully',
     });
     expect(logoutResponse.headers['set-cookie']?.[0]).toContain('jwt=');
+
+    await request(await getTestApp())
+      .post('/api/auth/refresh')
+      .set('Cookie', [`jwt=${rotatedRefreshToken}`])
+      .send({})
+      .expect(401);
+  });
+
+  it('revokes every refresh session when a rotated refresh token is reused', async () => {
+    await registerTestUser('refresh-reuse-user');
+    const app = await getTestApp();
+
+    const firstLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ username: 'refresh-reuse-user', password: 'password123' })
+      .expect(200);
+    const secondLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ username: 'refresh-reuse-user', password: 'password123' })
+      .expect(200);
+    const firstRefreshToken = getRefreshToken(firstLogin);
+    const secondRefreshToken = getRefreshToken(secondLogin);
+
+    await request(app).post('/api/auth/refresh').set('Cookie', [`jwt=${firstRefreshToken}`]).send({}).expect(200);
+
+    await request(app).post('/api/auth/refresh').set('Cookie', [`jwt=${firstRefreshToken}`]).send({}).expect(401);
+    await request(app).post('/api/auth/refresh').set('Cookie', [`jwt=${secondRefreshToken}`]).send({}).expect(401);
+  });
+
+  it('logs out every session and invalidates existing access tokens', async () => {
+    await registerTestUser('logout-all-user');
+    const app = await getTestApp();
+
+    const firstLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ username: 'logout-all-user', password: 'password123' })
+      .expect(200);
+    const secondLogin = await request(app)
+      .post('/api/auth/login')
+      .send({ username: 'logout-all-user', password: 'password123' })
+      .expect(200);
+    const firstAccessToken = firstLogin.body.accessToken as string;
+    const firstRefreshToken = getRefreshToken(firstLogin);
+    const secondRefreshToken = getRefreshToken(secondLogin);
+
+    const response = await request(app)
+      .post('/api/auth/logout-all')
+      .set('Authorization', `Bearer ${firstAccessToken}`)
+      .set('Cookie', [`jwt=${firstRefreshToken}`])
+      .send({})
+      .expect(200);
+
+    expect(response.body).toEqual({ message: 'Logged out on every device successfully' });
+    expect(response.headers['set-cookie']?.[0]).toContain('jwt=');
+
+    await request(app).get('/api/user/me').set('Authorization', `Bearer ${firstAccessToken}`).expect(401);
+    await request(app).post('/api/auth/refresh').set('Cookie', [`jwt=${firstRefreshToken}`]).send({}).expect(401);
+    await request(app).post('/api/auth/refresh').set('Cookie', [`jwt=${secondRefreshToken}`]).send({}).expect(401);
   });
 
   it('rejects refresh requests without a refresh cookie', async () => {

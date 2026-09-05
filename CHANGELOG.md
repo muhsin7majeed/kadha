@@ -4,6 +4,11 @@
 
 ### Feature Changes
 
+#### Account Security And Control
+
+- Added log-out-everywhere from Security settings and made normal logout invalidate the presented refresh session.
+- Rotated refresh sessions on every session refresh and revoked all sessions when reused refresh tokens are detected.
+
 #### Discovery
 
 - Fixed recommendation feedback buttons so only the clicked action shows loading and successful feedback remains visibly selected.

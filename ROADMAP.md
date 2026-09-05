@@ -62,7 +62,7 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 - [x] Resolve and triage known production dependency vulnerabilities, then enforce production dependency audits in CI.
 - [x] Protect login, registration, recovery, and session-refresh endpoints with targeted rate limits, require eight-character new passwords, and provide password-strength guidance.
-- [ ] Add rotated, revocable refresh sessions with logout invalidation, log-out-everywhere, and reuse detection.
+- [x] Add rotated, revocable refresh sessions with logout invalidation, log-out-everywhere, and reuse detection.
 - [ ] Add HSTS, CSP, MIME-sniffing, framing, referrer, permissions, and sensitive-response cache protections.
 - [ ] Require recent reauthentication before account export, deletion, password changes, recovery-code replacement, and other sensitive account actions.
 - [ ] Add end-to-end smoke coverage for authentication, media tracking, collection permissions, and privacy visibility.

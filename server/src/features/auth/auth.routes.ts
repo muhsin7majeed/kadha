@@ -7,6 +7,7 @@ import {
   getRecoveryStatus,
   login,
   logout,
+  logoutAll,
   manageRecoveryCode,
   recoverAccount,
   refresh,
@@ -31,6 +32,7 @@ router.post('/register', registrationRateLimit, validate(registerSchema), regist
 router.post('/login', loginRateLimit, validate(loginSchema), login);
 router.post('/refresh', refreshRateLimit, refresh);
 router.post('/logout', logout);
+router.post('/logout-all', authMiddleware, sensitiveActionRateLimit, logoutAll);
 router.get('/recovery-code/status', authMiddleware, getRecoveryStatus);
 router.post('/recovery-code', authMiddleware, validate(manageRecoveryCodeSchema), manageRecoveryCode);
 router.post('/password', authMiddleware, sensitiveActionRateLimit, validate(changePasswordSchema), changePassword);

@@ -10,6 +10,7 @@ import {
   createOrReplaceRecoveryCode,
   getRecoveryCodeStatus,
   loginUser,
+  logoutEverywhere,
   recordLogoutActivity,
   recoverUserAccount,
   refreshAccessToken,
@@ -57,7 +58,8 @@ export const refresh = async (req: Request, res: Response) => {
   }
 
   try {
-    const accessToken = await refreshAccessToken(req.cookies.jwt);
+    const { accessToken, refreshToken } = await refreshAccessToken(req.cookies.jwt);
+    setRefreshTokenCookie(res, refreshToken);
 
     return sendResponse(res, { accessToken });
   } catch {
@@ -69,6 +71,18 @@ export const logout = async (req: Request, res: Response) => {
   await recordLogoutActivity(req.cookies?.jwt);
   clearRefreshTokenCookie(res);
   sendMessage(res, 'User logged out successfully');
+};
+
+export const logoutAll = async (req: Request, res: Response) => {
+  const user = requireAuthUser(req);
+  const loggedOut = await logoutEverywhere(user.id);
+
+  if (!loggedOut) {
+    throw unauthorized();
+  }
+
+  clearRefreshTokenCookie(res);
+  sendMessage(res, 'Logged out on every device successfully');
 };
 
 export const getRecoveryStatus = async (req: Request, res: Response) => {
