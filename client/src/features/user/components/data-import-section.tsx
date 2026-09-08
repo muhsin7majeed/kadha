@@ -1,4 +1,4 @@
-import { Box, Button, Card, Checkbox, Field, Heading, HStack, Input, SimpleGrid, Stack, Text } from '@chakra-ui/react';
+import { Button, Card, Field, Heading, HStack, Input, SimpleGrid, Stack, Text } from '@chakra-ui/react';
 import { ChangeEvent, useState } from 'react';
 import { LuFileUp, LuUpload } from 'react-icons/lu';
 
@@ -6,6 +6,7 @@ import useImportUserData from '@/features/user/api/use-import-user-data';
 import usePreviewUserImport from '@/features/user/api/use-preview-user-import';
 import type { ImportCategory, UserImportPayload, UserImportPreview } from '@/features/user/user-import.types';
 import { toaster } from '@/components/ui/toaster-store';
+import SimpleCheckbox from '@/components/simple-checkbox';
 
 interface DataImportSectionProps {
   headingAs?: 'h2' | 'h3';
@@ -21,32 +22,32 @@ const importOptions: Array<{
   {
     value: 'accountPreferences',
     label: 'Account preferences',
-    description: 'Replace privacy settings and watch region. Your username is not changed.',
+    description: 'Replaces privacy settings and region.',
   },
   {
     value: 'mediaTracking',
     label: 'Media tracking',
-    description: 'Merge liked, watched, watchlist, ratings, dates, and personal notes.',
+    description: 'Adds or updates tracking data.',
   },
   {
     value: 'watchHistory',
     label: 'Watch history',
-    description: 'Add movie watches, rewatches, and TV episode watches.',
+    description: 'Adds watches and rewatches.',
   },
   {
     value: 'collections',
-    label: 'Owned collections',
-    description: 'Create owned collections and add their items.',
+    label: 'Collections',
+    description: 'Creates missing collections and adds items.',
   },
   {
     value: 'recommendationSettings',
     label: 'Recommendation settings',
-    description: 'Replace recommendation signal preferences.',
+    description: 'Replaces current settings.',
   },
   {
     value: 'recommendationFeedback',
     label: 'Recommendation feedback',
-    description: 'Add more-like-this, less-like-this, and hidden-title feedback.',
+    description: 'Adds feedback.',
   },
 ];
 
@@ -70,9 +71,38 @@ const getCategoryCount = (preview: UserImportPreview, category: ImportCategory) 
   return preview.importable.recommendationFeedback;
 };
 
+const pluralize = (count: number, singular: string) => `${count} ${count === 1 ? singular : `${singular}s`}`;
+
+const getCategoryLabel = (preview: UserImportPreview, category: ImportCategory, label: string) => {
+  if (category === 'accountPreferences' || category === 'recommendationSettings') return label;
+  if (category === 'collections') {
+    return `${label} (${pluralize(preview.importable.collections, 'collection')}, ${pluralize(
+      preview.importable.collectionItems,
+      'item',
+    )})`;
+  }
+  return `${label} (${getCategoryCount(preview, category)})`;
+};
+
+const formatList = (items: string[]) => {
+  if (items.length < 2) return items[0] ?? '';
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')}, and ${items[items.length - 1]}`;
+};
+
+const getUnsupportedLabels = (preview: UserImportPreview) => {
+  const labels: string[] = [];
+  if (preview.unsupported.friendships > 0) labels.push('friends');
+  if (preview.unsupported.collectionMemberships + preview.unsupported.collectionInvites > 0) {
+    labels.push('shared collection access');
+  }
+  if (preview.unsupported.notifications > 0) labels.push('notifications');
+  if (preview.unsupported.activity > 0) labels.push('activity');
+  return labels;
+};
+
 const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
   const [payload, setPayload] = useState<UserImportPayload | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
   const [selected, setSelected] = useState<ImportCategory[]>([]);
   const { mutate: previewImport, data: preview, isPending: isPreviewing, reset: resetPreview } = usePreviewUserImport();
   const { mutate: importData, isPending: isImporting } = useImportUserData();
@@ -80,7 +110,6 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     setPayload(null);
-    setFileName(null);
     setSelected([]);
     resetPreview();
     if (!file) return;
@@ -88,7 +117,6 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
     try {
       const nextPayload = await parseImportFile(file);
       setPayload(nextPayload);
-      setFileName(file.name);
       previewImport(nextPayload, {
         onSuccess: (result) =>
           setSelected(result.availableCategories.filter((category) => category !== 'accountPreferences')),
@@ -103,7 +131,7 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
   const toggleCategory = (category: ImportCategory, checked: boolean) => {
     setSelected((current) => (checked ? [...current, category] : current.filter((item) => item !== category)));
   };
-  const unsupportedTotal = preview ? Object.values(preview.unsupported).reduce((total, count) => total + count, 0) : 0;
+  const unsupportedLabels = preview ? getUnsupportedLabels(preview) : [];
 
   return (
     <Card.Root variant="outline">
@@ -115,24 +143,25 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
           </Heading>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
-          Preview a Kadha JSON export, then choose which supported data to add to this account.
+          Choose a Kadha export to see what can be imported. Some things can be imported, some, not so much. Like
+          friendship, which is less portable.
         </Text>
       </Card.Header>
       <Card.Body>
         <Stack gap="4">
           <Field.Root>
-            <Field.Label>Export file</Field.Label>
+            <Field.Label>Kadha export</Field.Label>
             <Input type="file" accept="application/json,.json" onChange={handleFileChange} />
-            <Field.HelperText>
-              {fileName ? `Selected: ${fileName}` : 'Choose a Kadha JSON export up to 10 MB.'}
-            </Field.HelperText>
+            <Field.HelperText>JSON, up to 10 MB.</Field.HelperText>
           </Field.Root>
 
           {preview ? (
             <Stack gap="4">
-              <Text color="fg.muted" textStyle="supporting">
-                Source: {preview.source.username ?? 'Unknown user'} · Imported records will belong to this account.
-              </Text>
+              {preview.source.username ? (
+                <Text color="fg.muted" textStyle="supporting">
+                  From {preview.source.username}
+                </Text>
+              ) : null}
               <HStack gap="2">
                 <Button
                   size="sm"
@@ -152,55 +181,21 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
                   .map((option) => {
                     const checked = selected.includes(option.value);
                     return (
-                      <Checkbox.Root
+                      <SimpleCheckbox
                         key={option.value}
                         checked={checked}
                         onCheckedChange={(details) => toggleCategory(option.value, details.checked === true)}
-                        alignItems="flex-start"
-                        borderWidth="1px"
-                        borderColor={checked ? 'brand.solid' : 'border.muted'}
-                        bg={checked ? 'brand.subtle' : 'transparent'}
-                        borderRadius="lg"
-                        p="4"
-                      >
-                        <Checkbox.HiddenInput />
-                        <Checkbox.Control mt="0.5" />
-                        <Box>
-                          <Checkbox.Label fontWeight="medium">
-                            {option.label} ({getCategoryCount(preview, option.value)})
-                          </Checkbox.Label>
-                          <Text color="fg.muted" textStyle="supporting" mt="1">
-                            {option.description}
-                          </Text>
-                        </Box>
-                      </Checkbox.Root>
+                        label={getCategoryLabel(preview, option.value, option.label)}
+                        description={option.description}
+                      />
                     );
                   })}
               </SimpleGrid>
-              {preview.importable.collectionItems > 0 && selected.includes('collections') ? (
+              {unsupportedLabels.length > 0 ? (
                 <Text color="fg.muted" textStyle="supporting">
-                  Selected collections contain {preview.importable.collectionItems} items.
+                  Not imported: {formatList(unsupportedLabels)}.
                 </Text>
               ) : null}
-              {unsupportedTotal > 0 ? (
-                <Box borderWidth="1px" borderRadius="md" p="3">
-                  <Text fontWeight="medium" textStyle="body">
-                    Included for reference only
-                  </Text>
-                  <Text color="fg.muted" textStyle="supporting">
-                    {preview.unsupported.friendships} friendships, {preview.unsupported.collectionMemberships}{' '}
-                    memberships, {preview.unsupported.collectionInvites} invitations,{' '}
-                    {preview.unsupported.notifications} notifications, and {preview.unsupported.activity} activity items
-                    cannot be imported.
-                  </Text>
-                </Box>
-              ) : null}
-              <Text color="fg.muted" textStyle="supporting">
-                Watch history can move between accounts. Friendships are less portable.
-              </Text>
-              <Text color="fg.muted" textStyle="supporting">
-                Importing never changes your username, role, account ID, password, recovery code, or sessions.
-              </Text>
             </Stack>
           ) : null}
 
@@ -212,7 +207,7 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
             onClick={() => payload && importData({ ...payload, options: { categories: selected } })}
           >
             <LuUpload />
-            Import selected data
+            Import
           </Button>
         </Stack>
       </Card.Body>

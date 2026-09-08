@@ -33,8 +33,8 @@ describe('DataExportSection', () => {
     expect(checkboxes).toHaveLength(9);
     checkboxes.forEach((checkbox) => expect(checkbox).toBeChecked());
 
-    await user.click(screen.getByRole('checkbox', { name: /Account profile and preferences/ }));
-    await user.click(screen.getByRole('button', { name: 'Export selected data' }));
+    await user.click(screen.getByRole('checkbox', { name: /Account & preferences/ }));
+    await user.click(screen.getByRole('button', { name: 'Export' }));
 
     expect(mocks.exportUserData).toHaveBeenCalledWith(expect.not.arrayContaining(['accountPreferences']));
     expect(mocks.exportUserData).toHaveBeenCalledWith(expect.arrayContaining(['mediaTracking', 'activity']));
@@ -45,7 +45,7 @@ describe('DataExportSection', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
 
-    expect(screen.getByRole('button', { name: 'Export selected data' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled();
     expect(screen.getByText('Select at least one category.')).toBeInTheDocument();
   });
 });

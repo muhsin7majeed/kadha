@@ -6,10 +6,10 @@
 
 #### Data Ownership
 
-- Added selectable, versioned Kadha JSON exports so users can choose account preferences, media tracking, watch history,
-  collections, recommendations, social relationships, notifications, and activity.
-- Added import previews with selectable categories, optional account-preference replacement, current-account ownership,
-  idempotent media/watch-history/collection imports, and clear reference-only social-data warnings.
+- Added focused, selectable Kadha JSON exports for account preferences, media tracking, watch history, collections,
+  recommendations, social relationships, notifications, and activity.
+- Added compact import previews with selectable categories, useful record counts, optional account-preference
+  replacement, idempotent media/watch-history/collection imports, and concise reference-only data warnings.
 - Fixed imports of normal account exports larger than Express's default request limit, with a 10 MB file limit and a
   clearer error for oversized files.
 

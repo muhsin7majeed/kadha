@@ -15,13 +15,13 @@ const mocks = vi.hoisted(() => ({
       exportedAt: '2026-09-05T00:00:00.000Z',
       schemaVersion: 2,
     },
-    availableCategories: ['accountPreferences', 'mediaTracking', 'watchHistory'] as const,
+    availableCategories: ['accountPreferences', 'mediaTracking', 'watchHistory', 'collections'] as const,
     importable: {
       accountPreferences: 1,
       media: 47,
       watchEvents: 290,
-      collections: 0,
-      collectionItems: 0,
+      collections: 2,
+      collectionItems: 18,
       recommendationSettings: 0,
       recommendationFeedback: 0,
     },
@@ -65,7 +65,7 @@ describe('DataImportSection', () => {
       value: () => Promise.resolve(JSON.stringify({ schemaVersion: 1 })),
     });
 
-    fireEvent.change(screen.getByLabelText('Export file'), {
+    fireEvent.change(screen.getByLabelText('Kadha export'), {
       target: { files: [file] },
     });
 
@@ -77,16 +77,19 @@ describe('DataImportSection', () => {
       expect(screen.getByRole('checkbox', { name: /Media tracking/ })).toBeChecked();
       expect(screen.getByRole('checkbox', { name: /Watch history/ })).toBeChecked();
     });
+    expect(screen.getByText(/Some things can be imported, some, not so much\. Like friendship/)).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Collections \(2 collections, 18 items\)/ })).toBeChecked();
     expect(
-      screen.getByText('Watch history can move between accounts. Friendships are less portable.'),
+      screen.getByText('Not imported: friends, shared collection access, notifications, and activity.'),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/Importing never changes/)).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Import selected data' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Import' }));
 
     await waitFor(() => {
       expect(mocks.importData).toHaveBeenCalledWith(
         expect.objectContaining({
-          options: { categories: ['mediaTracking', 'watchHistory'] },
+          options: { categories: ['mediaTracking', 'watchHistory', 'collections'] },
         }),
       );
     });
@@ -96,7 +99,7 @@ describe('DataImportSection', () => {
     renderWithProviders(<DataImportSection />);
     const file = new File(['{}'], 'export.json', { type: 'application/json' });
     Object.defineProperty(file, 'text', { value: () => Promise.resolve('{}') });
-    fireEvent.change(screen.getByLabelText('Export file'), {
+    fireEvent.change(screen.getByLabelText('Kadha export'), {
       target: { files: [file] },
     });
 
@@ -105,6 +108,6 @@ describe('DataImportSection', () => {
     screen.getAllByRole('checkbox').forEach((checkbox) => expect(checkbox).toBeChecked());
 
     fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
-    expect(screen.getByRole('button', { name: 'Import selected data' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Import' })).toBeDisabled();
   });
 });

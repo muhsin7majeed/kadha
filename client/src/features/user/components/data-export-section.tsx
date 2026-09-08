@@ -1,9 +1,10 @@
-import { Box, Button, Card, Checkbox, Heading, HStack, SimpleGrid, Stack, Text } from '@chakra-ui/react';
+import { Button, Card, Heading, HStack, SimpleGrid, Stack, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuDownload } from 'react-icons/lu';
 
 import useExportUserData from '@/features/user/api/use-export-user-data';
 import type { ExportCategory } from '@/features/user/user-import.types';
+import SimpleCheckbox from '@/components/simple-checkbox';
 
 interface DataExportSectionProps {
   headingAs?: 'h2' | 'h3';
@@ -12,52 +13,50 @@ interface DataExportSectionProps {
 const exportOptions: Array<{
   value: ExportCategory;
   label: string;
-  description: string;
+  description?: string;
 }> = [
   {
     value: 'accountPreferences',
-    label: 'Account profile and preferences',
-    description: 'Username, privacy settings, and watch region.',
+    label: 'Account & preferences',
+    description: 'Profile, privacy, and region.',
   },
   {
     value: 'mediaTracking',
     label: 'Media tracking',
-    description: 'Liked, watched, watchlist, ratings, dates, and personal notes.',
+    description: 'Likes, watchlist, ratings, and notes.',
   },
   {
     value: 'watchHistory',
     label: 'Watch history',
-    description: 'Movie watches, rewatches, and TV episode watches.',
+    description: 'Watches and rewatches.',
   },
   {
     value: 'collections',
-    label: 'Owned collections',
+    label: 'Collections',
     description: 'Collections you own and their items.',
   },
   {
     value: 'recommendations',
     label: 'Recommendations',
-    description: 'Recommendation settings and feedback.',
+    description: 'Settings and feedback.',
   },
   {
     value: 'friendships',
-    label: 'Friendships',
-    description: 'Friend requests, friends, and blocked relationships.',
+    label: 'Friends',
+    description: 'Friends, requests, and blocks.',
   },
   {
     value: 'collectionRelationships',
-    label: 'Collection relationships',
-    description: 'Memberships and invitations involving your account.',
+    label: 'Collection access',
+    description: 'Memberships and invitations.',
   },
   {
     value: 'notifications',
     label: 'Notifications',
-    description: 'Your notification history.',
   },
   {
     value: 'activity',
     label: 'Activity',
-    description: 'Your account activity history.',
   },
 ];
 
@@ -78,8 +77,7 @@ const DataExportSection = ({ headingAs = 'h2' }: DataExportSectionProps) => {
           Export
         </Heading>
         <Text color="fg.muted" textStyle="supporting">
-          Choose what to include in your JSON data export. Passwords, recovery codes, sessions, roles, and account IDs
-          are never included.
+          Choose what to include.
         </Text>
       </Card.Header>
       <Card.Body>
@@ -96,26 +94,13 @@ const DataExportSection = ({ headingAs = 'h2' }: DataExportSectionProps) => {
             {exportOptions.map((option) => {
               const checked = selected.includes(option.value);
               return (
-                <Checkbox.Root
+                <SimpleCheckbox
                   key={option.value}
                   checked={checked}
                   onCheckedChange={(details) => toggleCategory(option.value, details.checked === true)}
-                  alignItems="flex-start"
-                  borderWidth="1px"
-                  borderColor={checked ? 'brand.solid' : 'border.muted'}
-                  bg={checked ? 'brand.subtle' : 'transparent'}
-                  borderRadius="lg"
-                  p="4"
-                >
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control mt="0.5" />
-                  <Box>
-                    <Checkbox.Label fontWeight="medium">{option.label}</Checkbox.Label>
-                    <Text color="fg.muted" textStyle="supporting" mt="1">
-                      {option.description}
-                    </Text>
-                  </Box>
-                </Checkbox.Root>
+                  label={option.label}
+                  description={option.description}
+                />
               );
             })}
           </SimpleGrid>
@@ -128,7 +113,7 @@ const DataExportSection = ({ headingAs = 'h2' }: DataExportSectionProps) => {
             disabled={isExporting || selected.length === 0}
           >
             <LuDownload />
-            Export selected data
+            Export
           </Button>
           {selected.length === 0 ? (
             <Text color="fg.error" textStyle="supporting">
