@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.13
+
 ### Feature Changes
 
 #### Data Ownership
@@ -22,6 +24,10 @@
 
 - Fixed recommendation feedback buttons so only the clicked action shows loading and successful feedback remains visibly selected.
 
+#### Product Information
+
+- Updated the landing page to list recommendations and Kadha data import as available today, while showing Letterboxd and Trakt imports as planned.
+
 ### Engineering Changes
 
 #### Data Portability
@@ -32,6 +38,10 @@
 #### Planning
 
 - Rebalanced roadmap priorities around Kadha's current small-app stage, keeping account and privacy regression protections high while moving hosted-operations maturity work later.
+
+#### Testing
+
+- Stabilized client test runs in constrained containers by running jsdom test files sequentially instead of competing for resources and timing out.
 
 ## v0.1.12
 

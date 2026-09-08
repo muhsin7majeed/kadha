@@ -1,12 +1,6 @@
-import { LuBrain, LuChartBar, LuDownload, LuSparkles, LuUsers } from 'react-icons/lu';
+import { LuBrain, LuChartBar, LuDownload, LuUsers } from 'react-icons/lu';
 
 const UPCOMING_FEATURES = [
-  {
-    icon: LuSparkles,
-    title: 'TMDB Recommendations',
-    description: 'Optionally find similar movies and shows from TMDB using titles you choose to include.',
-    badge: 'Recommendations',
-  },
   {
     icon: LuBrain,
     title: 'AI Recommendations',
@@ -22,9 +16,8 @@ const UPCOMING_FEATURES = [
   },
   {
     icon: LuDownload,
-    title: 'Data Import',
-    description:
-      'Bring your existing history into Kadha with validation, preview, idempotency, and conflict handling.',
+    title: 'Letterboxd & Trakt Imports',
+    description: 'Bring your existing watch history into Kadha from supported tracking services.',
     badge: 'Data',
   },
   {

@@ -3,6 +3,7 @@ import {
   LuChartBar,
   LuCheck,
   LuClapperboard,
+  LuDownload,
   LuHeart,
   LuLink,
   LuLock,
@@ -44,6 +45,18 @@ const CURRENT_FEATURES = [
     title: 'Public Collection Links',
     description: 'Share selected collections with read-only public links while keeping private lists private.',
     badge: 'Sharing',
+  },
+  {
+    icon: LuSparkles,
+    title: 'Private Recommendations',
+    description: 'Get personalized suggestions from your own tracking history and tune them with direct feedback.',
+    badge: 'Discovery',
+  },
+  {
+    icon: LuDownload,
+    title: 'Data Export & Import',
+    description: 'Move selected account data between Kadha accounts with preview and conflict-safe merging.',
+    badge: 'Data',
   },
   {
     icon: LuChartBar,
