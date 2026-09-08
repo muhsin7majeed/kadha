@@ -3,6 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
+import type { ExportCategory } from '@/features/user/user-import.types';
 
 const fallbackFilename = 'kadha-export.json';
 
@@ -28,8 +29,9 @@ const downloadBlob = (blob: Blob, filename: string) => {
   URL.revokeObjectURL(url);
 };
 
-const exportUserData = async () => {
+const exportUserData = async (categories: ExportCategory[] | void) => {
   const response = await api.get<Blob>('/api/user/export', {
+    params: categories ? { categories: categories.join(',') } : undefined,
     responseType: 'blob',
   });
   const filename = getFilenameFromContentDisposition(response.headers['content-disposition']);
@@ -38,7 +40,7 @@ const exportUserData = async () => {
 };
 
 const useExportUserData = () => {
-  return useMutation<void, unknown, void>({
+  return useMutation<void, unknown, ExportCategory[] | void>({
     mutationFn: exportUserData,
     onError: useErrorHandler,
     onSuccess: () => {

@@ -73,7 +73,7 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 #### P1 — Portability, Useful Privacy, And Product Reliability
 
-- [ ] Add versioned JSON import with validation, preview, idempotency, and conflict handling.
+- [x] Add selectable, versioned JSON export and import with validation, preview, idempotency, and conflict handling.
 - [ ] Add supported import adapters for services such as Letterboxd or Trakt.
 - [ ] Add watch-history totals and trends.
 - [ ] Add breached-password rejection without sending complete passwords to a third party.
@@ -106,7 +106,7 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 ### Data Ownership
 
-- [ ] Keep export and import formats documented as they evolve.
+- [x] Keep export and import formats documented as they evolve.
 
 ### Media Tracking
 

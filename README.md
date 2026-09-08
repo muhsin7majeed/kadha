@@ -177,12 +177,28 @@ Kadha stores only a one-way verifier for the code and cannot reveal it later. If
 Signed-in users can change their password from **Settings → Security** after confirming their current password. A
 successful change revokes every access and refresh session, including the current device.
 
-Users can export their account data and permanently delete their account from **Settings → Data**. Deletion requires
-the current password and the exact irreversible-action confirmation phrase shown in the dialog. Before deleting, users
-can review the collaboration impact and explicitly transfer shared collections to accepted members. Untransferred
-collections are removed, while transferred collections keep their items and remaining memberships under the new owner.
-Affected collaborators receive anonymous in-app system notifications. The final administrator account cannot delete
-itself until another administrator has been promoted.
+Users can export their account data and import Kadha JSON exports from **Settings → Data**. Export categories are
+selectable and include account preferences, personal media tracking, watch history, owned collections, recommendation
+preferences, friendships, collection relationships, notifications, and activity. Passwords, recovery-code material,
+sessions, roles, and account IDs are never exported. Account-deletion downloads include every export category by
+default.
+
+Imports accept Kadha schema-v1 and schema-v2 JSON files up to 10 MB. After Kadha previews the file, users choose which
+detected categories to import. Media tracking, watch history, owned collections, recommendation settings, and
+recommendation feedback are selected by default. Privacy settings and watch region can also be imported, but account
+preferences default to off because they replace the target account's current values. Imports never change the target
+username, role, account ID, password, recovery code, or sessions.
+
+Imported records belong to the currently signed-in account and merge with existing data. Friendships, blocked-user
+relationships, notifications, collection memberships and invitations, and activity remain in a full export for
+reference but cannot be imported because they involve account-specific or shared state.
+
+Users can also permanently delete their account from **Settings → Data**. Deletion requires the current password and the
+exact irreversible-action confirmation phrase shown in the dialog. Before deleting, users can review the collaboration
+impact and explicitly transfer shared collections to accepted members. Untransferred collections are removed, while
+transferred collections keep their items and remaining memberships under the new owner. Affected collaborators receive
+anonymous in-app system notifications. The final administrator account cannot delete itself until another administrator
+has been promoted.
 
 ## Manual Builds
 

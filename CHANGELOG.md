@@ -4,6 +4,15 @@
 
 ### Feature Changes
 
+#### Data Ownership
+
+- Added selectable, versioned Kadha JSON exports so users can choose account preferences, media tracking, watch history,
+  collections, recommendations, social relationships, notifications, and activity.
+- Added import previews with selectable categories, optional account-preference replacement, current-account ownership,
+  idempotent media/watch-history/collection imports, and clear reference-only social-data warnings.
+- Fixed imports of normal account exports larger than Express's default request limit, with a 10 MB file limit and a
+  clearer error for oversized files.
+
 #### Account Security And Control
 
 - Added log-out-everywhere from Security settings and made normal logout invalidate the presented refresh session.
@@ -14,6 +23,11 @@
 - Fixed recommendation feedback buttons so only the clicked action shows loading and successful feedback remains visibly selected.
 
 ### Engineering Changes
+
+#### Data Portability
+
+- Normalized schema-v2 exports to store shared media snapshots once, removed duplicated episode-watch data, and retained
+  schema-v1 import compatibility.
 
 #### Planning
 

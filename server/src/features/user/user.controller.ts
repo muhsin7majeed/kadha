@@ -4,8 +4,8 @@ import { AppError, badRequest, conflict, notFound, sendMessage, sendResponse } f
 import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
+import { applyUserImport, previewUserImport } from './user-import.service';
 import {
-  exportCurrentUserData,
   getCurrentUser,
   getCurrentUserInProgressTv,
   getCurrentUserMediaByFlag,
@@ -18,6 +18,9 @@ import {
   updateCurrentUser,
 } from './user.service';
 import { DeleteMePayload, UpdateMePayload } from './user.schema';
+import { exportCurrentUserData } from './user-export.service';
+import { ImportPayload } from './user-import.schema';
+import { exportQuerySchema } from './user-export.schema';
 import { clearRefreshTokenCookie } from '@/features/auth/auth.cookies';
 import { deleteCurrentUserWithPlan, getDeletionImpact } from './account-deletion.service';
 
@@ -36,13 +39,24 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const exportMe = async (req: Request, res: Response) => {
   const { id, username } = requireAuthUser(req);
-  const exportedData = await exportCurrentUserData(id);
+  const { categories } = exportQuerySchema.parse(req.query);
+  const exportedData = await exportCurrentUserData(id, categories);
   const exportedDate = new Date().toISOString().slice(0, 10);
   const filenameUsername = formatExportFilenamePart(username) || 'user';
 
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="kadha-export-${filenameUsername}-${exportedDate}.json"`);
   res.status(200).send(JSON.stringify(exportedData, null, 2));
+};
+
+export const previewImport = async (req: Request<{}, {}, ImportPayload>, res: Response) => {
+  const { id } = requireAuthUser(req);
+  sendResponse(res, { data: await previewUserImport(id, req.body) });
+};
+
+export const applyImport = async (req: Request<{}, {}, ImportPayload>, res: Response) => {
+  const { id } = requireAuthUser(req);
+  sendResponse(res, { data: await applyUserImport(id, req.body) });
 };
 
 export const updateMe = async (req: Request, res: Response) => {

@@ -18,6 +18,9 @@ const isLegacyHttpError = (error: unknown): error is { status: number; message: 
   );
 };
 
+const isRequestTooLargeError = (error: unknown): error is { type: 'entity.too.large' } =>
+  typeof error === 'object' && error !== null && 'type' in error && error.type === 'entity.too.large';
+
 export const errorHandler = (err: unknown, req: Request, res: Response<ErrorResponse>, next: NextFunction) => {
   if (res.headersSent) {
     return next(err);
@@ -28,6 +31,18 @@ export const errorHandler = (err: unknown, req: Request, res: Response<ErrorResp
       message: err.message,
       ...(err.code ? { code: err.code } : {}),
       ...(err.fieldErrors ? { fieldErrors: err.fieldErrors } : {}),
+    });
+  }
+
+  if (isRequestTooLargeError(err)) {
+    const isImportRequest =
+      req.path === '/api/user/import' ||
+      req.path.startsWith('/api/user/import/') ||
+      req.path === '/api/users/import' ||
+      req.path.startsWith('/api/users/import/');
+    return res.status(413).json({
+      message: isImportRequest ? 'This export is larger than the 10 MB import limit.' : 'Request body is too large.',
+      ...(isImportRequest ? { code: 'IMPORT_FILE_TOO_LARGE' } : {}),
     });
   }
 

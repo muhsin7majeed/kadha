@@ -38,7 +38,14 @@ describe('user data export', () => {
         note: 'Exported episode note',
       },
     });
-    await createTestCollection(user, 'Export collection');
+    const collection = await createTestCollection(user, 'Export collection');
+    await prisma.collectionMember.create({
+      data: {
+        collectionId: collection.id,
+        userId: sender.userId,
+        role: 'VIEWER',
+      },
+    });
     await request(await getTestApp())
       .post('/api/friendship/send-friend-request')
       .set('Authorization', authorization(sender))
@@ -55,28 +62,36 @@ describe('user data export', () => {
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.headers['content-disposition']).toContain('kadha-export-export-user-');
     expect(exported).toMatchObject({
+      format: 'kadha-data-export',
+      schemaVersion: 2,
       app: {
         name: 'Kadha',
         version: expect.any(String),
       },
-      account: {
-        id: user.userId,
-        username: user.username,
+      manifest: {
+        selected: expect.arrayContaining(['accountPreferences', 'mediaTracking', 'watchHistory', 'collections']),
+        excluded: expect.arrayContaining(['passwords', 'sessions', 'account IDs']),
+      },
+      data: {
+        accountPreferences: {
+          username: user.username,
+        },
       },
     });
-    expect(exported.account).not.toHaveProperty('password');
-    expect(exported.media).toHaveLength(1);
-    expect(exported.media[0]).toMatchObject({
-      userId: user.userId,
+    expect(exported.data.accountPreferences).not.toHaveProperty('password');
+    expect(exported.data.accountPreferences).not.toHaveProperty('id');
+    expect(JSON.stringify(exported)).not.toContain(user.userId);
+    expect(JSON.stringify(exported)).not.toContain(sender.userId);
+    expect(exported.data.mediaTracking).toHaveLength(1);
+    expect(exported.data.mediaTracking[0]).toMatchObject({
       media_id: 885101,
       liked: true,
-      media: {
-        title: 'Test Movie 885101',
-      },
     });
-    expect(exported.episodeWatches).toEqual([
+    expect(exported.data.mediaSnapshots).toEqual(
+      expect.arrayContaining([expect.objectContaining({ title: 'Test Movie 885101' })]),
+    );
+    expect(exported.data.watchEvents).toEqual([
       expect.objectContaining({
-        userId: user.userId,
         media_id: 885102,
         media_type: 'tv',
         seasonNumber: 1,
@@ -84,17 +99,25 @@ describe('user data export', () => {
         note: 'Exported episode note',
       }),
     ]);
-    expect(exported.watchEvents).toEqual(exported.episodeWatches);
-    expect(exported.collections).toHaveLength(1);
-    expect(exported.collections[0]).toMatchObject({
-      userId: user.userId,
+    expect(exported.data).not.toHaveProperty('episodeWatches');
+    expect(exported.data.collections).toHaveLength(1);
+    expect(exported.data.collections[0]).toMatchObject({
       name: 'Export collection',
     });
-    expect(exported.friendships).toHaveLength(1);
-    expect(exported.notifications).toHaveLength(1);
-    expect(exported.activity.length).toBeGreaterThanOrEqual(3);
-    expect(exported.recommendationSettings).toMatchObject({
-      userId: user.userId,
+    expect(exported.data.collectionMemberships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          collection: 'Export collection',
+          owner: user.username,
+          member: sender.username,
+          role: 'VIEWER',
+        }),
+      ]),
+    );
+    expect(exported.data.friendships).toHaveLength(1);
+    expect(exported.data.notifications).toHaveLength(1);
+    expect(exported.data.activity.length).toBeGreaterThanOrEqual(3);
+    expect(exported.data.recommendationSettings).toMatchObject({
       useLiked: true,
       useRatings: true,
       useWatched: true,
@@ -102,16 +125,52 @@ describe('user data export', () => {
       useWatchlist: true,
       excludeWatched: true,
     });
-    expect(exported.recommendationFeedback).toEqual([
+    expect(exported.data.recommendationFeedback).toEqual([
       expect.objectContaining({
-        userId: user.userId,
         media_id: 885101,
         media_type: 'movie',
         type: 'MORE_LIKE_THIS',
-        media: expect.objectContaining({
-          title: 'Test Movie 885101',
-        }),
       }),
     ]);
+  });
+
+  it('exports only selected categories while retaining required media snapshots', async () => {
+    const user = await registerTestUser('selective-export-user');
+    await updateUserMediaFlag(user, 'liked', true, 885201);
+
+    const response = await request(await getTestApp())
+      .get('/api/user/export?categories=mediaTracking')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.manifest.selected).toEqual(['mediaTracking']);
+    expect(response.body.data.mediaTracking).toHaveLength(1);
+    expect(response.body.data.mediaSnapshots).toHaveLength(1);
+    expect(response.body.data).not.toHaveProperty('accountPreferences');
+    expect(response.body.data).not.toHaveProperty('watchEvents');
+    expect(response.body.data).not.toHaveProperty('activity');
+  });
+
+  it('includes media snapshot dependencies when exporting watch history alone', async () => {
+    const user = await registerTestUser('watch-history-export-user');
+    await updateUserMediaFlag(user, 'watched', true, 885301);
+    await prisma.watchEvent.create({
+      data: {
+        userId: user.userId,
+        media_id: 885301,
+        media_type: 'movie',
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/user/export?categories=watchHistory')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.watchEvents).toHaveLength(2);
+    expect(response.body.data.mediaSnapshots).toEqual(
+      expect.arrayContaining([expect.objectContaining({ media_id: 885301, media_type: 'movie' })]),
+    );
+    expect(response.body.data).not.toHaveProperty('mediaTracking');
   });
 });
