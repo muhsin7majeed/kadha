@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -175,7 +175,9 @@ describe('MediaTrackingDetails', () => {
     await user.click(screen.getByRole('button', { name: 'Manage personal tracking' }));
     await user.click(screen.getByRole('button', { name: 'Mark unwatched' }));
 
-    expect(screen.queryByRole('dialog', { name: 'Your tracking' })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: 'Your tracking' })).not.toBeInTheDocument();
+    });
     expect(screen.getByRole('alertdialog', { name: 'Mark this title unwatched?' })).toBeInTheDocument();
     expect(screen.getByText(/watched date, rating, and private notes will stay saved/i)).toBeInTheDocument();
 
