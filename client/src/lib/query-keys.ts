@@ -72,6 +72,10 @@ export const mediaQueryKeys = {
     ['media-recommendations', mediaType, id, page] as const,
 };
 
+export const navigationQueryKeys = {
+  navigationPreferences: ['navigation', 'preferences'] as const,
+};
+
 export const notificationQueryKeys = {
   notifications: ['notifications'] as const,
   notificationsPage: (page = 1) => ['notifications', page] as const,
@@ -125,6 +129,7 @@ export const queryKeys = {
   ...collectionQueryKeys,
   ...friendshipQueryKeys,
   ...mediaQueryKeys,
+  ...navigationQueryKeys,
   ...notificationQueryKeys,
   ...recommendationQueryKeys,
   ...searchQueryKeys,

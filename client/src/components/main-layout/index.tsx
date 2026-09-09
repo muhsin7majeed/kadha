@@ -30,20 +30,7 @@ const MainLayout = () => {
         </Box>
       </Container>
 
-      <Box
-        position="fixed"
-        bottom={0}
-        left={0}
-        right={0}
-        zIndex={2}
-        bg="bg"
-        borderTopWidth="1px"
-        borderColor="border"
-        pb="env(safe-area-inset-bottom)"
-        px={{ base: 0, md: 4 }}
-      >
-        <TabBar />
-      </Box>
+      <TabBar />
     </Box>
   );
 };
