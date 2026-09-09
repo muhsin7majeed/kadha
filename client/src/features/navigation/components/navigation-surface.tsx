@@ -243,7 +243,7 @@ const GridLauncher = ({ preferences, pathname, prefersReducedMotion, preview }: 
                   const DestinationIcon = destination.icon;
 
                   return (
-                    <Dialog.CloseTrigger key={item.id} asChild>
+                    <Dialog.ActionTrigger key={item.id} asChild>
                       <VStack
                         asChild
                         align="stretch"
@@ -273,10 +273,10 @@ const GridLauncher = ({ preferences, pathname, prefersReducedMotion, preview }: 
                           ) : null}
                         </Link>
                       </VStack>
-                    </Dialog.CloseTrigger>
+                    </Dialog.ActionTrigger>
                   );
                 })}
-                <Dialog.CloseTrigger asChild>
+                <Dialog.ActionTrigger asChild>
                   <VStack
                     asChild
                     align="stretch"
@@ -295,7 +295,7 @@ const GridLauncher = ({ preferences, pathname, prefersReducedMotion, preview }: 
                       <Text textStyle="cardTitle">Customize navigation</Text>
                     </Link>
                   </VStack>
-                </Dialog.CloseTrigger>
+                </Dialog.ActionTrigger>
               </SimpleGrid>
             </Dialog.Body>
             <Dialog.CloseTrigger asChild>

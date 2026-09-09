@@ -144,7 +144,8 @@ describe('TabBar', () => {
     expect(screen.getByRole('link', { name: 'Friends' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Customize navigation' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).not.toHaveAttribute('data-part', 'close-trigger');
+    expect(screen.getByRole('link', { name: 'Customize navigation' })).not.toHaveAttribute('data-part', 'close-trigger');
     expect(screen.queryByRole('link', { name: 'Menu' })).not.toBeInTheDocument();
   });
 });
