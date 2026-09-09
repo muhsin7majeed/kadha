@@ -22,7 +22,7 @@ const importOptions: Array<{
   {
     value: 'accountPreferences',
     label: 'Account preferences',
-    description: 'Replaces privacy settings and region.',
+    description: 'Replaces privacy, region, and navigation settings.',
   },
   {
     value: 'mediaTracking',

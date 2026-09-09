@@ -3,6 +3,8 @@ import { CollectionMemberRole, DataPrivacy, MediaType, Prisma, RecommendationFee
 import { upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
 import { isSupportedWatchRegion, normalizeWatchRegion } from '@/constants/watch-regions';
 import { prisma } from '@/lib/prisma';
+import { navigationPreferencesSchema } from '@/features/navigation-preferences/navigation-preferences.schema';
+import { normalizeNavigationPreferences } from '@/features/navigation-preferences/navigation-preferences.service';
 import { ImportPayload } from './user-import.schema';
 import { IMPORT_CATEGORIES, type ImportCategory } from './user-export.types';
 
@@ -148,6 +150,11 @@ const getValidRecommendationFeedback = (exportData: Record<string, unknown>) =>
       );
     });
 
+const getImportableNavigationPreferences = (exportData: Record<string, unknown>) => {
+  const parsed = navigationPreferencesSchema.safeParse(getAccount(exportData).navigation);
+  return parsed.success ? normalizeNavigationPreferences(parsed.data, false) : null;
+};
+
 const hasImportableAccountPreferences = (exportData: Record<string, unknown>) => {
   const account = getAccount(exportData);
   const watchRegion = asString(account.watchRegion);
@@ -157,7 +164,8 @@ const hasImportableAccountPreferences = (exportData: Record<string, unknown>) =>
     isPrivacy(account.watchedPrivacy) ||
     isPrivacy(account.likedPrivacy) ||
     isPrivacy(account.watchlistPrivacy) ||
-    Boolean(watchRegion && isSupportedWatchRegion(normalizeWatchRegion(watchRegion)))
+    Boolean(watchRegion && isSupportedWatchRegion(normalizeWatchRegion(watchRegion))) ||
+    Boolean(getImportableNavigationPreferences(exportData))
   );
 };
 
@@ -450,6 +458,8 @@ const importAccountPreferences = async (
   const watchRegion = asString(account.watchRegion);
   const normalizedWatchRegion = watchRegion ? normalizeWatchRegion(watchRegion) : null;
 
+  const navigationPreferences = getImportableNavigationPreferences(exportData);
+
   await tx.user.update({
     where: { id: userId },
     data: {
@@ -462,6 +472,15 @@ const importAccountPreferences = async (
         : {}),
     },
   });
+
+  if (navigationPreferences) {
+    const config = JSON.stringify(navigationPreferences);
+    await tx.navigationPreferences.upsert({
+      where: { userId },
+      update: { config },
+      create: { userId, config },
+    });
+  }
 };
 
 const importRecommendationFeedback = async (

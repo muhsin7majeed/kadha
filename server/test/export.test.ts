@@ -27,6 +27,19 @@ describe('user data export', () => {
         type: 'MORE_LIKE_THIS',
       },
     });
+    await prisma.navigationPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          layout: 'grid',
+          items: [
+            { id: 'menu', visible: true, display: 'icon' },
+            { id: 'home', visible: true, display: 'label' },
+          ],
+        }),
+      },
+    });
     await prisma.watchEvent.create({
       data: {
         userId: user.userId,
@@ -75,6 +88,14 @@ describe('user data export', () => {
       data: {
         accountPreferences: {
           username: user.username,
+          navigation: {
+            version: 1,
+            layout: 'grid',
+            items: expect.arrayContaining([
+              { id: 'menu', visible: true, display: 'icon' },
+              { id: 'home', visible: true, display: 'label' },
+            ]),
+          },
         },
       },
     });

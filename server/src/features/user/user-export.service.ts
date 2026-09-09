@@ -3,6 +3,11 @@ import { CollectionMemberRole } from '@prisma/client';
 import { envConfig } from '@/config/env';
 import { prisma } from '@/lib/prisma';
 import {
+  DEFAULT_NAVIGATION_PREFERENCES,
+  normalizeNavigationPreferences,
+  parseStoredNavigationPreferences,
+} from '@/features/navigation-preferences/navigation-preferences.service';
+import {
   EXCLUDED_EXPORT_DATA,
   type ExportCategory,
   EXPORT_CATEGORIES,
@@ -28,6 +33,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     activity,
     recommendationSettings,
     recommendationFeedback,
+    navigationPreferences,
   ] = await prisma.$transaction([
     prisma.user.findUnique({
       where: { id },
@@ -192,6 +198,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
         updatedAt: 'desc',
       },
     }),
+    prisma.navigationPreferences.findUnique({
+      where: { userId: id },
+    }),
   ]);
 
   const selected = new Set(categories);
@@ -226,6 +235,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       likedPrivacy: account.likedPrivacy,
       watchlistPrivacy: account.watchlistPrivacy,
       watchRegion: account.watchRegion,
+      navigation: navigationPreferences
+        ? normalizeNavigationPreferences(parseStoredNavigationPreferences(navigationPreferences.config))
+        : DEFAULT_NAVIGATION_PREFERENCES,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     };

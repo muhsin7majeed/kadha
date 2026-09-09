@@ -425,6 +425,20 @@ describe('user data import', () => {
         watchRegion: 'GB',
       },
     });
+    await prisma.navigationPreferences.create({
+      data: {
+        userId: source.userId,
+        config: JSON.stringify({
+          version: 1,
+          layout: 'scrollable',
+          items: [
+            { id: 'friends', visible: true, display: 'icon' },
+            { id: 'home', visible: true, display: 'label' },
+            { id: 'menu', visible: true, display: 'both' },
+          ],
+        }),
+      },
+    });
     await updateUserMediaFlag(source, 'liked', true, 886401);
 
     const exportResponse = await request(await getTestApp())
@@ -456,6 +470,53 @@ describe('user data import', () => {
       watchRegion: 'GB',
     });
     expect(await prisma.userMedia.count({ where: { userId: target.userId } })).toBe(0);
+    const importedNavigation = await prisma.navigationPreferences.findUniqueOrThrow({ where: { userId: target.userId } });
+    const importedNavigationConfig = JSON.parse(importedNavigation.config);
+    expect(importedNavigationConfig).toMatchObject({ version: 1, layout: 'scrollable' });
+    expect(importedNavigationConfig.items.slice(0, 3)).toEqual([
+      { id: 'friends', visible: true, display: 'icon' },
+      { id: 'home', visible: true, display: 'label' },
+      { id: 'menu', visible: true, display: 'both' },
+    ]);
+  });
+
+  it('preserves current navigation when imported account preferences contain invalid navigation', async () => {
+    const target = await registerTestUser('invalid-navigation-import-target');
+    const currentConfig = JSON.stringify({
+      version: 1,
+      layout: 'grid',
+      items: [
+        { id: 'home', visible: true, display: 'both' },
+        { id: 'menu', visible: true, display: 'icon' },
+      ],
+    });
+    await prisma.navigationPreferences.create({ data: { userId: target.userId, config: currentConfig } });
+
+    await request(await getTestApp())
+      .post('/api/user/import')
+      .set('Authorization', authorization(target))
+      .send({
+        export: {
+          format: 'kadha-data-export',
+          schemaVersion: 2,
+          data: {
+            accountPreferences: {
+              profilePrivacy: 'PUBLIC',
+              navigation: {
+                version: 1,
+                layout: 'compact',
+                items: [{ id: 'not-a-destination', visible: true, display: 'both' }],
+              },
+            },
+          },
+        },
+        options: { categories: ['accountPreferences'] },
+      })
+      .expect(200);
+
+    expect(await prisma.navigationPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
+      config: currentConfig,
+    });
   });
 
   it('preserves existing recommendation feedback when importing a conflicting preference', async () => {

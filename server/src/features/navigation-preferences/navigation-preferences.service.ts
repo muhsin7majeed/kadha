@@ -32,7 +32,7 @@ export const DEFAULT_NAVIGATION_PREFERENCES: NavigationPreferencesDocument = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
-const parseStoredPreferences = (value: string): unknown => {
+export const parseStoredNavigationPreferences = (value: string): unknown => {
   try {
     return JSON.parse(value) as unknown;
   } catch {
@@ -99,7 +99,7 @@ export const normalizeNavigationPreferences = (
 export const getNavigationPreferences = async (userId: string) => {
   const stored = await prisma.navigationPreferences.findUnique({ where: { userId } });
   return stored
-    ? normalizeNavigationPreferences(parseStoredPreferences(stored.config))
+    ? normalizeNavigationPreferences(parseStoredNavigationPreferences(stored.config))
     : structuredClone(DEFAULT_NAVIGATION_PREFERENCES);
 };
 
