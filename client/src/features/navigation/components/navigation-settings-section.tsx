@@ -28,6 +28,7 @@ import {
   HStack,
   IconButton,
   NativeSelect,
+  Portal,
   Stack,
   Text,
 } from '@chakra-ui/react';
@@ -306,14 +307,16 @@ const NavigationSettingsSection = () => {
                     ))}
                   </Stack>
                 </SortableContext>
-                <DragOverlay>
-                  {activeItemId ? (
-                    <HStack p="4" bg="brand.subtle" color="brand.fg" borderWidth="1px" rounded="lg" shadow="lg">
-                      <LuGripVertical aria-hidden />
-                      <Text fontWeight="medium">{NAVIGATION_BY_ID.get(activeItemId)?.label}</Text>
-                    </HStack>
-                  ) : null}
-                </DragOverlay>
+                <Portal>
+                  <DragOverlay>
+                    {activeItemId ? (
+                      <HStack p="4" bg="brand.subtle" color="brand.fg" borderWidth="1px" rounded="lg" shadow="lg">
+                        <LuGripVertical aria-hidden />
+                        <Text fontWeight="medium">{NAVIGATION_BY_ID.get(activeItemId)?.label}</Text>
+                      </HStack>
+                    ) : null}
+                  </DragOverlay>
+                </Portal>
               </DndContext>
             </Box>
 

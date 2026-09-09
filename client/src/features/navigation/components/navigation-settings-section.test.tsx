@@ -25,7 +25,9 @@ import NavigationSettingsSection from './navigation-settings-section';
 const renderSection = () =>
   renderWithProviders(
     <MemoryRouter initialEntries={['/app/settings/navigation']}>
-      <NavigationSettingsSection />
+      <div className="kadha-route-transition">
+        <NavigationSettingsSection />
+      </div>
     </MemoryRouter>,
   );
 
@@ -48,6 +50,20 @@ describe('NavigationSettingsSection', () => {
     expect(preview.querySelector('[data-layout="scrollable"]')).toBeInTheDocument();
     expect(within(preview).getByLabelText('Home')).not.toHaveTextContent('Home');
     expect(within(preview).getByText('Liked')).toBeInTheDocument();
+  });
+
+  it('renders the drag overlay outside the transformed route wrapper', async () => {
+    const user = userEvent.setup();
+    renderSection();
+
+    screen.getByRole('button', { name: 'Drag Home' }).focus();
+    await user.keyboard(' ');
+
+    const overlay = Array.from(document.querySelectorAll<HTMLElement>('body *')).find(
+      (element) => element.style.position === 'fixed' && element.textContent?.includes('Home'),
+    );
+    expect(overlay).toBeInTheDocument();
+    expect(overlay?.closest('.kadha-route-transition')).toBeNull();
   });
 
   it('reorders with accessible controls and saves the complete configuration', async () => {
