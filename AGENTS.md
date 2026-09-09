@@ -97,6 +97,7 @@ server/src/features/media/
 - Keep `README.md` aligned with setup, deployment, and operations changes.
 - Keep `docs/project-structure.md` aligned when changing architectural boundaries or placement rules.
 - Update `roadmap.md` whenever a feature is added, removed, completed, deferred, or materially changed, and keep its shipped and planned checkboxes accurate in the same change.
+- When adding or changing user-owned preferences, assess whether they belong in account export and import. Include portable preferences by default, or document why an intentional exclusion is necessary.
 
 ## Release And Changelog Workflow
 

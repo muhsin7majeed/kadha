@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Navigation
+
+- Added account-synced navigation customization with reorderable destinations, per-item icon and label controls, and optional Friends and Settings shortcuts.
+- Added Compact, horizontally scrollable, and full-screen Grid launcher layouts, with Home and Menu kept mandatory and omitted shortcuts available through Menu.
+- Added a live Navigation settings preview, smooth drag-and-drop ordering, keyboard and arrow-button alternatives, and direct customization access from Menu.
+- Included navigation preferences in selectable account-preference exports and imports.
+
+### Engineering Changes
+
+#### Navigation
+
+- Added validated user-owned navigation preference storage, forward-compatible destination normalization, and a database migration.
+- Kept the drag-and-drop editor in its lazy-loaded settings chunk so it does not increase the initial application bundle.
+
 ## v0.1.13
 
 ### Feature Changes
