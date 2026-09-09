@@ -114,6 +114,7 @@ model User {
   watchEvents            WatchEvent[]
   recommendationSettings RecommendationSettings?
   recommendationFeedback RecommendationFeedback[]
+  navigationPreferences  NavigationPreferences?
   refreshSessions        RefreshSession[]
   collections            Collection[]
 
@@ -255,6 +256,18 @@ model WatchEvent {
   @@index([userId, watchedAt])
   @@index([media_id, media_type])
   @@map("watch_events")
+}
+
+model NavigationPreferences {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  config    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("navigation_preferences")
 }
 
 model RecommendationSettings {
