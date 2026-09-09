@@ -1,5 +1,5 @@
 import { Button, Field, NativeSelect, Stack } from '@chakra-ui/react';
-import { LuDatabase, LuKeyRound, LuPalette, LuShield, LuSparkles, LuUserRound } from 'react-icons/lu';
+import { LuDatabase, LuKeyRound, LuNavigation, LuPalette, LuShield, LuSparkles, LuUserRound } from 'react-icons/lu';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 const settingsSections = [
@@ -17,6 +17,11 @@ const settingsSections = [
     value: 'recommendations',
     label: 'Recommendations',
     icon: LuSparkles,
+  },
+  {
+    value: 'navigation',
+    label: 'Navigation',
+    icon: LuNavigation,
   },
   {
     value: 'appearance',

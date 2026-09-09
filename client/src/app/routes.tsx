@@ -19,6 +19,7 @@ const Home = lazy(() => import('@/pages/home'));
 const InProgress = lazy(() => import('@/pages/in-progress'));
 const Liked = lazy(() => import('@/pages/liked'));
 const MediaDetails = lazy(() => import('@/pages/media-details'));
+const NavigationSettings = lazy(() => import('@/pages/settings/navigation'));
 const Notifications = lazy(() => import('@/pages/notifications'));
 const PrivacySettings = lazy(() => import('@/pages/settings/privacy'));
 const Recommendations = lazy(() => import('@/pages/recommendations'));
@@ -51,6 +52,7 @@ export function AppRoutes() {
               <Route path="account" element={<AccountSettings />} />
               <Route path="privacy" element={<PrivacySettings />} />
               <Route path="recommendations" element={<RecommendationSettings />} />
+              <Route path="navigation" element={<NavigationSettings />} />
               <Route path="appearance" element={<AppearanceSettings />} />
               <Route path="security" element={<SecuritySettings />} />
               <Route path="data" element={<DataSettings />} />

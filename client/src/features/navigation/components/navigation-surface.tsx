@@ -16,7 +16,7 @@ import { useEffect, useRef } from 'react';
 import { LuGrid3X3 } from 'react-icons/lu';
 import { Link, useLocation } from 'react-router';
 
-import { NAVIGATION_BY_ID, NAVIGATION_REGISTRY, isRouteActive } from '@/features/navigation/navigation-registry';
+import { NAVIGATION_BY_ID, isRouteActive } from '@/features/navigation/navigation-registry';
 import type { NavigationPreferenceItem, NavigationPreferences } from '@/features/navigation/navigation.types';
 
 interface NavigationSurfaceProps {
@@ -54,6 +54,7 @@ const controlStyles = {
   minH: 16,
   textDecoration: 'none',
   transition: 'background-color 0.2s ease, color 0.2s ease',
+  _motionReduce: { transition: 'none' },
 } as const;
 
 interface DestinationControlProps {
@@ -226,6 +227,7 @@ const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
                         transition="transform 0.18s ease, background-color 0.18s ease"
                         _hover={{ bg: 'brand.muted', transform: 'translateY(-2px)' }}
                         _focusVisible={{ outline: '3px solid', outlineColor: 'brand.focusRing' }}
+                        _motionReduce={{ transition: 'none', _hover: { transform: 'none' } }}
                       >
                         <Link to={destination.to} viewTransition aria-label={item.display === 'icon' ? destination.label : undefined}>
                           {item.display !== 'label' ? <DestinationIcon size={28} aria-hidden /> : <Box />}
@@ -289,15 +291,41 @@ export const NavigationSurface = ({ preferences, preview = false }: NavigationSu
   }, [pathname, preferences.layout, preview]);
 
   if (preferences.layout === 'grid') {
+    if (preview) {
+      return (
+        <SimpleGrid columns={{ base: 2, sm: 3 }} gap="2" p="4" aria-label="Navigation preview">
+          {preferences.items
+            .filter((item) => item.id !== 'menu')
+            .map((item) => (
+              <VStack
+                key={item.id}
+                align="stretch"
+                justify="space-between"
+                minH="6rem"
+                p="3"
+                bg="brand.subtle"
+                color="brand.fg"
+                borderWidth="1px"
+                borderColor="brand.muted"
+                rounded="lg"
+                aria-label={item.display === 'icon' ? NAVIGATION_BY_ID.get(item.id)?.label : undefined}
+              >
+                {itemContent(item, 6)}
+              </VStack>
+            ))}
+        </SimpleGrid>
+      );
+    }
+
     return (
       <Flex
-        position={preview ? 'relative' : 'fixed'}
-        bottom={preview ? undefined : 'calc(1rem + env(safe-area-inset-bottom))'}
-        right={preview ? undefined : { base: 4, md: 6 }}
+        position="fixed"
+        bottom="calc(1rem + env(safe-area-inset-bottom))"
+        right={{ base: 4, md: 6 }}
         justify="center"
         zIndex={2}
       >
-        <GridLauncher preferences={preferences} preview={preview} />
+        <GridLauncher preferences={preferences} />
       </Flex>
     );
   }
@@ -358,5 +386,3 @@ export const NavigationSurface = ({ preferences, preview = false }: NavigationSu
     </Box>
   );
 };
-
-export const getNavigationDestinationOrder = () => NAVIGATION_REGISTRY.map((item) => item.id);

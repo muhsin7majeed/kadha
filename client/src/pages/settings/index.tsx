@@ -44,7 +44,7 @@ const Settings = () => {
   return (
     <Container maxW="6xl" px="0">
       <VStack align="stretch" gap="6">
-        <PageHeader subHeader="Manage your account, privacy, recommendations, appearance, security, and data.">
+        <PageHeader subHeader="Manage your account, privacy, recommendations, navigation, appearance, security, and data.">
           <SettingsTitle />
         </PageHeader>
 

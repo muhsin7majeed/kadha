@@ -34,6 +34,7 @@ describe('SettingsNavigation', () => {
       'page',
     );
     expect(within(desktopNavigation).getByRole('link', { name: 'Recommendations', hidden: true })).toBeInTheDocument();
+    expect(within(desktopNavigation).getByRole('link', { name: 'Navigation', hidden: true })).toBeInTheDocument();
     expect(within(desktopNavigation).getByRole('link', { name: 'Appearance', hidden: true })).toBeInTheDocument();
     expect(within(desktopNavigation).getByRole('link', { name: 'Security', hidden: true })).toBeInTheDocument();
     expect(within(desktopNavigation).getByRole('link', { name: 'Data', hidden: true })).toBeInTheDocument();
