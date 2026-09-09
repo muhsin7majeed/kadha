@@ -8,11 +8,12 @@ import PwaInstallMenuItem from '@/features/pwa/pwa-install-menu-item';
 
 interface UtilityMenuItemsProps {
   settingsPath?: string;
+  showSettings?: boolean;
 }
 
 export const MenuSectionSeparator = () => <Box borderTopWidth="1px" borderColor="border" my={1} />;
 
-const UtilityMenuItems = ({ settingsPath = '/settings' }: UtilityMenuItemsProps) => {
+const UtilityMenuItems = ({ settingsPath = '/settings', showSettings = true }: UtilityMenuItemsProps) => {
   const { toggleColorMode, colorMode } = useColorMode();
 
   return (
@@ -22,11 +23,13 @@ const UtilityMenuItems = ({ settingsPath = '/settings' }: UtilityMenuItemsProps)
         {colorMode === 'dark' ? 'Light mode' : 'Dark mode'}
       </Menu.Item>
 
-      <Menu.Item value="settings" asChild>
-        <NavLink to={settingsPath}>
-          <LuSettings /> Settings
-        </NavLink>
-      </Menu.Item>
+      {showSettings ? (
+        <Menu.Item value="settings" asChild>
+          <NavLink to={settingsPath}>
+            <LuSettings /> Settings
+          </NavLink>
+        </Menu.Item>
+      ) : null}
 
       <PwaInstallMenuItem />
 

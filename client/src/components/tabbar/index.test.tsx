@@ -9,16 +9,21 @@ import { renderWithProviders } from '@/test/render';
 
 const mocks = vi.hoisted(() => ({
   preferences: null as NavigationPreferences | null,
+  loading: false,
 }));
 
 vi.mock('@/features/navigation/api/use-navigation-preferences', () => ({
-  default: () => ({ data: mocks.preferences ?? DEFAULT_NAVIGATION_PREFERENCES }),
+  default: () => ({
+    data: mocks.loading ? undefined : mocks.preferences ?? DEFAULT_NAVIGATION_PREFERENCES,
+    isError: false,
+  }),
 }));
 
 import TabBar from '.';
 
 const renderTabBar = (path = '/app', preferences: NavigationPreferences | null = null) => {
   mocks.preferences = preferences;
+  mocks.loading = false;
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]}>
       <TabBar />
@@ -63,6 +68,32 @@ describe('TabBar', () => {
       'href',
       '/app/settings/navigation',
     );
+    expect(screen.getByRole('menuitem', { name: /mode/ })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: /Version/ })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'GitHub' })).toBeInTheDocument();
+  });
+
+  it('marks Menu and an omitted destination current when the current route is hidden', async () => {
+    const user = userEvent.setup();
+    renderTabBar('/app/activity');
+
+    const menu = screen.getByRole('button', { name: 'Menu' });
+    expect(menu).toHaveAttribute('aria-current', 'page');
+    expect(menu).toHaveAttribute('data-navigation-active');
+
+    await user.click(menu);
+    expect(screen.getByRole('menuitem', { name: 'Activity' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('does not flash the default bar while account preferences are loading', () => {
+    mocks.loading = true;
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/app']}>
+        <TabBar />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('navigation', { name: 'Primary navigation' })).not.toBeInTheDocument();
   });
 
   it('respects item order and independent icon or label presentation', () => {
@@ -112,6 +143,7 @@ describe('TabBar', () => {
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Friends' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Customize navigation' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Menu' })).not.toBeInTheDocument();
   });

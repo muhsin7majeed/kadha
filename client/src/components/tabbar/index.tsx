@@ -3,7 +3,8 @@ import { DEFAULT_NAVIGATION_PREFERENCES } from '@/features/navigation/navigation
 import { NavigationSurface } from '@/features/navigation/components/navigation-surface';
 
 const TabBar = () => {
-  const { data } = useNavigationPreferences();
+  const { data, isError } = useNavigationPreferences();
+  if (!data && !isError) return null;
   return <NavigationSurface preferences={data ?? DEFAULT_NAVIGATION_PREFERENCES} />;
 };
 

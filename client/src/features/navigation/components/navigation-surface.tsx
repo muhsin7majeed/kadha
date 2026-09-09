@@ -10,12 +10,14 @@ import {
   Portal,
   SimpleGrid,
   Text,
+  useMediaQuery,
   VStack,
 } from '@chakra-ui/react';
 import { useEffect, useRef } from 'react';
 import { LuGrid3X3 } from 'react-icons/lu';
 import { Link, useLocation } from 'react-router';
 
+import UtilityMenuItems from '@/components/navbar/utility-menu-items';
 import { NAVIGATION_BY_ID, isRouteActive } from '@/features/navigation/navigation-registry';
 import type { NavigationPreferenceItem, NavigationPreferences } from '@/features/navigation/navigation.types';
 
@@ -106,17 +108,20 @@ interface NavigationMenuProps {
   active: boolean;
   item: NavigationPreferenceItem;
   omittedItems: NavigationPreferenceItem[];
+  pathname: string;
   preview?: boolean;
   scrollable?: boolean;
 }
 
-const NavigationMenu = ({ active, item, omittedItems, preview, scrollable }: NavigationMenuProps) => (
+const NavigationMenu = ({ active, item, omittedItems, pathname, preview, scrollable }: NavigationMenuProps) => (
   <Menu.Root positioning={{ placement: 'top-end', strategy: 'fixed', gutter: 8 }}>
     <Menu.Trigger asChild>
       <Button
         variant="ghost"
         colorPalette={active ? 'brand' : 'gray'}
         aria-label="Menu"
+        aria-current={active ? 'page' : undefined}
+        data-navigation-active={active ? '' : undefined}
         alignItems="center"
         borderRadius={0}
         borderTopWidth="2px"
@@ -154,7 +159,11 @@ const NavigationMenu = ({ active, item, omittedItems, preview, scrollable }: Nav
 
                 return (
                   <Menu.Item key={destination.id} value={destination.id} asChild>
-                    <Link to={destination.to} viewTransition>
+                    <Link
+                      to={destination.to}
+                      viewTransition
+                      aria-current={isRouteActive(pathname, destination.to) ? 'page' : undefined}
+                    >
                       <ItemIcon aria-hidden />
                       {destination.label}
                     </Link>
@@ -170,17 +179,27 @@ const NavigationMenu = ({ active, item, omittedItems, preview, scrollable }: Nav
               Customize navigation
             </Link>
           </Menu.Item>
+          <Menu.Separator />
+          <Text px="3" py="2" color="fg.muted" textStyle="compactLabel">
+            Utilities
+          </Text>
+          <UtilityMenuItems settingsPath="/app/settings" showSettings={false} />
         </Menu.Content>
       </Menu.Positioner>
     </Portal>
   </Menu.Root>
 );
 
-const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
+interface GridLauncherProps extends NavigationSurfaceProps {
+  pathname: string;
+  prefersReducedMotion: boolean;
+}
+
+const GridLauncher = ({ preferences, pathname, prefersReducedMotion, preview }: GridLauncherProps) => {
   const destinations = preferences.items.filter((item) => item.id !== 'menu');
 
   return (
-    <Dialog.Root size="full" placement="center" motionPreset="slide-in-bottom">
+    <Dialog.Root size="full" placement="center" motionPreset={prefersReducedMotion ? 'none' : 'slide-in-bottom'}>
       <Dialog.Trigger asChild>
         <Button
           aria-label="Open navigation"
@@ -197,13 +216,26 @@ const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
       <Portal disabled={preview}>
         <Dialog.Backdrop bg="bg" />
         <Dialog.Positioner>
-          <Dialog.Content bg="bg" borderRadius="0" h="100dvh" maxH="100dvh" maxW="100vw" p="0">
-            <Dialog.Header px={{ base: 5, md: 10 }} py="6" borderBottomWidth="1px" borderColor="border">
+          <Dialog.Content bg="bg" borderRadius="0" h="100dvh" minH="100dvh" maxH="100dvh" maxW="100vw" p="0">
+            <Dialog.Header
+              ps={{ base: 'max(1.25rem, env(safe-area-inset-left))', md: 'max(2.5rem, env(safe-area-inset-left))' }}
+              pe={{ base: 'max(1.25rem, env(safe-area-inset-right))', md: 'max(2.5rem, env(safe-area-inset-right))' }}
+              pt="calc(1.5rem + env(safe-area-inset-top))"
+              pb="6"
+              borderBottomWidth="1px"
+              borderColor="border"
+            >
               <Dialog.Title asChild>
                 <Heading textStyle="pageTitle">Navigate</Heading>
               </Dialog.Title>
             </Dialog.Header>
-            <Dialog.Body overflowY="auto" px={{ base: 5, md: 10 }} py={{ base: 6, md: 10 }}>
+            <Dialog.Body
+              overflowY="auto"
+              ps={{ base: 'max(1.25rem, env(safe-area-inset-left))', md: 'max(2.5rem, env(safe-area-inset-left))' }}
+              pe={{ base: 'max(1.25rem, env(safe-area-inset-right))', md: 'max(2.5rem, env(safe-area-inset-right))' }}
+              pt={{ base: 6, md: 10 }}
+              pb={{ base: 'calc(1.5rem + env(safe-area-inset-bottom))', md: 'calc(2.5rem + env(safe-area-inset-bottom))' }}
+            >
               <SimpleGrid columns={{ base: 2, sm: 3, lg: 5 }} gap={{ base: 3, md: 5 }} maxW="6xl" mx="auto">
                 {destinations.map((item) => {
                   const destination = NAVIGATION_BY_ID.get(item.id);
@@ -229,7 +261,12 @@ const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
                         _focusVisible={{ outline: '3px solid', outlineColor: 'brand.focusRing' }}
                         _motionReduce={{ transition: 'none', _hover: { transform: 'none' } }}
                       >
-                        <Link to={destination.to} viewTransition aria-label={item.display === 'icon' ? destination.label : undefined}>
+                        <Link
+                          to={destination.to}
+                          viewTransition
+                          aria-current={isRouteActive(pathname, destination.to) ? 'page' : undefined}
+                          aria-label={item.display === 'icon' ? destination.label : undefined}
+                        >
                           {item.display !== 'label' ? <DestinationIcon size={28} aria-hidden /> : <Box />}
                           {item.display !== 'icon' ? (
                             <Text textStyle="cardTitle">{destination.label}</Text>
@@ -262,7 +299,12 @@ const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
               </SimpleGrid>
             </Dialog.Body>
             <Dialog.CloseTrigger asChild>
-              <CloseButton position="absolute" top="5" right={{ base: 5, md: 10 }} aria-label="Close navigation" />
+              <CloseButton
+                position="absolute"
+                top="calc(1.25rem + env(safe-area-inset-top))"
+                right={{ base: 'max(1.25rem, env(safe-area-inset-right))', md: 'max(2.5rem, env(safe-area-inset-right))' }}
+                aria-label="Close navigation"
+              />
             </Dialog.CloseTrigger>
           </Dialog.Content>
         </Dialog.Positioner>
@@ -273,6 +315,7 @@ const GridLauncher = ({ preferences, preview }: NavigationSurfaceProps) => {
 
 export const NavigationSurface = ({ preferences, preview = false }: NavigationSurfaceProps) => {
   const { pathname } = useLocation();
+  const [prefersReducedMotion] = useMediaQuery(['(prefers-reduced-motion: reduce)'], { fallback: [false] });
   const scrollRef = useRef<HTMLDivElement>(null);
   const visibleItems = preferences.items.filter((item) => item.visible);
   const omittedItems = preferences.items.filter((item) => !item.visible && item.id !== 'menu');
@@ -284,11 +327,11 @@ export const NavigationSurface = ({ preferences, preview = false }: NavigationSu
   useEffect(() => {
     if (preferences.layout !== 'scrollable' || preview) return;
     scrollRef.current?.querySelector<HTMLElement>('[data-navigation-active]')?.scrollIntoView?.({
-      behavior: 'smooth',
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
       block: 'nearest',
       inline: 'center',
     });
-  }, [pathname, preferences.layout, preview]);
+  }, [pathname, preferences.layout, prefersReducedMotion, preview]);
 
   if (preferences.layout === 'grid') {
     if (preview) {
@@ -325,7 +368,11 @@ export const NavigationSurface = ({ preferences, preview = false }: NavigationSu
         justify="center"
         zIndex={2}
       >
-        <GridLauncher preferences={preferences} />
+        <GridLauncher
+          preferences={preferences}
+          pathname={pathname}
+          prefersReducedMotion={prefersReducedMotion}
+        />
       </Flex>
     );
   }
@@ -364,6 +411,7 @@ export const NavigationSurface = ({ preferences, preview = false }: NavigationSu
                   active={isMenuActive}
                   item={item}
                   omittedItems={omittedItems}
+                  pathname={pathname}
                   preview={preview}
                   scrollable={scrollable}
                 />
