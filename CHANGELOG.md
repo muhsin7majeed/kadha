@@ -6,7 +6,7 @@
 
 #### Viewing Diary
 
-- Improved Calendar accessibility and presentation with locale-aware weekday ordering, standard arrow-key navigation, a denser responsive layout, clearer activity summaries, and distinct interaction states.
+- Improved Calendar accessibility and presentation with locale-aware weekday ordering, standard arrow-key navigation, a denser responsive layout, clearer activity summaries, distinct interaction states, and theme-aware Insights heatmap colors.
 
 ### Engineering Changes
 

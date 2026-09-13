@@ -11,7 +11,7 @@ const utcDate = (year: number, month: number, day: number) => {
 };
 const dateKey = (date: Date) =>
   `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
-const heatColors = ['bg.subtle', 'blue.subtle', 'blue.muted', 'blue.solid', 'blue.emphasized'];
+const heatColors = ['bg.subtle', 'brand.subtle', 'brand.muted', 'brand.emphasized', 'brand.solid'];
 
 interface DiaryHeatmapProps {
   daily: DiaryDayBucket[];
