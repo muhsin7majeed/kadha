@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -82,12 +83,16 @@ const insightsResponse = {
   availableYears: [2026],
 };
 
-const renderPage = () =>
-  renderWithProviders(
-    <MemoryRouter>
-      <Diary />
-    </MemoryRouter>,
+const renderPage = () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return renderWithProviders(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <Diary />
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
+};
 
 describe('viewing diary page', () => {
   beforeEach(() => {

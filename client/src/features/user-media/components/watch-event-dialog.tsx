@@ -44,7 +44,7 @@ const WatchEventDialog = ({ event, media, onOpenChange, open }: WatchEventDialog
 
     setWatchedOn(event ? (event.watchedOn ?? '') : today);
     setNote(event?.note ?? '');
-    setRating(media.rating ?? null);
+    setRating(event?.seasonNumber !== null && event?.seasonNumber !== undefined ? event.rating : (media.rating ?? null));
     setRatingDirty(false);
     setClientRequestId(createClientRequestId(media.media_id));
   }, [event, media.media_id, media.rating, open, today]);
@@ -114,7 +114,11 @@ const WatchEventDialog = ({ event, media, onOpenChange, open }: WatchEventDialog
                 setRatingDirty(true);
               }}
             />
-            <Field.HelperText>This rating applies to the title overall, not only this viewing.</Field.HelperText>
+            <Field.HelperText>
+              {event?.seasonNumber !== null && event?.seasonNumber !== undefined
+                ? 'This rating belongs to this episode watch.'
+                : 'This rating applies to the title overall, not only this viewing.'}
+            </Field.HelperText>
           </Field.Root>
 
           <Field.Root>

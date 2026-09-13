@@ -22,6 +22,9 @@ const invalidateWatchHistoryDependents = (
   identity: WatchEventMutationIdentity,
 ) =>
   Promise.all([
+    queryClient.invalidateQueries({ queryKey: queryKeys.diaryRoot }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.diaryInsightsRoot }),
+    queryClient.invalidateQueries({ queryKey: queryKeys.tvProgress }),
     queryClient.invalidateQueries({ queryKey: queryKeys.mediaDetails }),
     queryClient.invalidateQueries({ queryKey: queryKeys.watched }),
     queryClient.invalidateQueries({ queryKey: queryKeys.watchList }),
