@@ -1,4 +1,5 @@
 import {
+  LuBookOpen,
   LuBookmark,
   LuChartBar,
   LuCheck,
@@ -27,6 +28,12 @@ const CURRENT_FEATURES = [
     icon: LuCheck,
     title: 'Watched',
     description: "Mark what you've seen. Never forget if you watched that movie or not.",
+  },
+  {
+    icon: LuBookOpen,
+    title: 'Private Viewing Diary',
+    description: 'Revisit watches and episodes in a timeline, calendar, and accessible yearly viewing patterns.',
+    badge: 'Insights',
   },
   {
     icon: LuClapperboard,

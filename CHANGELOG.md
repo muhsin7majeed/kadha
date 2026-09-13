@@ -11,7 +11,19 @@
 - Added a live Navigation settings preview, smooth drag-and-drop ordering, keyboard and arrow-button alternatives, and direct customization access from Menu.
 - Included navigation preferences in selectable account-preference exports and imports.
 
+#### Viewing Diary
+
+- Added a private Viewing Diary with an event-level Timeline for movie watches, rewatches, and individual TV episodes, separate from the deduplicated Watched library.
+- Added a monthly Calendar with day drill-down plus annual viewing-pattern Insights with an accessible activity heatmap and monthly movie/episode trends.
+- Added clearly labelled estimated watch time using movie runtimes and typical series episode runtimes, including runtime and recorded-date coverage instead of implying complete or exact totals.
+- Added safe editing and confirmed removal of diary entries, with Diary available from Menu, customizable navigation, and the Watched page.
+
 ### Engineering Changes
+
+#### Viewing Diary
+
+- Added owner-scoped Timeline and annual aggregation APIs over valid watch events, including deterministic date buckets, pagination, ownership isolation, and regression coverage.
+- Added dependency-free Chakra/CSS visualizations with keyboard-accessible exact values and cache invalidation across Diary, watch history, and TV progress.
 
 #### Navigation
 

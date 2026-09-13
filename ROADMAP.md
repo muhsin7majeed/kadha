@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-09-04
+Last reviewed: 2026-09-13
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -21,6 +21,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Watched, liked, and watchlist tracking.
 - [x] Optional ratings, watched dates, and private action-specific notes with owner-only summaries and edit access.
 - [x] Repeatable private watch-event storage and APIs for movies and TV episodes, with per-viewing dates and notes.
+- [x] Private Viewing Diary with an event timeline, monthly calendar, entry correction, and year-at-a-glance viewing patterns.
 - [x] TV episode and season progress tracking.
 - [x] In Progress TV library with next-episode context, sorting, and pagination.
 - [x] Custom collections for movies and TV shows.
@@ -76,7 +77,7 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 - [x] Add selectable, versioned JSON export and import with validation, preview, idempotency, and conflict handling.
 - [ ] Add supported import adapters for services such as Letterboxd or Trakt.
-- [ ] Add watch-history totals and trends.
+- [x] Add watch-history totals and trends through the private Viewing Diary.
 - [ ] Add breached-password rejection without sending complete passwords to a third party.
 - [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.
 - [ ] Complete the hosted privacy notice with operator contact, purposes, retention, recipients, user rights, cookies, and deletion details before broader hosted use.
@@ -131,16 +132,13 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 - [x] Add a private profile overview with watched-title and episode totals, personal rating summaries, and ranked genre,
   cast, movie-director, TV-creator, liked-genre, release-decade, and original-language insights.
-- [ ] Add time-watched estimates.
+- [x] Add clearly labelled time-watched estimates with runtime coverage and typical-runtime caveats for TV episodes.
 - [x] Add genre and media-type breakdowns.
-- [ ] Add TV progress and viewing-pattern insights.
+- [x] Add private daily and monthly movie/episode viewing-pattern insights.
 
-### Integrations
+### Deferred Integrations
 
-- [ ] Complete Plex activity-sync Phase 0 validation for authorization, webhooks, GUID mapping, imports, and reconciliation.
-- [ ] Add supported Plex-to-Kadha sync for watched movies, TV episode progress, and ratings.
-- [ ] Add Plex library availability and deep links after activity sync is stable.
-- [ ] Add supported Plex Watchlist preview and import as a separate RSS-based follow-up.
+Plex activity sync, library availability, deep links, and Watchlist import are intentionally deferred. The exploratory plan was removed so the roadmap does not imply a current delivery commitment; integration work can be reconsidered after Kadha's core tracking and portability flows mature.
 
 ### Optional Experiments And Sustainability
 
