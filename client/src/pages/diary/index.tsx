@@ -1,4 +1,4 @@
-import { Alert, Box, Tabs, Text } from '@chakra-ui/react';
+import { Box, Card, SimpleGrid, Stack, Tabs, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuBookOpen, LuCalendarDays, LuChartNoAxesColumnIncreasing, LuList } from 'react-icons/lu';
 
@@ -10,8 +10,10 @@ import useDiary from '@/features/user-media/api/use-diary';
 import useDiaryInsights from '@/features/user-media/api/use-diary-insights';
 import DiaryCalendar from '@/features/user-media/components/diary-calendar';
 import DiaryFilters, { DiaryMediaType } from '@/features/user-media/components/diary-filters';
+import DiaryHeatmap from '@/features/user-media/components/diary-heatmap';
 import DiarySummary from '@/features/user-media/components/diary-summary';
 import DiaryTimeline from '@/features/user-media/components/diary-timeline';
+import DiaryTrends from '@/features/user-media/components/diary-trends';
 
 export type DiaryTab = 'timeline' | 'calendar' | 'insights';
 
@@ -144,13 +146,55 @@ const Diary = () => {
             </Tabs.Content>
 
             <Tabs.Content value="insights" mt="6">
-              <Alert.Root status="info">
-                <Alert.Indicator />
-                <Alert.Content>
-                  <Alert.Title>Insights are being prepared</Alert.Title>
-                  <Alert.Description>Yearly activity and estimated-time patterns will appear here.</Alert.Description>
-                </Alert.Content>
-              </Alert.Root>
+              {insights.isLoading ? (
+                <CommonSpinner />
+              ) : insights.isError || !insights.data ? (
+                <ErrorState
+                  title="Diary insights unavailable"
+                  description="Could not load your viewing patterns."
+                  onRetry={insights.refetch}
+                />
+              ) : (
+                <Stack gap="5">
+                  <SimpleGrid columns={{ base: 1, sm: 2 }} gap="3">
+                    <Card.Root variant="outline">
+                      <Card.Body gap="1">
+                        <Text color="fg.muted" textStyle="compactLabel">Active viewing days</Text>
+                        <Text textStyle="subsectionTitle">{insights.data.activeDays}</Text>
+                        <Text color="fg.muted" textStyle="supporting">Days with a recorded watch date</Text>
+                      </Card.Body>
+                    </Card.Root>
+                    <Card.Root variant="outline">
+                      <Card.Body gap="1">
+                        <Text color="fg.muted" textStyle="compactLabel">Busiest recorded day</Text>
+                        <Text textStyle="subsectionTitle">{insights.data.busiestDay?.totalEntries ?? '—'}</Text>
+                        <Text color="fg.muted" textStyle="supporting">
+                          {insights.data.busiestDay
+                            ? `${insights.data.busiestDay.date} · ${insights.data.busiestDay.totalEntries === 1 ? 'entry' : 'entries'}`
+                            : 'No dated entries this year'}
+                        </Text>
+                      </Card.Body>
+                    </Card.Root>
+                  </SimpleGrid>
+
+                  <DiaryHeatmap
+                    year={calendarYear}
+                    daily={insights.data.daily}
+                    onSelectDate={(date) => {
+                      const [, selectedMonth] = date.split('-').map(Number);
+                      setCalendarMonth(selectedMonth);
+                      setSelectedDate(date);
+                      setDayPage(1);
+                      setTab('calendar');
+                    }}
+                  />
+                  <DiaryTrends monthly={insights.data.monthly} />
+                  <Text color="fg.muted" textStyle="supporting">
+                    {Math.round(insights.data.dateCoverage.ratio * 100)}% of eligible diary entries have a recorded date.
+                    {' '}{Math.round(insights.data.summary.runtimeCoverage.ratio * 100)}% of this year’s entries include runtime data.
+                  </Text>
+                </Stack>
+              )}
             </Tabs.Content>
           </Box>
         )}

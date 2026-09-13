@@ -139,7 +139,6 @@ describe('viewing diary page', () => {
       expect(mocks.useDiary).toHaveBeenCalledWith({ page: 1, mediaType: 'all', year: 2026, month: undefined }),
     );
 
-    fireEvent.click(screen.getByRole('tab', { name: /Insights/ }));
-    expect(screen.getByText('Insights are being prepared')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /Insights/ })).toBeInTheDocument();
   });
 });
