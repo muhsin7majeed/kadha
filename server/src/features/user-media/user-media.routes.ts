@@ -9,6 +9,7 @@ import {
   clearSeasonWatchedController,
   createWatchEventController,
   deleteWatchEventController,
+  getDiaryInsightsController,
   getDiaryTimelineController,
   getTvProgressController,
   markAllAiredWatchedController,
@@ -18,7 +19,7 @@ import {
   listWatchEventsController,
   updateWatchEventController,
 } from './user-media.controller';
-import { diaryQuerySchema } from './diary.schema';
+import { diaryInsightsQuerySchema, diaryQuerySchema } from './diary.schema';
 import {
   episodeWatchSchema,
   userMediaSchema,
@@ -28,6 +29,7 @@ import {
 
 const router = Router();
 
+router.get('/diary/insights', validate(diaryInsightsQuerySchema, 'query'), getDiaryInsightsController);
 router.get('/diary', validate(diaryQuerySchema, 'query'), getDiaryTimelineController);
 router.get('/tv/:mediaId/progress', getTvProgressController);
 router.post('/tv/:mediaId/episodes', validate(episodeWatchSchema), markEpisodeWatchedController);

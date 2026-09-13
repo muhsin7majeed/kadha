@@ -4,7 +4,16 @@ import { parseSnapshotGenreIds } from '@/features/media/media-snapshot.service';
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
 import { formatWatchedOnForApi } from './user-media.serializer';
-import { DiaryTimelineQuery, DiaryTimelineResponse } from './diary.types';
+import {
+  DiaryAggregateBucket,
+  DiaryCoverage,
+  DiaryDayBucket,
+  DiaryInsightsFilters,
+  DiaryInsightsResponse,
+  DiarySummary,
+  DiaryTimelineQuery,
+  DiaryTimelineResponse,
+} from './diary.types';
 
 const diaryEventSelect = {
   id: true,
@@ -133,11 +142,60 @@ const getMediaWhere = (events: DiaryEventRow[]) => {
   };
 };
 
-const getCoverage = (coveredEntries: number, totalEntries: number) => ({
+const getCoverage = (coveredEntries: number, totalEntries: number): DiaryCoverage => ({
   coveredEntries,
   totalEntries,
   ratio: totalEntries > 0 ? coveredEntries / totalEntries : 0,
 });
+
+const getRuntime = (event: DiaryEventRow, snapshotsByMedia: Map<string, SnapshotRow>) => {
+  const runtime = snapshotsByMedia.get(mediaKey(event.media_type, event.media_id))?.runtime;
+  return runtime !== null && runtime !== undefined && runtime > 0 ? runtime : null;
+};
+
+const buildSummary = (events: DiaryEventRow[], snapshotsByMedia: Map<string, SnapshotRow>): DiarySummary => {
+  const runtimeCoveredEvents = events.filter((event) => getRuntime(event, snapshotsByMedia) !== null);
+  const datedEventCount = events.filter((event) => event.watchedOn !== null).length;
+
+  return {
+    totalEntries: events.length,
+    movieWatches: events.filter((event) => event.media_type === MediaType.movie).length,
+    episodeWatches: events.filter((event) => event.media_type === MediaType.tv).length,
+    uniqueTitles: new Set(events.map((event) => mediaKey(event.media_type, event.media_id))).size,
+    estimatedMinutes: runtimeCoveredEvents.reduce(
+      (total, event) => total + (getRuntime(event, snapshotsByMedia) ?? 0),
+      0,
+    ),
+    runtimeCoverage: getCoverage(runtimeCoveredEvents.length, events.length),
+    dateCoverage: getCoverage(datedEventCount, events.length),
+  };
+};
+
+const createEmptyAggregate = (): DiaryAggregateBucket => ({
+  movieWatches: 0,
+  episodeWatches: 0,
+  totalEntries: 0,
+  estimatedMinutes: 0,
+  runtimeCoverage: getCoverage(0, 0),
+});
+
+const addEventToAggregate = (
+  bucket: DiaryAggregateBucket,
+  event: DiaryEventRow,
+  snapshotsByMedia: Map<string, SnapshotRow>,
+) => {
+  bucket.totalEntries += 1;
+  if (event.media_type === MediaType.movie) bucket.movieWatches += 1;
+  else bucket.episodeWatches += 1;
+
+  const runtime = getRuntime(event, snapshotsByMedia);
+  if (runtime !== null) {
+    bucket.estimatedMinutes += runtime;
+    bucket.runtimeCoverage.coveredEntries += 1;
+  }
+  bucket.runtimeCoverage.totalEntries += 1;
+  bucket.runtimeCoverage.ratio = bucket.runtimeCoverage.coveredEntries / bucket.runtimeCoverage.totalEntries;
+};
 
 const getFallbackTitle = (event: DiaryEventRow) =>
   event.media_type === MediaType.movie ? `Movie ${event.media_id}` : `TV show ${event.media_id}`;
@@ -211,15 +269,6 @@ export async function getDiaryTimeline(userId: string, query: DiaryTimelineQuery
     snapshots.map((snapshot) => [mediaKey(snapshot.media_type, snapshot.media_id), snapshot]),
   );
   const ratingsByMedia = new Map(userMediaRows.map((row) => [mediaKey(row.media_type, row.media_id), row.rating]));
-  const runtimeCoveredEvents = events.filter((event) => {
-    const runtime = snapshotsByMedia.get(mediaKey(event.media_type, event.media_id))?.runtime;
-    return runtime !== null && runtime !== undefined && runtime > 0;
-  });
-  const estimatedMinutes = runtimeCoveredEvents.reduce(
-    (total, event) => total + (snapshotsByMedia.get(mediaKey(event.media_type, event.media_id))?.runtime ?? 0),
-    0,
-  );
-  const datedEventCount = events.filter((event) => event.watchedOn !== null).length;
   const availableYears = [
     ...new Set(recordedDates.flatMap((event) => (event.watchedOn ? [event.watchedOn.getUTCFullYear()] : []))),
   ].sort((left, right) => right - left);
@@ -233,16 +282,87 @@ export async function getDiaryTimeline(userId: string, query: DiaryTimelineQuery
         ratingsByMedia.get(mediaKey(event.media_type, event.media_id)),
       ),
     ),
-    summary: {
-      totalEntries: events.length,
-      movieWatches: events.filter((event) => event.media_type === MediaType.movie).length,
-      episodeWatches: events.filter((event) => event.media_type === MediaType.tv).length,
-      uniqueTitles: new Set(events.map((event) => mediaKey(event.media_type, event.media_id))).size,
-      estimatedMinutes,
-      runtimeCoverage: getCoverage(runtimeCoveredEvents.length, events.length),
-      dateCoverage: getCoverage(datedEventCount, events.length),
-    },
+    summary: buildSummary(events, snapshotsByMedia),
     availableYears,
     pagination: createPaginationMeta(query.page, query.limit, events.length),
+  };
+}
+
+export async function getDiaryInsights(
+  userId: string,
+  filters: DiaryInsightsFilters,
+): Promise<DiaryInsightsResponse> {
+  const mediaTypeWhere =
+    filters.mediaType === 'all' ? {} : { media_type: filters.mediaType as MediaType };
+  const yearRange = {
+    gte: utcDate(filters.year, 1, 1),
+    lt: utcDate(filters.year + 1, 1, 1),
+  };
+  const baseWhere: Prisma.WatchEventWhereInput = {
+    userId,
+    ...validDiaryEventWhere,
+    ...mediaTypeWhere,
+  };
+
+  const [events, allDateRows] = await Promise.all([
+    prisma.watchEvent.findMany({
+      where: { ...baseWhere, watchedOn: yearRange },
+      select: diaryEventSelect,
+    }),
+    prisma.watchEvent.findMany({
+      where: baseWhere,
+      select: { watchedOn: true },
+    }),
+  ]);
+
+  const snapshots =
+    events.length === 0
+      ? []
+      : await prisma.mediaSnapshot.findMany({
+          where: getMediaWhere(events),
+          select: snapshotSelect,
+        });
+  const snapshotsByMedia = new Map(
+    snapshots.map((snapshot) => [mediaKey(snapshot.media_type, snapshot.media_id), snapshot]),
+  );
+  const monthly = Array.from({ length: 12 }, (_, index) => ({
+    month: index + 1,
+    ...createEmptyAggregate(),
+  }));
+  const dailyByDate = new Map<string, DiaryDayBucket>();
+
+  for (const event of events) {
+    const date = formatWatchedOnForApi(event.watchedOn);
+    if (!date) continue;
+
+    addEventToAggregate(monthly[event.watchedOn!.getUTCMonth()], event, snapshotsByMedia);
+    const day = dailyByDate.get(date) ?? { date, ...createEmptyAggregate() };
+    addEventToAggregate(day, event, snapshotsByMedia);
+    dailyByDate.set(date, day);
+  }
+
+  const daily = [...dailyByDate.values()].sort((left, right) => left.date.localeCompare(right.date));
+  const busiestDay = daily.reduce<DiaryInsightsResponse['busiestDay']>((busiest, day) => {
+    if (!busiest || day.totalEntries > busiest.totalEntries) {
+      return { date: day.date, totalEntries: day.totalEntries };
+    }
+    return busiest;
+  }, null);
+  const datedRows = allDateRows.filter(
+    (row): row is { watchedOn: Date } => row.watchedOn !== null,
+  );
+  const availableYears = [
+    ...new Set(datedRows.map((row) => row.watchedOn.getUTCFullYear())),
+  ].sort((left, right) => right - left);
+
+  return {
+    year: filters.year,
+    summary: buildSummary(events, snapshotsByMedia),
+    monthly,
+    daily,
+    activeDays: daily.length,
+    busiestDay,
+    dateCoverage: getCoverage(datedRows.length, allDateRows.length),
+    availableYears,
   };
 }

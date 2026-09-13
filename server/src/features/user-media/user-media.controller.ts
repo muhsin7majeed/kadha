@@ -2,8 +2,8 @@ import { Request, Response } from 'express';
 
 import { sendData, sendMessage, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
-import { diaryQuerySchema } from './diary.schema';
-import { getDiaryTimeline } from './diary.service';
+import { diaryInsightsQuerySchema, diaryQuerySchema } from './diary.schema';
+import { getDiaryInsights, getDiaryTimeline } from './diary.service';
 import {
   EpisodeWatchPayload,
   UserMediaPayload,
@@ -115,6 +115,13 @@ export const markNextEpisodeWatchedController = async (req: Request, res: Respon
 export const getDiaryTimelineController = async (req: Request, res: Response) => {
   const query = diaryQuerySchema.parse(req.query);
   const data = await getDiaryTimeline(requireAuthUser(req).id, query);
+
+  return sendResponse(res, data);
+};
+
+export const getDiaryInsightsController = async (req: Request, res: Response) => {
+  const query = diaryInsightsQuerySchema.parse(req.query);
+  const data = await getDiaryInsights(requireAuthUser(req).id, query);
 
   return sendResponse(res, data);
 };

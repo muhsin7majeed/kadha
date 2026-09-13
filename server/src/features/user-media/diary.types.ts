@@ -1,7 +1,7 @@
 import { MediaType } from '@prisma/client';
 
 import { PaginationMeta } from '@/types/common';
-import { DiaryQuery } from './diary.schema';
+import { DiaryInsightsQuery, DiaryQuery } from './diary.schema';
 
 export interface DiaryCoverage {
   coveredEntries: number;
@@ -55,4 +55,32 @@ export interface DiaryTimelineResponse {
   pagination: PaginationMeta;
 }
 
+export interface DiaryAggregateBucket {
+  movieWatches: number;
+  episodeWatches: number;
+  totalEntries: number;
+  estimatedMinutes: number;
+  runtimeCoverage: DiaryCoverage;
+}
+
+export interface DiaryMonthBucket extends DiaryAggregateBucket {
+  month: number;
+}
+
+export interface DiaryDayBucket extends DiaryAggregateBucket {
+  date: string;
+}
+
+export interface DiaryInsightsResponse {
+  year: number;
+  summary: DiarySummary;
+  monthly: DiaryMonthBucket[];
+  daily: DiaryDayBucket[];
+  activeDays: number;
+  busiestDay: { date: string; totalEntries: number } | null;
+  dateCoverage: DiaryCoverage;
+  availableYears: number[];
+}
+
 export type DiaryTimelineQuery = DiaryQuery;
+export type DiaryInsightsFilters = DiaryInsightsQuery;

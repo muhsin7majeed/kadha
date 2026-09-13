@@ -36,4 +36,10 @@ export const diaryQuerySchema = z
     }
   });
 
+export const diaryInsightsQuerySchema = z.object({
+  year: z.coerce.number().int().min(1).max(9999),
+  mediaType: z.enum(['all', 'movie', 'tv']).optional().default('all'),
+});
+
 export type DiaryQuery = z.infer<typeof diaryQuerySchema>;
+export type DiaryInsightsQuery = z.infer<typeof diaryInsightsQuerySchema>;

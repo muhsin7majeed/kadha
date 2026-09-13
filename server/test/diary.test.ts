@@ -420,3 +420,168 @@ describe('viewing diary timeline route', () => {
     });
   });
 });
+
+describe('viewing diary insights route', () => {
+  it('validates the requested year and requires authentication', async () => {
+    const user = await registerTestUser('diary-insights-validation-user');
+    const app = await getTestApp();
+
+    await request(app).get('/api/user-media/diary/insights').query({ year: 2026 }).expect(401);
+    await request(app)
+      .get('/api/user-media/diary/insights')
+      .set('Authorization', authorization(user))
+      .expect(400);
+    await request(app)
+      .get('/api/user-media/diary/insights')
+      .query({ year: 2026, mediaType: 'person' })
+      .set('Authorization', authorization(user))
+      .expect(400);
+  });
+
+  it('returns deterministic daily and monthly aggregates with honest coverage', async () => {
+    const owner = await registerTestUser('diary-insights-owner');
+    const otherUser = await registerTestUser('diary-insights-other');
+    const app = await getTestApp();
+
+    await seedEvent(owner, {
+      mediaId: 9401,
+      mediaType: MediaType.movie,
+      watchedOn: '2026-01-03',
+      runtime: 100,
+    });
+    await seedEvent(owner, {
+      mediaId: 9401,
+      mediaType: MediaType.movie,
+      watchedOn: '2026-01-03',
+      runtime: 100,
+    });
+    await seedEvent(owner, {
+      mediaId: 9402,
+      mediaType: MediaType.tv,
+      watchedOn: '2026-02-10',
+      runtime: 45,
+      seasonNumber: 1,
+      episodeNumber: 2,
+    });
+    await seedEvent(owner, {
+      mediaId: 9403,
+      mediaType: MediaType.movie,
+      watchedOn: '2026-02-10',
+      runtime: null,
+    });
+    await seedEvent(owner, {
+      mediaId: 9404,
+      mediaType: MediaType.movie,
+      watchedOn: null,
+      runtime: 90,
+    });
+    await seedEvent(owner, {
+      mediaId: 9405,
+      mediaType: MediaType.movie,
+      watchedOn: '2025-12-31',
+      runtime: 80,
+    });
+    await seedEvent(owner, {
+      mediaId: 9406,
+      mediaType: MediaType.tv,
+      watchedOn: '2026-03-01',
+      seasonNumber: null,
+      episodeNumber: null,
+    });
+    await seedEvent(otherUser, {
+      mediaId: 9499,
+      mediaType: MediaType.movie,
+      watchedOn: '2026-01-03',
+      runtime: 300,
+    });
+
+    const response = await request(app)
+      .get('/api/user-media/diary/insights')
+      .query({ year: 2026 })
+      .set('Authorization', authorization(owner))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      year: 2026,
+      summary: {
+        totalEntries: 4,
+        movieWatches: 3,
+        episodeWatches: 1,
+        uniqueTitles: 3,
+        estimatedMinutes: 245,
+        runtimeCoverage: { coveredEntries: 3, totalEntries: 4, ratio: 0.75 },
+        dateCoverage: { coveredEntries: 4, totalEntries: 4, ratio: 1 },
+      },
+      activeDays: 2,
+      busiestDay: { date: '2026-01-03', totalEntries: 2 },
+      dateCoverage: { coveredEntries: 5, totalEntries: 6, ratio: 5 / 6 },
+      availableYears: [2026, 2025],
+    });
+    expect(response.body.monthly).toHaveLength(12);
+    expect(response.body.monthly[0]).toMatchObject({
+      month: 1,
+      movieWatches: 2,
+      episodeWatches: 0,
+      totalEntries: 2,
+      estimatedMinutes: 200,
+      runtimeCoverage: { coveredEntries: 2, totalEntries: 2, ratio: 1 },
+    });
+    expect(response.body.monthly[1]).toMatchObject({
+      month: 2,
+      movieWatches: 1,
+      episodeWatches: 1,
+      totalEntries: 2,
+      estimatedMinutes: 45,
+      runtimeCoverage: { coveredEntries: 1, totalEntries: 2, ratio: 0.5 },
+    });
+    expect(response.body.monthly[2]).toMatchObject({
+      month: 3,
+      totalEntries: 0,
+      estimatedMinutes: 0,
+      runtimeCoverage: { coveredEntries: 0, totalEntries: 0, ratio: 0 },
+    });
+    expect(response.body.daily).toEqual([
+      expect.objectContaining({
+        date: '2026-01-03',
+        movieWatches: 2,
+        episodeWatches: 0,
+        totalEntries: 2,
+        estimatedMinutes: 200,
+      }),
+      expect.objectContaining({
+        date: '2026-02-10',
+        movieWatches: 1,
+        episodeWatches: 1,
+        totalEntries: 2,
+        estimatedMinutes: 45,
+      }),
+    ]);
+  });
+
+  it('returns twelve empty months for a valid year without activity', async () => {
+    const user = await registerTestUser('diary-insights-empty-user');
+    const app = await getTestApp();
+    await seedEvent(user, {
+      mediaId: 9501,
+      mediaType: MediaType.movie,
+      watchedOn: '2025-01-01',
+    });
+
+    const response = await request(app)
+      .get('/api/user-media/diary/insights')
+      .query({ year: 2026 })
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      year: 2026,
+      summary: { totalEntries: 0, estimatedMinutes: 0 },
+      activeDays: 0,
+      busiestDay: null,
+      availableYears: [2025],
+    });
+    expect(response.body.daily).toEqual([]);
+    expect(response.body.monthly).toHaveLength(12);
+    expect(response.body.monthly.every((month: { totalEntries: number }) => month.totalEntries === 0)).toBe(true);
+  });
+});
