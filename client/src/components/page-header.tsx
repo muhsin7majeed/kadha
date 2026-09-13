@@ -2,16 +2,20 @@ import { Flex, FlexProps, Heading, Text } from '@chakra-ui/react';
 import SyncSpinner from './spinners/sync-spinner';
 
 interface PageHeaderProps extends FlexProps {
+  action?: React.ReactNode;
   isFetching?: boolean;
   subHeader?: string;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ isFetching, children, subHeader, ...props }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ action, isFetching, children, subHeader, ...props }) => {
   return (
     <Flex justifyContent="space-between" direction="column" gap={2} mb="4" {...props}>
-      <Heading textStyle="pageTitle">
-        {children} {isFetching && <SyncSpinner size="sm" />}
-      </Heading>
+      <Flex justify="space-between" align="start" gap="3">
+        <Heading textStyle="pageTitle">
+          {children} {isFetching && <SyncSpinner size="sm" />}
+        </Heading>
+        {action}
+      </Flex>
 
       {subHeader && (
         <Text color="fg.muted" textStyle="supporting">

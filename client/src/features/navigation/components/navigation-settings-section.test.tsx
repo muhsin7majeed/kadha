@@ -44,12 +44,12 @@ describe('NavigationSettingsSection', () => {
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Navigation layout' }), 'scrollable');
     await user.selectOptions(screen.getByRole('combobox', { name: 'Home appearance' }), 'icon');
-    await user.click(screen.getByRole('checkbox', { name: 'Show Liked in navigation' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Show Diary in navigation' }));
 
     const preview = screen.getByRole('navigation', { name: 'Navigation preview' });
     expect(preview.querySelector('[data-layout="scrollable"]')).toBeInTheDocument();
     expect(within(preview).getByLabelText('Home')).not.toHaveTextContent('Home');
-    expect(within(preview).getByText('Liked')).toBeInTheDocument();
+    expect(within(preview).getByText('Diary')).toBeInTheDocument();
   });
 
   it('renders the drag overlay outside the transformed route wrapper', async () => {

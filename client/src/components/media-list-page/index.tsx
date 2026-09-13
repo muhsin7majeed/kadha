@@ -13,6 +13,7 @@ import { toMediaCardModel } from '@/features/media/media-card-model';
 interface MediaListPageProps {
   title: string;
   description: string;
+  headerAction?: React.ReactNode;
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
@@ -35,6 +36,7 @@ interface MediaListPageProps {
 const MediaListPage = ({
   title,
   description,
+  headerAction,
   data,
   isLoading,
   isFetching,
@@ -51,7 +53,7 @@ const MediaListPage = ({
 }: MediaListPageProps) => {
   return (
     <Box>
-      <PageHeader isFetching={isFetching} subHeader={description}>
+      <PageHeader action={headerAction} isFetching={isFetching} subHeader={description}>
         {title}
       </PageHeader>
 

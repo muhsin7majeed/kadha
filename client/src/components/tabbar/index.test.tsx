@@ -51,6 +51,7 @@ describe('TabBar', () => {
     expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Collections' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Diary' })).not.toBeInTheDocument();
   });
 
   it('reveals omitted destinations and navigation customization from Menu', async () => {
@@ -60,6 +61,7 @@ describe('TabBar', () => {
     await user.click(screen.getByRole('button', { name: 'Menu' }));
 
     expect(screen.getByRole('menuitem', { name: 'Activity' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Diary' })).toHaveAttribute('href', '/app/diary');
     expect(screen.getByRole('menuitem', { name: 'Watched' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Liked' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Friends' })).toBeInTheDocument();

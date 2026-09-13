@@ -2,6 +2,7 @@ import type { IconType } from 'react-icons';
 import {
   LuActivity,
   LuBookmark,
+  LuBookOpen,
   LuCheck,
   LuEllipsis,
   LuFolder,
@@ -37,6 +38,7 @@ export const NAVIGATION_REGISTRY: NavigationRegistryItem[] = [
   { id: 'in-progress', label: 'Progress', icon: LuListChecks, to: '/app/in-progress' },
   { id: 'collections', label: 'Collections', icon: LuFolder, to: '/app/collections' },
   { id: 'activity', label: 'Activity', icon: LuActivity, to: '/app/activity' },
+  { id: 'diary', label: 'Diary', icon: LuBookOpen, to: '/app/diary' },
   { id: 'watched', label: 'Watched', icon: LuCheck, to: '/app/watched' },
   { id: 'liked', label: 'Liked', icon: LuHeart, to: '/app/liked' },
   { id: 'friends', label: 'Friends', icon: LuUsers, to: '/app/friends' },

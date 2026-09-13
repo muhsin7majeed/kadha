@@ -1,4 +1,6 @@
-import { LuCheck } from 'react-icons/lu';
+import { Button } from '@chakra-ui/react';
+import { LuBookOpen, LuCheck } from 'react-icons/lu';
+import { Link } from 'react-router';
 import useWatched from '@/features/user-media/api/use-watched';
 import MediaListPage from '@/components/media-list-page';
 import { useState } from 'react';
@@ -10,7 +12,15 @@ const Watched = () => {
   return (
     <MediaListPage
       title="Watched"
-      description="Your viewing history. All the movies and shows you've completed watching, all in one place."
+      description="Your watched library keeps one card per title. Open Diary for individual watches, rewatches, and episodes."
+      headerAction={
+        <Button asChild colorPalette="gray" variant="outline" size={{ base: 'sm', md: 'md' }}>
+          <Link to="/app/diary">
+            <LuBookOpen aria-hidden />
+            Open Diary
+          </Link>
+        </Button>
+      }
       data={watched?.data}
       isLoading={isLoading}
       isFetching={isFetching}

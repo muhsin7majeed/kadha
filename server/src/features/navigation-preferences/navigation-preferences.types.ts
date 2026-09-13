@@ -5,6 +5,7 @@ export const NAVIGATION_ITEM_IDS = [
   'in-progress',
   'collections',
   'activity',
+  'diary',
   'watched',
   'liked',
   'friends',

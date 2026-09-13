@@ -12,6 +12,7 @@ const defaultItemIds = [
   'in-progress',
   'collections',
   'activity',
+  'diary',
   'watched',
   'liked',
   'friends',
@@ -160,6 +161,7 @@ describe('navigation preferences', () => {
       ...defaultItemIds.filter((id) => id !== 'liked'),
     ]);
     expect(response.body.data.items.find((item: { id: string }) => item.id === 'home').visible).toBe(true);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'diary').visible).toBe(false);
     expect(response.body.data.items.find((item: { id: string }) => item.id === 'menu').visible).toBe(true);
   });
 });

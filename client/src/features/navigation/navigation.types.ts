@@ -5,6 +5,7 @@ export type NavigationItemId =
   | 'in-progress'
   | 'collections'
   | 'activity'
+  | 'diary'
   | 'watched'
   | 'liked'
   | 'friends'
