@@ -15,6 +15,7 @@ const Activity = lazy(() => import('@/pages/activity'));
 const AppearanceSettings = lazy(() => import('@/pages/settings/appearance'));
 const Collections = lazy(() => import('@/pages/collections'));
 const DataSettings = lazy(() => import('@/pages/settings/data'));
+const Diary = lazy(() => import('@/pages/diary'));
 const Home = lazy(() => import('@/pages/home'));
 const InProgress = lazy(() => import('@/pages/in-progress'));
 const Liked = lazy(() => import('@/pages/liked'));
@@ -41,6 +42,7 @@ export function AppRoutes() {
             <Route index element={<Home />} />
             <Route path="recommendations" element={<Recommendations />} />
             <Route path="activity" element={<Activity />} />
+            <Route path="diary" element={<Diary />} />
             <Route path="watched" element={<Watched />} />
             <Route path="watchlist" element={<Watchlist />} />
             <Route path="in-progress" element={<InProgress />} />

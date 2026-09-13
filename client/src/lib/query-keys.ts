@@ -118,6 +118,11 @@ export const userMediaQueryKeys = {
     ['tv-progress', mediaId, seasonNumber, includeSpecials] as const,
   watched: ['watched'] as const,
   watchList: ['watch-list'] as const,
+  diaryRoot: ['diary'] as const,
+  diary: (filters: object) => ['diary', filters] as const,
+  diaryInsightsRoot: ['diary-insights'] as const,
+  diaryInsights: (year?: number, mediaType: 'all' | MediaType = 'all') =>
+    ['diary-insights', year, mediaType] as const,
   watchEvents: ['watch-events'] as const,
   watchEventsByMedia: (mediaType?: MediaType, mediaId?: number) => ['watch-events', mediaType, mediaId] as const,
 };

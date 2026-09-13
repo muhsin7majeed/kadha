@@ -94,6 +94,55 @@ export interface TvInProgressItem extends UserMedia {
   tvProgress: TvInProgressSummary;
 }
 
+export interface DiaryCoverage {
+  coveredEntries: number;
+  totalEntries: number;
+  ratio: number;
+}
+
+export interface DiaryEntry extends WatchEvent {
+  title: string;
+  original_title: string | null;
+  overview: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number | null;
+  vote_count: number | null;
+  popularity: number | null;
+  adult: boolean | null;
+  genre_ids: number[];
+  release_date: string | null;
+  original_language: string | null;
+  runtime: number | null;
+  status: string | null;
+}
+
+export interface DiarySummary {
+  totalEntries: number;
+  movieWatches: number;
+  episodeWatches: number;
+  uniqueTitles: number;
+  estimatedMinutes: number;
+  runtimeCoverage: DiaryCoverage;
+  dateCoverage: DiaryCoverage;
+}
+
+export interface DiaryResponse {
+  data: DiaryEntry[];
+  summary: DiarySummary;
+  availableYears: number[];
+  pagination: import('@/types/common').PaginationMeta;
+}
+
+export interface DiaryQuery {
+  page?: number;
+  limit?: number;
+  mediaType?: 'all' | MediaType;
+  year?: number;
+  month?: number;
+  date?: string;
+}
+
 export interface WatchEvent {
   id: string;
   media_id: number;
