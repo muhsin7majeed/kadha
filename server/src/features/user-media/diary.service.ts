@@ -53,6 +53,7 @@ const validDiaryEventWhere: Prisma.WatchEventWhereInput = {
       media_type: MediaType.movie,
       seasonNumber: null,
       episodeNumber: null,
+      episodeId: null,
     },
     {
       media_type: MediaType.tv,

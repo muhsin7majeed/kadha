@@ -15,6 +15,7 @@ interface SeedEventOptions {
   watchedAt?: string;
   seasonNumber?: number | null;
   episodeNumber?: number | null;
+  episodeId?: number | null;
   eventRating?: number | null;
   userMediaRating?: number | null;
   createSnapshot?: boolean;
@@ -31,6 +32,7 @@ const seedEvent = async (user: TestUser, options: SeedEventOptions) => {
     watchedAt = `${watchedOn ?? '2026-09-13'}T12:00:00.000Z`,
     seasonNumber = mediaType === MediaType.tv ? 1 : null,
     episodeNumber = mediaType === MediaType.tv ? 1 : null,
+    episodeId = null,
     eventRating = null,
     userMediaRating = null,
     createSnapshot = true,
@@ -89,6 +91,7 @@ const seedEvent = async (user: TestUser, options: SeedEventOptions) => {
       media_type: mediaType,
       seasonNumber,
       episodeNumber,
+      episodeId,
       watchedOn: watchedOn === null ? null : new Date(`${watchedOn}T00:00:00.000Z`),
       watchedAt: new Date(watchedAt),
       rating: eventRating,
@@ -188,6 +191,11 @@ describe('viewing diary timeline route', () => {
       seasonNumber: 1,
       episodeNumber: 1,
     });
+    await seedEvent(owner, {
+      mediaId: 9108,
+      mediaType: MediaType.movie,
+      episodeId: 12345,
+    });
     await seedEvent(otherUser, {
       mediaId: 9199,
       mediaType: MediaType.movie,
@@ -274,7 +282,9 @@ describe('viewing diary timeline route', () => {
       runtime: null,
       poster_path: null,
     });
-    expect(response.body.data.map((entry: { media_id: number }) => entry.media_id)).not.toContain(9199);
+    const mediaIds = response.body.data.map((entry: { media_id: number }) => entry.media_id);
+    expect(mediaIds).not.toContain(9108);
+    expect(mediaIds).not.toContain(9199);
   });
 
   it('filters by media type, year, month, and exact UTC date while preserving all available years', async () => {
