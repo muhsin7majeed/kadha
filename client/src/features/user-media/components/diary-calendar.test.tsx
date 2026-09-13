@@ -41,7 +41,18 @@ const renderCalendar = (
 
 describe('DiaryCalendar', () => {
   it('renders leap-day activity with exact accessible counts', async () => {
-    const props = renderCalendar();
+    const props = renderCalendar({
+      daily: [
+        ...daily,
+        {
+          date: '2024-03-01',
+          movieWatches: 4,
+          episodeWatches: 0,
+          totalEntries: 4,
+          estimatedMinutes: 420,
+        },
+      ],
+    });
 
     fireEvent.click(
       screen.getByRole('button', {
@@ -52,7 +63,9 @@ describe('DiaryCalendar', () => {
     await waitFor(() =>
       expect(props.onSelectDate).toHaveBeenCalledWith('2024-02-29'),
     );
-    expect(screen.getByText('1M · 2E')).toBeInTheDocument();
+    expect(screen.getByText('3 watches across 1 day')).toBeInTheDocument();
+    expect(screen.getByText('1 movie')).toBeInTheDocument();
+    expect(screen.getByText('2 episodes')).toBeInTheDocument();
   });
 
   it('moves focus between dates with calendar arrow keys and keeps one date in the tab order', async () => {
