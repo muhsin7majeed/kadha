@@ -1,15 +1,17 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
 import Diary from './index';
 
 const mocks = vi.hoisted(() => ({
   useDiary: vi.fn(),
+  useDiaryInsights: vi.fn(),
 }));
 
 vi.mock('@/features/user-media/api/use-diary', () => ({ default: mocks.useDiary }));
+vi.mock('@/features/user-media/api/use-diary-insights', () => ({ default: mocks.useDiaryInsights }));
 
 const response = {
   data: [
@@ -62,6 +64,24 @@ const response = {
   },
 };
 
+const insightsResponse = {
+  year: 2026,
+  summary: response.summary,
+  monthly: Array.from({ length: 12 }, (_, index) => ({
+    month: index + 1,
+    movieWatches: 0,
+    episodeWatches: 0,
+    totalEntries: 0,
+    estimatedMinutes: 0,
+    runtimeCoverage: { coveredEntries: 0, totalEntries: 0, ratio: 0 },
+  })),
+  daily: [],
+  activeDays: 0,
+  busiestDay: null,
+  dateCoverage: { coveredEntries: 1, totalEntries: 1, ratio: 1 },
+  availableYears: [2026],
+};
+
 const renderPage = () =>
   renderWithProviders(
     <MemoryRouter>
@@ -70,6 +90,16 @@ const renderPage = () =>
   );
 
 describe('viewing diary page', () => {
+  beforeEach(() => {
+    mocks.useDiaryInsights.mockReturnValue({
+      data: insightsResponse,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+  });
+
   it('renders the private timeline and its full-filter summary', () => {
     mocks.useDiary.mockReturnValue({
       data: response,
@@ -104,9 +134,9 @@ describe('viewing diary page', () => {
     fireEvent.change(screen.getByLabelText('Filter diary by month'), { target: { value: '9' } });
     fireEvent.click(screen.getByRole('tab', { name: /Calendar/ }));
 
-    expect(screen.getByText('Calendar is being prepared')).toBeInTheDocument();
+    expect(screen.getByLabelText('Calendar month')).toBeInTheDocument();
     await waitFor(() =>
-      expect(mocks.useDiary).toHaveBeenLastCalledWith({ page: 1, mediaType: 'all', year: 2026, month: undefined }),
+      expect(mocks.useDiary).toHaveBeenCalledWith({ page: 1, mediaType: 'all', year: 2026, month: undefined }),
     );
 
     fireEvent.click(screen.getByRole('tab', { name: /Insights/ }));

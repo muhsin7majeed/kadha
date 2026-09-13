@@ -127,6 +127,33 @@ export interface DiarySummary {
   dateCoverage: DiaryCoverage;
 }
 
+export interface DiaryAggregateBucket {
+  movieWatches: number;
+  episodeWatches: number;
+  totalEntries: number;
+  estimatedMinutes: number;
+  runtimeCoverage: DiaryCoverage;
+}
+
+export interface DiaryMonthBucket extends DiaryAggregateBucket {
+  month: number;
+}
+
+export interface DiaryDayBucket extends DiaryAggregateBucket {
+  date: string;
+}
+
+export interface DiaryInsightsResponse {
+  year: number;
+  summary: DiarySummary;
+  monthly: DiaryMonthBucket[];
+  daily: DiaryDayBucket[];
+  activeDays: number;
+  busiestDay: { date: string; totalEntries: number } | null;
+  dateCoverage: DiaryCoverage;
+  availableYears: number[];
+}
+
 export interface DiaryResponse {
   data: DiaryEntry[];
   summary: DiarySummary;

@@ -7,6 +7,8 @@ import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import useDiary from '@/features/user-media/api/use-diary';
+import useDiaryInsights from '@/features/user-media/api/use-diary-insights';
+import DiaryCalendar from '@/features/user-media/components/diary-calendar';
 import DiaryFilters, { DiaryMediaType } from '@/features/user-media/components/diary-filters';
 import DiarySummary from '@/features/user-media/components/diary-summary';
 import DiaryTimeline from '@/features/user-media/components/diary-timeline';
@@ -18,10 +20,24 @@ const Diary = () => {
   const [page, setPage] = useState(1);
   const [mediaType, setMediaType] = useState<DiaryMediaType>('all');
   const [year, setYear] = useState<number>();
+  const today = new Date();
   const [month, setMonth] = useState<number>();
+  const [calendarMonth, setCalendarMonth] = useState(today.getMonth() + 1);
+  const [selectedDate, setSelectedDate] = useState<string>();
+  const [dayPage, setDayPage] = useState(1);
   const diary = useDiary({ page, mediaType, year, month: tab === 'timeline' ? month : undefined });
+  const calendarYear = year ?? diary.data?.availableYears[0] ?? today.getFullYear();
+  const insights = useDiaryInsights(calendarYear, mediaType, tab === 'calendar' || tab === 'insights');
+  const dayDiary = useDiary(
+    { page: dayPage, mediaType, date: selectedDate },
+    tab === 'calendar' && selectedDate !== undefined,
+  );
 
   const resetPage = () => setPage(1);
+  const changeTab = (value: DiaryTab) => {
+    setTab(value);
+    if (value !== 'timeline' && year === undefined) setYear(calendarYear);
+  };
 
   return (
     <Box>
@@ -32,7 +48,7 @@ const Diary = () => {
         Diary
       </PageHeader>
 
-      <Tabs.Root value={tab} onValueChange={(details) => setTab(details.value as DiaryTab)} variant="line">
+      <Tabs.Root value={tab} onValueChange={(details) => changeTab(details.value as DiaryTab)} variant="line">
         <Box overflowX="auto" mb="5">
           <Tabs.List minW="fit-content">
             <Tabs.Trigger value="timeline" textStyle="compactLabel">
@@ -62,6 +78,7 @@ const Diary = () => {
           onYearChange={(value) => {
             setYear(value);
             if (value === undefined) setMonth(undefined);
+            setSelectedDate(undefined);
             resetPage();
           }}
           onMonthChange={(value) => {
@@ -95,13 +112,35 @@ const Diary = () => {
             </Tabs.Content>
 
             <Tabs.Content value="calendar" mt="6">
-              <Alert.Root status="info">
-                <Alert.Indicator />
-                <Alert.Content>
-                  <Alert.Title>Calendar is being prepared</Alert.Title>
-                  <Alert.Description>Your dated diary entries will appear here by month.</Alert.Description>
-                </Alert.Content>
-              </Alert.Root>
+              {insights.isLoading ? (
+                <CommonSpinner />
+              ) : insights.isError || !insights.data ? (
+                <ErrorState
+                  title="Calendar unavailable"
+                  description="Could not load your dated diary entries."
+                  onRetry={insights.refetch}
+                />
+              ) : (
+                <DiaryCalendar
+                  year={calendarYear}
+                  month={calendarMonth}
+                  daily={insights.data.daily}
+                  selectedDate={selectedDate}
+                  dayResponse={dayDiary.data}
+                  isDayFetching={dayDiary.isFetching}
+                  onDayPageChange={setDayPage}
+                  onSelectDate={(date) => {
+                    setSelectedDate(date);
+                    setDayPage(1);
+                  }}
+                  onPeriodChange={(nextYear, nextMonth) => {
+                    setYear(nextYear);
+                    setCalendarMonth(nextMonth);
+                    setSelectedDate(undefined);
+                    setDayPage(1);
+                  }}
+                />
+              )}
             </Tabs.Content>
 
             <Tabs.Content value="insights" mt="6">
