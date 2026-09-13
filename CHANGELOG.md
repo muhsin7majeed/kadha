@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Viewing Diary
+
+- Improved Calendar accessibility with locale-aware weekday ordering, one tab stop, and standard arrow-key date navigation while preserving exact watch-count announcements.
+
+### Engineering Changes
+
+#### Viewing Diary
+
+- Replaced the hand-built month grid with Ark UI Date Picker primitives and timezone-free calendar-date conversion.
+
 ## v0.2.0
 
 ### Feature Changes
