@@ -77,6 +77,14 @@ describe('feedback routes', () => {
       .expect(200);
     expect(updated.body.data).toMatchObject({ status: 'ACKNOWLEDGED', adminResponse: 'Thanks, we are investigating.' });
     expect(updated.body.data.acknowledgedAt).toEqual(expect.any(String));
+    expect(await prisma.notification.count({ where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' } })).toBe(1);
+
+    await request(await getTestApp())
+      .patch(`/api/admin/feedback/${created.body.data.id}`)
+      .set('Authorization', authorization(admin))
+      .send({ status: 'ACKNOWLEDGED' })
+      .expect(200);
+    expect(await prisma.notification.count({ where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' } })).toBe(1);
 
     const completed = await request(await getTestApp())
       .patch(`/api/admin/feedback/${created.body.data.id}`)
@@ -84,5 +92,6 @@ describe('feedback routes', () => {
       .send({ status: 'COMPLETED' })
       .expect(200);
     expect(completed.body.data.resolvedAt).toEqual(expect.any(String));
+    expect(await prisma.notification.count({ where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' } })).toBe(2);
   });
 });

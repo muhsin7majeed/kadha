@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseCollectionInviteMetadata, parseSystemNotificationMetadata } from './notification-metadata';
+import { parseCollectionInviteMetadata, parseFeedbackNotificationMetadata, parseSystemNotificationMetadata } from './notification-metadata';
 
 describe('parseCollectionInviteMetadata', () => {
   it('returns empty metadata for missing or invalid JSON input', () => {
@@ -35,5 +35,15 @@ describe('parseSystemNotificationMetadata', () => {
   it('falls back safely for malformed or future metadata', () => {
     expect(parseSystemNotificationMetadata('invalid')).toEqual({ count: 1 });
     expect(parseSystemNotificationMetadata('{"count":"many","extra":true}')).toEqual({ count: 1 });
+  });
+});
+
+describe('parseFeedbackNotificationMetadata', () => {
+  it('parses only supported feedback status metadata', () => {
+    expect(parseFeedbackNotificationMetadata('{"subject":"Calendar bug","status":"COMPLETED"}')).toEqual({
+      subject: 'Calendar bug',
+      status: 'COMPLETED',
+    });
+    expect(parseFeedbackNotificationMetadata('{"subject":4,"status":"NEW"}')).toEqual({});
   });
 });

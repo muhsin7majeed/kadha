@@ -30,14 +30,14 @@ describe('DataExportSection', () => {
     renderWithProviders(<DataExportSection />);
 
     const checkboxes = screen.getAllByRole('checkbox');
-    expect(checkboxes).toHaveLength(9);
+    expect(checkboxes).toHaveLength(10);
     checkboxes.forEach((checkbox) => expect(checkbox).toBeChecked());
 
     await user.click(screen.getByRole('checkbox', { name: /Account & preferences/ }));
     await user.click(screen.getByRole('button', { name: 'Export' }));
 
     expect(mocks.exportUserData).toHaveBeenCalledWith(expect.not.arrayContaining(['accountPreferences']));
-    expect(mocks.exportUserData).toHaveBeenCalledWith(expect.arrayContaining(['mediaTracking', 'activity']));
+    expect(mocks.exportUserData).toHaveBeenCalledWith(expect.arrayContaining(['mediaTracking', 'feedback', 'activity']));
   });
 
   it('requires at least one selected category', () => {

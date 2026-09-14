@@ -51,6 +51,14 @@ describe('user data export', () => {
         note: 'Exported episode note',
       },
     });
+    await prisma.feedback.create({
+      data: {
+        userId: user.userId,
+        category: 'SUGGESTION',
+        subject: 'Export feedback',
+        message: 'Please include this feedback in my account archive.',
+      },
+    });
     const collection = await createTestCollection(user, 'Export collection');
     await prisma.collectionMember.create({
       data: {
@@ -137,6 +145,10 @@ describe('user data export', () => {
     );
     expect(exported.data.friendships).toHaveLength(1);
     expect(exported.data.notifications).toHaveLength(1);
+    expect(exported.data.feedback).toEqual([
+      expect.objectContaining({ subject: 'Export feedback', message: expect.any(String) }),
+    ]);
+    expect(exported.data.feedback[0]).not.toHaveProperty('userId');
     expect(exported.data.activity.length).toBeGreaterThanOrEqual(3);
     expect(exported.data.recommendationSettings).toMatchObject({
       useLiked: true,

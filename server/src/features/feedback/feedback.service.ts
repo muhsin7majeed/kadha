@@ -3,6 +3,8 @@ import { FeedbackStatus, Prisma } from '@prisma/client';
 import { notFound } from '@/lib/http';
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
+import { createNotification } from '@/features/notification/notification.service';
+import { NotificationType } from '@/types/common';
 import type { CreateFeedbackInput, UpdateFeedbackInput } from './feedback.schema';
 import type { AdminFeedbackListParams } from './feedback.types';
 
@@ -100,26 +102,54 @@ export async function getAdminFeedbackItem(id: string) {
 }
 
 export async function updateFeedback(id: string, input: UpdateFeedbackInput) {
-  const current = await prisma.feedback.findUnique({ where: { id } });
-  if (!current) throw notFound('Feedback not found');
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.feedback.findUnique({ where: { id } });
+    if (!current) throw notFound('Feedback not found');
 
-  const adminResponse = input.adminResponse === undefined ? undefined : input.adminResponse || null;
-  const status = input.status ?? (adminResponse && current.status === FeedbackStatus.NEW ? FeedbackStatus.ACKNOWLEDGED : undefined);
-  const nextStatus = status ?? current.status;
-  const now = new Date();
+    const adminResponse = input.adminResponse === undefined ? undefined : input.adminResponse || null;
+    const status =
+      input.status ?? (adminResponse && current.status === FeedbackStatus.NEW ? FeedbackStatus.ACKNOWLEDGED : undefined);
+    const nextStatus = status ?? current.status;
+    const now = new Date();
+    const firstAcknowledgment = current.acknowledgedAt === null && nextStatus !== FeedbackStatus.NEW;
+    const terminalStatus =
+      nextStatus === FeedbackStatus.COMPLETED || nextStatus === FeedbackStatus.NOT_PLANNED ? nextStatus : null;
 
-  const updated = await prisma.feedback.update({
-    where: { id },
-    data: {
-      ...(status ? { status } : {}),
-      ...(adminResponse !== undefined ? { adminResponse } : {}),
-      ...(nextStatus === FeedbackStatus.ACKNOWLEDGED && !current.acknowledgedAt ? { acknowledgedAt: now } : {}),
-      ...(nextStatus === FeedbackStatus.COMPLETED || nextStatus === FeedbackStatus.NOT_PLANNED
-        ? { resolvedAt: current.status === nextStatus ? current.resolvedAt : now }
-        : { resolvedAt: null }),
-    },
-    include: { user: { select: { username: true } } },
+    const updated = await tx.feedback.update({
+      where: { id },
+      data: {
+        ...(status ? { status } : {}),
+        ...(adminResponse !== undefined ? { adminResponse } : {}),
+        ...(firstAcknowledgment ? { acknowledgedAt: now } : {}),
+        ...(terminalStatus ? { resolvedAt: current.status === terminalStatus ? current.resolvedAt : now } : { resolvedAt: null }),
+      },
+      include: { user: { select: { username: true } } },
+    });
+
+    const notifyOnce = async (notificationStatus: FeedbackStatus) => {
+      const dedupeKey = `feedback:${id}:${notificationStatus}`;
+      const exists = await tx.notification.findUnique({
+        where: { userId_dedupeKey: { userId: current.userId, dedupeKey } },
+        select: { id: true },
+      });
+      if (exists) return;
+      await createNotification(
+        {
+          userId: current.userId,
+          type: NotificationType.FeedbackStatusChanged,
+          entityType: 'feedback',
+          entityId: id,
+          metadata: { subject: current.subject, status: notificationStatus },
+          dedupeKey,
+        },
+        tx,
+      );
+    };
+
+    if (firstAcknowledgment) await notifyOnce(FeedbackStatus.ACKNOWLEDGED);
+    if (terminalStatus && current.status !== terminalStatus) await notifyOnce(terminalStatus);
+
+    const { userId: _userId, user, ...data } = updated;
+    return { ...data, username: user.username };
   });
-  const { userId: _userId, user, ...data } = updated;
-  return { ...data, username: user.username };
 }

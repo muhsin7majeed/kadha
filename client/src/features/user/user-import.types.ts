@@ -7,6 +7,7 @@ export type ExportCategory =
   | 'friendships'
   | 'collectionRelationships'
   | 'notifications'
+  | 'feedback'
   | 'activity';
 
 export type ImportCategory =

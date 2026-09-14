@@ -7,6 +7,7 @@ export const EXPORT_CATEGORIES = [
   'friendships',
   'collectionRelationships',
   'notifications',
+  'feedback',
   'activity',
 ] as const;
 
@@ -27,6 +28,7 @@ export const REFERENCE_ONLY_EXPORT_CATEGORIES: ExportCategory[] = [
   'friendships',
   'collectionRelationships',
   'notifications',
+  'feedback',
   'activity',
 ];
 
