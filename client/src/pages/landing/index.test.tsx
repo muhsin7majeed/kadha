@@ -25,7 +25,7 @@ describe('Landing', () => {
     expect(heroHeading.compareDocumentPosition(disclosureHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(disclosureHeading.compareDocumentPosition(showcaseHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByText(/Kadha is built by one developer/)).toBeInTheDocument();
-    expect(screen.getByText(/the server operator can technically access stored data and backups/)).toBeInTheDocument();
-    expect(screen.getByText(/it can move up the roadmap/)).toBeInTheDocument();
+    expect(screen.getByText(/I can technically access it as the server operator/)).toBeInTheDocument();
+    expect(screen.getByText(/sustained demand/)).toBeInTheDocument();
   });
 });
