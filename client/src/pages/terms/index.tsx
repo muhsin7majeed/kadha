@@ -31,14 +31,15 @@ const Terms = () => {
               </Heading>
               <Text color="fg.muted">
                 These terms apply to the hosted {APP_CONFIG.appName} beta. Self-hosted users are responsible for their
-                own deployments.
+                own deployments. Effective September 14, 2026.
               </Text>
             </Box>
 
             <Section title="Early Beta">
               <Text>
-                Kadha is provided as an early beta. Features may change, hosted data may be reset, and the service may
-                be paused or discontinued while the product is being tested.
+                Kadha is built and operated by one developer and is provided as an early beta. Automated backups are in
+                place, but mistakes or failures could still cause data loss. Features may change, hosted data may be
+                reset, and the service may be paused or discontinued while the product is being tested.
               </Text>
               <Text>
                 Hosted beta access is currently complimentary and requires no payment method. A useful free core and a
@@ -62,8 +63,9 @@ const Terms = () => {
 
             <Section title="Privacy And Sharing">
               <Text>
-                New accounts start private, but you can choose to share profile sections or collections with friends or
-                other signed-in users. People who receive shared data may copy or disclose it outside Kadha.
+                New accounts start private, but you can choose to share profile sections or collections with friends,
+                other signed-in users, or anyone on the web. Collection members can also receive viewer or editor access.
+                People who receive or view shared data may copy or disclose it outside Kadha.
               </Text>
               <Text>
                 The hosted service is not end-to-end encrypted. The application server and hosted operator can

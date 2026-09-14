@@ -11,8 +11,8 @@ const BetaDisclosureContent = () => (
       <LuInfo />
     </Icon>
     <Text textStyle="supporting" color="fg.muted">
-      Kadha is in early beta. Features may change and hosted data may be reset. Keep a separate record of anything
-      important.
+      Kadha is built and operated by one developer. Automated backups are in place, but this is still an early beta and
+      mistakes or failures could cause data loss. Export anything you would not want to recreate.
     </Text>
   </HStack>
 );
