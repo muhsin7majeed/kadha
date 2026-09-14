@@ -141,6 +141,10 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 Plex activity sync, library availability, deep links, and Watchlist import are intentionally deferred. The exploratory plan was removed so the roadmap does not imply a current delivery commitment; integration work can be reconsidered after Kadha's core tracking and portability flows mature.
 
+### Deferred End-To-End Encryption
+
+Full end-to-end encryption is intentionally deferred during beta. Implementing it safely would require redesigning server-side recommendations, insights, TV progress, shared collections, account recovery, and multi-device key management. This work can be reprioritized if Kadha sees sustained user demand for that tradeoff.
+
 ### Optional Experiments And Sustainability
 
 - [ ] Evaluate swipe-based discovery and feedback-driven recommendation tuning.
