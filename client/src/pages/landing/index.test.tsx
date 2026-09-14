@@ -18,9 +18,9 @@ describe('Landing', () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: "Why Kadha isn't end-to-end encrypted—yet" })).toBeInTheDocument();
-    expect(screen.getByText(/Kadha is built by two people/)).toBeInTheDocument();
-    expect(screen.getByText(/the server operator can technically access it/)).toBeInTheDocument();
-    expect(screen.getByText(/sustained user demand/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'A note about end-to-end encryption' })).toBeInTheDocument();
+    expect(screen.getByText(/Kadha is built by one developer/)).toBeInTheDocument();
+    expect(screen.getByText(/I can technically access it as the server operator/)).toBeInTheDocument();
+    expect(screen.getByText(/sustained demand/)).toBeInTheDocument();
   });
 });

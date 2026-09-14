@@ -74,19 +74,17 @@ const Landing = () => {
                 </Box>
                 <VStack align="start" gap={3}>
                   <Heading as="h2" size="lg">
-                    Why Kadha isn't end-to-end encrypted—yet
+                    A note about end-to-end encryption
                   </Heading>
                   <Text color="fg.muted">
-                    Kadha is built by two people. Full end-to-end encryption would require us to redesign
-                    recommendations, viewing insights, TV progress, shared collections, account recovery, and how
-                    encryption keys move between devices. It is not something we can add safely by encrypting a few
-                    database fields.
+                    Kadha is built by one developer and is not end-to-end encrypted today. Adding it properly would
+                    mean redesigning recommendations, viewing insights, TV progress, shared collections, and account
+                    recovery, so I have left it out of the beta for now.
                   </Text>
                   <Text color="fg.muted">
-                    For the beta, we chose clear privacy controls and honest limits instead of rushing a weak
-                    implementation. Hosted data is private from other users by default, but the server operator can
-                    technically access it. If sustained user demand makes end-to-end encryption a priority, we will
-                    revisit the design and prioritize that work.
+                    Your hosted data is private from other users by default, but I can technically access it as the
+                    server operator. If there is sustained demand for end-to-end encryption, I will make that work a
+                    priority.
                   </Text>
                 </VStack>
               </Flex>
