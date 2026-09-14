@@ -3,6 +3,8 @@ import { Route } from 'react-router';
 
 import AdminRoute from '@/components/admin-route';
 
+const AdminFeedback = lazy(() => import('@/pages/admin/feedback'));
+const AdminFeedbackDetail = lazy(() => import('@/pages/admin/feedback/feedback-detail'));
 const AdminOverview = lazy(() => import('@/pages/admin'));
 const AdminUserDetail = lazy(() => import('@/pages/admin/users/user-detail'));
 const AdminUsers = lazy(() => import('@/pages/admin/users'));
@@ -10,6 +12,8 @@ const AdminUsers = lazy(() => import('@/pages/admin/users'));
 export const adminRoutes = (
   <Route element={<AdminRoute />}>
     <Route path="admin" element={<AdminOverview />} />
+    <Route path="admin/feedback" element={<AdminFeedback />} />
+    <Route path="admin/feedback/:id" element={<AdminFeedbackDetail />} />
     <Route path="admin/users" element={<AdminUsers />} />
     <Route path="admin/users/:id" element={<AdminUserDetail />} />
   </Route>

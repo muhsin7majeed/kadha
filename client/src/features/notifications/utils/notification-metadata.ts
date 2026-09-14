@@ -55,9 +55,8 @@ export const parseFeedbackNotificationMetadata = (metadata: string | null): Feed
     const parsed = JSON.parse(metadata) as unknown;
     if (!parsed || typeof parsed !== 'object') return {};
     const data = parsed as Record<string, unknown>;
-    const validStatus =
-      data.status === 'ACKNOWLEDGED' || data.status === 'COMPLETED' || data.status === 'NOT_PLANNED';
-    if (typeof data.subject !== 'string' || !validStatus) return {};
+    if (typeof data.subject !== 'string') return {};
+    if (data.status !== 'ACKNOWLEDGED' && data.status !== 'COMPLETED' && data.status !== 'NOT_PLANNED') return {};
     return { subject: data.subject, status: data.status };
   } catch {
     return {};

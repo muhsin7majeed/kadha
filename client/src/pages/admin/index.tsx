@@ -1,5 +1,5 @@
 import { Badge, Box, Button, Card, HStack, SimpleGrid, Stack, Text } from '@chakra-ui/react';
-import { LuUsers } from 'react-icons/lu';
+import { LuMessageSquare, LuUsers } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import ErrorState from '@/components/info-states/error-state';
@@ -55,12 +55,14 @@ const AdminOverview = () => {
                   </Text>
                 </Box>
 
-                <Button asChild colorPalette="brand" alignSelf={{ base: 'stretch', md: 'center' }}>
-                  <Link to="/app/admin/users">
-                    <LuUsers />
-                    Users
-                  </Link>
-                </Button>
+                <HStack alignSelf={{ base: 'stretch', md: 'center' }} flexWrap="wrap">
+                  <Button asChild colorPalette="brand" flex={{ base: '1', md: 'initial' }}>
+                    <Link to="/app/admin/feedback"><LuMessageSquare />Feedback</Link>
+                  </Button>
+                  <Button asChild variant="outline" colorPalette="gray" flex={{ base: '1', md: 'initial' }}>
+                    <Link to="/app/admin/users"><LuUsers />Users</Link>
+                  </Button>
+                </HStack>
               </Stack>
             </Card.Body>
           </Card.Root>
