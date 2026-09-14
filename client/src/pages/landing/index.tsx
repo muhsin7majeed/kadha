@@ -14,7 +14,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { LuBookOpen, LuDownload, LuGithub, LuServer, LuTv, LuUsers } from 'react-icons/lu';
+import { LuGithub, LuServer, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import BetaDisclosure from '@/components/beta-disclosure';
@@ -22,27 +22,7 @@ import Navbar from '@/components/navbar';
 import { APP_CONFIG } from '@/config/app-config';
 import CURRENT_FEATURES from './current-features';
 import FAQ_ITEMS from './faq';
-
-const PRINCIPLES = [
-  {
-    icon: LuBookOpen,
-    title: 'Keep a history that is yours',
-    description:
-      'Record movies, shows, episodes, rewatches, ratings, dates, and private notes without turning your viewing into a public performance.',
-  },
-  {
-    icon: LuUsers,
-    title: 'Share only when it helps',
-    description:
-      'Use Kadha privately, or invite people you trust to build collections together. Public sharing is always a deliberate choice.',
-  },
-  {
-    icon: LuDownload,
-    title: 'Take your data with you',
-    description:
-      'Export your Kadha data, delete your account, or run the open-source app on infrastructure you control.',
-  },
-];
+import ProductShowcase from './product-showcase';
 
 const Landing = () => {
   return (
@@ -82,44 +62,7 @@ const Landing = () => {
         </Container>
       </Box>
 
-      <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
-          <VStack gap={4} mb={12} textAlign="center">
-            <Badge colorPalette="brand">Why Kadha?</Badge>
-            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
-              Personal first. Social when you choose.
-            </Heading>
-            <Text color="fg.muted" fontSize="lg" maxW="2xl">
-              Your viewing history should be useful to you before it becomes content for anyone else.
-            </Text>
-          </VStack>
-
-          <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
-            {PRINCIPLES.map((principle) => (
-              <VStack
-                key={principle.title}
-                align="start"
-                gap={3}
-                p={5}
-                borderWidth="1px"
-                borderColor="border"
-                rounded="md"
-                bg="bg"
-              >
-                <Box p={3} bg="brand.subtle" rounded="md">
-                  <Icon fontSize="xl" color="brand.fg">
-                    <principle.icon />
-                  </Icon>
-                </Box>
-                <Heading as="h3" size="md">
-                  {principle.title}
-                </Heading>
-                <Text color="fg.muted">{principle.description}</Text>
-              </VStack>
-            ))}
-          </SimpleGrid>
-        </Container>
-      </Box>
+      <ProductShowcase />
 
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
