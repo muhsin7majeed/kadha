@@ -108,7 +108,10 @@ export async function updateFeedback(id: string, input: UpdateFeedbackInput) {
 
     const adminResponse = input.adminResponse === undefined ? undefined : input.adminResponse || null;
     const status =
-      input.status ?? (adminResponse && current.status === FeedbackStatus.NEW ? FeedbackStatus.ACKNOWLEDGED : undefined);
+      adminResponse && input.status === FeedbackStatus.NEW
+        ? FeedbackStatus.ACKNOWLEDGED
+        : (input.status ??
+          (adminResponse && current.status === FeedbackStatus.NEW ? FeedbackStatus.ACKNOWLEDGED : undefined));
     const nextStatus = status ?? current.status;
     const now = new Date();
     const firstAcknowledgment = current.acknowledgedAt === null && nextStatus !== FeedbackStatus.NEW;

@@ -19,7 +19,7 @@ const AdminFeedbackDetail = () => {
   const updateFeedback = useUpdateFeedback();
   const [status, setStatus] = useState<FeedbackStatus>('NEW');
   const [adminResponse, setAdminResponse] = useState('');
-  const initializedId = useRef<string>();
+  const initializedId = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     if (!feedback.data || initializedId.current === feedback.data.id) return;
@@ -31,7 +31,11 @@ const AdminFeedbackDetail = () => {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!id) return;
-    await updateFeedback.mutateAsync({ id, status, adminResponse });
+    try {
+      await updateFeedback.mutateAsync({ id, status, adminResponse });
+    } catch {
+      return;
+    }
   };
 
   return <Box>

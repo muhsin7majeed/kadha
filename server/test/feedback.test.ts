@@ -73,7 +73,7 @@ describe('feedback routes', () => {
     const updated = await request(await getTestApp())
       .patch(`/api/admin/feedback/${created.body.data.id}`)
       .set('Authorization', authorization(admin))
-      .send({ adminResponse: 'Thanks, we are investigating.' })
+      .send({ status: 'NEW', adminResponse: 'Thanks, we are investigating.' })
       .expect(200);
     expect(updated.body.data).toMatchObject({ status: 'ACKNOWLEDGED', adminResponse: 'Thanks, we are investigating.' });
     expect(updated.body.data.acknowledgedAt).toEqual(expect.any(String));

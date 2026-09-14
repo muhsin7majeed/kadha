@@ -28,10 +28,14 @@ const FeedbackPage = () => {
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    await createFeedback.mutateAsync({ category, subject, message, sourcePath, appVersion: APP_CONFIG.version });
-    setSubject('');
-    setMessage('');
-    setPage(1);
+    try {
+      await createFeedback.mutateAsync({ category, subject, message, sourcePath, appVersion: APP_CONFIG.version });
+      setSubject('');
+      setMessage('');
+      setPage(1);
+    } catch {
+      return;
+    }
   };
 
   return (
