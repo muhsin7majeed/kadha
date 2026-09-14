@@ -121,6 +121,14 @@ describe('collaboration-safe account deletion', () => {
     const removedInvite = await inviteUserToCollection(owner, deletedCollection.id, removedMember, 'viewer');
     await acceptCollectionInvite(removedMember, removedInvite.id);
     await addMovieToCollection(owner, automaticCollection.id, 998001);
+    const ownerFeedback = await prisma.feedback.create({
+      data: {
+        userId: owner.userId,
+        category: 'GENERAL',
+        subject: 'Delete with my account',
+        message: 'This private feedback should be deleted with its owner.',
+      },
+    });
 
     const impact = await getImpact(owner);
     const response = await deleteAccount(owner, impact.impactFingerprint, {
@@ -137,6 +145,7 @@ describe('collaboration-safe account deletion', () => {
 
     expect(response.status).toBe(200);
     expect(await prisma.user.findUnique({ where: { id: owner.userId } })).toBeNull();
+    expect(await prisma.feedback.findUnique({ where: { id: ownerFeedback.id } })).toBeNull();
 
     const survivingAutomatic = await prisma.collection.findUniqueOrThrow({
       where: { id: automaticCollection.id },

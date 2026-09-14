@@ -153,8 +153,8 @@ const Landing = () => {
               See what is planned
             </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
-              Kadha is shaped by real use rather than a fixed feature checklist. Follow shipped work and current
-              priorities on the public roadmap.
+              Kadha is still taking shape. Signed-in users can send feedback from the profile menu, or check the public
+              roadmap to see what’s next.
             </Text>
             <Button variant="outline" colorPalette="gray" asChild>
               <a

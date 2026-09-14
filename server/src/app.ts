@@ -11,6 +11,7 @@ import activityRoutes from './features/activity/activity.routes';
 import authRoutes from './features/auth/auth.routes';
 import collectionRoutes from './features/collection/collection.routes';
 import friendshipRoutes from './features/friendship/friendship.routes';
+import { adminFeedbackRoutes, feedbackRoutes } from './features/feedback/feedback.routes';
 import insightsRoutes from './features/insights/insights.routes';
 import mediaRoutes from './features/media/media.routes';
 import navigationPreferencesRoutes from './features/navigation-preferences/navigation-preferences.routes';
@@ -44,6 +45,7 @@ export function createApp(): Express {
 
   app.use('/api/auth', authRoutes);
   app.use('/api/public', optionalAuthMiddleware, publicRoutes);
+  app.use('/api/admin/feedback', authMiddleware, requireAdmin, adminFeedbackRoutes);
   app.use('/api/admin', authMiddleware, requireAdmin, adminRoutes);
   app.use('/api/user/activity', authMiddleware, activityRoutes);
   app.use('/api/user/insights', authMiddleware, insightsRoutes);
@@ -55,6 +57,7 @@ export function createApp(): Express {
   app.use('/api/user-media', authMiddleware, userMediaRoutes);
   app.use('/api/collection', authMiddleware, collectionRoutes);
   app.use('/api/friendship', authMiddleware, friendshipRoutes);
+  app.use('/api/feedback', authMiddleware, feedbackRoutes);
   app.use('/api/notifications', authMiddleware, notificationRoutes);
 
   app.get('/', getRoot);

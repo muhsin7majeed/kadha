@@ -8,6 +8,7 @@ export enum NotificationType {
   CollectionOwnershipChanged = 'COLLECTION_OWNERSHIP_CHANGED',
   SharedCollectionsRemoved = 'SHARED_COLLECTIONS_REMOVED',
   CollectionCollaboratorDeparted = 'COLLECTION_COLLABORATOR_DEPARTED',
+  FeedbackStatusChanged = 'FEEDBACK_STATUS_CHANGED',
 }
 
 export interface Notification {

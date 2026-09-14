@@ -55,6 +55,11 @@ const exportOptions: Array<{
     label: 'Notifications',
   },
   {
+    value: 'feedback',
+    label: 'Feedback',
+    description: 'Submissions, statuses, and responses.',
+  },
+  {
     value: 'activity',
     label: 'Activity',
   },

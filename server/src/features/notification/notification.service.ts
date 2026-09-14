@@ -5,7 +5,7 @@ import { NotificationType } from '@/types/common';
 
 type NotificationDelegate = Pick<typeof prisma, 'notification'>;
 
-type NotificationEntityType = 'friendship' | 'collection_invite' | 'collection';
+type NotificationEntityType = 'friendship' | 'collection_invite' | 'collection' | 'feedback';
 
 interface CreateNotificationPayload {
   userId: string;

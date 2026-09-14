@@ -43,3 +43,22 @@ export const parseSystemNotificationMetadata = (metadata: string | null): System
     return { count: 1 };
   }
 };
+
+export interface FeedbackNotificationMetadata {
+  subject?: string;
+  status?: 'ACKNOWLEDGED' | 'COMPLETED' | 'NOT_PLANNED';
+}
+
+export const parseFeedbackNotificationMetadata = (metadata: string | null): FeedbackNotificationMetadata => {
+  if (!metadata) return {};
+  try {
+    const parsed = JSON.parse(metadata) as unknown;
+    if (!parsed || typeof parsed !== 'object') return {};
+    const data = parsed as Record<string, unknown>;
+    if (typeof data.subject !== 'string') return {};
+    if (data.status !== 'ACKNOWLEDGED' && data.status !== 'COMPLETED' && data.status !== 'NOT_PLANNED') return {};
+    return { subject: data.subject, status: data.status };
+  } catch {
+    return {};
+  }
+};

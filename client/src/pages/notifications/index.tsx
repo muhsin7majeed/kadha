@@ -12,9 +12,11 @@ import useMarkNotificationRead from '@/features/notifications/api/use-mark-notif
 import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-all-notifications-read';
 import PaginationControls from '@/components/pagination-controls';
 import { useState } from 'react';
+import { Link } from 'react-router';
 import useRespondToCollectionInvite from '@/features/collections/api/use-respond-to-collection-invite';
 import {
   parseCollectionInviteMetadata,
+  parseFeedbackNotificationMetadata,
   parseSystemNotificationMetadata,
 } from '@/features/notifications/utils/notification-metadata';
 import CollectionDetailsDialog from '@/features/collections/components/collection-details-dialog';
@@ -38,6 +40,13 @@ const getNotificationMessage = (notification: Notification) => {
       return metadata.collectionName
         ? `Invited you to ${action} ${metadata.collectionName}`
         : 'Invited you to a collection';
+    }
+    case NotificationType.FeedbackStatusChanged: {
+      const metadata = parseFeedbackNotificationMetadata(notification.metadata);
+      const subject = metadata.subject ? ` “${metadata.subject}”` : '';
+      if (metadata.status === 'COMPLETED') return `Your feedback${subject} was completed`;
+      if (metadata.status === 'NOT_PLANNED') return `Your feedback${subject} was marked not planned`;
+      return `Your feedback${subject} was acknowledged`;
     }
     default:
       return 'Sent you a notification';
@@ -195,6 +204,12 @@ const Notifications = () => {
                         Reject
                       </Button>
                     </>
+                  )}
+
+                  {notification.type === NotificationType.FeedbackStatusChanged && notification.entityId && (
+                    <Button asChild size="sm" variant="outline" colorPalette="gray">
+                      <Link to={`/app/feedback/${notification.entityId}`}>View feedback</Link>
+                    </Button>
                   )}
 
                   {notification.actor && notification.type !== NotificationType.CollectionInvite && (

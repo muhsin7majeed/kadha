@@ -4,6 +4,12 @@
 
 ### Feature Changes
 
+#### Feedback
+
+- Added private signed-in feedback submissions with personal status history and user-visible administrator responses.
+- Added administrator feedback triage with search, category and status filters, and in-app status notifications.
+- Included feedback in selectable account exports as reference-only data that is never imported.
+
 #### Product Information
 
 - Reframed the public landing page around private personal tracking, with collaboration as an optional second use case.
@@ -16,6 +22,10 @@
 - Improved Calendar accessibility and presentation with locale-aware weekday ordering, standard arrow-key navigation, a denser responsive layout, clearer activity summaries, distinct interaction states, and theme-aware Insights heatmap colors.
 
 ### Engineering Changes
+
+#### Feedback
+
+- Added a dedicated feedback domain, additive SQLite migration, owner-scoped APIs, administrator-only triage APIs, and account-deletion cascade coverage.
 
 #### Viewing Diary
 

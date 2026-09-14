@@ -34,6 +34,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     recommendationSettings,
     recommendationFeedback,
     navigationPreferences,
+    feedback,
   ] = await prisma.$transaction([
     prisma.user.findUnique({
       where: { id },
@@ -200,6 +201,10 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     }),
     prisma.navigationPreferences.findUnique({
       where: { userId: id },
+    }),
+    prisma.feedback.findMany({
+      where: { userId: id },
+      orderBy: { createdAt: 'desc' },
     }),
   ]);
 
@@ -411,6 +416,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     }));
+  }
+  if (selected.has('feedback')) {
+    data.feedback = feedback.map(({ userId: _userId, ...item }) => item);
   }
   if (selected.has('activity')) {
     data.activity = activity.map((item) => ({
