@@ -37,7 +37,7 @@ const Terms = () => {
 
             <Section title="Early Beta">
               <Text>
-                Kadha is built and operated by one developer and is provided as an early beta. Automated backups are in
+                Kadha is built and operated by a small team and is provided as an early beta. Automated backups are in
                 place, but mistakes or failures could still cause data loss. Features may change, hosted data may be
                 reset, and the service may be paused or discontinued while the product is being tested.
               </Text>

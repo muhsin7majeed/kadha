@@ -37,7 +37,7 @@ const Privacy = () => {
 
             <Section title="Hosted Beta">
               <Text>
-                The hosted Kadha beta is built and operated by one developer. Automated encrypted backups are in place,
+                The hosted Kadha beta is built and operated by a small team. Automated encrypted backups are in place,
                 but mistakes, software failures, or infrastructure failures could still cause data loss. Export anything
                 you would not want to recreate, and do not add information you consider highly sensitive.
               </Text>

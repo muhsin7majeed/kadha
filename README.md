@@ -17,7 +17,7 @@ Use the hosted beta at [kadha.org](https://kadha.org), or deploy your own instan
 
 ## Hosted Beta
 
-The hosted service is built and operated by one developer. Automated encrypted backups are in place, but this is still
+The hosted service is built and operated by a small team. Automated encrypted backups are in place, but this is still
 an early beta and mistakes, software failures, or infrastructure failures could cause data loss. Export anything you
 would not want to recreate, and do not store highly sensitive information in Kadha.
 

@@ -7,8 +7,9 @@
 #### Product Information
 
 - Reframed the public landing page around private personal tracking, with collaboration as an optional second use case.
+- Added an accessible product tour with optimized screenshots of viewing insights, TV progress, shared collections, and privacy controls.
 - Consolidated overlapping feature claims, removed stale upcoming-work promises and repeated competitor comparisons, and corrected hosted-beta, privacy, import, and account-recovery copy.
-- Clarified that Kadha is operated by one developer with automated backups while an early beta can still lose data through mistakes or failures.
+- Clarified that Kadha is operated by a small team with automated backups while an early beta can still lose data through mistakes or failures.
 
 #### Viewing Diary
 
