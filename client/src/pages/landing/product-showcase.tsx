@@ -82,7 +82,7 @@ const ProductShowcase = () => {
       <Container maxW="6xl" px={{ base: 4, md: 6 }}>
         <VStack gap={4} mb={{ base: 8, md: 12 }} textAlign="center">
           <Badge colorPalette="brand">Inside Kadha</Badge>
-          <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+          <Heading as="h2" textStyle="sectionTitle">
             Built around your viewing history
           </Heading>
           <Text color="fg.muted" textStyle="lead" maxW="2xl">
@@ -142,6 +142,7 @@ const ProductShowcase = () => {
                   scrollSnapAlign="start"
                   aria-roledescription="slide"
                   aria-label={`${index + 1} of ${SLIDES.length}: ${slide.title}`}
+                  aria-hidden={index !== activeIndex}
                 >
                   <Image
                     src={slide.src}

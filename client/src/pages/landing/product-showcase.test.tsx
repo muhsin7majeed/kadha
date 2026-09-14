@@ -17,6 +17,10 @@ describe('ProductShowcase', () => {
       'aria-current',
       'true',
     );
+
+    const slides = screen.getAllByRole('figure', { hidden: true });
+    expect(slides[0]).toHaveAttribute('aria-hidden', 'false');
+    slides.slice(1).forEach((slide) => expect(slide).toHaveAttribute('aria-hidden', 'true'));
   });
 
   it('moves directly, wraps, and responds to arrow keys', async () => {
@@ -25,6 +29,9 @@ describe('ProductShowcase', () => {
 
     await user.click(screen.getByRole('button', { name: 'Next screenshot' }));
     expect(screen.getByRole('status')).toHaveTextContent('Always know what is next, slide 2 of 4');
+    const slides = screen.getAllByRole('figure', { hidden: true });
+    expect(slides[0]).toHaveAttribute('aria-hidden', 'true');
+    expect(slides[1]).toHaveAttribute('aria-hidden', 'false');
 
     await user.click(screen.getByRole('button', { name: 'Show Share one list, not your whole profile' }));
     expect(screen.getByRole('status')).toHaveTextContent('Share one list, not your whole profile, slide 3 of 4');
