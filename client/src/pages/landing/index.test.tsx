@@ -18,9 +18,14 @@ describe('Landing', () => {
       </QueryClientProvider>,
     );
 
-    expect(screen.getByRole('heading', { name: 'A note about end-to-end encryption' })).toBeInTheDocument();
+    const heroHeading = screen.getByRole('heading', { name: /Keep track of what you watch/ });
+    const disclosureHeading = screen.getByRole('heading', { name: 'A note about end-to-end encryption' });
+    const showcaseHeading = screen.getByRole('heading', { name: 'Built around your viewing history' });
+
+    expect(heroHeading.compareDocumentPosition(disclosureHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(disclosureHeading.compareDocumentPosition(showcaseHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByText(/Kadha is built by one developer/)).toBeInTheDocument();
-    expect(screen.getByText(/I can technically access it as the server operator/)).toBeInTheDocument();
-    expect(screen.getByText(/sustained demand/)).toBeInTheDocument();
+    expect(screen.getByText(/the server operator can technically access stored data and backups/)).toBeInTheDocument();
+    expect(screen.getByText(/it can move up the roadmap/)).toBeInTheDocument();
   });
 });

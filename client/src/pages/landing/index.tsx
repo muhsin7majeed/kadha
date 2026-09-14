@@ -73,18 +73,17 @@ const Landing = () => {
                   </Icon>
                 </Box>
                 <VStack align="start" gap={3}>
-                  <Heading as="h2" size="lg">
+                  <Heading as="h2" textStyle="sectionTitle">
                     A note about end-to-end encryption
                   </Heading>
-                  <Text color="fg.muted">
+                  <Text textStyle="body" color="fg.muted">
                     Kadha is built by one developer and is not end-to-end encrypted today. Adding it properly would
-                    mean redesigning recommendations, viewing insights, TV progress, shared collections, and account
-                    recovery, so I have left it out of the beta for now.
+                    change how recommendations, viewing insights, TV progress, shared collections, account recovery,
+                    and encryption keys work across devices, so it is not part of the beta for now.
                   </Text>
-                  <Text color="fg.muted">
-                    Your hosted data is private from other users by default, but I can technically access it as the
-                    server operator. If there is sustained demand for end-to-end encryption, I will make that work a
-                    priority.
+                  <Text textStyle="body" color="fg.muted">
+                    Hosted data is private from other users by default, but the server operator can technically access
+                    stored data and backups. If enough users need end-to-end encryption, it can move up the roadmap.
                   </Text>
                 </VStack>
               </Flex>
