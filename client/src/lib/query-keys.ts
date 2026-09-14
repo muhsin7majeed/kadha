@@ -1,3 +1,4 @@
+import type { AdminFeedbackParams } from '@/features/feedback/feedback.types';
 import { MediaType, UserRole } from '@/types/common';
 
 interface CollectionsParams {
@@ -41,6 +42,15 @@ export const collectionQueryKeys = {
   collectionInviteUsers: (collectionId?: string) => ['collection', collectionId, 'invite-users'] as const,
   collectionInviteUserSearch: (collectionId: string, query: string) =>
     ['collection', collectionId, 'invite-users', query] as const,
+};
+
+export const feedbackQueryKeys = {
+  feedbackRoot: ['feedback'] as const,
+  feedbackList: (page = 1) => ['feedback', 'list', page] as const,
+  feedbackItem: (id?: string) => ['feedback', 'item', id] as const,
+  adminFeedbackRoot: ['admin', 'feedback'] as const,
+  adminFeedbackList: (params: AdminFeedbackParams) => ['admin', 'feedback', 'list', params] as const,
+  adminFeedbackItem: (id?: string) => ['admin', 'feedback', 'item', id] as const,
 };
 
 export const friendshipQueryKeys = {
@@ -132,6 +142,7 @@ export const queryKeys = {
   ...activityQueryKeys,
   ...adminQueryKeys,
   ...collectionQueryKeys,
+  ...feedbackQueryKeys,
   ...friendshipQueryKeys,
   ...mediaQueryKeys,
   ...navigationQueryKeys,
