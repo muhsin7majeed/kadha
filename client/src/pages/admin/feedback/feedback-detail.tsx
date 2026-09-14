@@ -1,5 +1,5 @@
 import { Box, Button, Card, Field, NativeSelect, SimpleGrid, Stack, Text, Textarea } from '@chakra-ui/react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { LuArrowLeft } from 'react-icons/lu';
 import { Link, useParams } from 'react-router';
 
@@ -19,9 +19,11 @@ const AdminFeedbackDetail = () => {
   const updateFeedback = useUpdateFeedback();
   const [status, setStatus] = useState<FeedbackStatus>('NEW');
   const [adminResponse, setAdminResponse] = useState('');
+  const initializedId = useRef<string>();
 
   useEffect(() => {
-    if (!feedback.data) return;
+    if (!feedback.data || initializedId.current === feedback.data.id) return;
+    initializedId.current = feedback.data.id;
     setStatus(feedback.data.status);
     setAdminResponse(feedback.data.adminResponse ?? '');
   }, [feedback.data]);
