@@ -30,15 +30,16 @@ const Privacy = () => {
                 Privacy Policy
               </Heading>
               <Text color="fg.muted">
-                This policy explains how {APP_CONFIG.appName} handles data for the hosted beta and for self-hosted
-                deployments.
+                This policy explains how {APP_CONFIG.appName} handles data for the hosted beta and how self-hosted
+                deployments differ. Effective September 14, 2026.
               </Text>
             </Box>
 
             <Section title="Hosted Beta">
               <Text>
-                The hosted Kadha beta is for early testing. Data may be reset while the product changes. Do not add
-                information you would consider highly sensitive.
+                The hosted Kadha beta is built and operated by a small team. Automated encrypted backups are in place,
+                but mistakes, software failures, or infrastructure failures could still cause data loss. Export anything
+                you would not want to recreate, and do not add information you consider highly sensitive.
               </Text>
               <Text>
                 The hosted beta is not end-to-end encrypted. Passwords are hashed, but account data and media activity
@@ -66,11 +67,12 @@ const Privacy = () => {
                 <List.Item>Kadha users means signed-in users on the same Kadha instance can access it.</List.Item>
                 <List.Item>Friends means accepted friends can access it.</List.Item>
                 <List.Item>
-                  Only me means other users cannot access that profile section or collection through Kadha.
+                  Only me means other users cannot access that profile section. An Only me collection remains available
+                  to its owner and any members the owner explicitly invited.
                 </List.Item>
                 <List.Item>
-                  Collection members can access content intentionally shared with them, according to their viewer or
-                  editor role.
+                  Collection members can access a collection intentionally shared with them, according to their viewer
+                  or editor role, even when it is not visible to other users.
                 </List.Item>
               </List.Root>
               <Text>
@@ -83,15 +85,18 @@ const Privacy = () => {
               <Text>Kadha may store the following data when you use the hosted beta:</Text>
               <List.Root ps={5}>
                 <List.Item>
-                  Username, password hash, account role, watch region, privacy settings, session version, timestamps,
-                  and an account recovery-code verifier.
+                  Username, password hash, account role, watch region, privacy settings, navigation preferences, session
+                  version, timestamps, and an account recovery-code verifier.
                 </List.Item>
                 <List.Item>
-                  Watched, liked, and watchlist items, including ratings, private notes, watched dates, and TV episode
-                  progress.
+                  Watched, liked, and watchlist items, including ratings, private notes, watched dates, repeat watches,
+                  and individual TV episode history.
                 </List.Item>
                 <List.Item>
                   Collections, descriptions, items, visibility, members, roles, invitations, and who added an item.
+                </List.Item>
+                <List.Item>
+                  Recommendation settings and feedback used to tune suggestions for the account that submitted them.
                 </List.Item>
                 <List.Item>Friendships, blocks, notifications, and account activity records.</List.Item>
                 <List.Item>Movie and TV metadata copied from TMDB for saved items.</List.Item>
@@ -107,8 +112,9 @@ const Privacy = () => {
               </Text>
               <Text>
                 Kadha does not sell or rent personal data, use it to target advertising, build unrelated marketing
-                profiles, or train AI models. Future statistics or recommendation features may process data for the
-                feature a user requests, and any external provider will be disclosed before data is sent to it.
+                profiles, or train AI models. Private viewing insights and recommendations are calculated from the
+                signed-in user's own allowed tracking signals, settings, and recommendation feedback. One user's
+                preferences or location do not affect another user's recommendations.
               </Text>
             </Section>
 
@@ -142,9 +148,10 @@ const Privacy = () => {
                 does not currently use advertising or analytics cookies.
               </Text>
               <Text>
-                The application temporarily processes IP addresses in memory to rate-limit account-recovery attempts.
-                Hosting infrastructure may also process network traffic and operational logs. Formal retention periods
-                for operational logs and obsolete application records have not yet been established.
+                The application temporarily processes IP addresses in memory to rate-limit registration, login,
+                session-refresh, account-recovery, and other sensitive authentication requests. Hosting infrastructure
+                may also process network traffic and operational logs. Formal retention periods for operational logs
+                and obsolete application records have not yet been established.
               </Text>
             </Section>
 

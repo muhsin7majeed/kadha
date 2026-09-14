@@ -53,7 +53,7 @@ const Navbar = () => {
                 <Icon fontSize={['sm', '2xl']} color="brand.fg">
                   <LuTv />
                 </Icon>
-                <Heading size={['sm', 'lg']} truncate maxW={{ base: '42vw', sm: 'none' }}>
+                <Heading as="span" size={['sm', 'lg']} truncate maxW={{ base: '42vw', sm: 'none' }}>
                   {APP_CONFIG.appName}
                 </Heading>
               </Link>

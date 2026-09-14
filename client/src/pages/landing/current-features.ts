@@ -1,95 +1,48 @@
 import {
   LuBookOpen,
-  LuBookmark,
   LuChartBar,
-  LuCheck,
   LuClapperboard,
-  LuDownload,
-  LuHeart,
-  LuLink,
+  LuListChecks,
   LuLock,
   LuSparkles,
-  LuServer,
-  LuUsers,
 } from 'react-icons/lu';
 
 const CURRENT_FEATURES = [
   {
-    icon: LuBookmark,
-    title: 'Watchlist',
-    description: 'Keep track of stuff you want to watch. Simple as that.',
-  },
-  {
-    icon: LuHeart,
-    title: 'Liked',
-    description: 'Save your favorites. Build your own hall of fame.',
-  },
-  {
-    icon: LuCheck,
-    title: 'Watched',
-    description: "Mark what you've seen. Never forget if you watched that movie or not.",
-  },
-  {
     icon: LuBookOpen,
-    title: 'Private Viewing Diary',
-    description: 'Revisit watches and episodes in a timeline, calendar, and accessible yearly viewing patterns.',
-    badge: 'Insights',
+    title: 'Your library and viewing diary',
+    description:
+      'Track watched, liked, and watchlisted titles. Record dates, ratings, private notes, rewatches, and individual TV episodes, then revisit them in your diary.',
+  },
+  {
+    icon: LuListChecks,
+    title: 'Shared collections',
+    description:
+      'Make lists for movie nights, recommendations, or anything else. Invite friends as viewers or editors, or share a read-only public link.',
   },
   {
     icon: LuClapperboard,
-    title: 'Trending Content',
-    description: "See what's popular right now, so you are not missing out.",
-    badge: 'Discovery',
+    title: 'TV progress',
+    description:
+      'Keep up with seasons and episodes, see what is in progress, and find the next episode without treating an entire series as one watch.',
   },
   {
     icon: LuSparkles,
-    title: 'Custom Collections',
-    description: 'Create themed lists like "Comfort Movies", "Date Night", or anything else you want to organize.',
-    badge: 'Organization',
-  },
-  {
-    icon: LuLink,
-    title: 'Public Collection Links',
-    description: 'Share selected collections with read-only public links while keeping private lists private.',
-    badge: 'Sharing',
-  },
-  {
-    icon: LuSparkles,
-    title: 'Private Recommendations',
-    description: 'Get personalized suggestions from your own tracking history and tune them with direct feedback.',
-    badge: 'Discovery',
-  },
-  {
-    icon: LuDownload,
-    title: 'Data Export & Import',
-    description: 'Move selected account data between Kadha accounts with preview and conflict-safe merging.',
-    badge: 'Data',
+    title: 'Personal recommendations',
+    description:
+      'Get suggestions based on your own library and feedback. Your private activity is not combined with another user’s recommendation profile.',
   },
   {
     icon: LuChartBar,
-    title: 'Viewing Insights',
-    description: 'Review private profile insights for watched totals, ratings, genres, people, and media breakdowns.',
-    badge: 'Insights',
-  },
-  {
-    icon: LuServer,
-    title: 'Self-Hosting',
+    title: 'Insights that explain themselves',
     description:
-      'Host it yourself with Docker. Kadha is open source under the permissive MIT License.',
-    badge: 'Core',
-  },
-  {
-    icon: LuUsers,
-    title: 'Friends System',
-    description: 'Find users, become friends, share your favorites.',
-    badge: 'Social',
+      'Explore viewing patterns, favorite genres and people, ratings, and estimated watch time, with coverage shown when metadata is incomplete.',
   },
   {
     icon: LuLock,
-    title: 'Privacy Controls',
+    title: 'Privacy and data ownership',
     description:
-      'New accounts start private. You can choose who sees your profile, watched list, liked list, watchlist, and collections.',
-    badge: 'Privacy',
+      'New accounts start private. Control each part of your profile, export or import Kadha data, permanently delete your account, or self-host the app.',
   },
 ];
 
