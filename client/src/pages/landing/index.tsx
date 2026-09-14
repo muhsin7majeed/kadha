@@ -14,7 +14,7 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { LuGithub, LuServer, LuTv } from 'react-icons/lu';
+import { LuGithub, LuLockKeyhole, LuServer, LuTv } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import BetaDisclosure from '@/components/beta-disclosure';
@@ -59,6 +59,39 @@ const Landing = () => {
           <Text fontSize="sm" color="fg.muted" mt={4}>
             No email required. New accounts start private. Export or delete your data at any time.
           </Text>
+        </Container>
+      </Box>
+
+      <Box as="section" py={{ base: 8, md: 10 }}>
+        <Container maxW="4xl" px={{ base: 4, md: 6 }}>
+          <Card.Root variant="outline" bg="bg.subtle">
+            <Card.Body>
+              <Flex direction={{ base: 'column', md: 'row' }} gap={4} align={{ md: 'start' }}>
+                <Box p={3} bg="brand.subtle" rounded="lg" alignSelf="start">
+                  <Icon fontSize="xl" color="brand.fg">
+                    <LuLockKeyhole />
+                  </Icon>
+                </Box>
+                <VStack align="start" gap={3}>
+                  <Heading as="h2" size="lg">
+                    Why Kadha isn't end-to-end encrypted—yet
+                  </Heading>
+                  <Text color="fg.muted">
+                    Kadha is built by two people. Full end-to-end encryption would require us to redesign
+                    recommendations, viewing insights, TV progress, shared collections, account recovery, and how
+                    encryption keys move between devices. It is not something we can add safely by encrypting a few
+                    database fields.
+                  </Text>
+                  <Text color="fg.muted">
+                    For the beta, we chose clear privacy controls and honest limits instead of rushing a weak
+                    implementation. Hosted data is private from other users by default, but the server operator can
+                    technically access it. If sustained user demand makes end-to-end encryption a priority, we will
+                    revisit the design and prioritize that work.
+                  </Text>
+                </VStack>
+              </Flex>
+            </Card.Body>
+          </Card.Root>
         </Container>
       </Box>
 
