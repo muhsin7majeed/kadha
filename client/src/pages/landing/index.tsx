@@ -55,7 +55,7 @@ const Landing = () => {
           <Badge colorPalette="brand" size="lg" mb={4}>
             Private by default · Open source
           </Badge>
-          <Heading size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
+          <Heading as="h1" size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
             Keep track of what you watch.{' '}
             <Text as="span" color="brand.fg">
               Decide what comes next.
@@ -86,7 +86,9 @@ const Landing = () => {
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="brand">Why Kadha?</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>Personal first. Social when you choose.</Heading>
+            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+              Personal first. Social when you choose.
+            </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
               Your viewing history should be useful to you before it becomes content for anyone else.
             </Text>
@@ -109,7 +111,9 @@ const Landing = () => {
                     <principle.icon />
                   </Icon>
                 </Box>
-                <Heading size="md">{principle.title}</Heading>
+                <Heading as="h3" size="md">
+                  {principle.title}
+                </Heading>
                 <Text color="fg.muted">{principle.description}</Text>
               </VStack>
             ))}
@@ -121,7 +125,9 @@ const Landing = () => {
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
             <Badge colorPalette="green">Available now</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>One place for your viewing life</Heading>
+            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+              One place for your viewing life
+            </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
               Search movies and TV through TMDB, explore current releases, and check streaming availability for your
               region.
@@ -138,7 +144,9 @@ const Landing = () => {
                         <feature.icon />
                       </Icon>
                     </Box>
-                    <Heading size="md">{feature.title}</Heading>
+                    <Heading as="h3" size="md">
+                      {feature.title}
+                    </Heading>
                     <Text color="fg.muted">{feature.description}</Text>
                   </VStack>
                 </Card.Body>
@@ -152,7 +160,9 @@ const Landing = () => {
         <Container maxW="4xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} textAlign="center">
             <Badge colorPalette="gray">Product fit</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>Not a public review network</Heading>
+            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+              Not a public review network
+            </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="3xl">
               Kadha is designed for personal tracking and deliberate sharing, not followers, public ratings, or
               building an audience. If you want a large film community and public reviews, Letterboxd is likely a
@@ -173,7 +183,9 @@ const Landing = () => {
                     <LuServer />
                   </Icon>
                 </Box>
-                <Heading size={{ base: 'xl', md: '2xl' }}>Prefer to run it yourself?</Heading>
+                <Heading as="h2" size={{ base: 'xl', md: '2xl' }}>
+                  Prefer to run it yourself?
+                </Heading>
                 <Text fontSize="lg" color="fg.muted" maxW="xl">
                   Kadha is MIT-licensed and includes a Docker deployment path. Run your own instance and control its
                   database, backups, updates, and access policies.
@@ -194,7 +206,9 @@ const Landing = () => {
         <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center">
           <VStack gap={4}>
             <Badge colorPalette="brand">Still evolving</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>See what is planned</Heading>
+            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+              See what is planned
+            </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
               Kadha is shaped by real use rather than a fixed feature checklist. Follow shipped work and current
               priorities on the public roadmap.
@@ -215,7 +229,9 @@ const Landing = () => {
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="3xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
-            <Heading size={{ base: '2xl', md: '3xl' }}>Frequently asked questions</Heading>
+            <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
+              Frequently asked questions
+            </Heading>
             <Text fontSize="lg" color="fg.muted">
               Straight answers about the hosted beta, privacy, recovery, and self-hosting.
             </Text>
@@ -241,7 +257,7 @@ const Landing = () => {
 
       <Box py={{ base: 16, md: 20 }}>
         <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center">
-          <Heading size={{ base: '2xl', md: '3xl' }} mb={4}>
+          <Heading as="h2" size={{ base: '2xl', md: '3xl' }} mb={4}>
             Start your own watch history
           </Heading>
           <Text fontSize="lg" color="fg.muted" mb={8}>

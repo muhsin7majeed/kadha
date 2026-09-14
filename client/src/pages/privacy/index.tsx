@@ -67,11 +67,12 @@ const Privacy = () => {
                 <List.Item>Kadha users means signed-in users on the same Kadha instance can access it.</List.Item>
                 <List.Item>Friends means accepted friends can access it.</List.Item>
                 <List.Item>
-                  Only me means other users cannot access that profile section or collection through Kadha.
+                  Only me means other users cannot access that profile section. An Only me collection remains available
+                  to its owner and any members the owner explicitly invited.
                 </List.Item>
                 <List.Item>
-                  Collection members can access content intentionally shared with them, according to their viewer or
-                  editor role.
+                  Collection members can access a collection intentionally shared with them, according to their viewer
+                  or editor role, even when it is not visible to other users.
                 </List.Item>
               </List.Root>
               <Text>
