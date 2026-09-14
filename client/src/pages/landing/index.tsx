@@ -1,76 +1,46 @@
 import {
+  Accordion,
+  Badge,
   Box,
   Button,
+  Card,
   Container,
+  Flex,
   Heading,
-  Text,
-  SimpleGrid,
-  VStack,
   HStack,
   Icon,
-  Card,
-  Accordion,
   Link as ChakraLink,
-  Badge,
-  Flex,
-  Table,
+  SimpleGrid,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
-import { LuGithub, LuTv, LuGlobe, LuLock, LuServer, LuUsers, LuMessagesSquare } from 'react-icons/lu';
+import { LuBookOpen, LuDownload, LuGithub, LuServer, LuTv, LuUsers } from 'react-icons/lu';
 import { Link } from 'react-router';
+
 import BetaDisclosure from '@/components/beta-disclosure';
 import Navbar from '@/components/navbar';
 import { APP_CONFIG } from '@/config/app-config';
-import FAQ_ITEMS from './faq';
 import CURRENT_FEATURES from './current-features';
-import UPCOMING_FEATURES from './upcoming-features';
+import FAQ_ITEMS from './faq';
 
-const AUDIENCES = [
+const PRINCIPLES = [
+  {
+    icon: LuBookOpen,
+    title: 'Keep a history that is yours',
+    description:
+      'Record movies, shows, episodes, rewatches, ratings, dates, and private notes without turning your viewing into a public performance.',
+  },
   {
     icon: LuUsers,
-    title: 'Couples and families',
-    description: 'Build a shared watchlist without losing movie-night ideas in chat.',
+    title: 'Share only when it helps',
+    description:
+      'Use Kadha privately, or invite people you trust to build collections together. Public sharing is always a deliberate choice.',
   },
   {
-    icon: LuMessagesSquare,
-    title: 'Friend groups',
-    description: 'Create collaborative collections for watch parties, recommendations, and inside-joke lists.',
-  },
-  {
-    icon: LuServer,
-    title: 'Self-hosters',
-    description: 'Run your own instance and keep your movie and TV history on infrastructure you control.',
-  },
-  {
-    icon: LuLock,
-    title: 'Privacy-conscious users',
-    description: 'Choose who can see your profile, watched list, liked list, watchlist, and collections.',
-  },
-];
-
-const COMPARISON_ROWS = [
-  {
-    label: 'Best for',
-    kadha: 'Privacy-controlled tracking and shared lists',
-    letterboxd: 'Film culture and reviews',
-    trakt: 'Automated media tracking',
-  },
-  {
-    label: 'Shared planning',
-    kadha: 'Collaborative collections',
-    letterboxd: 'Lists and sharing',
-    trakt: 'Lists',
-  },
-  {
-    label: 'Self-hosting',
-    kadha: 'Yes',
-    letterboxd: 'No',
-    trakt: 'No',
-  },
-  {
-    label: 'Data ownership',
-    kadha: 'Visibility controls, export, and self-hosting',
-    letterboxd: 'Hosted platform',
-    trakt: 'Hosted platform',
+    icon: LuDownload,
+    title: 'Take your data with you',
+    description:
+      'Export your Kadha data, delete your account, or run the open-source app on infrastructure you control.',
   },
 ];
 
@@ -83,31 +53,31 @@ const Landing = () => {
       <Box py={{ base: 16, md: 24 }} bg="bg.subtle" position="relative" overflow="hidden">
         <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center" position="relative" zIndex={1}>
           <Badge colorPalette="brand" size="lg" mb={4}>
-            Open Source & Self-Hostable
+            Private by default · Open source
           </Badge>
           <Heading size={{ base: '3xl', md: '5xl' }} mb={6} lineHeight="tight">
-            A privacy-conscious home for{' '}
+            Keep track of what you watch.{' '}
             <Text as="span" color="brand.fg">
-              movies and TV.
+              Decide what comes next.
             </Text>
           </Heading>
           <Text fontSize={{ base: 'lg', md: 'xl' }} color="fg.muted" mb={8} maxW="2xl" mx="auto">
-            Track what you've watched, save what you want to watch next, and build shared collections with people you
-            trust. Use the hosted beta or run Kadha on your own server.
+            Build your movie and TV history, keep shared lists with people you trust, and choose exactly what others can
+            see.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
             <Button colorPalette="brand" size="lg" asChild>
-              <Link to="/auth/register">Start Tracking</Link>
+              <Link to="/auth/register">Try the hosted beta</Link>
             </Button>
             <Button variant="outline" colorPalette="gray" size="lg" asChild>
               <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                 <LuGithub />
-                View on GitHub
+                View source and self-host
               </a>
             </Button>
           </HStack>
           <Text fontSize="sm" color="fg.muted" mt={4}>
-            Hosted beta access is complimentary. No credit card, advertising, or data sales.
+            No email required. New accounts start private. Export or delete your data at any time.
           </Text>
         </Container>
       </Box>
@@ -115,17 +85,17 @@ const Landing = () => {
       <Box py={{ base: 16, md: 20 }}>
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
-            <Badge colorPalette="brand">Built For</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>People who watch together</Heading>
+            <Badge colorPalette="brand">Why Kadha?</Badge>
+            <Heading size={{ base: '2xl', md: '3xl' }}>Personal first. Social when you choose.</Heading>
             <Text color="fg.muted" fontSize="lg" maxW="2xl">
-              New accounts start private, and sharing is a deliberate choice you control.
+              Your viewing history should be useful to you before it becomes content for anyone else.
             </Text>
           </VStack>
 
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} gap={5}>
-            {AUDIENCES.map((audience) => (
+          <SimpleGrid columns={{ base: 1, md: 3 }} gap={5}>
+            {PRINCIPLES.map((principle) => (
               <VStack
-                key={audience.title}
+                key={principle.title}
                 align="start"
                 gap={3}
                 p={5}
@@ -136,65 +106,26 @@ const Landing = () => {
               >
                 <Box p={3} bg="brand.subtle" rounded="md">
                   <Icon fontSize="xl" color="brand.fg">
-                    <audience.icon />
+                    <principle.icon />
                   </Icon>
                 </Box>
-                <Heading size="md">{audience.title}</Heading>
-                <Text color="fg.muted">{audience.description}</Text>
+                <Heading size="md">{principle.title}</Heading>
+                <Text color="fg.muted">{principle.description}</Text>
               </VStack>
             ))}
           </SimpleGrid>
         </Container>
       </Box>
 
-      <Box py={{ base: 16, md: 20 }}>
-        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
-          <VStack gap={4} mb={10} textAlign="center">
-            <Badge colorPalette="gray">Comparison</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>Not trying to be next Letterboxd</Heading>
-            <Text color="fg.muted" fontSize="lg" maxW="3xl">
-              Letterboxd is excellent for public film culture. Trakt and Simkl are strong hosted trackers. Kadha is for
-              privacy-controlled movie and TV tracking, shared planning, and self-hosting.
-            </Text>
-          </VStack>
-
-          <Box overflowX="auto" borderWidth="1px" borderColor="border" rounded="md">
-            <Table.Root minW="760px" size="sm">
-              <Table.Header>
-                <Table.Row bg="bg.subtle">
-                  <Table.ColumnHeader>Feature</Table.ColumnHeader>
-                  <Table.ColumnHeader>Kadha</Table.ColumnHeader>
-                  <Table.ColumnHeader>Letterboxd</Table.ColumnHeader>
-                  <Table.ColumnHeader>Trakt / Simkl</Table.ColumnHeader>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {COMPARISON_ROWS.map((row) => (
-                  <Table.Row key={row.label}>
-                    <Table.Cell fontWeight="medium">{row.label}</Table.Cell>
-                    <Table.Cell color="brand.fg" fontWeight="medium">
-                      {row.kadha}
-                    </Table.Cell>
-                    <Table.Cell>{row.letterboxd}</Table.Cell>
-                    <Table.Cell>{row.trakt}</Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table.Root>
-          </Box>
-
-          <Text color="fg.muted" mt={5} textAlign="center">
-            Use Letterboxd if you want public reviews, ratings, and film-community discovery. Use Kadha if you want a
-            tracker with private defaults, deliberate sharing, and a self-hosting path.
-          </Text>
-        </Container>
-      </Box>
-
-      <Box py={{ base: 16, md: 20 }}>
+      <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="6xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
-            <Badge colorPalette="green">Available Now</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>What you can do today</Heading>
+            <Badge colorPalette="green">Available now</Badge>
+            <Heading size={{ base: '2xl', md: '3xl' }}>One place for your viewing life</Heading>
+            <Text color="fg.muted" fontSize="lg" maxW="2xl">
+              Search movies and TV through TMDB, explore current releases, and check streaming availability for your
+              region.
+            </Text>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
@@ -207,14 +138,7 @@ const Landing = () => {
                         <feature.icon />
                       </Icon>
                     </Box>
-                    <HStack flexWrap="wrap">
-                      <Heading size="md">{feature.title}</Heading>
-                      {'badge' in feature && feature.badge && (
-                        <Badge size="sm" colorPalette="gray">
-                          {feature.badge}
-                        </Badge>
-                      )}
-                    </HStack>
+                    <Heading size="md">{feature.title}</Heading>
                     <Text color="fg.muted">{feature.description}</Text>
                   </VStack>
                 </Card.Body>
@@ -224,59 +148,40 @@ const Landing = () => {
         </Container>
       </Box>
 
-      <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
-        <Container maxW="6xl" px={{ base: 4, md: 6 }}>
-          <VStack gap={4} mb={12} textAlign="center">
-            <Badge colorPalette="brand">Coming Soon</Badge>
-            <Heading size={{ base: '2xl', md: '3xl' }}>What we're building</Heading>
+      <Box py={{ base: 16, md: 20 }}>
+        <Container maxW="4xl" px={{ base: 4, md: 6 }}>
+          <VStack gap={4} textAlign="center">
+            <Badge colorPalette="gray">Product fit</Badge>
+            <Heading size={{ base: '2xl', md: '3xl' }}>Not a public review network</Heading>
+            <Text color="fg.muted" fontSize="lg" maxW="3xl">
+              Kadha is designed for personal tracking and deliberate sharing, not followers, public ratings, or
+              building an audience. If you want a large film community and public reviews, Letterboxd is likely a
+              better fit. If you want private movie and TV tracking with shared collections and a self-hosting option,
+              Kadha may fit better.
+            </Text>
           </VStack>
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-            {UPCOMING_FEATURES.map((feature) => (
-              <Card.Root key={feature.title} variant="outline">
-                <Card.Body>
-                  <HStack align="start" gap={4}>
-                    <Box p={3} bg="brand.subtle" rounded="lg" flexShrink={0}>
-                      <Icon fontSize="xl" color="brand.solid">
-                        <feature.icon />
-                      </Icon>
-                    </Box>
-                    <VStack align="start" gap={2}>
-                      <HStack flexWrap="wrap">
-                        <Heading size="md">{feature.title}</Heading>
-                        <Badge size="sm" colorPalette="gray">
-                          {feature.badge}
-                        </Badge>
-                      </HStack>
-                      <Text color="fg.muted">{feature.description}</Text>
-                    </VStack>
-                  </HStack>
-                </Card.Body>
-              </Card.Root>
-            ))}
-          </SimpleGrid>
         </Container>
       </Box>
 
-      <Box py={{ base: 16, md: 20 }}>
+      <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="4xl" px={{ base: 4, md: 6 }}>
           <Card.Root variant="outline" borderColor="brand.muted" bg="brand.subtle">
             <Card.Body py={10}>
               <VStack gap={6} textAlign="center">
                 <Box p={4} bg="brand.subtle" rounded="full">
                   <Icon fontSize="3xl" color="brand.fg">
-                    <LuGlobe />
+                    <LuServer />
                   </Icon>
                 </Box>
-                <Heading size={{ base: 'xl', md: '2xl' }}>Your Server, Your Cinema</Heading>
+                <Heading size={{ base: 'xl', md: '2xl' }}>Prefer to run it yourself?</Heading>
                 <Text fontSize="lg" color="fg.muted" maxW="xl">
-                  Don't want your watch history on someone else's server? Fork the MIT-licensed repo, deploy with
-                  Docker, and modify your instance to fit your needs.
+                  Kadha is MIT-licensed and includes a Docker deployment path. Run your own instance and control its
+                  database, backups, updates, and access policies.
                 </Text>
                 <Button variant="outline" colorPalette="brand" asChild>
                   <a href={APP_CONFIG.githubUrl} target="_blank" rel="noopener noreferrer">
                     <LuGithub />
-                    Check out the repo
+                    Self-host Kadha
                   </a>
                 </Button>
               </VStack>
@@ -285,18 +190,40 @@ const Landing = () => {
         </Container>
       </Box>
 
+      <Box py={{ base: 16, md: 20 }}>
+        <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center">
+          <VStack gap={4}>
+            <Badge colorPalette="brand">Still evolving</Badge>
+            <Heading size={{ base: '2xl', md: '3xl' }}>See what is planned</Heading>
+            <Text color="fg.muted" fontSize="lg" maxW="2xl">
+              Kadha is shaped by real use rather than a fixed feature checklist. Follow shipped work and current
+              priorities on the public roadmap.
+            </Text>
+            <Button variant="outline" colorPalette="gray" asChild>
+              <a
+                href={`${APP_CONFIG.githubUrl}/blob/master/ROADMAP.md`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View the roadmap
+              </a>
+            </Button>
+          </VStack>
+        </Container>
+      </Box>
+
       <Box py={{ base: 16, md: 20 }} bg="bg.subtle">
         <Container maxW="3xl" px={{ base: 4, md: 6 }}>
           <VStack gap={4} mb={12} textAlign="center">
-            <Heading size={{ base: '2xl', md: '3xl' }}>Frequently Asked Questions</Heading>
+            <Heading size={{ base: '2xl', md: '3xl' }}>Frequently asked questions</Heading>
             <Text fontSize="lg" color="fg.muted">
-              Straight answers for people comparing Kadha with hosted watch trackers.
+              Straight answers about the hosted beta, privacy, recovery, and self-hosting.
             </Text>
           </VStack>
 
           <Accordion.Root collapsible defaultValue={['item-0']}>
             {FAQ_ITEMS.map((item, index) => (
-              <Accordion.Item key={index} value={`item-${index}`}>
+              <Accordion.Item key={item.question} value={`item-${index}`}>
                 <Accordion.ItemTrigger>
                   <Text fontWeight="medium">{item.question}</Text>
                   <Accordion.ItemIndicator />
@@ -315,18 +242,17 @@ const Landing = () => {
       <Box py={{ base: 16, md: 20 }}>
         <Container maxW="4xl" px={{ base: 4, md: 6 }} textAlign="center">
           <Heading size={{ base: '2xl', md: '3xl' }} mb={4}>
-            Start your private watch hub
+            Start your own watch history
           </Heading>
           <Text fontSize="lg" color="fg.muted" mb={8}>
-            Keep your movies, shows, lists, and shared plans in one place. Your account starts private, and you choose
-            what to share.
+            Create a private account, add a few titles, and see whether Kadha fits the way you watch.
           </Text>
           <HStack gap={4} justify="center" flexWrap="wrap">
             <Button colorPalette="brand" size="lg" asChild>
-              <Link to="/auth/register">Create Beta Account</Link>
+              <Link to="/auth/register">Create beta account</Link>
             </Button>
             <Button variant="outline" colorPalette="gray" size="lg" asChild>
-              <Link to="/auth/login">Login</Link>
+              <Link to="/auth/login">Sign in</Link>
             </Button>
           </HStack>
         </Container>
@@ -343,7 +269,7 @@ const Landing = () => {
             </HStack>
 
             <Text color="fg.muted" fontSize="sm">
-              Open source. Privacy-conscious. Built for deliberate sharing.
+              Personal by default. Shared when you choose.
             </Text>
 
             <HStack gap={4}>
