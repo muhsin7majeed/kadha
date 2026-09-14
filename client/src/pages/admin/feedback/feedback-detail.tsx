@@ -32,7 +32,9 @@ const AdminFeedbackDetail = () => {
     event.preventDefault();
     if (!id) return;
     try {
-      await updateFeedback.mutateAsync({ id, status, adminResponse });
+      const updated = await updateFeedback.mutateAsync({ id, status, adminResponse });
+      setStatus(updated.status);
+      setAdminResponse(updated.adminResponse ?? '');
     } catch {
       return;
     }

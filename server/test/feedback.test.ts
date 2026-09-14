@@ -94,4 +94,46 @@ describe('feedback routes', () => {
     expect(completed.body.data.resolvedAt).toEqual(expect.any(String));
     expect(await prisma.notification.count({ where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' } })).toBe(2);
   });
+
+  it('keeps transition timestamps and status notifications idempotent across terminal changes', async () => {
+    const owner = await registerTestUser('feedback-transition-owner');
+    const admin = await registerTestUser('feedback-transition-admin');
+    await promote(admin.userId);
+    const created = await createFeedback(owner, { subject: 'Transition matrix' });
+    const id = created.body.data.id as string;
+    const update = async (status: string) =>
+      request(await getTestApp()).patch(`/api/admin/feedback/${id}`).set('Authorization', authorization(admin)).send({ status }).expect(200);
+
+    const completed = await update('COMPLETED');
+    expect(completed.body.data).toMatchObject({ status: 'COMPLETED' });
+    expect(completed.body.data.acknowledgedAt).toEqual(expect.any(String));
+    expect(completed.body.data.resolvedAt).toEqual(expect.any(String));
+
+    const repeatedCompleted = await update('COMPLETED');
+    expect(repeatedCompleted.body.data.resolvedAt).toBe(completed.body.data.resolvedAt);
+
+    const notPlanned = await update('NOT_PLANNED');
+    expect(notPlanned.body.data).toMatchObject({ status: 'NOT_PLANNED' });
+    expect(notPlanned.body.data.acknowledgedAt).toBe(completed.body.data.acknowledgedAt);
+    const repeatedNotPlanned = await update('NOT_PLANNED');
+    expect(repeatedNotPlanned.body.data.resolvedAt).toBe(notPlanned.body.data.resolvedAt);
+
+    const reopened = await update('ACKNOWLEDGED');
+    expect(reopened.body.data.resolvedAt).toBeNull();
+    const reentered = await update('NOT_PLANNED');
+    expect(reentered.body.data.resolvedAt).toEqual(expect.any(String));
+    await update('COMPLETED');
+
+    const notifications = await prisma.notification.findMany({
+      where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' },
+      orderBy: { dedupeKey: 'asc' },
+      select: { dedupeKey: true },
+    });
+    expect(notifications).toEqual([
+      { dedupeKey: `feedback:${id}:ACKNOWLEDGED` },
+      { dedupeKey: `feedback:${id}:COMPLETED` },
+      { dedupeKey: `feedback:${id}:NOT_PLANNED` },
+    ]);
+  });
+
 });

@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { describe, expect, it, vi } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
 import AdminFeedback from '.';
@@ -27,6 +28,9 @@ vi.mock('@/features/feedback/api/use-admin-feedback', () => ({
 }));
 
 describe('AdminFeedback', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   it('shows triage filters and links to feedback details', () => {
     renderWithProviders(<MemoryRouter><AdminFeedback /></MemoryRouter>);
     expect(screen.getByRole('combobox', { name: 'Filter by status' })).toBeInTheDocument();
@@ -35,13 +39,20 @@ describe('AdminFeedback', () => {
     expect(screen.getByRole('link', { name: 'View' })).toHaveAttribute('href', '/app/admin/feedback/feedback-1');
   });
 
-  it('submits administrator status and response updates', async () => {
-    const user = (await import('@testing-library/user-event')).default.setup();
+  it('synchronizes the editor with the canonical status returned by an update', async () => {
+    const user = userEvent.setup();
+    updateFeedback.mockResolvedValueOnce({
+      id: 'feedback-1',
+      status: 'ACKNOWLEDGED',
+      adminResponse: 'Thanks for reporting this.',
+    });
     renderWithProviders(<MemoryRouter initialEntries={['/app/admin/feedback/feedback-1']}><Routes><Route path="/app/admin/feedback/:id" element={<AdminFeedbackDetail />} /></Routes></MemoryRouter>);
-    await user.selectOptions(screen.getByLabelText('Status'), 'ACKNOWLEDGED');
+    const status = screen.getByLabelText('Status');
+    expect(status).toHaveValue('NEW');
     await user.type(screen.getByLabelText('Response to user'), 'Thanks for reporting this.');
     await user.click(screen.getByRole('button', { name: 'Save update' }));
-    expect(updateFeedback).toHaveBeenCalledWith({ id: 'feedback-1', status: 'ACKNOWLEDGED', adminResponse: 'Thanks for reporting this.' });
+    expect(updateFeedback).toHaveBeenCalledWith({ id: 'feedback-1', status: 'NEW', adminResponse: 'Thanks for reporting this.' });
+    expect(status).toHaveValue('ACKNOWLEDGED');
   });
 
 });

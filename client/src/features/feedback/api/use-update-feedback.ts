@@ -14,6 +14,8 @@ export default function useUpdateFeedback() {
     onSuccess: (_, input) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminFeedbackRoot });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminFeedbackItem(input.id) });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.feedbackRoot });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
       toaster.success({ title: 'Feedback updated' });
     },
     onError: useErrorHandler,
