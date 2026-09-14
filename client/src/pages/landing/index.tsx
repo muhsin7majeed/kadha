@@ -104,13 +104,13 @@ const Landing = () => {
           <VStack gap={4} textAlign="center">
             <Badge colorPalette="gray">Product fit</Badge>
             <Heading as="h2" size={{ base: '2xl', md: '3xl' }}>
-              Not a public review network
+              Private first, even when you share
             </Heading>
             <Text color="fg.muted" fontSize="lg" maxW="3xl">
-              Kadha is designed for personal tracking and deliberate sharing, not followers, public ratings, or
-              building an audience. If you want a large film community and public reviews, Letterboxd is likely a
-              better fit. If you want private movie and TV tracking with shared collections and a self-hosting option,
-              Kadha may fit better.
+              Kadha is built around your personal movie and TV history. You can share a collection when you want to
+              without turning your whole profile into public content. If public reviews are something people using
+              Kadha actually want, we may explore them later—but they would stay opt-in and separate from your private
+              activity. If you mainly want a large film community today, Letterboxd is still the better fit.
             </Text>
           </VStack>
         </Container>
