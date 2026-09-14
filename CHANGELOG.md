@@ -4,6 +4,12 @@
 
 ### Feature Changes
 
+#### Product Information
+
+- Reframed the public landing page around private personal tracking, with collaboration as an optional second use case.
+- Consolidated overlapping feature claims, removed stale upcoming-work promises and repeated competitor comparisons, and corrected hosted-beta, privacy, import, and account-recovery copy.
+- Clarified that Kadha is operated by one developer with automated backups while an early beta can still lose data through mistakes or failures.
+
 #### Viewing Diary
 
 - Improved Calendar accessibility and presentation with locale-aware weekday ordering, standard arrow-key navigation, a denser responsive layout, clearer activity summaries, distinct interaction states, and theme-aware Insights heatmap colors.

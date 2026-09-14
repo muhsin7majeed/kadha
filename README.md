@@ -2,7 +2,28 @@
 
 ![GitHub release](https://img.shields.io/github/v/release/muhsin7majeed/kadha)
 
-An open-source, self-hostable web app for movie and TV tracking.
+An open-source, self-hostable movie and TV tracker built for personal history first and deliberate sharing second.
+
+Use the hosted beta at [kadha.org](https://kadha.org), or deploy your own instance with Docker.
+
+## What You Can Do
+
+- Track watched, liked, and watchlisted movies and TV shows with ratings, dates, and private notes.
+- Record movie rewatches and individual TV episodes in a private viewing diary.
+- Follow TV progress and find the next episode of an in-progress series.
+- Build private collections, collaborate with invited members, or share selected collections through read-only links.
+- Explore personal recommendations and viewing insights derived from your own tracking activity.
+- Control the visibility of each profile section, export or import Kadha data, and permanently delete your account.
+
+## Hosted Beta
+
+The hosted service is built and operated by one developer. Automated encrypted backups are in place, but this is still
+an early beta and mistakes, software failures, or infrastructure failures could cause data loss. Export anything you
+would not want to recreate, and do not store highly sensitive information in Kadha.
+
+Signup does not require an email address or phone number. New accounts receive a private recovery code instead; losing
+both the password and recovery code makes the account unrecoverable. Direct imports from Letterboxd and Trakt are not
+yet available.
 
 ## Screenshots
 <img width="1856" height="907" alt="image" src="https://github.com/user-attachments/assets/d5304b28-7e39-4e60-ace8-fdc573d9da19" />
