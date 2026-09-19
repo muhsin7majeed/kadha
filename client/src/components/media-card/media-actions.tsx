@@ -1,5 +1,5 @@
-import { IconButton, VStack } from '@chakra-ui/react';
-import type { IconButtonProps } from '@chakra-ui/react';
+import { IconButton, Stack } from '@chakra-ui/react';
+import type { IconButtonProps, StackProps } from '@chakra-ui/react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
 
@@ -20,6 +20,7 @@ import type { MediaTrackingDetailsUpdate } from '@/features/user-media/utils/med
 
 interface MediaActionsProps {
   media: MediaCardModel;
+  orientation?: StackProps['direction'];
   size?: IconButtonProps['size'];
 }
 
@@ -56,7 +57,7 @@ const MediaActionIconButton = ({
   </Tooltip>
 );
 
-const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
+const MediaActions: React.FC<MediaActionsProps> = ({ media, orientation = 'column', size = 'md' }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
   const [watchHistoryOpen, setWatchHistoryOpen] = useState(false);
@@ -172,7 +173,13 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
         </>
       )}
 
-      <VStack gap={{ base: 0.5, md: 1 }} backdropFilter="blur(10px)" p={{ base: 0.5, md: 1 }} borderRadius="full">
+      <Stack
+        direction={orientation}
+        gap={{ base: 0.5, md: 1 }}
+        backdropFilter="blur(10px)"
+        p={{ base: 0.5, md: 1 }}
+        borderRadius="full"
+      >
         <MediaActionIconButton
           label={likeLabel}
           colorPalette="red"
@@ -220,7 +227,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, size = 'md' }) => {
         <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
           <LuPlus />
         </MediaActionIconButton>
-      </VStack>
+      </Stack>
     </>
   );
 };

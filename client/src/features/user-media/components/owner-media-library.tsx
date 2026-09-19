@@ -10,6 +10,8 @@ import type { OwnerMediaLibraryKey, OwnerMediaQuery } from '@/features/user-medi
 import MediaLibraryFilters from './media-library-filters';
 import MediaLibraryToolbar from './media-library-toolbar';
 import MediaLibraryViewSwitcher from './media-library-view-switcher';
+import OwnerMediaListView from './owner-media-list-view';
+import OwnerMediaTableView from './owner-media-table-view';
 
 interface OwnerMediaLibraryProps {
   addedLabel: string;
@@ -87,6 +89,20 @@ const OwnerMediaLibrary = ({
   }, [isCorrectingPage, targetPage, updateQuery]);
 
   const clearAll = () => updateQuery(defaultOwnerMediaQuery);
+  const results =
+    view === 'list' ? (
+      <OwnerMediaListView
+        data={response?.data ?? []}
+        libraryKey={libraryKey}
+        showPersonalRating={supportsPersonalRating}
+      />
+    ) : view === 'table' ? (
+      <OwnerMediaTableView
+        data={response?.data ?? []}
+        libraryKey={libraryKey}
+        showPersonalRating={supportsPersonalRating}
+      />
+    ) : undefined;
   const controls = (
     <Box bg="bg.subtle" borderColor="border.subtle" borderWidth="1px" borderRadius="lg" p={{ base: '3', md: '4' }} mb="6">
       <MediaLibraryToolbar
@@ -210,6 +226,7 @@ const OwnerMediaLibrary = ({
       description={description}
       headerAction={headerAction}
       controls={controls}
+      results={results}
       data={response?.data}
       isLoading={isLoading || isCorrectingPage || (isPlaceholderData && response?.data.length === 0)}
       isFetching={isFetching}

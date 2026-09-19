@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { LuHeart } from 'react-icons/lu';
+import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { defaultOwnerMediaQuery } from '@/features/user-media/api/use-owner-media-query';
@@ -12,6 +13,10 @@ vi.mock('@chakra-ui/react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@chakra-ui/react')>();
   return { ...actual, useBreakpointValue: () => responsive.desktop };
 });
+
+vi.mock('@/components/media-card/media-actions', () => ({
+  default: () => <div data-testid="media-actions">Actions</div>,
+}));
 
 const response = {
   data: [],
@@ -32,6 +37,23 @@ const response = {
     ],
     years: { min: 1970, max: 2026 },
   },
+};
+
+const media = {
+  adult: false,
+  genre_ids: [18],
+  liked: true,
+  likedAt: '2026-09-18T12:00:00.000Z',
+  media_id: 42,
+  media_type: 'movie' as const,
+  overview: 'A linguist tries to understand unexpected visitors.',
+  poster_path: '/arrival.jpg',
+  rating: 9,
+  release_date: '2016-11-11',
+  runtime: 116,
+  title: 'Arrival',
+  vote_average: 7.9,
+  vote_count: 19000,
 };
 
 const baseProps = {
@@ -68,6 +90,33 @@ describe('owner media library', () => {
 
     expect(screen.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
     expect(updateQuery).not.toHaveBeenCalled();
+  });
+
+  it('renders retained results in each selected display mode', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <OwnerMediaLibrary
+          {...baseProps}
+          response={{
+            ...response,
+            data: [media],
+            pagination: { ...response.pagination, total: 1, totalPages: 1 },
+            facets: { ...response.facets, total: 1 },
+          }}
+          updateQuery={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('img', { name: 'Arrival poster' })).toBeInTheDocument();
+    expect(screen.queryByText(media.overview)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'List view' }));
+    expect(screen.getByText(media.overview)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Table view' }));
+    expect(screen.getByRole('table', { name: 'Liked library table' })).toBeInTheDocument();
+    expect(screen.queryByText(media.overview)).not.toBeInTheDocument();
   });
 
   it('debounces title search and commits type and sort controls', async () => {

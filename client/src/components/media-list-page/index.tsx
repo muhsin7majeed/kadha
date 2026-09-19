@@ -15,6 +15,7 @@ interface MediaListPageProps {
   description: string;
   headerAction?: React.ReactNode;
   controls?: React.ReactNode;
+  results?: React.ReactNode;
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
@@ -41,6 +42,7 @@ const MediaListPage = ({
   description,
   headerAction,
   controls,
+  results,
   data,
   isLoading,
   isFetching,
@@ -82,28 +84,30 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <SimpleGrid
-            gridTemplateColumns={{
-              base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
-              sm: 'repeat(2, minmax(0, 1fr))',
-              md: 'repeat(3, minmax(0, 1fr))',
-              lg: 'repeat(4, minmax(0, 1fr))',
-            }}
-            gap={{ base: 2, sm: 4, md: 6 }}
-            justifyItems="center"
-          >
-            {data?.map((media) => (
-              <MediaCard
-                key={`${media.media_type}:${media.media_id}`}
-                detailsPathPrefix={detailsPathPrefix}
-                media={toMediaCardModel(media)}
-                showActions={showActions}
-                showLibraryMetadata={showLibraryMetadata}
-                showPersonalRating={showPersonalRating}
-                width="100%"
-              />
-            ))}
-          </SimpleGrid>
+          {results ?? (
+            <SimpleGrid
+              gridTemplateColumns={{
+                base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
+                sm: 'repeat(2, minmax(0, 1fr))',
+                md: 'repeat(3, minmax(0, 1fr))',
+                lg: 'repeat(4, minmax(0, 1fr))',
+              }}
+              gap={{ base: 2, sm: 4, md: 6 }}
+              justifyItems="center"
+            >
+              {data?.map((media) => (
+                <MediaCard
+                  key={`${media.media_type}:${media.media_id}`}
+                  detailsPathPrefix={detailsPathPrefix}
+                  media={toMediaCardModel(media)}
+                  showActions={showActions}
+                  showLibraryMetadata={showLibraryMetadata}
+                  showPersonalRating={showPersonalRating}
+                  width="100%"
+                />
+              ))}
+            </SimpleGrid>
+          )}
           {onPageChange && (
             <PaginationControls pagination={pagination} isDisabled={isFetching} onPageChange={onPageChange} />
           )}
