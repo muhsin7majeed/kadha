@@ -27,6 +27,7 @@
 - Added title search, media type, match-all genre, and release year filters to your Watchlist, Watched, and Liked libraries, with personal-rating controls where ratings apply.
 - Added contextual sorting by saved date, title, release date, runtime, TMDB score, and personal rating where applicable, with filter, sort, and page state preserved in the URL.
 - Added TMDB score and runtime details to owner-library cards, plus personal ratings on Watched and Liked cards.
+- Added Grid, rich List, and dense horizontally scrollable Table views, with each owner library remembering its own device-local preference.
 - Added compact desktop filters, a viewport-safe mobile filter dialog, removable filter summaries, and clearer empty and updating states.
 
 ### Engineering Changes
@@ -42,6 +43,7 @@
 #### Media Libraries
 
 - Added validated owner-only library queries, stable server-side ordering and pagination, full-library facets, and regression coverage for privacy boundaries, null ordering, URL state, and filtered cache updates.
+- Kept owner-library display preferences in device-local storage rather than URLs or account export/import because they are presentation state, not portable account data.
 
 ## v0.2.0
 
