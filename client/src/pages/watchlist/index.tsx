@@ -1,19 +1,22 @@
 import { LuBookmark } from 'react-icons/lu';
 import useWatchList from '@/features/user-media/api/use-watch-list';
-import MediaListPage from '@/components/media-list-page';
-import { useState } from 'react';
+import useOwnerMediaQuery from '@/features/user-media/api/use-owner-media-query';
+import OwnerMediaLibrary from '@/features/user-media/components/owner-media-library';
 
 const Watchlist = () => {
-  const [page, setPage] = useState(1);
-  const { data: watchList, isLoading, isFetching, error, refetch } = useWatchList(undefined, { page });
+  const { query, updateQuery } = useOwnerMediaQuery();
+  const { data: watchList, isLoading, isFetching, isPlaceholderData, error, refetch } = useWatchList(undefined, { ownerQuery: query });
 
   return (
-    <MediaListPage
+    <OwnerMediaLibrary
       title="Watchlist"
+      addedLabel="Recently watchlisted"
+      firstAddedLabel="First watchlisted"
       description="Movies and shows you're planning to watch. Your personal queue of entertainment waiting to be discovered."
-      data={watchList?.data}
+      response={watchList}
       isLoading={isLoading}
       isFetching={isFetching}
+      isPlaceholderData={isPlaceholderData}
       error={error}
       refetch={refetch}
       emptyState={{
@@ -25,8 +28,8 @@ const Watchlist = () => {
       errorDescription="Failed to fetch watchlist"
       loadingText="Loading your watchlist..."
       spinnerColor="brand.solid"
-      pagination={watchList?.pagination}
-      onPageChange={setPage}
+      query={query}
+      updateQuery={updateQuery}
     />
   );
 };

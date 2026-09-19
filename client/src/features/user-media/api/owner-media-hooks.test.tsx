@@ -18,7 +18,7 @@ const response = {
     data: [],
     access: { canView: true },
     pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNextPage: false, hasPreviousPage: false },
-    facets: { genres: [], years: { min: null, max: null } },
+    facets: { total: 0, genres: [], years: { min: null, max: null } },
   },
 };
 

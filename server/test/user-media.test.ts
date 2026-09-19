@@ -355,6 +355,7 @@ describe('user media routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882101]);
     expect(response.body.facets).toEqual({
+      total: 4,
       genres: [
         { id: 12, name: 'Adventure' },
         { id: 35, name: 'Comedy' },

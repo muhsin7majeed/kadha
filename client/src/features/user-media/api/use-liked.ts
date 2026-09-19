@@ -31,6 +31,7 @@ const useLiked = (username?: string, options: { enabled?: boolean; page?: number
         : [...queryKeys.liked, page],
     queryFn: () => fetchLiked(username, page, ownerQuery),
     enabled: options.enabled ?? true,
+    placeholderData: ownerQuery ? (previousData) => previousData : undefined,
   });
 };
 

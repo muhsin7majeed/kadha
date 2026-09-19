@@ -14,6 +14,7 @@ interface MediaListPageProps {
   title: string;
   description: string;
   headerAction?: React.ReactNode;
+  controls?: React.ReactNode;
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
@@ -37,6 +38,7 @@ const MediaListPage = ({
   title,
   description,
   headerAction,
+  controls,
   data,
   isLoading,
   isFetching,
@@ -56,6 +58,8 @@ const MediaListPage = ({
       <PageHeader action={headerAction} isFetching={isFetching} subHeader={description}>
         {title}
       </PageHeader>
+
+      {controls}
 
       {isLoading ? (
         <Center py={20}>

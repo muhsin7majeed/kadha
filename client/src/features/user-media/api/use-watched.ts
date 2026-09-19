@@ -51,6 +51,7 @@ const useWatched = (
         : [...queryKeys.watched, page],
     queryFn: () => fetchWatched(username, page, ownerQuery),
     enabled: options.enabled ?? true,
+    placeholderData: ownerQuery ? (previousData) => previousData : undefined,
   });
 };
 

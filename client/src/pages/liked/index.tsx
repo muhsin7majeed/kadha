@@ -1,19 +1,22 @@
 import { LuHeart } from 'react-icons/lu';
 import useLiked from '@/features/user-media/api/use-liked';
-import MediaListPage from '@/components/media-list-page';
-import { useState } from 'react';
+import useOwnerMediaQuery from '@/features/user-media/api/use-owner-media-query';
+import OwnerMediaLibrary from '@/features/user-media/components/owner-media-library';
 
 const Liked = () => {
-  const [page, setPage] = useState(1);
-  const { data: liked, isLoading, isFetching, error, refetch } = useLiked(undefined, { page });
+  const { query, updateQuery } = useOwnerMediaQuery();
+  const { data: liked, isLoading, isFetching, isPlaceholderData, error, refetch } = useLiked(undefined, { ownerQuery: query });
 
   return (
-    <MediaListPage
+    <OwnerMediaLibrary
       title="Liked"
+      addedLabel="Recently liked"
+      firstAddedLabel="First liked"
       description="Your favorite movies and shows. The ones that left a lasting impression and deserve a special place."
-      data={liked?.data}
+      response={liked}
       isLoading={isLoading}
       isFetching={isFetching}
+      isPlaceholderData={isPlaceholderData}
       error={error}
       refetch={refetch}
       emptyState={{
@@ -24,8 +27,8 @@ const Liked = () => {
       errorDescription="Failed to fetch liked"
       loadingText="Loading your favorites..."
       spinnerColor="red.500"
-      pagination={liked?.pagination}
-      onPageChange={setPage}
+      query={query}
+      updateQuery={updateQuery}
     />
   );
 };

@@ -38,6 +38,7 @@ const useWatchList = (
         : [...queryKeys.watchList, page],
     queryFn: () => fetchWatchList(username, page, ownerQuery),
     enabled: options.enabled ?? true,
+    placeholderData: ownerQuery ? (previousData) => previousData : undefined,
   });
 };
 

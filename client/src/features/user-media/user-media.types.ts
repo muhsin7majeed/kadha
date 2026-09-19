@@ -100,6 +100,7 @@ export interface OwnerMediaQuery {
 }
 
 export interface OwnerMediaFacets {
+  total: number;
   genres: Array<{ id: number; name: string }>;
   years: { min: number | null; max: number | null };
 }

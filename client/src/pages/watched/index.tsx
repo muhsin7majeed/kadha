@@ -2,16 +2,18 @@ import { Button } from '@chakra-ui/react';
 import { LuBookOpen, LuCheck } from 'react-icons/lu';
 import { Link } from 'react-router';
 import useWatched from '@/features/user-media/api/use-watched';
-import MediaListPage from '@/components/media-list-page';
-import { useState } from 'react';
+import useOwnerMediaQuery from '@/features/user-media/api/use-owner-media-query';
+import OwnerMediaLibrary from '@/features/user-media/components/owner-media-library';
 
 const Watched = () => {
-  const [page, setPage] = useState(1);
-  const { data: watched, isLoading, isFetching, error, refetch } = useWatched(undefined, { page });
+  const { query, updateQuery } = useOwnerMediaQuery();
+  const { data: watched, isLoading, isFetching, isPlaceholderData, error, refetch } = useWatched(undefined, { ownerQuery: query });
 
   return (
-    <MediaListPage
+    <OwnerMediaLibrary
       title="Watched"
+      addedLabel="Recently watched"
+      firstAddedLabel="First watched"
       description="Your watched library keeps one card per title. Open Diary for individual watches, rewatches, and episodes."
       headerAction={
         <Button asChild colorPalette="gray" variant="outline" size={{ base: 'sm', md: 'md' }}>
@@ -21,9 +23,10 @@ const Watched = () => {
           </Link>
         </Button>
       }
-      data={watched?.data}
+      response={watched}
       isLoading={isLoading}
       isFetching={isFetching}
+      isPlaceholderData={isPlaceholderData}
       error={error}
       refetch={refetch}
       emptyState={{
@@ -35,8 +38,8 @@ const Watched = () => {
       errorDescription="Failed to fetch watched"
       loadingText="Loading your watch history..."
       spinnerColor="green.500"
-      pagination={watched?.pagination}
-      onPageChange={setPage}
+      query={query}
+      updateQuery={updateQuery}
     />
   );
 };

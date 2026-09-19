@@ -478,6 +478,7 @@ export async function getUserMediaByFlag(
     }),
     pagination: createPaginationMeta(page, limit, total),
     facets: {
+      total: facetRows.length,
       genres: [...genres.entries()]
         .map(([genreId, name]) => ({ id: genreId, name }))
         .sort((first, second) => first.name.localeCompare(second.name)),
