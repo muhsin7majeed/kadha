@@ -16,6 +16,13 @@ interface TestMediaPayloadOptions {
   likedNote?: string | null;
   watchedNote?: string | null;
   watchlistNote?: string | null;
+  title?: string;
+  originalTitle?: string;
+  genreIds?: number[];
+  releaseDate?: string;
+  runtime?: number | null;
+  voteAverage?: number;
+  voteCount?: number;
 }
 
 export interface UserMediaListItem {
@@ -41,6 +48,10 @@ export interface UserMediaListResponseBody {
   pagination: {
     total: number;
   };
+  facets?: {
+    genres: Array<{ id: number; name: string }>;
+    years: { min: number | null; max: number | null };
+  };
 }
 
 export interface UserMediaAccessResponseBody {
@@ -65,25 +76,32 @@ export const buildTestMediaPayload = ({
   likedNote,
   watchedNote,
   watchlistNote,
+  title,
+  originalTitle,
+  genreIds,
+  releaseDate,
+  runtime,
+  voteAverage,
+  voteCount,
 }: TestMediaPayloadOptions = {}) => ({
   media_id: mediaId,
   media_type: mediaType,
   liked,
   watched,
   watchlist,
-  title: `Test Movie ${mediaId}`,
-  original_title: `Test Movie ${mediaId}`,
+  title: title ?? `Test Movie ${mediaId}`,
+  original_title: originalTitle ?? title ?? `Test Movie ${mediaId}`,
   overview: 'A movie created by the user-media integration test suite.',
   poster_path: null,
   backdrop_path: null,
-  vote_average: 8.1,
-  vote_count: 120,
+  vote_average: voteAverage ?? 8.1,
+  vote_count: voteCount ?? 120,
   popularity: 14.2,
   adult: false,
-  genre_ids: [12, 18],
-  release_date: '2026-02-01',
+  genre_ids: genreIds ?? [12, 18],
+  release_date: releaseDate ?? '2026-02-01',
   original_language: 'en',
-  runtime: 118,
+  runtime: runtime === undefined ? 118 : runtime,
   status: 'Released',
   ...(rating !== undefined ? { rating } : {}),
   ...(watchedOn !== undefined ? { watchedOn } : {}),
@@ -119,6 +137,19 @@ export const getCurrentUserMediaList = async (user: TestUser, flag: UserMediaFla
     .expect(200);
 
   return response.body as UserMediaListResponseBody;
+};
+
+export const getCurrentUserMediaListWithQuery = async (
+  user: TestUser,
+  flag: UserMediaFlag,
+  query: Record<string, string | number>,
+) => {
+  const response = await request(await getTestApp())
+    .get(`/api/user/${flag}`)
+    .query(query)
+    .set('Authorization', authorization(user));
+
+  return response;
 };
 
 export const getUserMediaListByUsername = async (viewer: TestUser, username: string, flag: UserMediaFlag) => {

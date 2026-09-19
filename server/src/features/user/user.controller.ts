@@ -23,6 +23,7 @@ import { ImportPayload } from './user-import.schema';
 import { exportQuerySchema } from './user-export.schema';
 import { clearRefreshTokenCookie } from '@/features/auth/auth.cookies';
 import { deleteCurrentUserWithPlan, getDeletionImpact } from './account-deletion.service';
+import { userMediaQuerySchema } from './user-media-query.schema';
 
 const formatExportFilenamePart = (value: string) =>
   value
@@ -126,16 +127,14 @@ export const searchUsers = async (req: Request, res: Response) => {
 
 export const getUserWatchlist = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
-  const { page, limit } = getPaginationParams(req.query);
-  const data = await getCurrentUserMediaByFlag(id, 'watchlist', page, limit);
+  const data = await getCurrentUserMediaByFlag(id, 'watchlist', userMediaQuerySchema.parse(req.query));
 
   sendResponse(res, data);
 };
 
 export const getUserLiked = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
-  const { page, limit } = getPaginationParams(req.query);
-  const data = await getCurrentUserMediaByFlag(id, 'liked', page, limit);
+  const data = await getCurrentUserMediaByFlag(id, 'liked', userMediaQuerySchema.parse(req.query));
 
   sendResponse(res, data);
 };
@@ -215,8 +214,7 @@ export const getUserCollectionsByUsernameController = async (req: Request, res: 
 
 export const getUserWatched = async (req: Request, res: Response) => {
   const { id } = requireAuthUser(req);
-  const { page, limit } = getPaginationParams(req.query);
-  const data = await getCurrentUserMediaByFlag(id, 'watched', page, limit);
+  const data = await getCurrentUserMediaByFlag(id, 'watched', userMediaQuerySchema.parse(req.query));
 
   sendResponse(res, data);
 };

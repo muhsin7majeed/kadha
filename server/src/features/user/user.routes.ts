@@ -25,6 +25,7 @@ import { exportQuerySchema } from './user-export.schema';
 import { deleteMeSchema, updateMeSchema } from './user.schema';
 import { sensitiveActionRateLimit } from '@/features/auth/auth-rate-limit';
 import { requireJsonAuthRequest, validateAuthRequestOrigin } from '@/features/auth/auth-request-security';
+import { userMediaQuerySchema } from './user-media-query.schema';
 
 const router = Router();
 
@@ -56,9 +57,9 @@ router.delete(
 );
 router.get('/export', validate(exportQuerySchema, 'query'), exportMe);
 
-router.get('/watchlist', getUserWatchlist);
-router.get('/liked', getUserLiked);
-router.get('/watched', getUserWatched);
+router.get('/watchlist', validate(userMediaQuerySchema, 'query'), getUserWatchlist);
+router.get('/liked', validate(userMediaQuerySchema, 'query'), getUserLiked);
+router.get('/watched', validate(userMediaQuerySchema, 'query'), getUserWatched);
 router.get('/in-progress', getUserInProgressTv);
 
 router.get('/search', searchUsers);

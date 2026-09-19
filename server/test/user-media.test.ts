@@ -9,6 +9,7 @@ import { updateUserPrivacy } from './helpers/user';
 import {
   buildTestMediaPayload,
   getCurrentUserMediaList,
+  getCurrentUserMediaListWithQuery,
   getUserMediaListByUsername,
   updateUserMediaFlag,
 } from './helpers/user-media';
@@ -267,5 +268,285 @@ describe('user media routes', () => {
     expect(publicLiked.data[0]).not.toHaveProperty('rating');
     expect(publicLiked.data[0]).not.toHaveProperty('likedNote');
     expect(publicLiked.data[0]).not.toHaveProperty('watchCount');
+  });
+
+  it('filters owner libraries by title, media type, year, and personal rating before pagination', async () => {
+    const user = await registerTestUser('library-filter-user');
+
+    await updateUserMediaFlag(user, 'liked', true, 882001, { rating: 8 });
+    await request(await getTestApp())
+      .post('/api/user-media/liked')
+      .set('Authorization', authorization(user))
+      .send(
+        buildTestMediaPayload({
+          mediaId: 882002,
+          mediaType: 'tv',
+          liked: true,
+          rating: 10,
+          title: 'Northern Lights',
+          originalTitle: 'Aurora',
+          releaseDate: '2022-03-04',
+        }),
+      )
+      .expect(200);
+    await request(await getTestApp())
+      .post('/api/user-media/liked')
+      .set('Authorization', authorization(user))
+      .send(
+        buildTestMediaPayload({ mediaId: 882003, liked: true, title: 'Unrated Lights', releaseDate: '2018-01-01' }),
+      )
+      .expect(200);
+
+    const filtered = await getCurrentUserMediaListWithQuery(user, 'liked', {
+      query: 'aurora',
+      mediaType: 'tv',
+      yearFrom: 2020,
+      yearTo: 2024,
+      rating: 9,
+      page: 1,
+      limit: 1,
+    });
+
+    expect(filtered.status).toBe(200);
+    expect(filtered.body.pagination.total).toBe(1);
+    expect(filtered.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882002]);
+
+    const unrated = await getCurrentUserMediaListWithQuery(user, 'liked', { rating: 'unrated' });
+    expect(unrated.status).toBe(200);
+    expect(unrated.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882003]);
+
+    const rated = await getCurrentUserMediaListWithQuery(user, 'liked', { rating: 'rated' });
+    expect(rated.status).toBe(200);
+    expect(rated.body.pagination.total).toBe(2);
+  });
+
+  it('requires every selected genre and returns facets from the complete flagged library', async () => {
+    const user = await registerTestUser('library-genre-user');
+
+    for (const [mediaId, genres] of [
+      [882101, [12, 18]],
+      [882102, [12]],
+      [882103, [18, 35]],
+      [882104, [80]],
+    ] as const) {
+      await request(await getTestApp())
+        .post('/api/user-media/watchlist')
+        .set('Authorization', authorization(user))
+        .send(buildTestMediaPayload({ mediaId, watchlist: true, genreIds: [...genres] }))
+        .expect(200);
+    }
+
+    await prisma.genre.createMany({
+      data: [
+        { id: 12, name: 'Adventure' },
+        { id: 18, name: 'Drama' },
+        { id: 35, name: 'Comedy' },
+      ],
+    });
+    const snapshots = await prisma.mediaSnapshot.findMany({ where: { media_id: { in: [882101, 882102, 882103] } } });
+    await prisma.mediaGenre.createMany({
+      data: snapshots.flatMap((snapshot) =>
+        JSON.parse(snapshot.genre_ids ?? '[]').map((genreId: number) => ({ mediaSnapshotId: snapshot.id, genreId })),
+      ),
+    });
+
+    const response = await getCurrentUserMediaListWithQuery(user, 'watchlist', { genres: '12,18' });
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882101]);
+    expect(response.body.facets).toEqual({
+      genres: [
+        { id: 12, name: 'Adventure' },
+        { id: 35, name: 'Comedy' },
+        { id: 18, name: 'Drama' },
+      ],
+      years: { min: 2026, max: 2026 },
+    });
+
+    const pendingGenre = await getCurrentUserMediaListWithQuery(user, 'watchlist', { genres: '80' });
+    expect(pendingGenre.body.data).toEqual([]);
+    expect(response.body.facets.genres).not.toContainEqual(expect.objectContaining({ id: 80 }));
+
+    const otherUser = await registerTestUser('library-genre-other-user');
+    await request(await getTestApp())
+      .post('/api/user-media/watchlist')
+      .set('Authorization', authorization(otherUser))
+      .send(buildTestMediaPayload({ mediaId: 882105, watchlist: true, genreIds: [99] }))
+      .expect(200);
+    await prisma.genre.create({ data: { id: 99, name: 'Other User Genre' } });
+    const otherSnapshot = await prisma.mediaSnapshot.findUniqueOrThrow({
+      where: { media_id_media_type: { media_id: 882105, media_type: 'movie' } },
+    });
+    await prisma.mediaGenre.create({ data: { mediaSnapshotId: otherSnapshot.id, genreId: 99 } });
+    const ownerFacets = await getCurrentUserMediaListWithQuery(user, 'watchlist', {});
+    expect(ownerFacets.body.facets.genres).not.toContainEqual(expect.objectContaining({ id: 99 }));
+  });
+
+  it('sorts owner libraries with nulls last and deterministic ties', async () => {
+    const user = await registerTestUser('library-sort-user');
+    const entries = [
+      {
+        mediaId: 882201,
+        title: 'Zulu',
+        releaseDate: '2020-01-01',
+        runtime: 90,
+        voteAverage: 7,
+        voteCount: 500,
+        rating: 6,
+      },
+      {
+        mediaId: 882202,
+        title: 'alpha',
+        releaseDate: '2022-01-01',
+        runtime: 120,
+        voteAverage: 9,
+        voteCount: 10,
+        rating: 10,
+      },
+      {
+        mediaId: 882203,
+        title: '',
+        releaseDate: '',
+        runtime: null,
+        voteAverage: 9,
+        voteCount: 100,
+        rating: null,
+      },
+    ];
+
+    for (const entry of entries) {
+      await request(await getTestApp())
+        .post('/api/user-media/watched')
+        .set('Authorization', authorization(user))
+        .send(buildTestMediaPayload({ ...entry, watched: true }))
+      .expect(200);
+    }
+
+    await Promise.all(
+      entries.map((entry, index) =>
+        prisma.userMedia.update({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: entry.mediaId, media_type: 'movie' },
+          },
+          data: { watchedAt: new Date(`2020-01-0${index + 1}T00:00:00.000Z`) },
+        }),
+      ),
+    );
+
+    const byTitle = await getCurrentUserMediaListWithQuery(user, 'watched', { sort: 'title', order: 'asc' });
+    expect(byTitle.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882202, 882201, 882203]);
+
+    const byScore = await getCurrentUserMediaListWithQuery(user, 'watched', { sort: 'tmdbScore', order: 'desc' });
+    expect(byScore.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882203, 882202, 882201]);
+
+    const byRuntime = await getCurrentUserMediaListWithQuery(user, 'watched', {
+      mediaType: 'movie',
+      sort: 'runtime',
+      order: 'desc',
+    });
+    expect(byRuntime.body.data.map((item: { media_id: number }) => item.media_id)).toEqual([882202, 882201, 882203]);
+
+    const cases = [
+      [{ sort: 'added', order: 'asc' }, [882201, 882202, 882203]],
+      [{}, [882203, 882202, 882201]],
+      [{ sort: 'title', order: 'desc' }, [882201, 882202, 882203]],
+      [{ sort: 'releaseDate', order: 'asc' }, [882201, 882202, 882203]],
+      [{ sort: 'releaseDate', order: 'desc' }, [882202, 882201, 882203]],
+      [{ sort: 'rating', order: 'asc' }, [882201, 882202, 882203]],
+      [{ sort: 'rating', order: 'desc' }, [882202, 882201, 882203]],
+      [{ sort: 'tmdbScore', order: 'asc' }, [882201, 882203, 882202]],
+      [{ sort: 'runtime', order: 'asc', mediaType: 'movie' }, [882201, 882202, 882203]],
+    ] as const;
+
+    for (const [query, expectedIds] of cases) {
+      const response = await getCurrentUserMediaListWithQuery(user, 'watched', query);
+      expect(response.body.data.map((item: { media_id: number }) => item.media_id)).toEqual(expectedIds);
+    }
+  });
+
+  it('uses media type and media ID as stable title tie-breakers across pages', async () => {
+    const user = await registerTestUser('library-title-tie-user');
+
+    for (const mediaType of ['movie', 'tv'] as const) {
+      await request(await getTestApp())
+        .post('/api/user-media/liked')
+        .set('Authorization', authorization(user))
+        .send(buildTestMediaPayload({ mediaId: 882301, mediaType, liked: true }))
+        .expect(200);
+      await prisma.mediaSnapshot.update({
+        where: { media_id_media_type: { media_id: 882301, media_type: mediaType } },
+        data: { title: null },
+      });
+    }
+
+    const firstPage = await getCurrentUserMediaListWithQuery(user, 'liked', {
+      sort: 'title',
+      order: 'asc',
+      page: 1,
+      limit: 1,
+    });
+    const secondPage = await getCurrentUserMediaListWithQuery(user, 'liked', {
+      sort: 'title',
+      order: 'asc',
+      page: 2,
+      limit: 1,
+    });
+
+    expect([firstPage.body.data[0].media_type, secondPage.body.data[0].media_type]).toEqual(['movie', 'tv']);
+
+    for (const mediaId of [882302, 882303]) {
+      await request(await getTestApp())
+        .post('/api/user-media/liked')
+        .set('Authorization', authorization(user))
+        .send(buildTestMediaPayload({ mediaId, liked: true, title: 'Same title' }))
+        .expect(200);
+    }
+    const sameTitleFirstPage = await getCurrentUserMediaListWithQuery(user, 'liked', {
+      query: 'Same title',
+      sort: 'title',
+      order: 'asc',
+      page: 1,
+      limit: 1,
+    });
+    const sameTitleSecondPage = await getCurrentUserMediaListWithQuery(user, 'liked', {
+      query: 'Same title',
+      sort: 'title',
+      order: 'asc',
+      page: 2,
+      limit: 1,
+    });
+    expect([sameTitleFirstPage.body.data[0].media_id, sameTitleSecondPage.body.data[0].media_id]).toEqual([
+      882302, 882303,
+    ]);
+  });
+
+  it('rejects invalid owner library query combinations', async () => {
+    const user = await registerTestUser('library-query-validation-user');
+
+    const invalidRuntime = await getCurrentUserMediaListWithQuery(user, 'liked', { sort: 'runtime' });
+    expect(invalidRuntime.status).toBe(400);
+
+    const invalidYears = await getCurrentUserMediaListWithQuery(user, 'liked', { yearFrom: 2025, yearTo: 2020 });
+    expect(invalidYears.status).toBe(400);
+
+    const invalidGenres = await getCurrentUserMediaListWithQuery(user, 'liked', { genres: '12,nope' });
+    expect(invalidGenres.status).toBe(400);
+
+    const invalidQueries = [
+      { page: 0 },
+      { limit: 51 },
+      { query: 'x'.repeat(121) },
+      { mediaType: 'book' },
+      { yearFrom: 1873 },
+      { yearTo: 10000 },
+      { rating: 11 },
+      { sort: 'popularity' },
+      { order: 'sideways' },
+    ];
+
+    for (const query of invalidQueries) {
+      const response = await getCurrentUserMediaListWithQuery(user, 'liked', query);
+      expect(response.status).toBe(400);
+    }
   });
 });
