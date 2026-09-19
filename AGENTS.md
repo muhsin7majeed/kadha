@@ -11,6 +11,16 @@
 - Avoid using `any` in TypeScript. Prefer precise types, `unknown` with narrowing, generics, or existing domain types.
 - Ask before adding production dependencies or changing deployment/runtime assumptions.
 
+## Code Quality And Incremental Refactoring
+
+- Treat readability and maintainability as correctness requirements. Passing tests do not make unnecessarily tangled, duplicated, or poorly structured code acceptable.
+- Prefer clear domain boundaries, cohesive modules, small named functions, and explicit control flow over oversized multi-purpose services, deeply nested conditionals or ternaries, and dense inline query construction.
+- Reuse existing domain logic and established framework or library capabilities before writing custom equivalents. Introduce a new dependency only when it materially simplifies the solution, and ask first as required above.
+- Avoid premature abstractions: extract shared code when duplication is real or a domain concept has a clear independent responsibility, not merely because two snippets look similar.
+- When feature work touches problematic code, refactor the relevant area enough to leave it clearer, cohesive, and maintainable. Keep that cleanup bounded to the behavior being changed rather than turning it into an unrelated whole-file rewrite.
+- Do not duplicate filters, sorting rules, validation, or business decisions across multiple query paths without a strong reason. When duplication is unavoidable, centralize the contract where practical and add tests that keep the implementations aligned.
+- If safe incremental cleanup is not practical within the requested change, explain the debt and risk explicitly instead of silently extending the problematic pattern.
+
 ## Project Overview
 
 - Kadha is a self-hostable app for tracking movies and TV shows.

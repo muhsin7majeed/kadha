@@ -1,113 +1,14 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Field,
-  HStack,
-  NativeSelect,
-  SimpleGrid,
-  Spinner,
-  Stack,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Center, Field, HStack, NativeSelect, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
-import { LuCheck, LuExternalLink, LuListChecks } from 'react-icons/lu';
-import { Link } from 'react-router';
+import { LuListChecks } from 'react-icons/lu';
 
-import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import PaginationControls from '@/components/pagination-controls';
 import useInProgressTv from '@/features/user-media/api/use-in-progress-tv';
-import useMarkNextEpisodeWatched from '@/features/user-media/api/use-mark-next-episode-watched';
-import { InProgressTvSort, TvInProgressItem } from '@/features/user-media/user-media.types';
-import { tvProgressStatusLabel } from '@/features/user-media/utils/tv-progress';
-import { toMediaCardModel } from '@/features/media/media-card-model';
-import { formatDate, formatTimeAgo } from '@/utils/date';
-
-const getBadgePalette = (status: TvInProgressItem['tvProgress']['status']) => {
-  if (status === 'caught_up' || status === 'completed') return 'green';
-
-  return 'blue';
-};
-
-const formatNextEpisodeLabel = (item: TvInProgressItem) => {
-  const nextEpisode = item.tvProgress.nextEpisode;
-
-  if (!nextEpisode) return null;
-
-  return `S${nextEpisode.seasonNumber} E${nextEpisode.episodeNumber}`;
-};
-
-interface InProgressTvCardProps {
-  item: TvInProgressItem;
-}
-
-const InProgressTvCard = ({ item }: InProgressTvCardProps) => {
-  const markNextEpisodeWatched = useMarkNextEpisodeWatched(item.media_id);
-  const nextEpisodeLabel = formatNextEpisodeLabel(item);
-  const nextEpisode = item.tvProgress.nextEpisode;
-
-  return (
-    <Stack gap="3" width="full" maxW="220px">
-      <MediaCard media={toMediaCardModel(item)} />
-
-      <Stack gap="3" borderWidth="1px" borderColor="border" borderRadius="md" p="3" minH="44">
-        <HStack gap="2" justify="space-between" align="start">
-          <Badge colorPalette={getBadgePalette(item.tvProgress.status)}>
-            {tvProgressStatusLabel[item.tvProgress.status]}
-          </Badge>
-          <Text color="fg.muted" textStyle="supporting" whiteSpace="nowrap">
-            {formatTimeAgo(item.tvProgress.lastWatchedAt)}
-          </Text>
-        </HStack>
-
-        <Stack gap="1" flex="1">
-          {nextEpisode ? (
-            <>
-              <Text textStyle="compactLabel">
-                {nextEpisodeLabel}: {nextEpisode.name}
-              </Text>
-              {nextEpisode.airDate && (
-                <Text color="fg.muted" textStyle="supporting">
-                  Aired {formatDate(nextEpisode.airDate)}
-                </Text>
-              )}
-            </>
-          ) : (
-            <Text textStyle="compactLabel">No aired episodes left</Text>
-          )}
-          <Text color="fg.muted" textStyle="supporting">
-            {item.tvProgress.watchedEpisodeCount} of {item.tvProgress.totalAiredEpisodeCount} aired watched
-          </Text>
-        </Stack>
-
-        <HStack gap="2" flexWrap="wrap">
-          {nextEpisode && (
-            <Button
-              size="xs"
-              colorPalette="blue"
-              loading={markNextEpisodeWatched.isPending}
-              onClick={() => markNextEpisodeWatched.mutate()}
-            >
-              <LuCheck />
-              Mark next
-            </Button>
-          )}
-          <Button size="xs" variant="outline" colorPalette="gray" asChild>
-            <Link to={`/app/media/tv/${item.media_id}`} viewTransition>
-              <LuExternalLink />
-              Open
-            </Link>
-          </Button>
-        </HStack>
-      </Stack>
-    </Stack>
-  );
-};
+import InProgressTvCard from '@/features/user-media/components/in-progress-tv-card';
+import type { InProgressTvSort } from '@/features/user-media/user-media.types';
 
 const InProgress = () => {
   const [page, setPage] = useState(1);

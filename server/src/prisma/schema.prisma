@@ -129,6 +129,7 @@ model User {
   recommendationSettings RecommendationSettings?
   recommendationFeedback RecommendationFeedback[]
   navigationPreferences  NavigationPreferences?
+  homePreferences        HomePreferences?
   feedback               Feedback[]
   refreshSessions        RefreshSession[]
   collections            Collection[]
@@ -283,6 +284,18 @@ model NavigationPreferences {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("navigation_preferences")
+}
+
+model HomePreferences {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  config    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("home_preferences")
 }
 
 model Feedback {

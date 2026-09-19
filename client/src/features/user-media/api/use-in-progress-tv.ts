@@ -8,24 +8,31 @@ import { InProgressTvSort, TvInProgressItem } from '../user-media.types';
 export type TvInProgressAccessResponse = ResourceAccessResponse<TvInProgressItem[]> &
   Partial<PaginatedResponse<TvInProgressItem[]>>;
 
-const fetchInProgressTv = async (page = 1, sort: InProgressTvSort = 'recent'): Promise<TvInProgressAccessResponse> => {
+const fetchInProgressTv = async (
+  page = 1,
+  sort: InProgressTvSort = 'recent',
+  limit = 20,
+): Promise<TvInProgressAccessResponse> => {
   const response = await api.get<TvInProgressAccessResponse>('/api/user/in-progress', {
     params: {
       page,
       sort,
+      limit,
     },
   });
 
   return response.data;
 };
 
-const useInProgressTv = (options: { page?: number; sort?: InProgressTvSort } = {}) => {
+const useInProgressTv = (options: { enabled?: boolean; limit?: number; page?: number; sort?: InProgressTvSort } = {}) => {
   const page = options.page ?? 1;
   const sort = options.sort ?? 'recent';
+  const limit = options.limit ?? 20;
 
   return useQuery({
-    queryKey: queryKeys.inProgressTv(page, sort),
-    queryFn: () => fetchInProgressTv(page, sort),
+    queryKey: queryKeys.inProgressTv(page, sort, limit),
+    queryFn: () => fetchInProgressTv(page, sort, limit),
+    enabled: options.enabled ?? true,
   });
 };
 

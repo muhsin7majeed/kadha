@@ -7,6 +7,7 @@ import { authorization, registerTestUser } from './helpers/auth';
 
 const defaultItemIds = [
   'home',
+  'discover',
   'recommendations',
   'watchlist',
   'in-progress',
@@ -19,6 +20,12 @@ const defaultItemIds = [
   'settings',
   'menu',
 ];
+const legacyItemIds = defaultItemIds.filter((id) => id !== 'discover');
+
+const legacyCompactItems = (visibleIds: string[]) => {
+  const visible = new Set(visibleIds);
+  return legacyItemIds.map((id) => ({ id, visible: visible.has(id), display: 'both' }));
+};
 
 describe('navigation preferences', () => {
   it('returns defaults without creating a preference record', async () => {
@@ -34,7 +41,7 @@ describe('navigation preferences', () => {
       layout: 'compact',
       items: defaultItemIds.map((id) => ({
         id,
-        visible: ['home', 'recommendations', 'watchlist', 'in-progress', 'collections', 'menu'].includes(id),
+        visible: ['home', 'discover', 'watchlist', 'in-progress', 'collections', 'menu'].includes(id),
         display: 'both',
       })),
     });
@@ -131,6 +138,58 @@ describe('navigation preferences', () => {
         items: defaultItemIds.map((id, index) => ({ id, visible: index < 7, display: 'both' })),
       })
       .expect(400);
+  });
+
+  it('preserves a full legacy compact bar and appends Discover hidden', async () => {
+    const user = await registerTestUser('navigation-legacy-full');
+    const legacyVisibleIds = ['home', 'recommendations', 'watchlist', 'in-progress', 'collections', 'menu'];
+    await prisma.navigationPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          layout: 'compact',
+          items: legacyCompactItems(legacyVisibleIds),
+        }),
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/navigation-preferences')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([...legacyItemIds, 'discover']);
+    expect(
+      response.body.data.items.filter((item: { visible: boolean }) => item.visible).map((item: { id: string }) => item.id),
+    ).toEqual(legacyVisibleIds);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'discover').visible).toBe(false);
+  });
+
+  it('adds Discover to a legacy compact bar with a free slot without replacing For You', async () => {
+    const user = await registerTestUser('navigation-legacy-space');
+    const legacyVisibleIds = ['home', 'recommendations', 'watchlist', 'in-progress', 'menu'];
+    await prisma.navigationPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          layout: 'compact',
+          items: legacyCompactItems(legacyVisibleIds),
+        }),
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/navigation-preferences')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([...legacyItemIds, 'discover']);
+    expect(
+      response.body.data.items.filter((item: { visible: boolean }) => item.visible).map((item: { id: string }) => item.id),
+    ).toEqual([...legacyVisibleIds, 'discover']);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'recommendations').visible).toBe(true);
   });
 
   it('normalizes stale stored preferences and appends newly known destinations', async () => {

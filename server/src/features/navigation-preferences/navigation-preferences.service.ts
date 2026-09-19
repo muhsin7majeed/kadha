@@ -9,7 +9,7 @@ import {
 
 const DEFAULT_VISIBLE_ITEMS = new Set<NavigationItemId>([
   'home',
-  'recommendations',
+  'discover',
   'watchlist',
   'in-progress',
   'collections',

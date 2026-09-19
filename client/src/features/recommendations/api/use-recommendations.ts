@@ -9,10 +9,11 @@ const fetchRecommendations = async (page = 1, limit = 20) => {
   return response.data;
 };
 
-const useRecommendations = (page = 1, limit = 20) => {
+const useRecommendations = (page = 1, limit = 20, options: { enabled?: boolean } = {}) => {
   return useQuery({
     queryKey: queryKeys.recommendations(page, limit),
     queryFn: () => fetchRecommendations(page, limit),
+    enabled: options.enabled ?? true,
     staleTime: 1000 * 60 * 5,
   });
 };

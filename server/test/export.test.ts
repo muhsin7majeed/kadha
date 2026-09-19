@@ -27,6 +27,18 @@ describe('user data export', () => {
         type: 'MORE_LIKE_THIS',
       },
     });
+    await prisma.homePreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          items: [
+            { id: 'recommendations', visible: true },
+            { id: 'continue-watching', visible: false },
+          ],
+        }),
+      },
+    });
     await prisma.navigationPreferences.create({
       data: {
         userId: user.userId,
@@ -96,6 +108,16 @@ describe('user data export', () => {
       data: {
         accountPreferences: {
           username: user.username,
+          home: {
+            version: 1,
+            items: [
+              { id: 'recommendations', visible: true },
+              { id: 'continue-watching', visible: false },
+              { id: 'watchlist', visible: true },
+              { id: 'trending-movies', visible: true },
+              { id: 'trending-tv', visible: true },
+            ],
+          },
           navigation: {
             version: 1,
             layout: 'grid',

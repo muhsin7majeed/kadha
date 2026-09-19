@@ -4,6 +4,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCarousel from '@/components/media-carousel';
 import useMediaRecommendations from '@/features/media/api/use-media-recommendations';
+import { toMediaCardModel } from '@/features/media/media-card-model';
 import { MediaType } from '@/types/common';
 
 interface RecommendationsSectionProps {
@@ -24,9 +25,8 @@ const RecommendationsSection = ({ mediaType, id }: RecommendationsSectionProps) 
         <MediaCarousel
           isLoading={isLoading}
           isFetching={isFetching}
-          mediaType={mediaType}
           title="More like this"
-          data={recommendations?.data || []}
+          data={(recommendations?.data ?? []).map(toMediaCardModel)}
         />
       )}
     </Box>

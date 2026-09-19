@@ -83,6 +83,10 @@ export const mediaQueryKeys = {
     ['media-recommendations', mediaType, id, page] as const,
 };
 
+export const homeQueryKeys = {
+  homePreferences: ['home', 'preferences'] as const,
+};
+
 export const navigationQueryKeys = {
   navigationPreferences: ['navigation', 'preferences'] as const,
 };
@@ -122,7 +126,7 @@ export const userQueryKeys = {
 
 export const userMediaQueryKeys = {
   inProgressTvRoot: ['in-progress-tv'] as const,
-  inProgressTv: (page = 1, sort = 'recent') => ['in-progress-tv', page, sort] as const,
+  inProgressTv: (page = 1, sort = 'recent', limit = 20) => ['in-progress-tv', page, sort, limit] as const,
   liked: ['liked'] as const,
   likedList: (params: OwnerMediaQuery) => ['liked', params] as const,
   tvProgress: ['tv-progress'] as const,
@@ -148,6 +152,7 @@ export const queryKeys = {
   ...collectionQueryKeys,
   ...feedbackQueryKeys,
   ...friendshipQueryKeys,
+  ...homeQueryKeys,
   ...mediaQueryKeys,
   ...navigationQueryKeys,
   ...notificationQueryKeys,

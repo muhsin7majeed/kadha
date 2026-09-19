@@ -12,6 +12,7 @@ import authRoutes from './features/auth/auth.routes';
 import collectionRoutes from './features/collection/collection.routes';
 import friendshipRoutes from './features/friendship/friendship.routes';
 import { adminFeedbackRoutes, feedbackRoutes } from './features/feedback/feedback.routes';
+import homePreferencesRoutes from './features/home-preferences/home-preferences.routes';
 import insightsRoutes from './features/insights/insights.routes';
 import mediaRoutes from './features/media/media.routes';
 import navigationPreferencesRoutes from './features/navigation-preferences/navigation-preferences.routes';
@@ -52,6 +53,7 @@ export function createApp(): Express {
   app.use('/api/user', authMiddleware, userRoutes);
   app.use('/api/users', authMiddleware, userRoutes);
   app.use('/api/media', authMiddleware, mediaRoutes);
+  app.use('/api/home-preferences', authMiddleware, homePreferencesRoutes);
   app.use('/api/navigation-preferences', authMiddleware, navigationPreferencesRoutes);
   app.use('/api/recommendations', authMiddleware, recommendationsRoutes);
   app.use('/api/user-media', authMiddleware, userMediaRoutes);

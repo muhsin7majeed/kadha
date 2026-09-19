@@ -31,7 +31,7 @@ const Privacy = () => {
               </Heading>
               <Text color="fg.muted">
                 This policy explains how {APP_CONFIG.appName} handles data for the hosted beta and how self-hosted
-                deployments differ. Effective September 14, 2026.
+                deployments differ. Effective September 20, 2026.
               </Text>
             </Box>
 
@@ -85,8 +85,8 @@ const Privacy = () => {
               <Text>Kadha may store the following data when you use the hosted beta:</Text>
               <List.Root ps={5}>
                 <List.Item>
-                  Username, password hash, account role, watch region, privacy settings, navigation preferences, session
-                  version, timestamps, and an account recovery-code verifier.
+                  Username, password hash, account role, watch region, privacy settings, Home and navigation preferences,
+                  session version, timestamps, and an account recovery-code verifier.
                 </List.Item>
                 <List.Item>
                   Watched, liked, and watchlist items, including ratings, private notes, watched dates, repeat watches,
@@ -186,8 +186,8 @@ const Privacy = () => {
 
             <Section title="Data Export And Deletion">
               <Text>
-                You can download a JSON export from Settings containing account settings, saved media, collections,
-                episode-watch history, sharing, friendships, notifications, and activity.
+                You can download a JSON export from Settings containing account settings, Home and navigation preferences,
+                saved media, collections, episode-watch history, sharing, friendships, notifications, and activity.
               </Text>
               <Text>
                 You can permanently delete your account from Settings after entering your current password and an

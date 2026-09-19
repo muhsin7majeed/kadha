@@ -425,6 +425,21 @@ describe('user data import', () => {
         watchRegion: 'GB',
       },
     });
+    await prisma.homePreferences.create({
+      data: {
+        userId: source.userId,
+        config: JSON.stringify({
+          version: 1,
+          items: [
+            { id: 'recommendations', visible: true },
+            { id: 'continue-watching', visible: false },
+            { id: 'watchlist', visible: true },
+            { id: 'trending-movies', visible: false },
+            { id: 'trending-tv', visible: true },
+          ],
+        }),
+      },
+    });
     await prisma.navigationPreferences.create({
       data: {
         userId: source.userId,
@@ -478,9 +493,20 @@ describe('user data import', () => {
       { id: 'home', visible: true, display: 'label' },
       { id: 'menu', visible: true, display: 'both' },
     ]);
+    const importedHome = await prisma.homePreferences.findUniqueOrThrow({ where: { userId: target.userId } });
+    expect(JSON.parse(importedHome.config)).toEqual({
+      version: 1,
+      items: [
+        { id: 'recommendations', visible: true },
+        { id: 'continue-watching', visible: false },
+        { id: 'watchlist', visible: true },
+        { id: 'trending-movies', visible: false },
+        { id: 'trending-tv', visible: true },
+      ],
+    });
   });
 
-  it('preserves current navigation when imported account preferences contain invalid navigation', async () => {
+  it('preserves current layout preferences when imported account preferences contain invalid layouts', async () => {
     const target = await registerTestUser('invalid-navigation-import-target');
     const currentConfig = JSON.stringify({
       version: 1,
@@ -491,6 +517,14 @@ describe('user data import', () => {
       ],
     });
     await prisma.navigationPreferences.create({ data: { userId: target.userId, config: currentConfig } });
+    const currentHomeConfig = JSON.stringify({
+      version: 1,
+      items: [
+        { id: 'watchlist', visible: true },
+        { id: 'continue-watching', visible: false },
+      ],
+    });
+    await prisma.homePreferences.create({ data: { userId: target.userId, config: currentHomeConfig } });
 
     await request(await getTestApp())
       .post('/api/user/import')
@@ -507,6 +541,10 @@ describe('user data import', () => {
                 layout: 'compact',
                 items: [{ id: 'not-a-destination', visible: true, display: 'both' }],
               },
+              home: {
+                version: 1,
+                items: [{ id: 'not-a-section', visible: true }],
+              },
             },
           },
         },
@@ -516,6 +554,9 @@ describe('user data import', () => {
 
     expect(await prisma.navigationPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
       config: currentConfig,
+    });
+    expect(await prisma.homePreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
+      config: currentHomeConfig,
     });
   });
 
