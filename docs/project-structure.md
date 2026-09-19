@@ -85,6 +85,7 @@ packages/contracts/
 - New Express app middleware and route mounting belongs in `server/src/app.ts`.
 - New server feature code belongs in `server/src/features/<feature-name>`.
 - Feedback persistence, validation, owner/admin query boundaries, and status transitions belong in `server/src/features/feedback`; notification delivery remains in the notification feature and account portability remains in the user feature.
+- Account-synced Home layout validation, normalization, and persistence belong in `server/src/features/home-preferences`; export and import orchestration remain in the user feature.
 - New server business logic should live in feature services, not controllers.
 - Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated
   `account-deletion.service.ts`; reusable collection ownership invariants live in the collection feature.
@@ -95,6 +96,7 @@ packages/contracts/
 - New client API hooks belong in `client/src/features/<feature-name>/api`, not `client/src/pages/**/apis`.
 - Feature-owned client types belong near the feature, using `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned client utilities and hooks belong near the feature, not in generic `client/src/utils` or `client/src/hooks`.
+- Home section preferences, the typed Home registry, and personal Home previews belong in `client/src/features/home`; reusable global catalog rows belong in `client/src/features/discovery`.
 - Shared UI-only components can remain in `client/src/components`.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.

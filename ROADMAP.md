@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-09-19
+Last reviewed: 2026-09-20
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -11,10 +11,11 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] TMDB integration for trending, popular, and top-rated movies and TV shows.
 - [x] Movie and TV search with media-type filters and pagination.
 - [x] Responsive discovery grids, carousels, and media details.
+- [x] Dedicated provider-neutral Discover destination for trending, popular, theatrical, airing, upcoming, and top-rated feeds.
 - [x] Cast, metadata, artwork fallbacks, and external media links.
 - [x] Region-aware streaming availability using TMDB watch-provider data powered by JustWatch.
 - [x] Saved watch-region settings during signup and account settings.
-- [ ] Dedicated upcoming-release discovery feed.
+- [x] Dedicated upcoming-release discovery feed.
 
 ### Tracking And Organization
 
@@ -26,6 +27,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Private Viewing Diary with an event timeline, monthly calendar, entry correction, and year-at-a-glance viewing patterns.
 - [x] TV episode and season progress tracking.
 - [x] In Progress TV library with next-episode context, sorting, and pagination.
+- [x] Account-synced customizable Home focused on Continue Watching, Watchlist, private recommendations, and limited discovery fallbacks.
 - [x] Custom collections for movies and TV shows.
 - [x] Private activity timeline for account, media, collection, and profile actions.
 
@@ -51,6 +53,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Theme presets with independent light and dark modes.
 - [x] Responsive grouped navigation for account, privacy, recommendations, navigation, appearance, security, and data settings.
 - [x] Account-synced customizable app navigation with Compact, Scrollable, and Grid launcher layouts, reorderable destinations, and per-item icon and label controls.
+- [x] Portable, versioned Home section preferences with accessible reorder and visibility controls.
 - [x] Installable Progressive Web App with branded icons, controlled updates, and privacy-safe static-shell caching.
 - [x] Automated server and client builds, tests, linting, and CI.
 - [x] Canonical package versions and automated release preparation.

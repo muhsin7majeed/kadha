@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Feature Changes
+
+#### Home And Discover
+
+- Redesigned Home around the next viewing decision with Continue Watching, recent Watchlist titles, private recommendations, and limited trending fallbacks.
+- Added account-synced Home customization for reordering or hiding sections; personal sections with no content stay out of the way.
+- Added a dedicated, provider-neutral Discover destination for trending, popular, theatrical, airing, upcoming, and top-rated feeds.
+- Made Discover a default compact-navigation shortcut for new configurations while keeping For You available from Menu and preserving existing saved navigation choices.
+- Included Home preferences in selectable account-preference exports and imports.
+
+### Engineering Changes
+
+#### Home And Discover
+
+- Added a versioned Home-preference domain with strict validation, forward-compatible normalization, owner isolation, account-deletion cascading, and an additive SQLite migration.
+- Consolidated discovery-feed presentation, normalized shared carousel inputs, and reused accessible ordering controls across Home and Navigation settings.
+
 ## v0.3.0
 
 ### Feature Changes

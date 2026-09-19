@@ -73,6 +73,7 @@ describe('DataImportSection', () => {
       name: /Account preferences/,
     });
     expect(accountPreferences).not.toBeChecked();
+    expect(screen.getByText('Replaces privacy, region, Home, and navigation settings.')).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByRole('checkbox', { name: /Media tracking/ })).toBeChecked();
       expect(screen.getByRole('checkbox', { name: /Watch history/ })).toBeChecked();

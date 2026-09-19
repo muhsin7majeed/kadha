@@ -3,6 +3,11 @@ import { CollectionMemberRole } from '@prisma/client';
 import { envConfig } from '@/config/env';
 import { prisma } from '@/lib/prisma';
 import {
+  DEFAULT_HOME_PREFERENCES,
+  normalizeHomePreferences,
+  parseStoredHomePreferences,
+} from '@/features/home-preferences/home-preferences.service';
+import {
   DEFAULT_NAVIGATION_PREFERENCES,
   normalizeNavigationPreferences,
   parseStoredNavigationPreferences,
@@ -33,6 +38,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     activity,
     recommendationSettings,
     recommendationFeedback,
+    homePreferences,
     navigationPreferences,
     feedback,
   ] = await prisma.$transaction([
@@ -199,6 +205,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
         updatedAt: 'desc',
       },
     }),
+    prisma.homePreferences.findUnique({
+      where: { userId: id },
+    }),
     prisma.navigationPreferences.findUnique({
       where: { userId: id },
     }),
@@ -240,6 +249,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       likedPrivacy: account.likedPrivacy,
       watchlistPrivacy: account.watchlistPrivacy,
       watchRegion: account.watchRegion,
+      home: homePreferences
+        ? normalizeHomePreferences(parseStoredHomePreferences(homePreferences.config))
+        : DEFAULT_HOME_PREFERENCES,
       navigation: navigationPreferences
         ? normalizeNavigationPreferences(parseStoredNavigationPreferences(navigationPreferences.config))
         : DEFAULT_NAVIGATION_PREFERENCES,

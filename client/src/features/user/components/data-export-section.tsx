@@ -18,7 +18,7 @@ const exportOptions: Array<{
   {
     value: 'accountPreferences',
     label: 'Account & preferences',
-    description: 'Profile, privacy, region, and navigation.',
+    description: 'Profile, privacy, region, Home, and navigation.',
   },
   {
     value: 'mediaTracking',
