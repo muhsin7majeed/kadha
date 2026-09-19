@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.3.0
+
 ### Feature Changes
 
 #### Feedback
