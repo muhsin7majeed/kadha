@@ -83,6 +83,10 @@ export const mediaQueryKeys = {
     ['media-recommendations', mediaType, id, page] as const,
 };
 
+export const homeQueryKeys = {
+  homePreferences: ['home', 'preferences'] as const,
+};
+
 export const navigationQueryKeys = {
   navigationPreferences: ['navigation', 'preferences'] as const,
 };
@@ -148,6 +152,7 @@ export const queryKeys = {
   ...collectionQueryKeys,
   ...feedbackQueryKeys,
   ...friendshipQueryKeys,
+  ...homeQueryKeys,
   ...mediaQueryKeys,
   ...navigationQueryKeys,
   ...notificationQueryKeys,
