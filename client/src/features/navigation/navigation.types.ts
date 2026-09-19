@@ -1,5 +1,6 @@
 export type NavigationItemId =
   | 'home'
+  | 'discover'
   | 'recommendations'
   | 'watchlist'
   | 'in-progress'

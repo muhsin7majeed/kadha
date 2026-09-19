@@ -1,5 +1,6 @@
 export const NAVIGATION_ITEM_IDS = [
   'home',
+  'discover',
   'recommendations',
   'watchlist',
   'in-progress',

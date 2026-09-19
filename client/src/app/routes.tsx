@@ -16,6 +16,7 @@ const AppearanceSettings = lazy(() => import('@/pages/settings/appearance'));
 const Collections = lazy(() => import('@/pages/collections'));
 const DataSettings = lazy(() => import('@/pages/settings/data'));
 const Diary = lazy(() => import('@/pages/diary'));
+const Discover = lazy(() => import('@/pages/discover'));
 const Feedback = lazy(() => import('@/pages/feedback'));
 const FeedbackDetail = lazy(() => import('@/pages/feedback/feedback-detail'));
 const Home = lazy(() => import('@/pages/home'));
@@ -42,6 +43,7 @@ export function AppRoutes() {
         <Route element={<PrivateRoute />}>
           <Route path="app" element={<MainLayout />}>
             <Route index element={<Home />} />
+            <Route path="discover" element={<Discover />} />
             <Route path="recommendations" element={<Recommendations />} />
             <Route path="activity" element={<Activity />} />
             <Route path="diary" element={<Diary />} />

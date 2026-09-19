@@ -46,7 +46,8 @@ describe('TabBar', () => {
 
     expect(screen.getByRole('navigation', { name: 'Primary navigation' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'For You' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Discover' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'For You' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Watchlist' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Collections' })).toBeInTheDocument();
@@ -60,6 +61,7 @@ describe('TabBar', () => {
 
     await user.click(screen.getByRole('button', { name: 'Menu' }));
 
+    expect(screen.getByRole('menuitem', { name: 'For You' })).toHaveAttribute('href', '/app/recommendations');
     expect(screen.getByRole('menuitem', { name: 'Activity' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Diary' })).toHaveAttribute('href', '/app/diary');
     expect(screen.getByRole('menuitem', { name: 'Watched' })).toBeInTheDocument();
@@ -103,7 +105,7 @@ describe('TabBar', () => {
       {},
       {
         home: { display: 'icon' },
-        recommendations: { display: 'label' },
+        discover: { display: 'label' },
       },
     );
     preferences.items = [
@@ -118,7 +120,7 @@ describe('TabBar', () => {
     expect(controls[0]).toHaveAccessibleName('Menu');
     expect(controls[1]).toHaveAccessibleName('Home');
     expect(screen.getByRole('link', { name: 'Home' })).not.toHaveTextContent('Home');
-    expect(screen.getByRole('link', { name: 'For You' }).querySelector('svg')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Discover' }).querySelector('svg')).not.toBeInTheDocument();
   });
 
   it('renders the entire configured bar as a horizontal scroller', () => {

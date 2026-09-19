@@ -4,6 +4,7 @@ import {
   LuBookmark,
   LuBookOpen,
   LuCheck,
+  LuCompass,
   LuEllipsis,
   LuFolder,
   LuHeart,
@@ -33,6 +34,7 @@ export type NavigationRegistryItem = NavigationDestination | NavigationMenuItem;
 
 export const NAVIGATION_REGISTRY: NavigationRegistryItem[] = [
   { id: 'home', label: 'Home', icon: LuHouse, to: '/app' },
+  { id: 'discover', label: 'Discover', icon: LuCompass, to: '/app/discover' },
   { id: 'recommendations', label: 'For You', icon: LuWandSparkles, to: '/app/recommendations' },
   { id: 'watchlist', label: 'Watchlist', icon: LuBookmark, to: '/app/watchlist' },
   { id: 'in-progress', label: 'Progress', icon: LuListChecks, to: '/app/in-progress' },

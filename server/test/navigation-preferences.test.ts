@@ -7,6 +7,7 @@ import { authorization, registerTestUser } from './helpers/auth';
 
 const defaultItemIds = [
   'home',
+  'discover',
   'recommendations',
   'watchlist',
   'in-progress',
@@ -34,7 +35,7 @@ describe('navigation preferences', () => {
       layout: 'compact',
       items: defaultItemIds.map((id) => ({
         id,
-        visible: ['home', 'recommendations', 'watchlist', 'in-progress', 'collections', 'menu'].includes(id),
+        visible: ['home', 'discover', 'watchlist', 'in-progress', 'collections', 'menu'].includes(id),
         display: 'both',
       })),
     });
