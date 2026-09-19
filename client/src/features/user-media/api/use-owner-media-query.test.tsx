@@ -100,6 +100,7 @@ describe('owner media URL query', () => {
 
     expect(updateOwnerMediaQuery(current, { query: 'heat' })).toMatchObject({ page: 1, query: 'heat' });
     expect(updateOwnerMediaQuery(current, { page: 3 })).toMatchObject({ page: 3, sort: 'runtime' });
+    expect(updateOwnerMediaQuery(current, { mediaType: 'movie' })).toMatchObject({ page: 4, mediaType: 'movie' });
     expect(updateOwnerMediaQuery(current, { mediaType: 'all' })).toMatchObject({
       page: 1,
       mediaType: 'all',

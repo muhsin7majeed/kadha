@@ -22,6 +22,12 @@
 
 - Improved Calendar accessibility and presentation with locale-aware weekday ordering, standard arrow-key navigation, a denser responsive layout, clearer activity summaries, distinct interaction states, and theme-aware Insights heatmap colors.
 
+#### Media Libraries
+
+- Added title search, media type, match-all genre, release year, and personal-rating filters to your Watchlist, Watched, and Liked libraries.
+- Added contextual sorting by saved date, title, release date, runtime, TMDB score, and personal rating, with filter, sort, and page state preserved in the URL.
+- Added compact desktop filters, a viewport-safe mobile filter dialog, removable filter summaries, and clearer empty and updating states.
+
 ### Engineering Changes
 
 #### Feedback
@@ -31,6 +37,10 @@
 #### Viewing Diary
 
 - Replaced the hand-built month grid with Ark UI Date Picker primitives and timezone-free calendar-date conversion.
+
+#### Media Libraries
+
+- Added validated owner-only library queries, stable server-side ordering and pagination, full-library facets, and regression coverage for privacy boundaries, null ordering, URL state, and filtered cache updates.
 
 ## v0.2.0
 

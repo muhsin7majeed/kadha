@@ -13,7 +13,7 @@ import {
   Text,
   useBreakpointValue,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { LuSlidersHorizontal } from 'react-icons/lu';
 
 import SimpleDialog from '@/components/dialogs/simple-dialog';
@@ -54,6 +54,7 @@ const MediaLibraryFilters = ({
 }: MediaLibraryFiltersProps) => {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<FilterDraft>(() => getDraft(query));
+  const yearErrorId = useId();
   const useDesktopPopover = useBreakpointValue({ base: false, md: true }) ?? false;
   const minimumYear = facets?.years.min ?? 1874;
   const maximumYear = facets?.years.max ?? 9999;
@@ -137,6 +138,7 @@ const MediaLibraryFilters = ({
         <Field.Root invalid={invalidYears}>
           <Field.Label>From year</Field.Label>
           <Input
+            aria-describedby={invalidYears ? yearErrorId : undefined}
             aria-label="From year"
             type="number"
             min={minimumYear}
@@ -153,6 +155,7 @@ const MediaLibraryFilters = ({
         <Field.Root invalid={invalidYears}>
           <Field.Label>Through year</Field.Label>
           <Input
+            aria-describedby={invalidYears ? yearErrorId : undefined}
             aria-label="Through year"
             type="number"
             min={minimumYear}
@@ -166,7 +169,7 @@ const MediaLibraryFilters = ({
             }}
           />
           {invalidYears && (
-            <Field.ErrorText>
+            <Field.ErrorText id={yearErrorId}>
               Use whole years from {minimumYear} through {maximumYear}, with the through year last.
             </Field.ErrorText>
           )}

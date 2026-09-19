@@ -1,6 +1,6 @@
 # Kadha Roadmap
 
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-19
 
 Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and licensed under the MIT License. This roadmap reflects the features implemented in the repository. Checked items are shipped in the codebase; unchecked items are planned and may change as the product evolves.
 
@@ -19,6 +19,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 ### Tracking And Organization
 
 - [x] Watched, liked, and watchlist tracking.
+- [x] URL-backed search, filtering, sorting, and pagination for the signed-in owner's Watchlist, Watched, and Liked libraries.
 - [x] Optional ratings, watched dates, and private action-specific notes with owner-only summaries and edit access.
 - [x] Repeatable private watch-event storage and APIs for movies and TV episodes, with per-viewing dates and notes.
 - [x] Private Viewing Diary with an event timeline, monthly calendar, entry correction, and year-at-a-glance viewing patterns.
@@ -115,6 +116,7 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 - [x] Add movie watch-history management to the media details experience, including explicit rewatch logging and
   individual event editing and removal.
+- [ ] Extend compatible URL-backed browsing controls where list size justifies them: custom and public collection contents; visible profile/public Watched, Liked, and Watchlist sections; and stronger filtering or search for In Progress TV and Diary. Keep Home carousels, generated Recommendations, and global Search on their purpose-built interaction models.
 
 ### Social
 

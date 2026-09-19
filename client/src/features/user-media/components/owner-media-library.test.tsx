@@ -192,7 +192,12 @@ describe('owner media library', () => {
     expect(updateQuery).toHaveBeenCalledWith({ genres: [] });
 
     fireEvent.click(screen.getByRole('button', { name: /Filters/ }));
-    fireEvent.change(await screen.findByLabelText('From year'), { target: { value: '1960' } });
+    const fromYearInput = await screen.findByLabelText('From year');
+    fireEvent.change(fromYearInput, { target: { value: '1960' } });
+    const yearError = screen.getByText(/Use whole years from 1970 through 2026/);
+
+    expect(fromYearInput).toHaveAttribute('aria-describedby', yearError.id);
+    expect(screen.getByLabelText('Through year')).toHaveAttribute('aria-describedby', yearError.id);
     expect(screen.getByRole('button', { name: 'Apply filters' })).toBeDisabled();
   });
 

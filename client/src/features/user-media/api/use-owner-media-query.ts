@@ -96,19 +96,20 @@ export const serializeOwnerMediaQuery = (query: OwnerMediaQuery) => {
 };
 
 export const updateOwnerMediaQuery = (current: OwnerMediaQuery, patch: Partial<OwnerMediaQuery>): OwnerMediaQuery => {
-  const changesCriteria = Object.keys(patch).some((key) => key !== 'page');
-  const next = {
-    ...current,
-    ...patch,
-    ...(changesCriteria ? { page: 1 } : {}),
-  };
+  const next = { ...current, ...patch };
 
   if (next.sort === 'runtime' && next.mediaType === 'all') {
     next.sort = 'added';
     next.order = 'desc';
   }
 
-  return next;
+  const currentCriteria = serializeOwnerMediaQuery({ ...current, page: 1 }).toString();
+  const nextCriteria = serializeOwnerMediaQuery({ ...next, page: 1 }).toString();
+
+  return {
+    ...next,
+    page: currentCriteria === nextCriteria ? next.page : 1,
+  };
 };
 
 interface UpdateQueryOptions {
