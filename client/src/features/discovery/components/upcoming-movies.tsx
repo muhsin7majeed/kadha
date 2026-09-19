@@ -7,7 +7,6 @@ const UpcomingMovies = () => {
     <DiscoverySection
       {...query}
       data={query.data}
-      mediaType="movie"
       title="Upcoming Movies"
       emptyTitle="No upcoming movies"
       emptyDescription="No upcoming movies found"

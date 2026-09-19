@@ -3,6 +3,7 @@ import { Box } from '@chakra-ui/react';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCarousel from '@/components/media-carousel';
+import { toMediaCardModel } from '@/features/media/media-card-model';
 import type { MovieWithMeta, TvWithMeta } from '@/features/media/media.types';
 
 interface DiscoverySectionProps {
@@ -13,9 +14,9 @@ interface DiscoverySectionProps {
   errorDescription: string;
   isFetching: boolean;
   isLoading: boolean;
-  mediaType: 'movie' | 'tv';
   onRetry: () => void;
   title: string;
+  viewAllTo?: string;
 }
 
 const DiscoverySection = ({
@@ -26,9 +27,9 @@ const DiscoverySection = ({
   errorDescription,
   isFetching,
   isLoading,
-  mediaType,
   onRetry,
   title,
+  viewAllTo,
 }: DiscoverySectionProps) => (
   <Box>
     {error ? (
@@ -39,9 +40,9 @@ const DiscoverySection = ({
       <MediaCarousel
         isLoading={isLoading}
         isFetching={isFetching}
-        mediaType={mediaType}
         title={title}
-        data={data ?? []}
+        data={(data ?? []).map(toMediaCardModel)}
+        viewAllTo={viewAllTo}
       />
     )}
   </Box>

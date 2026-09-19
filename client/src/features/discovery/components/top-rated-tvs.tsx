@@ -7,7 +7,6 @@ const TopRatedTvs = () => {
     <DiscoverySection
       {...query}
       data={query.data}
-      mediaType="tv"
       title="Top Rated TV Shows"
       emptyTitle="No top rated TV shows"
       emptyDescription="No top rated TV shows found"

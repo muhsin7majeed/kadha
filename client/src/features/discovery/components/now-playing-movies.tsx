@@ -7,7 +7,6 @@ const NowPlayingMovies = () => {
     <DiscoverySection
       {...query}
       data={query.data}
-      mediaType="movie"
       title="In Theaters"
       emptyTitle="No movies in theaters"
       emptyDescription="No current theatrical releases found"

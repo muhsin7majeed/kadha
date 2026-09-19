@@ -7,7 +7,6 @@ const PopularMovies = () => {
     <DiscoverySection
       {...query}
       data={query.data}
-      mediaType="movie"
       title="Popular Movies"
       emptyTitle="No popular movies"
       emptyDescription="No popular movies found"

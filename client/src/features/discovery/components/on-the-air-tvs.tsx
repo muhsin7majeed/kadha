@@ -7,7 +7,6 @@ const OnTheAirTvs = () => {
     <DiscoverySection
       {...query}
       data={query.data}
-      mediaType="tv"
       title="Airing Now"
       emptyTitle="No TV shows airing now"
       emptyDescription="No currently airing TV shows found"
