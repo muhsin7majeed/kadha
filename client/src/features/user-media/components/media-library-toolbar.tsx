@@ -67,7 +67,6 @@ const MediaLibraryToolbar = ({
             aria-label="Search this library"
             maxLength={120}
             placeholder="Search by title"
-            disabled={disabled}
             value={searchValue}
             onChange={(event) => setSearchValue(event.currentTarget.value)}
           />

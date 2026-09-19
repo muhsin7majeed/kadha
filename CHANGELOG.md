@@ -29,6 +29,7 @@
 - Added TMDB score and runtime details to owner-library cards, plus personal ratings on Watched and Liked cards.
 - Added Grid, rich List, and dense horizontally scrollable Table views, with each owner library remembering its own device-local preference.
 - Added compact desktop filters, a viewport-safe mobile filter dialog, removable filter summaries, and clearer empty and updating states.
+- Kept library title search focused and editable while debounced results refresh.
 
 ### Engineering Changes
 

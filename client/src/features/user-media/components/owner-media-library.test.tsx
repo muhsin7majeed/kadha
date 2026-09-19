@@ -194,7 +194,7 @@ describe('owner media library', () => {
     expect(updateQuery).toHaveBeenCalledWith(defaultOwnerMediaQuery);
   });
 
-  it('qualifies placeholder results and locks conflicting controls', () => {
+  it('qualifies placeholder results and keeps search available while locking conflicting controls', () => {
     renderWithProviders(
       <OwnerMediaLibrary
         {...baseProps}
@@ -213,7 +213,7 @@ describe('owner media library', () => {
     expect(screen.getByText(/Updating results/)).toBeInTheDocument();
     expect(screen.queryByText(/titles below/)).not.toBeInTheDocument();
     expect(screen.queryByText('100 titles match your filters')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Search this library')).toBeDisabled();
+    expect(screen.getByLabelText('Search this library')).toBeEnabled();
     expect(screen.getByRole('button', { name: /Clear all/ })).toBeDisabled();
   });
 
