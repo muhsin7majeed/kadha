@@ -1,2 +1,8 @@
 - Public profile link / sharing.
 - "Who can see this collection?" should be a dropdown for better UI.
+- Safari on iphone overflowing
+- Merge search results of movie and tv together
+- Different view for media cards | Like detailed view with one card in each row.
+- Package audit / upgrades
+- Separate page for collection and collection details
+- server/src/features/user/user.service.ts questionable chaining
