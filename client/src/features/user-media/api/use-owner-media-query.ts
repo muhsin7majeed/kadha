@@ -77,6 +77,16 @@ export const parseOwnerMediaSearchParams = (params: URLSearchParams): OwnerMedia
   };
 };
 
+export const normalizeOwnerMediaQuery = (query: OwnerMediaQuery, supportsPersonalRating: boolean) => {
+  if (supportsPersonalRating) return query;
+
+  return {
+    ...query,
+    rating: 'any' as const,
+    ...(query.sort === 'rating' ? { sort: 'added' as const, order: 'desc' as const } : {}),
+  };
+};
+
 export const serializeOwnerMediaQuery = (query: OwnerMediaQuery) => {
   const params = new URLSearchParams();
   const normalizedQuery = query.query.trim();
@@ -116,14 +126,19 @@ interface UpdateQueryOptions {
   replace?: boolean;
 }
 
-const useOwnerMediaQuery = () => {
+const useOwnerMediaQuery = (supportsPersonalRating = true) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = useMemo(() => parseOwnerMediaSearchParams(searchParams), [searchParams]);
+  const query = useMemo(
+    () => normalizeOwnerMediaQuery(parseOwnerMediaSearchParams(searchParams), supportsPersonalRating),
+    [searchParams, supportsPersonalRating],
+  );
   const canonicalSearch = useMemo(() => serializeOwnerMediaQuery(query).toString(), [query]);
   const searchParamsRef = useRef(searchParams);
   const setSearchParamsRef = useRef(setSearchParams);
+  const supportsPersonalRatingRef = useRef(supportsPersonalRating);
   searchParamsRef.current = searchParams;
   setSearchParamsRef.current = setSearchParams;
+  supportsPersonalRatingRef.current = supportsPersonalRating;
 
   useEffect(() => {
     if (searchParams.toString() !== canonicalSearch) {
@@ -133,10 +148,15 @@ const useOwnerMediaQuery = () => {
 
   const updateQuery = useCallback(
     (patch: Partial<OwnerMediaQuery>, options: UpdateQueryOptions = {}) => {
-      setSearchParamsRef.current(
-        serializeOwnerMediaQuery(updateOwnerMediaQuery(parseOwnerMediaSearchParams(searchParamsRef.current), patch)),
-        { replace: options.replace },
+      const current = normalizeOwnerMediaQuery(
+        parseOwnerMediaSearchParams(searchParamsRef.current),
+        supportsPersonalRatingRef.current,
       );
+      const next = normalizeOwnerMediaQuery(
+        updateOwnerMediaQuery(current, patch),
+        supportsPersonalRatingRef.current,
+      );
+      setSearchParamsRef.current(serializeOwnerMediaQuery(next), { replace: options.replace });
     },
     [],
   );

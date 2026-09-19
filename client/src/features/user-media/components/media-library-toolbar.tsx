@@ -15,6 +15,7 @@ interface MediaLibraryToolbarProps {
   disabled?: boolean;
   filtersControl: React.ReactNode;
   query: OwnerMediaQuery;
+  supportsPersonalRating?: boolean;
   updateQuery: (patch: Partial<OwnerMediaQuery>, options?: { replace?: boolean }) => void;
 }
 
@@ -30,6 +31,7 @@ const MediaLibraryToolbar = ({
   disabled,
   filtersControl,
   query,
+  supportsPersonalRating = true,
   updateQuery,
 }: MediaLibraryToolbarProps) => {
   const [searchValue, setSearchValue] = useState(query.query);
@@ -114,8 +116,12 @@ const MediaLibraryToolbar = ({
             )}
             <option value="tmdbScore:desc">Highest TMDB score</option>
             <option value="tmdbScore:asc">Lowest TMDB score</option>
-            <option value="rating:desc">Highest personal rating</option>
-            <option value="rating:asc">Lowest personal rating</option>
+            {supportsPersonalRating && (
+              <>
+                <option value="rating:desc">Highest personal rating</option>
+                <option value="rating:asc">Lowest personal rating</option>
+              </>
+            )}
           </NativeSelect.Field>
           <NativeSelect.Indicator />
         </NativeSelect.Root>

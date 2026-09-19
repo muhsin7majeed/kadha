@@ -4,7 +4,7 @@ import useOwnerMediaQuery from '@/features/user-media/api/use-owner-media-query'
 import OwnerMediaLibrary from '@/features/user-media/components/owner-media-library';
 
 const Watchlist = () => {
-  const { query, updateQuery } = useOwnerMediaQuery();
+  const { query, updateQuery } = useOwnerMediaQuery(false);
   const { data: watchList, isLoading, isFetching, isPlaceholderData, error, refetch } = useWatchList(undefined, { ownerQuery: query });
 
   return (
@@ -28,6 +28,7 @@ const Watchlist = () => {
       errorDescription="Failed to fetch watchlist"
       loadingText="Loading your watchlist..."
       spinnerColor="brand.solid"
+      supportsPersonalRating={false}
       query={query}
       updateQuery={updateQuery}
     />

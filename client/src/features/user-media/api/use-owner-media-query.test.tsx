@@ -5,13 +5,14 @@ import { describe, expect, it } from 'vitest';
 
 import useOwnerMediaQuery, {
   defaultOwnerMediaQuery,
+  normalizeOwnerMediaQuery,
   parseOwnerMediaSearchParams,
   serializeOwnerMediaQuery,
   updateOwnerMediaQuery,
 } from './use-owner-media-query';
 
-const QueryHarness = () => {
-  const { query, updateQuery } = useOwnerMediaQuery();
+const QueryHarness = ({ supportsPersonalRating = true }: { supportsPersonalRating?: boolean }) => {
+  const { query, updateQuery } = useOwnerMediaQuery(supportsPersonalRating);
   const location = useLocation();
   const navigate = useNavigate();
   const retainedUpdate = useRef(updateQuery);
@@ -34,12 +35,16 @@ const PreviousPage = () => {
   return <button onClick={() => navigate(1)}>Forward to library</button>;
 };
 
-const renderHarness = (initialEntries: string[], initialIndex = initialEntries.length - 1) =>
+const renderHarness = (
+  initialEntries: string[],
+  initialIndex = initialEntries.length - 1,
+  supportsPersonalRating = true,
+) =>
   render(
     <MemoryRouter initialEntries={initialEntries} initialIndex={initialIndex}>
       <Routes>
         <Route path="/previous" element={<PreviousPage />} />
-        <Route path="/library" element={<QueryHarness />} />
+        <Route path="/library" element={<QueryHarness supportsPersonalRating={supportsPersonalRating} />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -74,6 +79,29 @@ describe('owner media URL query', () => {
 
     expect(query).toEqual(defaultOwnerMediaQuery);
     expect(parseOwnerMediaSearchParams(new URLSearchParams(`genres=${'1,'.repeat(251)}1`)).genres).toEqual([]);
+  });
+
+  it('removes unsupported personal-rating state from watchlist queries', () => {
+    const ratingFilter = parseOwnerMediaSearchParams(new URLSearchParams('page=3&rating=8&sort=title&order=asc'));
+    const ratingSort = parseOwnerMediaSearchParams(new URLSearchParams('page=3&sort=rating&order=asc'));
+
+    expect(normalizeOwnerMediaQuery(ratingFilter, false)).toMatchObject({
+      page: 3,
+      rating: 'any',
+      sort: 'title',
+      order: 'asc',
+    });
+    expect(normalizeOwnerMediaQuery(ratingSort, false)).toEqual({ ...defaultOwnerMediaQuery, page: 3 });
+    expect(normalizeOwnerMediaQuery(ratingFilter, true)).toEqual(ratingFilter);
+  });
+
+  it.each([
+    ['/library?page=3&rating=8', '?page=3'],
+    ['/library?page=3&sort=rating&order=asc', '?page=3'],
+  ])('canonicalizes unsupported watchlist rating URLs: %s', async (initialEntry, expectedSearch) => {
+    renderHarness([initialEntry], 0, false);
+
+    await waitFor(() => expect(screen.getByTestId('search')).toHaveTextContent(expectedSearch));
   });
 
   it('serializes stable non-default URL state', () => {

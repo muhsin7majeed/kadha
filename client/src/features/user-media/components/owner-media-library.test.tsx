@@ -71,6 +71,31 @@ describe('owner media library', () => {
     expect(screen.getByRole('option', { name: 'Recently liked' })).toBeInTheDocument();
   });
 
+  it('uses the media-type pills without a redundant chip and can hide rating controls', async () => {
+    renderWithProviders(
+      <OwnerMediaLibrary
+        {...baseProps}
+        supportsPersonalRating={false}
+        query={{ ...defaultOwnerMediaQuery, mediaType: 'movie' }}
+        response={{
+          ...response,
+          pagination: { ...response.pagination, total: 10, totalPages: 1 },
+          facets: { ...response.facets, total: 10 },
+        }}
+        updateQuery={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Movies' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.queryByRole('button', { name: 'Remove media type filter' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Highest personal rating' })).not.toBeInTheDocument();
+    expect(screen.getByText('10 titles match your filters')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filters' }));
+    await screen.findByRole('dialog');
+    expect(screen.queryByLabelText('Personal rating')).not.toBeInTheDocument();
+  });
+
   it('batches match-all genres, years, and rating behind Apply', async () => {
     const updateQuery = vi.fn();
     renderWithProviders(<OwnerMediaLibrary {...baseProps} updateQuery={updateQuery} />);

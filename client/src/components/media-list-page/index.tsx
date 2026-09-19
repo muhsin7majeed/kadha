@@ -31,6 +31,8 @@ interface MediaListPageProps {
   detailsPathPrefix?: string;
   pagination?: PaginationMeta;
   showActions?: boolean;
+  showLibraryMetadata?: boolean;
+  showPersonalRating?: boolean;
   onPageChange?: (page: number) => void;
 }
 
@@ -51,6 +53,8 @@ const MediaListPage = ({
   spinnerColor = 'brand.solid',
   pagination,
   showActions,
+  showLibraryMetadata,
+  showPersonalRating,
   onPageChange,
 }: MediaListPageProps) => {
   return (
@@ -94,6 +98,8 @@ const MediaListPage = ({
                 detailsPathPrefix={detailsPathPrefix}
                 media={toMediaCardModel(media)}
                 showActions={showActions}
+                showLibraryMetadata={showLibraryMetadata}
+                showPersonalRating={showPersonalRating}
                 width="100%"
               />
             ))}

@@ -24,8 +24,9 @@
 
 #### Media Libraries
 
-- Added title search, media type, match-all genre, release year, and personal-rating filters to your Watchlist, Watched, and Liked libraries.
-- Added contextual sorting by saved date, title, release date, runtime, TMDB score, and personal rating, with filter, sort, and page state preserved in the URL.
+- Added title search, media type, match-all genre, and release year filters to your Watchlist, Watched, and Liked libraries, with personal-rating controls where ratings apply.
+- Added contextual sorting by saved date, title, release date, runtime, TMDB score, and personal rating where applicable, with filter, sort, and page state preserved in the URL.
+- Added TMDB score and runtime details to owner-library cards, plus personal ratings on Watched and Liked cards.
 - Added compact desktop filters, a viewport-safe mobile filter dialog, removable filter summaries, and clearer empty and updating states.
 
 ### Engineering Changes

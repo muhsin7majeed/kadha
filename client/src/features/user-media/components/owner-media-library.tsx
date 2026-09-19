@@ -29,15 +29,16 @@ interface OwnerMediaLibraryProps {
   refetch: () => void;
   response?: UserMediaAccessResponse;
   spinnerColor?: string;
+  supportsPersonalRating?: boolean;
   title: string;
   updateQuery: (patch: Partial<OwnerMediaQuery>, options?: { replace?: boolean }) => void;
 }
 
-const filterCount = (query: OwnerMediaQuery) =>
+const filterCount = (query: OwnerMediaQuery, supportsPersonalRating: boolean) =>
   query.genres.length +
   Number(query.yearFrom !== undefined) +
   Number(query.yearTo !== undefined) +
-  Number(query.rating !== 'any');
+  Number(supportsPersonalRating && query.rating !== 'any');
 
 const hasCriteria = (query: OwnerMediaQuery) =>
   Boolean(
@@ -65,6 +66,7 @@ const OwnerMediaLibrary = ({
   refetch,
   response,
   spinnerColor,
+  supportsPersonalRating = true,
   title,
   updateQuery,
 }: OwnerMediaLibraryProps) => {
@@ -87,13 +89,15 @@ const OwnerMediaLibrary = ({
         firstAddedLabel={firstAddedLabel}
         disabled={isFetching}
         query={query}
+        supportsPersonalRating={supportsPersonalRating}
         updateQuery={updateQuery}
         filtersControl={
           <MediaLibraryFilters
-            activeCount={filterCount(query)}
+            activeCount={filterCount(query, supportsPersonalRating)}
             disabled={isFetching}
             facets={response?.facets}
             query={query}
+            supportsPersonalRating={supportsPersonalRating}
             updateQuery={updateQuery}
           />
         }
@@ -112,18 +116,6 @@ const OwnerMediaLibrary = ({
                 onClick={() => updateQuery({ query: '' })}
               >
                 “{query.query}” <LuX aria-hidden />
-              </Button>
-            )}
-            {query.mediaType !== 'all' && (
-              <Button
-                aria-label="Remove media type filter"
-                colorPalette="gray"
-                disabled={isFetching}
-                size="xs"
-                variant="subtle"
-                onClick={() => updateQuery({ mediaType: 'all' })}
-              >
-                {query.mediaType === 'movie' ? 'Movies' : 'TV'} <LuX aria-hidden />
               </Button>
             )}
             {query.genres.map((genreId) => (
@@ -163,7 +155,7 @@ const OwnerMediaLibrary = ({
                 Through {query.yearTo} <LuX aria-hidden />
               </Button>
             )}
-            {query.rating !== 'any' && (
+            {supportsPersonalRating && query.rating !== 'any' && (
               <Button
                 aria-label="Remove personal rating filter"
                 colorPalette="gray"
@@ -226,6 +218,8 @@ const OwnerMediaLibrary = ({
       errorDescription={errorDescription}
       loadingText={loadingText}
       spinnerColor={spinnerColor}
+      showLibraryMetadata
+      showPersonalRating={supportsPersonalRating}
       pagination={response?.pagination}
       onPageChange={(page) => updateQuery({ page })}
     />

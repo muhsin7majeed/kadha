@@ -28,6 +28,7 @@ interface MediaLibraryFiltersProps {
   disabled?: boolean;
   facets?: OwnerMediaFacets;
   query: OwnerMediaQuery;
+  supportsPersonalRating?: boolean;
   updateQuery: (patch: Partial<OwnerMediaQuery>) => void;
 }
 
@@ -50,6 +51,7 @@ const MediaLibraryFilters = ({
   disabled,
   facets,
   query,
+  supportsPersonalRating = true,
   updateQuery,
 }: MediaLibraryFiltersProps) => {
   const [open, setOpen] = useState(false);
@@ -176,35 +178,37 @@ const MediaLibraryFilters = ({
         </Field.Root>
       </SimpleGrid>
 
-      <Field.Root>
-        <Field.Label>Personal rating</Field.Label>
-        <NativeSelect.Root>
-          <NativeSelect.Field
-            aria-label="Personal rating"
-            value={draft.rating}
-            onChange={(event) => {
-              const value = event.currentTarget.value;
-              setDraft((current) => ({
-                ...current,
-                rating:
-                  value === 'any' || value === 'rated' || value === 'unrated'
-                    ? value
-                    : (Number(value) as OwnerMediaRatingFilter),
-              }));
-            }}
-          >
-            <option value="any">Any rating</option>
-            <option value="rated">Rated</option>
-            <option value="unrated">Not rated</option>
-            {Array.from({ length: 10 }, (_, index) => 10 - index).map((rating) => (
-              <option key={rating} value={rating}>
-                At least {rating / 2} stars
-              </option>
-            ))}
-          </NativeSelect.Field>
-          <NativeSelect.Indicator />
-        </NativeSelect.Root>
-      </Field.Root>
+      {supportsPersonalRating && (
+        <Field.Root>
+          <Field.Label>Personal rating</Field.Label>
+          <NativeSelect.Root>
+            <NativeSelect.Field
+              aria-label="Personal rating"
+              value={draft.rating}
+              onChange={(event) => {
+                const value = event.currentTarget.value;
+                setDraft((current) => ({
+                  ...current,
+                  rating:
+                    value === 'any' || value === 'rated' || value === 'unrated'
+                      ? value
+                      : (Number(value) as OwnerMediaRatingFilter),
+                }));
+              }}
+            >
+              <option value="any">Any rating</option>
+              <option value="rated">Rated</option>
+              <option value="unrated">Not rated</option>
+              {Array.from({ length: 10 }, (_, index) => 10 - index).map((rating) => (
+                <option key={rating} value={rating}>
+                  At least {rating / 2} stars
+                </option>
+              ))}
+            </NativeSelect.Field>
+            <NativeSelect.Indicator />
+          </NativeSelect.Root>
+        </Field.Root>
+      )}
     </Stack>
   );
 

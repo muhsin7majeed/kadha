@@ -4,7 +4,7 @@ import { LuStar } from 'react-icons/lu';
 
 import { useGenreAtom } from '@/atoms/genre-atom';
 import { MediaCardModel } from '@/features/media/media-card-model';
-import { formatDate } from '@/utils/date';
+import { formatDate, minutesToHours } from '@/utils/date';
 import NavLink from '../nav-link';
 import MediaActions from './media-actions';
 
@@ -13,6 +13,8 @@ interface MediaCardProps {
   onNavigate?: () => void;
   detailsPathPrefix?: string;
   showActions?: boolean;
+  showLibraryMetadata?: boolean;
+  showPersonalRating?: boolean;
   width?: BoxProps['width'];
 }
 
@@ -21,6 +23,8 @@ const MediaCard = ({
   detailsPathPrefix = '/app/media',
   onNavigate,
   showActions = true,
+  showLibraryMetadata = false,
+  showPersonalRating = false,
   width = { base: '150px', md: '100%' },
 }: MediaCardProps) => {
   const genreMap = useGenreAtom();
@@ -60,15 +64,17 @@ const MediaCard = ({
       >
         <Flex justify="space-between" w="100%">
           <VStack gap={1} alignItems="flex-start">
-            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="surface" colorPalette="blackAlpha">
-              <LuStar fill="yellow" />
+            {!showLibraryMetadata && (
+              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="surface" colorPalette="blackAlpha">
+                <LuStar fill="yellow" />
 
-              {media.vote_average.toFixed(1)}
+                {media.vote_average.toFixed(1)}
 
-              <Text as="span" hideBelow="md" textStyle="supporting" color="gray.400">
-                from {media.vote_count} votes
-              </Text>
-            </Badge>
+                <Text as="span" hideBelow="md" textStyle="supporting" color="gray.400">
+                  from {media.vote_count} votes
+                </Text>
+              </Badge>
+            )}
 
             <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
               {media.adult ? 'R' : 'PG-13'}
@@ -77,6 +83,25 @@ const MediaCard = ({
             <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
               {media.media_type === 'movie' ? 'Movie' : 'TV'}
             </Badge>
+
+            {showLibraryMetadata && (
+              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="surface" colorPalette="blackAlpha">
+                TMDB {media.vote_average.toFixed(1)}
+              </Badge>
+            )}
+
+            {showLibraryMetadata && media.runtime !== null && media.runtime !== undefined && media.runtime > 0 && (
+              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle" colorPalette="gray">
+                {minutesToHours(media.runtime)}
+                {media.media_type === 'tv' ? '/episode' : ''}
+              </Badge>
+            )}
+
+            {showLibraryMetadata && showPersonalRating && media.rating != null && (
+              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="solid" colorPalette="yellow">
+                Your rating {media.rating / 2}/5
+              </Badge>
+            )}
 
             {media.media_type === 'movie' && Boolean(media.watchCount) && (
               <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="solid" colorPalette="blue">
