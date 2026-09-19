@@ -37,6 +37,7 @@ const Watched = () => {
       }}
       errorDescription="Failed to fetch watched"
       loadingText="Loading your watch history..."
+      libraryKey="watched"
       spinnerColor="green.500"
       query={query}
       updateQuery={updateQuery}

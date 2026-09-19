@@ -45,6 +45,7 @@ const baseProps = {
   isLoading: false,
   isPlaceholderData: false,
   loadingText: 'Loading favorites...',
+  libraryKey: 'liked' as const,
   query: defaultOwnerMediaQuery,
   refetch: vi.fn(),
   response,
@@ -54,6 +55,19 @@ const baseProps = {
 describe('owner media library', () => {
   beforeEach(() => {
     responsive.desktop = false;
+    window.localStorage.clear();
+  });
+
+  it('switches display modes without changing the library query', () => {
+    const updateQuery = vi.fn();
+    renderWithProviders(<OwnerMediaLibrary {...baseProps} updateQuery={updateQuery} />);
+
+    expect(screen.getByRole('button', { name: 'Grid view' })).toHaveAttribute('aria-pressed', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'List view' }));
+
+    expect(screen.getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
+    expect(updateQuery).not.toHaveBeenCalled();
   });
 
   it('debounces title search and commits type and sort controls', async () => {

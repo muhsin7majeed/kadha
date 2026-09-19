@@ -3,11 +3,13 @@ import { useEffect } from 'react';
 import { LuX } from 'react-icons/lu';
 
 import MediaListPage from '@/components/media-list-page';
-import type { UserMediaAccessResponse } from '@/features/user-media/api/use-watched';
+import useOwnerLibraryView from '@/features/user-media/api/use-owner-library-view';
 import { defaultOwnerMediaQuery } from '@/features/user-media/api/use-owner-media-query';
-import type { OwnerMediaQuery } from '@/features/user-media/user-media.types';
+import type { UserMediaAccessResponse } from '@/features/user-media/api/use-watched';
+import type { OwnerMediaLibraryKey, OwnerMediaQuery } from '@/features/user-media/user-media.types';
 import MediaLibraryFilters from './media-library-filters';
 import MediaLibraryToolbar from './media-library-toolbar';
+import MediaLibraryViewSwitcher from './media-library-view-switcher';
 
 interface OwnerMediaLibraryProps {
   addedLabel: string;
@@ -25,6 +27,7 @@ interface OwnerMediaLibraryProps {
   isLoading: boolean;
   isPlaceholderData: boolean;
   loadingText: string;
+  libraryKey: OwnerMediaLibraryKey;
   query: OwnerMediaQuery;
   refetch: () => void;
   response?: UserMediaAccessResponse;
@@ -62,6 +65,7 @@ const OwnerMediaLibrary = ({
   isLoading,
   isPlaceholderData,
   loadingText,
+  libraryKey,
   query,
   refetch,
   response,
@@ -70,6 +74,7 @@ const OwnerMediaLibrary = ({
   title,
   updateQuery,
 }: OwnerMediaLibraryProps) => {
+  const { view, setView } = useOwnerLibraryView(libraryKey);
   const genreNames = new Map(response?.facets?.genres.map((genre) => [genre.id, genre.name]));
   const criteriaApplied = hasCriteria(query);
   const total = response?.pagination?.total;
@@ -102,6 +107,10 @@ const OwnerMediaLibrary = ({
           />
         }
       />
+
+      <Flex justify="flex-end" mt="4">
+        <MediaLibraryViewSwitcher value={view} onChange={setView} />
+      </Flex>
 
       {criteriaApplied && (
         <Flex align="center" justify="space-between" gap="3" mt="4" wrap="wrap">

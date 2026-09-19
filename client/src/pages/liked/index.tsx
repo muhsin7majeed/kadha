@@ -26,6 +26,7 @@ const Liked = () => {
       }}
       errorDescription="Failed to fetch liked"
       loadingText="Loading your favorites..."
+      libraryKey="liked"
       spinnerColor="red.500"
       query={query}
       updateQuery={updateQuery}
