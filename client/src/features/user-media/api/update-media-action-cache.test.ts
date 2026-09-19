@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { queryKeys } from '@/lib/query-keys';
 import type { PaginatedResponse, ResourceAccessResponse } from '@/types/common';
@@ -7,9 +7,11 @@ import type { PaginatedResponse, ResourceAccessResponse } from '@/types/common';
 import type { UserMedia, UserMediaPayload } from '../user-media.types';
 import {
   getMediaActionCacheSnapshot,
+  invalidateMediaDiscoveryQueries,
   restoreMediaActionCacheSnapshot,
   updateMediaActionCache,
 } from './update-media-action-cache';
+import { defaultOwnerMediaQuery } from './use-owner-media-query';
 
 type SavedMediaResponse = ResourceAccessResponse<UserMedia[]> & Partial<PaginatedResponse<UserMedia[]>>;
 
@@ -208,5 +210,42 @@ describe('updateMediaActionCache', () => {
     restoreMediaActionCacheSnapshot(queryClient, snapshot);
 
     expect(queryClient.getQueryData<{ liked?: boolean }>(queryKey)).toMatchObject({ liked: false });
+  });
+
+  it('does not insert new media into parameterized list caches before server filtering', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ liked: true, media_id: 16, title: 'Does not match' });
+    const queryKey = queryKeys.likedList({ ...defaultOwnerMediaQuery, query: 'something else' });
+
+    queryClient.setQueryData(queryKey, createSavedResponse([], 0));
+    updateMediaActionCache(queryClient, 'liked', payload);
+
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKey)).toEqual(createSavedResponse([], 0));
+  });
+
+  it('removes and restores media in filtered caches during optimistic rollback', () => {
+    const queryClient = new QueryClient();
+    const cachedMedia = createUserMedia({ liked: true, media_id: 17 });
+    const payload = createPayload({ liked: false, media_id: 17 });
+    const queryKey = queryKeys.likedList({ ...defaultOwnerMediaQuery, rating: 'rated' });
+    queryClient.setQueryData(queryKey, createSavedResponse([cachedMedia], 1));
+    const snapshot = getMediaActionCacheSnapshot(queryClient);
+
+    updateMediaActionCache(queryClient, 'liked', payload);
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKey)?.data).toEqual([]);
+
+    restoreMediaActionCacheSnapshot(queryClient, snapshot);
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKey)?.data[0]).toMatchObject({ media_id: 17, liked: true });
+  });
+
+  it('invalidates every saved-list root after successful mutations', async () => {
+    const queryClient = new QueryClient();
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+
+    await invalidateMediaDiscoveryQueries(queryClient);
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.liked });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watched });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
   });
 });

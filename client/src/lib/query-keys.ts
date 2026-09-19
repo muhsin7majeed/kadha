@@ -1,4 +1,5 @@
 import type { AdminFeedbackParams } from '@/features/feedback/feedback.types';
+import type { OwnerMediaQuery } from '@/features/user-media/user-media.types';
 import { MediaType, UserRole } from '@/types/common';
 
 interface CollectionsParams {
@@ -123,11 +124,14 @@ export const userMediaQueryKeys = {
   inProgressTvRoot: ['in-progress-tv'] as const,
   inProgressTv: (page = 1, sort = 'recent') => ['in-progress-tv', page, sort] as const,
   liked: ['liked'] as const,
+  likedList: (params: OwnerMediaQuery) => ['liked', params] as const,
   tvProgress: ['tv-progress'] as const,
   tvProgressByMedia: (mediaId?: number, seasonNumber?: number, includeSpecials = false) =>
     ['tv-progress', mediaId, seasonNumber, includeSpecials] as const,
   watched: ['watched'] as const,
+  watchedList: (params: OwnerMediaQuery) => ['watched', params] as const,
   watchList: ['watch-list'] as const,
+  watchListList: (params: OwnerMediaQuery) => ['watch-list', params] as const,
   diaryRoot: ['diary'] as const,
   diary: (filters: object) => ['diary', filters] as const,
   diaryInsightsRoot: ['diary-insights'] as const,

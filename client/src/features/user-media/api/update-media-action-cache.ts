@@ -52,9 +52,12 @@ export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapsh
 
 export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
   Promise.all(
-    [...mediaDiscoveryQueryKeys, queryKeys.viewingInsightsRoot, queryKeys.recommendationsRoot].map((queryKey) =>
-      queryClient.invalidateQueries({ queryKey }),
-    ),
+    [
+      ...mediaDiscoveryQueryKeys,
+      ...savedMediaQueryKeys,
+      queryKeys.viewingInsightsRoot,
+      queryKeys.recommendationsRoot,
+    ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
   );
 
 const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): MediaMeta => {
@@ -221,12 +224,22 @@ const updateSavedListQueries = (
   shouldInclude: boolean,
 ) => {
   queryClient.getQueriesData<SavedMediaCache>({ queryKey }).forEach(([matchedQueryKey]) => {
-    const page = matchedQueryKey[1];
+    const queryState = matchedQueryKey[1];
+    const page =
+      typeof queryState === 'number'
+        ? queryState
+        : typeof queryState === 'object' && queryState !== null && 'page' in queryState
+          ? queryState.page
+          : 1;
 
     queryClient.setQueryData<SavedMediaCache>(matchedQueryKey, (oldData) => {
-      if (typeof page === 'number' && page !== 1 && shouldInclude) {
-        const existingItem = oldData?.data.find((item) => isSameMedia(item, payload));
+      const existingItem = oldData?.data.find((item) => isSameMedia(item, payload));
 
+      if (typeof queryState === 'object' && shouldInclude && !existingItem) {
+        return oldData;
+      }
+
+      if (typeof page === 'number' && page !== 1 && shouldInclude) {
         return oldData
           ? updatePaginationTotal(
               {

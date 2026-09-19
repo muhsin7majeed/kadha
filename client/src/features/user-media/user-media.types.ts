@@ -82,6 +82,28 @@ export interface TvProgressResponse {
 
 export type InProgressTvSort = 'recent' | 'next';
 
+export type OwnerMediaTypeFilter = 'all' | MediaType;
+export type OwnerMediaRatingFilter = 'any' | 'rated' | 'unrated' | number;
+export type OwnerMediaSort = 'added' | 'title' | 'releaseDate' | 'runtime' | 'tmdbScore' | 'rating';
+export type OwnerMediaSortOrder = 'asc' | 'desc';
+
+export interface OwnerMediaQuery {
+  page: number;
+  query: string;
+  mediaType: OwnerMediaTypeFilter;
+  genres: number[];
+  yearFrom?: number;
+  yearTo?: number;
+  rating: OwnerMediaRatingFilter;
+  sort: OwnerMediaSort;
+  order: OwnerMediaSortOrder;
+}
+
+export interface OwnerMediaFacets {
+  genres: Array<{ id: number; name: string }>;
+  years: { min: number | null; max: number | null };
+}
+
 export interface TvInProgressSummary {
   status: Exclude<TvProgressStatus, 'not_started' | 'plan_to_watch'>;
   watchedEpisodeCount: number;
