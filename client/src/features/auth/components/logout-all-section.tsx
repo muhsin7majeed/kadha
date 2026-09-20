@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 
 import useLogoutAll from '@/features/auth/api/use-logout-all';
 import { clearSession } from '@/features/auth/session';
+import { removeCurrentPushSubscription } from '@/features/notifications/api/use-push-notifications';
 import { toaster } from '@/components/ui/toaster-store';
 
 interface LogoutAllSectionProps {
@@ -14,7 +15,8 @@ const LogoutAllSection = ({ headingAs = 'h2' }: LogoutAllSectionProps) => {
   const navigate = useNavigate();
   const { mutate: logoutAll, isPending } = useLogoutAll();
 
-  const handleLogoutAll = () => {
+  const handleLogoutAll = async () => {
+    await removeCurrentPushSubscription().catch(() => undefined);
     logoutAll(undefined, {
       onSuccess: async () => {
         await clearSession();

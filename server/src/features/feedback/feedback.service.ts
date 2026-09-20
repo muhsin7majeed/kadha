@@ -1,4 +1,4 @@
-import { FeedbackStatus, Prisma } from '@prisma/client';
+import { FeedbackStatus, Prisma, UserRole } from '@prisma/client';
 
 import { notFound } from '@/lib/http';
 import { createPaginationMeta } from '@/lib/pagination';
@@ -33,16 +33,36 @@ const toAdminSummary = (feedback: Prisma.FeedbackGetPayload<{ select: typeof adm
 });
 
 export async function createFeedback(userId: string, input: CreateFeedbackInput) {
-  return prisma.feedback.create({
-    data: {
-      userId,
-      category: input.category,
-      subject: input.subject,
-      message: input.message,
-      sourcePath: input.sourcePath || null,
-      appVersion: input.appVersion || null,
-    },
-    select: userSummarySelect,
+  return prisma.$transaction(async (tx) => {
+    const feedback = await tx.feedback.create({
+      data: {
+        userId,
+        category: input.category,
+        subject: input.subject,
+        message: input.message,
+        sourcePath: input.sourcePath || null,
+        appVersion: input.appVersion || null,
+      },
+      select: userSummarySelect,
+    });
+    const admins = await tx.user.findMany({ where: { role: UserRole.ADMIN }, select: { id: true } });
+
+    for (const admin of admins) {
+      await createNotification(
+        {
+          userId: admin.id,
+          type: NotificationType.FeedbackSubmitted,
+          actorId: userId,
+          entityType: 'feedback',
+          entityId: feedback.id,
+          metadata: { subject: feedback.subject },
+          dedupeKey: `feedback:${feedback.id}:submitted:${admin.id}`,
+        },
+        tx,
+      );
+    }
+
+    return feedback;
   });
 }
 

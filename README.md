@@ -98,6 +98,10 @@ JWT_ACCESS_SECRET=your-random-secret-min-32-chars
 JWT_REFRESH_SECRET=another-random-secret-min-32-chars
 TMDB_API_KEY=your-tmdb-api-key
 TMDB_BEARER_TOKEN=your-tmdb-bearer-token
+# Optional browser push configuration
+# VAPID_SUBJECT=mailto:you@example.com
+# VAPID_PUBLIC_KEY=your-vapid-public-key
+# VAPID_PRIVATE_KEY=your-vapid-private-key
 APP_NAME=Kadha
 CLIENT_URL=http://localhost:3000
 APP_URL=http://localhost:3000
@@ -177,6 +181,31 @@ also use JSON, and browser requests from an Origin other than `CLIENT_URL` are r
 Set `AUTH_COOKIE_SAME_SITE=none` only when the frontend and API must run on genuinely different sites. This permits the
 secure refresh cookie to travel cross-site, while Origin validation still limits authentication requests to
 `CLIENT_URL`. `lax` is also accepted for unusual deployments.
+
+### Browser Push Notifications
+
+Kadha can send opt-in browser push notifications for new friend requests, collection updates, feedback updates, and
+new feedback submitted to administrators. Push is disabled until all three VAPID variables are configured on the server:
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+```env
+VAPID_SUBJECT=mailto:you@example.com
+VAPID_PUBLIC_KEY=generated-public-key
+VAPID_PRIVATE_KEY=generated-private-key
+```
+
+After restarting the server, each user can enable notifications from **Settings → Notifications**. Push subscriptions
+are per browser and device, so repeat the opt-in on each device. They are not included in account exports because they are
+device-specific credentials. The site must use HTTPS in production; localhost is allowed for local testing. In-app
+notifications remain the source of truth if a browser or device does not deliver push.
+
+For Android testing, open Kadha at an HTTPS URL reachable from the device (for example, through a local HTTPS reverse
+proxy or development tunnel), sign in, enable notifications in **Settings → Notifications**, and allow the browser
+permission. Trigger a friend request or collection invite from another account to verify the notification and its link.
+The computer's `localhost` is not the Android device's `localhost`.
 
 ### Trusted Reverse Proxy
 
@@ -292,6 +321,9 @@ services:
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       TMDB_API_KEY: ${TMDB_API_KEY}
       TMDB_BEARER_TOKEN: ${TMDB_BEARER_TOKEN}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
       APP_NAME: ${APP_NAME:-Kadha}
       CLIENT_URL: ${CLIENT_URL}
       APP_URL: ${APP_URL:-https://kadha.org}
@@ -313,6 +345,9 @@ JWT_REFRESH_SECRET=your-production-secret
 DATABASE_URL=file:/app/db/prod.db
 TMDB_API_KEY=your-tmdb-api-key
 TMDB_BEARER_TOKEN=your-tmdb-bearer-token
+VAPID_SUBJECT=mailto:you@example.com
+VAPID_PUBLIC_KEY=generated-public-key
+VAPID_PRIVATE_KEY=generated-private-key
 APP_NAME=Kadha
 CLIENT_URL=https://kadha.org
 APP_URL=https://kadha.org

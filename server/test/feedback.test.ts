@@ -54,13 +54,27 @@ describe('feedback routes', () => {
   it('restricts admin triage and supports filters, search, and updates', async () => {
     const owner = await registerTestUser('feedback-submitter');
     const admin = await registerTestUser('feedback-admin');
+    const secondAdmin = await registerTestUser('feedback-second-admin');
     await promote(admin.userId);
+    await promote(secondAdmin.userId);
     const created = await createFeedback(owner);
 
     await request(await getTestApp())
       .get('/api/admin/feedback')
       .set('Authorization', authorization(owner))
       .expect(403);
+
+    const feedbackNotifications = await prisma.notification.findMany({
+      where: { type: 'FEEDBACK_SUBMITTED', entityId: created.body.data.id },
+      orderBy: { userId: 'asc' },
+    });
+    expect(feedbackNotifications).toHaveLength(2);
+    expect(feedbackNotifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: admin.userId, actorId: owner.userId, metadata: JSON.stringify({ subject: payload.subject }) }),
+        expect.objectContaining({ userId: secondAdmin.userId, actorId: owner.userId, metadata: JSON.stringify({ subject: payload.subject }) }),
+      ]),
+    );
 
     const list = await request(await getTestApp())
       .get('/api/admin/feedback?status=NEW&category=BUG&query=submitter&page=1&limit=20')

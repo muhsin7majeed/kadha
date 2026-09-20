@@ -4,6 +4,7 @@ import {
   LuHouse,
   LuKeyRound,
   LuNavigation,
+  LuBell,
   LuPalette,
   LuShield,
   LuSparkles,
@@ -36,6 +37,11 @@ const settingsSections = [
     value: 'navigation',
     label: 'Navigation',
     icon: LuNavigation,
+  },
+  {
+    value: 'notifications',
+    label: 'Notifications',
+    icon: LuBell,
   },
   {
     value: 'appearance',

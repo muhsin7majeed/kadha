@@ -71,4 +71,7 @@ export const envConfig = {
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || '',
   tmdbApiKey: process.env.TMDB_API_KEY || '',
   tmdbBearerToken: process.env.TMDB_BEARER_TOKEN || '',
+  vapidSubject: process.env.VAPID_SUBJECT || '',
+  vapidPublicKey: process.env.VAPID_PUBLIC_KEY || '',
+  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY || '',
 };

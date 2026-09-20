@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { prisma } from '@/lib/prisma';
 import { getTestApp } from './helpers/app';
 import { authorization, registerTestUser } from './helpers/auth';
 import { createTestCollection, inviteUserToCollection } from './helpers/collection';
@@ -18,6 +19,51 @@ const getNotifications = async (user: Awaited<ReturnType<typeof registerTestUser
 };
 
 describe('notification routes', () => {
+  it('reports disabled push configuration without persisting a subscription', async () => {
+    const user = await registerTestUser('push-disabled');
+    const subscription = {
+      endpoint: 'https://push.example/subscription',
+      keys: { p256dh: 'p256dh-key', auth: 'auth-key' },
+    };
+
+    const configResponse = await request(await getTestApp())
+      .get('/api/notifications/push/config')
+      .set('Authorization', authorization(user))
+      .expect(200);
+    expect(configResponse.body).toEqual({ data: { enabled: false, publicKey: null } });
+
+    const subscribeResponse = await request(await getTestApp())
+      .put('/api/notifications/push/subscription')
+      .set('Authorization', authorization(user))
+      .send(subscription)
+      .expect(200);
+    expect(subscribeResponse.body).toEqual({ data: { enabled: false } });
+    expect(await prisma.pushSubscription.count({ where: { userId: user.userId } })).toBe(0);
+  });
+
+  it('only removes a push subscription for its owning user', async () => {
+    const owner = await registerTestUser('push-owner');
+    const outsider = await registerTestUser('push-outsider');
+    const endpoint = 'https://push.example/owned-subscription';
+    await prisma.pushSubscription.create({
+      data: { userId: owner.userId, endpoint, p256dh: 'p256dh-key', auth: 'auth-key' },
+    });
+
+    await request(await getTestApp())
+      .delete('/api/notifications/push/subscription')
+      .set('Authorization', authorization(outsider))
+      .send({ endpoint, keys: { p256dh: 'p256dh-key', auth: 'auth-key' } })
+      .expect(200);
+    expect(await prisma.pushSubscription.count({ where: { endpoint } })).toBe(1);
+
+    await request(await getTestApp())
+      .delete('/api/notifications/push/subscription')
+      .set('Authorization', authorization(owner))
+      .send({ endpoint, keys: { p256dh: 'p256dh-key', auth: 'auth-key' } })
+      .expect(200);
+    expect(await prisma.pushSubscription.count({ where: { endpoint } })).toBe(0);
+  });
+
   it('lists unread notifications and marks one as read', async () => {
     const sender = await registerTestUser('notification-sender');
     const receiver = await registerTestUser('notification-receiver');

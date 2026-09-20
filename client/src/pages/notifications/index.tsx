@@ -35,6 +35,8 @@ const getNotificationMessage = (notification: Notification) => {
         ? `Invited you to ${action} ${metadata.collectionName}`
         : 'Invited you to a collection';
     }
+    case NotificationType.FeedbackSubmitted:
+      return 'Submitted feedback';
     case NotificationType.FeedbackStatusChanged: {
       const metadata = parseFeedbackNotificationMetadata(notification.metadata);
       const subject = metadata.subject ? ` “${metadata.subject}”` : '';
@@ -206,6 +208,12 @@ const Notifications = () => {
                   {notification.type === NotificationType.FeedbackStatusChanged && notification.entityId && (
                     <Button asChild size="sm" variant="outline" colorPalette="gray">
                       <Link to={`/app/feedback/${notification.entityId}`}>View feedback</Link>
+                    </Button>
+                  )}
+
+                  {notification.type === NotificationType.FeedbackSubmitted && notification.entityId && (
+                    <Button asChild size="sm" variant="outline" colorPalette="gray">
+                      <Link to={`/app/admin/feedback/${notification.entityId}`}>Review feedback</Link>
                     </Button>
                   )}
 

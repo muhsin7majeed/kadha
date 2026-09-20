@@ -96,6 +96,8 @@ export const notificationQueryKeys = {
   notifications: ['notifications'] as const,
   notificationsPage: (page = 1) => ['notifications', page] as const,
   unreadNotificationsCount: ['notifications', 'unread-count'] as const,
+  pushConfig: ['notifications', 'push-config'] as const,
+  pushSubscription: ['notifications', 'push-subscription'] as const,
 };
 
 export const recommendationQueryKeys = {

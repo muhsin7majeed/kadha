@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 import { notFound, sendData, sendMessage, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
+import { pushSubscriptionSchema } from './push.schema';
+import { getPushPublicKey, removePushSubscription, savePushSubscription } from './push.service';
 import {
   getUnreadNotificationsCount,
   getUserNotifications,
@@ -42,4 +44,25 @@ export const markAllAsRead = async (req: Request, res: Response) => {
   const count = await markAllNotificationsRead(currentUserId);
 
   sendData(res, { count });
+};
+
+export const getPushConfig = async (_req: Request, res: Response) => {
+  const publicKey = getPushPublicKey();
+  sendData(res, { enabled: publicKey !== null, publicKey });
+};
+
+export const registerPushSubscription = async (req: Request, res: Response) => {
+  const { id: currentUserId } = requireAuthUser(req);
+  const subscription = pushSubscriptionSchema.parse(req.body);
+  const enabled = await savePushSubscription(currentUserId, subscription);
+
+  sendData(res, { enabled });
+};
+
+export const unregisterPushSubscription = async (req: Request, res: Response) => {
+  const { id: currentUserId } = requireAuthUser(req);
+  const subscription = pushSubscriptionSchema.parse(req.body);
+  await removePushSubscription(currentUserId, subscription.endpoint);
+
+  sendMessage(res, 'Push subscription removed');
 };

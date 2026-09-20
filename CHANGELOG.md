@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Feature Changes
+
+- Added opt-in browser push notifications for friend requests, collection updates, feedback updates, and new feedback alerts for admins.
+
 ### Behavior Fixes
 
 - Made Watchlist, Watched, and Liked controls follow the selected color theme, including display-mode selection.

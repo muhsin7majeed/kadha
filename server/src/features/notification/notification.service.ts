@@ -2,8 +2,9 @@ import { enrichUserWithFriendship, getFriendshipStatusMap } from '@/lib/friendsh
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
 import { NotificationType } from '@/types/common';
+import { isPushConfigured } from './push.service';
 
-type NotificationDelegate = Pick<typeof prisma, 'notification'>;
+type NotificationDelegate = Pick<typeof prisma, 'notification' | 'pushSubscription' | 'pushDelivery'>;
 
 type NotificationEntityType = 'friendship' | 'collection_invite' | 'collection' | 'feedback';
 
@@ -47,23 +48,41 @@ export async function createNotification(payload: CreateNotificationPayload, db:
     resolvedAt: null,
   };
 
-  if (!payload.dedupeKey) {
-    return db.notification.create({ data });
+  const notification = !payload.dedupeKey
+    ? await db.notification.create({ data })
+    : await db.notification.upsert({
+        where: {
+          userId_dedupeKey: {
+            userId: payload.userId,
+            dedupeKey: payload.dedupeKey,
+          },
+        },
+        create: data,
+        update: {
+          ...data,
+          createdAt: new Date(),
+        },
+      });
+
+  if (isPushConfigured()) {
+    const subscriptions = await db.pushSubscription.findMany({
+      where: { userId: payload.userId },
+      select: { id: true },
+    });
+
+    await db.pushDelivery.deleteMany({ where: { notificationId: notification.id } });
+
+    if (subscriptions.length > 0) {
+      await db.pushDelivery.createMany({
+        data: subscriptions.map((subscription) => ({
+          notificationId: notification.id,
+          subscriptionId: subscription.id,
+        })),
+      });
+    }
   }
 
-  return db.notification.upsert({
-    where: {
-      userId_dedupeKey: {
-        userId: payload.userId,
-        dedupeKey: payload.dedupeKey,
-      },
-    },
-    create: data,
-    update: {
-      ...data,
-      createdAt: new Date(),
-    },
-  });
+  return notification;
 }
 
 export async function getUserNotifications(currentUserId: string, page: number, limit: number) {

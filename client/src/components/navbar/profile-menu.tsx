@@ -16,6 +16,7 @@ import UtilityMenuItems, { MenuSectionSeparator } from "./utility-menu-items";
 import { UserRole } from "@/types/common";
 import { useAuth } from "@/features/auth/use-auth";
 import { clearSession } from "@/features/auth/session";
+import { removeCurrentPushSubscription } from "@/features/notifications/api/use-push-notifications";
 
 const ProfileMenu = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const ProfileMenu = () => {
 
   const logout = async () => {
     try {
+      await removeCurrentPushSubscription().catch(() => undefined);
       await logoutMutation();
     } finally {
       await clearSession();
