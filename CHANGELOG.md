@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.5.0
+
 ### Feature Changes
 
 - Added admin-panel role management for promoting or demoting existing users, with self-demotion protection and role-change activity records.
