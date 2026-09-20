@@ -21,6 +21,7 @@ import publicRoutes from './features/public/public.routes';
 import recommendationsRoutes from './features/recommendations/recommendations.routes';
 import userRoutes from './features/user/user.routes';
 import userMediaRoutes from './features/user-media/user-media.routes';
+import upcomingRoutes from './features/upcoming/upcoming.routes';
 import { notFoundHandler } from './lib/http';
 import { errorHandler } from './middlewares/errorHandler';
 import { authMiddleware, optionalAuthMiddleware } from './middlewares/auth';
@@ -57,6 +58,7 @@ export function createApp(): Express {
   app.use('/api/navigation-preferences', authMiddleware, navigationPreferencesRoutes);
   app.use('/api/recommendations', authMiddleware, recommendationsRoutes);
   app.use('/api/user-media', authMiddleware, userMediaRoutes);
+  app.use('/api/upcoming', authMiddleware, upcomingRoutes);
   app.use('/api/collection', authMiddleware, collectionRoutes);
   app.use('/api/friendship', authMiddleware, friendshipRoutes);
   app.use('/api/feedback', authMiddleware, feedbackRoutes);
