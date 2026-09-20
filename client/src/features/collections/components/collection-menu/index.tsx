@@ -1,29 +1,33 @@
-import React, { useState } from 'react';
-import { Collection } from '@/features/collections/collections.types';
-import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
-import { IconButton, Menu, Portal } from '@chakra-ui/react';
-import { LuEllipsis } from 'react-icons/lu';
-import useDeleteCollection from '@/features/collections/api/use-delete-collection';
-import useLeaveCollection from '@/features/collections/api/use-leave-collection';
-import UpdateCollection from './update-collection';
-import SimpleDialog from '@/components/dialogs/simple-dialog';
-import CollectionMembersDialog from '../collection-members-dialog';
+import React, { useState } from "react";
+import { Collection } from "@/features/collections/collections.types";
+import ConfirmationDialog from "@/components/dialogs/confirmation-dialog";
+import { IconButton, Menu, Portal } from "@chakra-ui/react";
+import { LuEllipsis } from "react-icons/lu";
+import useDeleteCollection from "@/features/collections/api/use-delete-collection";
+import useLeaveCollection from "@/features/collections/api/use-leave-collection";
+import UpdateCollection from "./update-collection";
+import SimpleDialog from "@/components/dialogs/simple-dialog";
+import CollectionMembersDialog from "../collection-members-dialog";
 
 interface CollectionMenuProps {
   collection: Collection;
   onCollectionUnavailable?: () => void;
 }
 
-const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectionUnavailable }) => {
+const CollectionMenu: React.FC<CollectionMenuProps> = ({
+  collection,
+  onCollectionUnavailable,
+}) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
 
-  const { mutateAsync: deleteCollection, isPending: isDeletingCollection } = useDeleteCollection();
+  const { mutateAsync: deleteCollection, isPending: isDeletingCollection } =
+    useDeleteCollection();
   const leaveCollection = useLeaveCollection();
   const canManageSharing = collection.access?.canManageSharing !== false;
-  const canLeaveCollection = collection.access?.relationship === 'member';
+  const canLeaveCollection = collection.access?.relationship === "member";
 
   const handleDeleteCollection = async () => {
     if (isDeletingCollection) return;
@@ -52,7 +56,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectio
         description="Are you sure you want to delete this collection? This action cannot be undone."
         onConfirm={handleDeleteCollection}
         confirmButtonProps={{
-          colorPalette: 'red',
+          colorPalette: "red",
           loading: isDeletingCollection,
         }}
       />
@@ -64,7 +68,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectio
         description="Are you sure you want to leave this shared collection?"
         onConfirm={handleLeaveCollection}
         confirmButtonProps={{
-          colorPalette: 'red',
+          colorPalette: "red",
           loading: leaveCollection.isPending,
         }}
       />
@@ -91,7 +95,12 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectio
 
       <Menu.Root>
         <Menu.Trigger asChild>
-          <IconButton variant="ghost" aria-label={`Actions for ${collection.name}`} title="Collection actions">
+          <IconButton
+            colorPalette="gray"
+            variant="ghost"
+            aria-label={`Actions for ${collection.name}`}
+            title="Collection actions"
+          >
             <LuEllipsis />
           </IconButton>
         </Menu.Trigger>
@@ -122,7 +131,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectio
                   <Menu.Item
                     value="delete"
                     color="fg.error"
-                    _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                    _hover={{ bg: "bg.error", color: "fg.error" }}
                     onClick={() => {
                       setIsDeleteDialogOpen(true);
                     }}
@@ -136,7 +145,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectio
                 <Menu.Item
                   value="leave"
                   color="fg.error"
-                  _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                  _hover={{ bg: "bg.error", color: "fg.error" }}
                   onClick={() => {
                     setIsLeaveDialogOpen(true);
                   }}

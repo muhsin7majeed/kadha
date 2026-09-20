@@ -1,14 +1,18 @@
-import { GenericLabelValue } from '@/types/common';
-import { RadioGroup, HStack, Text } from '@chakra-ui/react';
+import { GenericLabelValue } from "@/types/common";
+import { RadioGroup, HStack, Text } from "@chakra-ui/react";
 
 interface SimpleRadioGroupProps extends RadioGroup.RootProps {
   options: GenericLabelValue[];
   label?: string;
 }
 
-const SimpleRadioGroup: React.FC<SimpleRadioGroupProps> = ({ options, label, ...props }) => {
+const SimpleRadioGroup: React.FC<SimpleRadioGroupProps> = ({
+  options,
+  label,
+  ...props
+}) => {
   return (
-    <RadioGroup.Root {...props}>
+    <RadioGroup.Root colorPalette="brand" {...props}>
       {label && <Text mb={2}>{label}</Text>}
 
       <HStack gap="6" flexWrap="wrap">

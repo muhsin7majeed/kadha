@@ -4,7 +4,11 @@
 
 ### Behavior Fixes
 
-- Made Watchlist, Watched, and Liked filter and sorting controls follow the selected color theme.
+- Made Watchlist, Watched, and Liked controls follow the selected color theme, including display-mode selection.
+
+### Engineering Changes
+
+- Set the selected Kadha theme as the client-wide default interactive palette and standardized repeated tab and selection controls around shared `SimpleX` components.
 
 ## v0.4.0
 

@@ -1,35 +1,37 @@
-import { Alert, Box, Stack, Tabs } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
-import { LuCalendarDays, LuList, LuPartyPopper } from 'react-icons/lu';
+import { Alert, Stack } from "@chakra-ui/react";
+import { useMemo, useState } from "react";
+import { LuCalendarDays, LuList, LuPartyPopper } from "react-icons/lu";
 
-import EmptyState from '@/components/info-states/empty-state';
-import ErrorState from '@/components/info-states/error-state';
-import CommonSpinner from '@/components/spinners/common-spinner';
-import useUpcoming from '@/features/upcoming/api/use-upcoming';
-import UpcomingList from './upcoming-list';
-import UpcomingCalendar from './upcoming-calendar';
+import EmptyState from "@/components/info-states/empty-state";
+import SimpleTabs from "@/components/simple-tabs";
+import ErrorState from "@/components/info-states/error-state";
+import CommonSpinner from "@/components/spinners/common-spinner";
+import useUpcoming from "@/features/upcoming/api/use-upcoming";
+import UpcomingList from "./upcoming-list";
+import UpcomingCalendar from "./upcoming-calendar";
 
-type UpcomingView = 'list' | 'month';
+type UpcomingView = "list" | "month";
 
-const pad = (value: number) => String(value).padStart(2, '0');
+const pad = (value: number) => String(value).padStart(2, "0");
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
 const addUtcDays = (date: Date, days: number) => {
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + days);
   return next;
 };
-const monthEnd = (year: number, month: number) => utcDateOnly(new Date(Date.UTC(year, month, 0)));
+const monthEnd = (year: number, month: number) =>
+  utcDateOnly(new Date(Date.UTC(year, month, 0)));
 
 const UpcomingPageContent = () => {
   const [today] = useState(() => new Date());
   const todayDate = utcDateOnly(today);
   const currentMonthKey = todayDate.slice(0, 7);
-  const [view, setView] = useState<UpcomingView>('list');
+  const [view, setView] = useState<UpcomingView>("list");
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
   const range = useMemo(() => {
-    if (view === 'list') {
+    if (view === "list") {
       return { from: todayDate, to: utcDateOnly(addUtcDays(today, 91)) };
     }
 
@@ -51,26 +53,23 @@ const UpcomingPageContent = () => {
   };
 
   return (
-    <Tabs.Root
+    <SimpleTabs
+      tabs={[
+        { value: "list", label: "List", icon: <LuList aria-hidden /> },
+        {
+          value: "month",
+          label: "Month",
+          icon: <LuCalendarDays aria-hidden />,
+        },
+      ]}
       value={view}
-      onValueChange={(details) => {
-        setView(details.value as UpcomingView);
+      listProps={{ mb: "5" }}
+      variant="line"
+      onValueChange={(value) => {
+        setView(value as UpcomingView);
         setSelectedDate(undefined);
       }}
-      variant="line"
     >
-      <Box overflowX="auto" mb="5">
-        <Tabs.List minW="fit-content">
-          <Tabs.Trigger value="list" textStyle="compactLabel">
-            <LuList aria-hidden /> List
-          </Tabs.Trigger>
-          <Tabs.Trigger value="month" textStyle="compactLabel">
-            <LuCalendarDays aria-hidden /> Month
-          </Tabs.Trigger>
-          <Tabs.Indicator />
-        </Tabs.List>
-      </Box>
-
       {upcoming.isLoading ? (
         <CommonSpinner />
       ) : upcoming.isError || !upcoming.data ? (
@@ -85,26 +84,31 @@ const UpcomingPageContent = () => {
             <Alert.Root role="status" status="warning" variant="subtle">
               <Alert.Indicator />
               <Alert.Content>
-                <Alert.Title>Some upcoming dates could not be refreshed</Alert.Title>
+                <Alert.Title>
+                  Some upcoming dates could not be refreshed
+                </Alert.Title>
                 <Alert.Description>
-                  Showing dates from {upcoming.data.coverage.resolvedTitles} of{' '}
+                  Showing dates from {upcoming.data.coverage.resolvedTitles} of{" "}
                   {upcoming.data.coverage.trackedTitles} tracked titles.
                 </Alert.Description>
               </Alert.Content>
             </Alert.Root>
           )}
 
-          {view === 'list' && upcoming.data.entries.length === 0 && (
+          {view === "list" && upcoming.data.entries.length === 0 && (
             <EmptyState
               title="Nothing scheduled"
               description="No tracked episodes or watchlist movie releases have dates in this period."
               icon={<LuPartyPopper />}
             />
           )}
-          {view === 'list' && upcoming.data.entries.length > 0 && (
-            <UpcomingList entries={upcoming.data.entries} todayDate={todayDate} />
+          {view === "list" && upcoming.data.entries.length > 0 && (
+            <UpcomingList
+              entries={upcoming.data.entries}
+              todayDate={todayDate}
+            />
           )}
-          {view === 'month' && (
+          {view === "month" && (
             <UpcomingCalendar
               entries={upcoming.data.entries}
               minimumDate={todayDate}
@@ -117,7 +121,7 @@ const UpcomingPageContent = () => {
           )}
         </Stack>
       )}
-    </Tabs.Root>
+    </SimpleTabs>
   );
 };
 

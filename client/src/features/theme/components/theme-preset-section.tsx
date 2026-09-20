@@ -1,18 +1,29 @@
-import { Badge, Box, Button, Card, Heading, HStack, SimpleGrid, Stack, Text, VStack } from '@chakra-ui/react';
-import { LuCheck, LuPalette } from 'react-icons/lu';
+import {
+  Badge,
+  Box,
+  Button,
+  Card,
+  Heading,
+  HStack,
+  SimpleGrid,
+  Stack,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { LuCheck, LuPalette } from "react-icons/lu";
 
-import { useColorMode } from '@/components/ui/color-mode-hooks';
-import type { ThemePresetMode } from '@/features/theme/theme.types';
-import { useThemePreset } from '@/features/theme/use-theme-preset';
+import { useColorMode } from "@/components/ui/color-mode-hooks";
+import type { ThemePresetMode } from "@/features/theme/theme.types";
+import { useThemePreset } from "@/features/theme/use-theme-preset";
 
 interface ThemePresetSectionProps {
-  headingAs?: 'h2' | 'h3';
+  headingAs?: "h2" | "h3";
 }
 
-const ThemePresetSection = ({ headingAs = 'h2' }: ThemePresetSectionProps) => {
+const ThemePresetSection = ({ headingAs = "h2" }: ThemePresetSectionProps) => {
   const { colorMode } = useColorMode();
   const { presetId, presets, setPresetId } = useThemePreset();
-  const presetMode: ThemePresetMode = colorMode === 'dark' ? 'dark' : 'light';
+  const presetMode: ThemePresetMode = colorMode === "dark" ? "dark" : "light";
 
   return (
     <Card.Root variant="outline">
@@ -35,12 +46,13 @@ const ThemePresetSection = ({ headingAs = 'h2' }: ThemePresetSectionProps) => {
                 <Button
                   key={preset.id}
                   variant="outline"
+                  colorPalette={isSelected ? "brand" : "gray"}
                   justifyContent="flex-start"
                   h="auto"
                   p={4}
-                  borderColor={isSelected ? 'brand.solid' : 'border'}
-                  bg={isSelected ? 'brand.subtle' : 'transparent'}
-                  color={isSelected ? 'brand.fg' : 'fg'}
+                  borderColor={isSelected ? "brand.solid" : "border"}
+                  bg={isSelected ? "brand.subtle" : "transparent"}
+                  color={isSelected ? "brand.fg" : "fg"}
                   onClick={() => setPresetId(preset.id)}
                 >
                   <HStack gap={3} w="full">
@@ -57,8 +69,20 @@ const ThemePresetSection = ({ headingAs = 'h2' }: ThemePresetSectionProps) => {
                         {preset.label}
                       </Text>
                       <HStack gap={1}>
-                        <Box boxSize="3" rounded="full" bg={variables.subtle} borderWidth="1px" borderColor="border" />
-                        <Box boxSize="3" rounded="full" bg={variables.muted} borderWidth="1px" borderColor="border" />
+                        <Box
+                          boxSize="3"
+                          rounded="full"
+                          bg={variables.subtle}
+                          borderWidth="1px"
+                          borderColor="border"
+                        />
+                        <Box
+                          boxSize="3"
+                          rounded="full"
+                          bg={variables.muted}
+                          borderWidth="1px"
+                          borderColor="border"
+                        />
                         <Box
                           boxSize="3"
                           rounded="full"
@@ -69,7 +93,11 @@ const ThemePresetSection = ({ headingAs = 'h2' }: ThemePresetSectionProps) => {
                       </HStack>
                     </VStack>
                     {isSelected && (
-                      <Badge colorPalette="brand" variant="solid" flexShrink={0}>
+                      <Badge
+                        colorPalette="brand"
+                        variant="solid"
+                        flexShrink={0}
+                      >
                         <LuCheck />
                         Active
                       </Badge>

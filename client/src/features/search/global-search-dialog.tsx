@@ -1,26 +1,26 @@
-import { IconButton } from '@chakra-ui/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { LuSearch } from 'react-icons/lu';
+import { IconButton } from "@chakra-ui/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LuSearch } from "react-icons/lu";
 
-import SimpleDialog from '@/components/dialogs/simple-dialog';
-import SearchInput from '@/components/search-input';
-import { Tooltip } from '@/components/ui/tooltip';
-import SearchStartState from '@/features/search/components/search-start-state';
-import SearchTabs from '@/features/search/components/search-tabs';
-import { SearchTab, SearchTabOption } from '@/features/search/search.types';
+import SimpleDialog from "@/components/dialogs/simple-dialog";
+import SearchInput from "@/components/search-input";
+import { Tooltip } from "@/components/ui/tooltip";
+import SearchStartState from "@/features/search/components/search-start-state";
+import SearchTabs from "@/features/search/components/search-tabs";
+import { SearchTab, SearchTabOption } from "@/features/search/search.types";
 
 const MIN_SEARCH_LENGTH = 2;
 
 const tabs: SearchTabOption[] = [
-  { value: 'movie', label: 'Movies' },
-  { value: 'tv', label: 'TV' },
-  { value: 'users', label: 'Users' },
+  { value: "movie", label: "Movies" },
+  { value: "tv", label: "TV" },
+  { value: "users", label: "Users" },
 ];
 
 const GlobalSearchDialog = () => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<SearchTab>('movie');
-  const [query, setQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<SearchTab>("movie");
+  const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,10 +44,21 @@ const GlobalSearchDialog = () => {
       scrollBehavior="inside"
       title="Search"
       closeButton
-      contentProps={{ maxH: { base: '100dvh', md: '85vh' }, mx: { base: 0, md: 4 }, py: 0 }}
-      triggerWrapper={(trigger) => <Tooltip content="Search">{trigger}</Tooltip>}
+      contentProps={{
+        maxH: { base: "100dvh", md: "85vh" },
+        mx: { base: 0, md: 4 },
+        py: 0,
+      }}
+      triggerWrapper={(trigger) => (
+        <Tooltip content="Search">{trigger}</Tooltip>
+      )}
       trigger={
-        <IconButton aria-label="Search" variant="ghost" size="sm">
+        <IconButton
+          colorPalette="gray"
+          aria-label="Search"
+          variant="ghost"
+          size="sm"
+        >
           <LuSearch />
         </IconButton>
       }

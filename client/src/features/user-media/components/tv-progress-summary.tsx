@@ -1,8 +1,19 @@
-import { Badge, Box, Button, HStack, Skeleton, Stack, Text } from '@chakra-ui/react';
-import { LuCheck, LuListChecks } from 'react-icons/lu';
+import {
+  Badge,
+  Box,
+  Button,
+  HStack,
+  Skeleton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { LuCheck, LuListChecks } from "react-icons/lu";
 
-import { TvProgressResponse } from '../user-media.types';
-import { getNextEpisodeLabel, tvProgressStatusLabel } from '../utils/tv-progress';
+import { TvProgressResponse } from "../user-media.types";
+import {
+  getNextEpisodeLabel,
+  tvProgressStatusLabel,
+} from "../utils/tv-progress";
 
 interface TvProgressSummaryProps {
   progress?: TvProgressResponse;
@@ -12,12 +23,12 @@ interface TvProgressSummaryProps {
   onTrackEpisodes: () => void;
 }
 
-const getBadgePalette = (status: TvProgressResponse['status']) => {
-  if (status === 'caught_up' || status === 'completed') return 'green';
-  if (status === 'in_progress') return 'blue';
-  if (status === 'plan_to_watch') return 'purple';
+const getBadgePalette = (status: TvProgressResponse["status"]) => {
+  if (status === "caught_up" || status === "completed") return "green";
+  if (status === "in_progress") return "blue";
+  if (status === "plan_to_watch") return "purple";
 
-  return 'gray';
+  return "gray";
 };
 
 const TvProgressSummary = ({
@@ -32,7 +43,7 @@ const TvProgressSummary = ({
       <Stack gap="3">
         <Skeleton height="7" width="40" />
         <Skeleton height="5" width="64" />
-        <Skeleton height="10" width={{ base: 'full', sm: '72' }} />
+        <Skeleton height="10" width={{ base: "full", sm: "72" }} />
       </Stack>
     );
   }
@@ -42,7 +53,10 @@ const TvProgressSummary = ({
   const nextEpisodeLabel = getNextEpisodeLabel(progress);
   const percent =
     progress.totalAiredEpisodeCount > 0
-      ? Math.round((progress.watchedEpisodeCount / progress.totalAiredEpisodeCount) * 100)
+      ? Math.round(
+          (progress.watchedEpisodeCount / progress.totalAiredEpisodeCount) *
+            100,
+        )
       : 0;
 
   return (
@@ -51,28 +65,41 @@ const TvProgressSummary = ({
         <Stack gap="1">
           <HStack gap="2" flexWrap="wrap">
             <Text fontWeight="semibold">Your progress</Text>
-            <Badge colorPalette={getBadgePalette(progress.status)}>{tvProgressStatusLabel[progress.status]}</Badge>
+            <Badge colorPalette={getBadgePalette(progress.status)}>
+              {tvProgressStatusLabel[progress.status]}
+            </Badge>
           </HStack>
           <Text color="fg.muted" textStyle="supporting">
             {nextEpisodeLabel && progress.nextEpisode
               ? `${nextEpisodeLabel} next: ${progress.nextEpisode.name}`
               : progress.watchedEpisodeCount > 0
-                ? 'No aired episodes left to watch'
-                : 'No episodes watched yet'}
+                ? "No aired episodes left to watch"
+                : "No episodes watched yet"}
           </Text>
           <Text color="fg.muted" textStyle="supporting">
-            {progress.watchedEpisodeCount} of {progress.totalAiredEpisodeCount} aired episodes watched
+            {progress.watchedEpisodeCount} of {progress.totalAiredEpisodeCount}{" "}
+            aired episodes watched
           </Text>
         </Stack>
 
         <HStack gap="2" flexWrap="wrap">
           {progress.nextEpisode && (
-            <Button size="sm" colorPalette="blue" onClick={onMarkNext} loading={isMarkingNext}>
+            <Button
+              size="sm"
+              colorPalette="brand"
+              onClick={onMarkNext}
+              loading={isMarkingNext}
+            >
               <LuCheck />
               Mark next
             </Button>
           )}
-          <Button size="sm" variant="outline" colorPalette="gray" onClick={onTrackEpisodes}>
+          <Button
+            size="sm"
+            variant="outline"
+            colorPalette="gray"
+            onClick={onTrackEpisodes}
+          >
             <LuListChecks />
             Track episodes
           </Button>
@@ -90,7 +117,7 @@ const TvProgressSummary = ({
         bg="bg.subtle"
         overflow="hidden"
       >
-        <Box height="full" width={`${percent}%`} bg="blue.solid" />
+        <Box height="full" width={`${percent}%`} bg="brand.solid" />
       </Box>
     </Stack>
   );

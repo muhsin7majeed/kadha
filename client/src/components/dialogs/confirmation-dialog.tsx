@@ -1,4 +1,10 @@
-import { Button, ButtonProps, CloseButton, Dialog, Portal } from '@chakra-ui/react';
+import {
+  Button,
+  ButtonProps,
+  CloseButton,
+  Dialog,
+  Portal,
+} from "@chakra-ui/react";
 
 interface ConfirmationDialogProps {
   title: string;
@@ -11,11 +17,11 @@ interface ConfirmationDialogProps {
   confirmButtonProps?: ButtonProps;
 }
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
-  title = 'Are you sure?',
+  title = "Are you sure?",
   description,
   onConfirm,
-  confirmButtonText = 'Confirm',
-  cancelButtonText = 'Cancel',
+  confirmButtonText = "Confirm",
+  cancelButtonText = "Cancel",
   isOpen,
   confirmButtonProps,
   onOpenChange,
@@ -36,7 +42,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <Dialog.Title textStyle="sectionTitle">{title}</Dialog.Title>
             </Dialog.Header>
 
-            {description && <Dialog.Body textStyle="body">{description}</Dialog.Body>}
+            {description && (
+              <Dialog.Body textStyle="body">{description}</Dialog.Body>
+            )}
 
             <Dialog.Footer>
               <Dialog.ActionTrigger asChild>
@@ -51,7 +59,11 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                 </Button>
               </Dialog.ActionTrigger>
 
-              <Button {...confirmButtonProps} onClick={onConfirm}>
+              <Button
+                colorPalette="brand"
+                {...confirmButtonProps}
+                onClick={onConfirm}
+              >
                 {confirmButtonText}
               </Button>
             </Dialog.Footer>
