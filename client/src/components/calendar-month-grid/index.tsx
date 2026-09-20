@@ -24,6 +24,7 @@ const dateKey = (year: number, month: number, day: number) => `${year}-${pad(mon
 interface CalendarMonthGridProps {
   getDayLabel: (date: string) => string;
   hasContent?: (date: string) => boolean;
+  minimumDate?: string;
   month: number;
   onPeriodChange: (year: number, month: number) => void;
   onSelectDate: (date: string) => void;
@@ -36,6 +37,7 @@ interface CalendarMonthGridProps {
 const CalendarMonthGrid = ({
   getDayLabel,
   hasContent = () => false,
+  minimumDate,
   month,
   onPeriodChange,
   onSelectDate,
@@ -45,13 +47,14 @@ const CalendarMonthGrid = ({
   year,
 }: CalendarMonthGridProps) => {
   const periodStart = dateKey(year, month, 1);
-  const [focusedValue, setFocusedValue] = useState<DateValue>(() =>
-    parseDate(selectedDate?.startsWith(`${year}-${pad(month)}-`) ? selectedDate : periodStart),
-  );
+  const defaultFocusDate =
+    minimumDate?.startsWith(`${year}-${pad(month)}-`) && minimumDate > periodStart ? minimumDate : periodStart;
+  const focusedDate = selectedDate?.startsWith(`${year}-${pad(month)}-`) ? selectedDate : defaultFocusDate;
+  const [focusedValue, setFocusedValue] = useState<DateValue>(() => parseDate(focusedDate));
 
   useEffect(() => {
-    setFocusedValue(parseDate(selectedDate?.startsWith(`${year}-${pad(month)}-`) ? selectedDate : periodStart));
-  }, [month, periodStart, selectedDate, year]);
+    setFocusedValue(parseDate(focusedDate));
+  }, [focusedDate]);
 
   const handleFocusChange = (nextFocusedValue: DateValue) => {
     setFocusedValue(nextFocusedValue);
@@ -68,6 +71,7 @@ const CalendarMonthGrid = ({
         locale={locale}
         timeZone="UTC"
         focusedValue={focusedValue}
+        min={minimumDate ? parseDate(minimumDate) : undefined}
         value={selectedDate ? [parseDate(selectedDate)] : []}
         onFocusChange={(details) => handleFocusChange(details.focusedValue)}
         onValueChange={(details) => {
@@ -116,7 +120,13 @@ const CalendarMonthGrid = ({
                             onChange={(event) => onPeriodChange(year, Number(event.currentTarget.value))}
                           >
                             {monthNames.map((name, index) => (
-                              <option key={name} value={index + 1}>
+                              <option
+                                key={name}
+                                value={index + 1}
+                                disabled={
+                                  minimumDate?.startsWith(`${year}-`) && index + 1 < Number(minimumDate.slice(5, 7))
+                                }
+                              >
                                 {name}
                               </option>
                             ))}

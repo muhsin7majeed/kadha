@@ -1,0 +1,38 @@
+import { Heading, Stack } from '@chakra-ui/react';
+
+import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
+import { formatUpcomingDate } from './upcoming-date';
+import UpcomingEntry from './upcoming-entry';
+
+interface UpcomingAgendaProps {
+  entries: UpcomingEntryModel[];
+}
+
+const UpcomingAgenda = ({ entries }: UpcomingAgendaProps) => {
+  const entriesByDate = new Map<string, UpcomingEntryModel[]>();
+
+  for (const entry of entries) {
+    const datedEntries = entriesByDate.get(entry.date) ?? [];
+    datedEntries.push(entry);
+    entriesByDate.set(entry.date, datedEntries);
+  }
+
+  return (
+    <Stack gap="7">
+      {[...entriesByDate.entries()].map(([date, datedEntries]) => (
+        <Stack as="section" key={date} gap="3" aria-labelledby={`upcoming-${date}`}>
+          <Heading id={`upcoming-${date}`} as="h2" textStyle="sectionTitle">
+            {formatUpcomingDate(date)}
+          </Heading>
+          <Stack gap="3">
+            {datedEntries.map((entry) => (
+              <UpcomingEntry key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}:${entry.date}`} entry={entry} />
+            ))}
+          </Stack>
+        </Stack>
+      ))}
+    </Stack>
+  );
+};
+
+export default UpcomingAgenda;
