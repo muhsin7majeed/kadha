@@ -1,14 +1,18 @@
 import { UserMedia } from '@/features/user-media/user-media.types';
 import { DataPrivacy, FriendStatus } from '@/types/common';
 
-export interface Collection {
+export interface ProfileCollectionSummary {
   id: string;
-  userId: string;
   name: string;
   description: string;
   privacy: DataPrivacy;
   created_at: Date;
   updated_at: Date;
+  itemCount: number;
+}
+
+export interface Collection extends Omit<ProfileCollectionSummary, 'itemCount'> {
+  userId: string;
   hasMedia?: boolean;
   owner?: UserSummary;
   members?: CollectionMember[];

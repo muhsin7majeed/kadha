@@ -183,6 +183,46 @@ describe('collection permissions', () => {
     expect(response.body.data.media[0].addedByUserId).toBeUndefined();
   });
 
+  it('returns privacy-safe collection summaries for public profile lists', async () => {
+    const owner = await registerTestUser('profile-collection-owner');
+    const member = await registerTestUser('profile-collection-member');
+    const collection = await createTestCollection(owner, 'Public profile collection');
+    const invite = await inviteUserToCollection(owner, collection.id, member, 'editor');
+
+    await acceptCollectionInvite(member, invite.id);
+    await request(await getTestApp())
+      .put(`/api/collection/${collection.id}`)
+      .set('Authorization', authorization(owner))
+      .send({
+        name: collection.name,
+        description: 'A visible collection summary',
+        privacy: 'PUBLIC',
+      })
+      .expect(200);
+    await addMovieToCollection(owner, collection.id, 991402);
+
+    const response = await request(await getTestApp())
+      .get('/api/public/users/profile-collection-owner/collections')
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      access: { canView: true },
+      data: [
+        {
+          id: collection.id,
+          name: collection.name,
+          description: 'A visible collection summary',
+          privacy: 'PUBLIC',
+          itemCount: 1,
+        },
+      ],
+    });
+    expect(response.body.data[0]).not.toHaveProperty('media');
+    expect(response.body.data[0]).not.toHaveProperty('members');
+    expect(response.body.data[0]).not.toHaveProperty('memberCount');
+    expect(response.body.data[0]).not.toHaveProperty('owner');
+  });
+
   it('requires anonymous viewers to sign in for Kadha-users collection links', async () => {
     const owner = await registerTestUser('kadha-users-collection-owner');
     const viewer = await registerTestUser('kadha-users-collection-viewer');

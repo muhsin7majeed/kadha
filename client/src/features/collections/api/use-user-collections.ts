@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { CollectionDetails } from '@/features/collections/collections.types';
+import { ProfileCollectionSummary } from '@/features/collections/collections.types';
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import { ResourceAccessResponse } from '@/types/common';
 
-type UserCollectionsResponse = ResourceAccessResponse<CollectionDetails[]>;
+type UserCollectionsResponse = ResourceAccessResponse<ProfileCollectionSummary[]>;
 
 const getUserCollections = async (username: string) => {
   const response = await api.get<UserCollectionsResponse>(`/api/public/users/${username}/collections`);
