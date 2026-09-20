@@ -5,10 +5,15 @@
 ### Behavior Fixes
 
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.
+- Preserved accessible loading labels and single-dialog transitions after the Chakra UI refresh.
 
 ### Engineering Changes
 
 - Added instance-branding guidance to the working agreement so new runtime copy uses configured names while stable compatibility identifiers remain unchanged.
+- Standardized Docker, CI, package engines, and deployment builds on Node.js 24, including reproducible Alpine native-module compilation and explicit Prisma CLI availability.
+- Migrated the server to Express 5, removed `express-async-errors`, and added async error-handling regression coverage.
+- Refreshed Chakra UI and Ark UI together and migrated the frontend toolchain to Vite 8 with Vite's native tsconfig path resolution.
+- Removed the unused `ts-node` dependency and retired the unreferenced legacy server Dockerfile.
 
 ## v0.5.0
 

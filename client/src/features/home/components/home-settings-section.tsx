@@ -94,6 +94,7 @@ const HomeSettingsSection = () => {
             <Button
               colorPalette="brand"
               loading={isPending}
+              loadingText="Save Home settings"
               disabled={isLoading || isPending || !isDirty}
               onClick={handleSave}
             >

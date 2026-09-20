@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendData, sendMessage, sendResponse } from '@/lib/http';
+import { getRouteParam, sendData, sendMessage, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import {
   CollectionPayload,
@@ -46,13 +46,13 @@ export const createCollection = async (req: Request, res: Response) => {
 };
 
 export const getCollection = async (req: Request, res: Response) => {
-  const data = await getUserCollection(requireAuthUser(req).id, req.params.id);
+  const data = await getUserCollection(requireAuthUser(req).id, getRouteParam(req, 'id'));
 
   sendData(res, data);
 };
 
 export const getPublicCollectionById = async (req: Request, res: Response) => {
-  const result = await getPublicCollection(req.params.id, req.user?.id);
+  const result = await getPublicCollection(getRouteParam(req, 'id'), req.user?.id);
 
   if (!result) {
     return sendData(res, null, 404);
@@ -62,13 +62,13 @@ export const getPublicCollectionById = async (req: Request, res: Response) => {
 };
 
 export const updateCollection = async (req: Request, res: Response) => {
-  const data = await updateUserCollection(requireAuthUser(req).id, req.params.id, req.body as CollectionPayload);
+  const data = await updateUserCollection(requireAuthUser(req).id, getRouteParam(req, 'id'), req.body as CollectionPayload);
 
   sendData(res, data);
 };
 
 export const deleteCollection = async (req: Request, res: Response) => {
-  await deleteUserCollection(requireAuthUser(req).id, req.params.id);
+  await deleteUserCollection(requireAuthUser(req).id, getRouteParam(req, 'id'));
 
   sendMessage(res, 'Collection deleted successfully');
 };
@@ -76,7 +76,7 @@ export const deleteCollection = async (req: Request, res: Response) => {
 export const toggleCollectionItem = async (req: Request, res: Response) => {
   const result = await toggleUserCollectionItem(
     requireAuthUser(req).id,
-    req.params.id,
+    getRouteParam(req, 'id'),
     req.body as ToggleCollectionPayload,
   );
 
@@ -84,7 +84,7 @@ export const toggleCollectionItem = async (req: Request, res: Response) => {
 };
 
 export const searchInviteUsers = async (req: SearchInviteUsersRequest, res: Response) => {
-  const data = await searchUsersForCollectionInvite(requireAuthUser(req).id, req.params.id, req.query.q ?? '');
+  const data = await searchUsersForCollectionInvite(requireAuthUser(req).id, getRouteParam(req, 'id'), req.query.q ?? '');
 
   sendData(res, data);
 };
@@ -92,7 +92,7 @@ export const searchInviteUsers = async (req: SearchInviteUsersRequest, res: Resp
 export const inviteUserToCollection = async (req: Request, res: Response) => {
   const data = await createCollectionInvite(
     requireAuthUser(req).id,
-    req.params.id,
+    getRouteParam(req, 'id'),
     req.body as CreateCollectionInvitePayload,
   );
 
@@ -100,13 +100,13 @@ export const inviteUserToCollection = async (req: Request, res: Response) => {
 };
 
 export const getCollectionInvites = async (req: Request, res: Response) => {
-  const data = await listCollectionInvites(requireAuthUser(req).id, req.params.id);
+  const data = await listCollectionInvites(requireAuthUser(req).id, getRouteParam(req, 'id'));
 
   sendData(res, data);
 };
 
 export const revokeInvite = async (req: Request, res: Response) => {
-  const data = await revokeCollectionInvite(requireAuthUser(req).id, req.params.id, req.params.inviteId);
+  const data = await revokeCollectionInvite(requireAuthUser(req).id, getRouteParam(req, 'id'), getRouteParam(req, 'inviteId'));
 
   sendData(res, data);
 };
@@ -114,8 +114,8 @@ export const revokeInvite = async (req: Request, res: Response) => {
 export const updateMemberRole = async (req: Request, res: Response) => {
   const data = await updateCollectionMember(
     requireAuthUser(req).id,
-    req.params.id,
-    req.params.memberId,
+    getRouteParam(req, 'id'),
+    getRouteParam(req, 'memberId'),
     req.body as UpdateCollectionMemberPayload,
   );
 
@@ -123,13 +123,13 @@ export const updateMemberRole = async (req: Request, res: Response) => {
 };
 
 export const removeMember = async (req: Request, res: Response) => {
-  await removeCollectionMember(requireAuthUser(req).id, req.params.id, req.params.memberId);
+  await removeCollectionMember(requireAuthUser(req).id, getRouteParam(req, 'id'), getRouteParam(req, 'memberId'));
 
   sendMessage(res, 'Member removed successfully');
 };
 
 export const leaveCollection = async (req: Request, res: Response) => {
-  await leaveSharedCollection(requireAuthUser(req).id, req.params.id);
+  await leaveSharedCollection(requireAuthUser(req).id, getRouteParam(req, 'id'));
 
   sendMessage(res, 'Left collection successfully');
 };
@@ -137,7 +137,7 @@ export const leaveCollection = async (req: Request, res: Response) => {
 export const respondToInvite = async (req: Request, res: Response) => {
   const data = await respondToCollectionInvite(
     requireAuthUser(req).id,
-    req.params.inviteId,
+    getRouteParam(req, 'inviteId'),
     req.body as RespondToCollectionInvitePayload,
   );
 

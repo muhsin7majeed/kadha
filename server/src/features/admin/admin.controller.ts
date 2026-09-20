@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { badRequest, sendResponse } from '@/lib/http';
+import { badRequest, getRouteParam, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import { adminUsersQuerySchema, updateAdminUserRoleSchema } from './admin.schema';
@@ -30,7 +30,7 @@ export const getUsers = async (req: Request, res: Response) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
-  const data = await getAdminUser(req.params.id);
+  const data = await getAdminUser(getRouteParam(req, 'id'));
 
   sendResponse(res, { data });
 };
@@ -43,7 +43,7 @@ export const updateUserRole = async (req: Request, res: Response) => {
   }
 
   const { id: actorId } = requireAuthUser(req);
-  const data = await updateAdminUserRole(actorId, req.params.id, parsedBody.data.role);
+  const data = await updateAdminUserRole(actorId, getRouteParam(req, 'id'), parsedBody.data.role);
 
   sendResponse(res, { data });
 };

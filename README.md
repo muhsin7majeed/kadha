@@ -85,7 +85,7 @@ Production installations require HTTPS. Localhost remains available for developm
 ### Prerequisites
 
 - Docker and Docker Compose
-- Node.js 20.19+ if building outside Docker
+- Node.js 24+ if building outside Docker
 - [TMDB API Key](https://www.themoviedb.org/settings/api)
 
 ### Setup

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendData, sendMessage, sendResponse } from '@/lib/http';
+import { getRouteParam, sendData, sendMessage, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { diaryInsightsQuerySchema, diaryQuerySchema } from './diary.schema';
 import { getDiaryInsights, getDiaryTimeline } from './diary.service';
@@ -63,7 +63,7 @@ export const addToWatchlist = async (req: Request, res: Response) => {
 export const getTvProgressController = async (req: Request, res: Response) => {
   const selectedSeasonNumber = typeof req.query.seasonNumber === 'string' ? Number(req.query.seasonNumber) : undefined;
   const includeSpecials = req.query.includeSpecials === 'true';
-  const data = await getTvProgress(requireAuthUser(req).id, req.params.mediaId, {
+  const data = await getTvProgress(requireAuthUser(req).id, getRouteParam(req, 'mediaId'), {
     selectedSeasonNumber,
     includeSpecials,
   });
@@ -72,7 +72,7 @@ export const getTvProgressController = async (req: Request, res: Response) => {
 };
 
 export const markEpisodeWatchedController = async (req: Request, res: Response) => {
-  const data = await markEpisodeWatched(requireAuthUser(req).id, req.params.mediaId, req.body as EpisodeWatchPayload);
+  const data = await markEpisodeWatched(requireAuthUser(req).id, getRouteParam(req, 'mediaId'), req.body as EpisodeWatchPayload);
 
   return sendData(res, data);
 };
@@ -80,34 +80,34 @@ export const markEpisodeWatchedController = async (req: Request, res: Response) 
 export const clearEpisodeWatchedController = async (req: Request, res: Response) => {
   const data = await clearEpisodeWatched(
     requireAuthUser(req).id,
-    req.params.mediaId,
-    req.params.seasonNumber,
-    req.params.episodeNumber,
+    getRouteParam(req, 'mediaId'),
+    getRouteParam(req, 'seasonNumber'),
+    getRouteParam(req, 'episodeNumber'),
   );
 
   return sendData(res, data);
 };
 
 export const markSeasonWatchedController = async (req: Request, res: Response) => {
-  const data = await markSeasonWatched(requireAuthUser(req).id, req.params.mediaId, req.params.seasonNumber);
+  const data = await markSeasonWatched(requireAuthUser(req).id, getRouteParam(req, 'mediaId'), getRouteParam(req, 'seasonNumber'));
 
   return sendData(res, data);
 };
 
 export const clearSeasonWatchedController = async (req: Request, res: Response) => {
-  const data = await clearSeasonWatched(requireAuthUser(req).id, req.params.mediaId, req.params.seasonNumber);
+  const data = await clearSeasonWatched(requireAuthUser(req).id, getRouteParam(req, 'mediaId'), getRouteParam(req, 'seasonNumber'));
 
   return sendData(res, data);
 };
 
 export const markAllAiredWatchedController = async (req: Request, res: Response) => {
-  const data = await markAllAiredWatched(requireAuthUser(req).id, req.params.mediaId);
+  const data = await markAllAiredWatched(requireAuthUser(req).id, getRouteParam(req, 'mediaId'));
 
   return sendData(res, data);
 };
 
 export const markNextEpisodeWatchedController = async (req: Request, res: Response) => {
-  const data = await markNextEpisodeWatched(requireAuthUser(req).id, req.params.mediaId);
+  const data = await markNextEpisodeWatched(requireAuthUser(req).id, getRouteParam(req, 'mediaId'));
 
   return sendData(res, data);
 };
@@ -127,7 +127,7 @@ export const getDiaryInsightsController = async (req: Request, res: Response) =>
 };
 
 export const listWatchEventsController = async (req: Request, res: Response) => {
-  const data = await listWatchEvents(requireAuthUser(req).id, req.params.mediaId, req.params.mediaType);
+  const data = await listWatchEvents(requireAuthUser(req).id, getRouteParam(req, 'mediaId'), getRouteParam(req, 'mediaType'));
 
   return sendData(res, data);
 };
@@ -139,13 +139,13 @@ export const createWatchEventController = async (req: Request, res: Response) =>
 };
 
 export const updateWatchEventController = async (req: Request, res: Response) => {
-  const data = await updateWatchEvent(requireAuthUser(req).id, req.params.eventId, req.body as WatchEventUpdatePayload);
+  const data = await updateWatchEvent(requireAuthUser(req).id, getRouteParam(req, 'eventId'), req.body as WatchEventUpdatePayload);
 
   return sendData(res, data);
 };
 
 export const deleteWatchEventController = async (req: Request, res: Response) => {
-  const data = await deleteWatchEvent(requireAuthUser(req).id, req.params.eventId);
+  const data = await deleteWatchEvent(requireAuthUser(req).id, getRouteParam(req, 'eventId'));
 
   return sendData(res, data);
 };

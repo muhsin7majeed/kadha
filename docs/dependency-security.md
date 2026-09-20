@@ -13,11 +13,11 @@ Exceptions live in `security/npm-audit-exceptions.json`. Each exception must ide
 
 ## Prisma Node Engine Warning
 
-Prisma 7.9.1 supports Node 20.19 or newer, matching Kadha's Node 20 image. Its unused `@prisma/streams-local` development-tooling dependency currently declares Node 22 and produces a non-failing install warning. Kadha's Prisma client generation, server build, production image, and existing-database migration checks pass on Node 20. Recheck this transitive constraint during the next Prisma or Node runtime upgrade.
+Prisma 7.10.0 supports Node 20.19 or newer; Kadha standardizes on Node 24. Its unused `@prisma/streams-local` development-tooling dependency currently declares Node 22 and produces a non-failing install warning. Kadha's Prisma client generation, server build, production image, and existing-database migration checks pass on Node 24. Recheck this transitive constraint during the next Prisma or Node runtime upgrade.
 
 ## Current Prisma Configuration Exception
 
-Prisma 7.9.1 pins `deepmerge-ts` 7.1.5 in its configuration tooling. npm advisory `1145093` requires
+Prisma 7.10.0 pins `deepmerge-ts` 7.1.5 in its configuration tooling. npm advisory `1145093` requires
 attacker-controlled recursive object graphs to reach the affected merge API. Kadha loads a static, repository-owned
 Prisma configuration during builds, migrations, and startup; it does not pass request data or other user-controlled
 objects into this path.

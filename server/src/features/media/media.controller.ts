@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { sendData, sendResponse } from '@/lib/http';
+import { getRouteParam, sendData, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { BaseResponse, PaginatedResponse } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
@@ -71,7 +71,8 @@ export const getMediaDetails = async (
   req: Request,
   res: Response<BaseResponse<TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta>>,
 ) => {
-  const { mediaType, id } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const id = getRouteParam(req, 'id');
   const data = await mediaService.getMediaDetails(requireAuthUser(req).id, mediaType, id);
 
   sendData(res, data);
@@ -81,7 +82,8 @@ export const getPublicMediaDetails = async (
   req: Request,
   res: Response<BaseResponse<TMDBMovieDetailsWithMeta | TMDBTvDetailsWithMeta>>,
 ) => {
-  const { mediaType, id } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const id = getRouteParam(req, 'id');
   const data = await mediaService.getMediaDetails(req.user?.id, mediaType, id);
 
   sendData(res, data);
@@ -91,7 +93,8 @@ export const getMediaRecommendations = async (
   req: Request,
   res: Response<PaginatedResponse<TMDBMovieWithMeta[] | TMDBTvWithMeta[]>>,
 ) => {
-  const { mediaType, id } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const id = getRouteParam(req, 'id');
   const { page } = getPaginationParams(req.query);
   const data = await mediaService.getMediaRecommendations(requireAuthUser(req).id, mediaType, id, page);
 
@@ -99,7 +102,8 @@ export const getMediaRecommendations = async (
 };
 
 export const getWatchProviders = async (req: Request, res: Response<BaseResponse<WatchProvidersResponse>>) => {
-  const { mediaType, id } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const id = getRouteParam(req, 'id');
   const region = typeof req.query.region === 'string' ? req.query.region : undefined;
   const data = await mediaService.getWatchProviders(requireAuthUser(req).id, mediaType, id, region);
 
@@ -107,7 +111,8 @@ export const getWatchProviders = async (req: Request, res: Response<BaseResponse
 };
 
 export const getPublicWatchProviders = async (req: Request, res: Response<BaseResponse<WatchProvidersResponse>>) => {
-  const { mediaType, id } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const id = getRouteParam(req, 'id');
   const region = typeof req.query.region === 'string' ? req.query.region : undefined;
   const data = await mediaService.getWatchProviders(req.user?.id, mediaType, id, region);
 
@@ -124,7 +129,8 @@ export const searchMedia = async (
   req: Request,
   res: Response<PaginatedResponse<TMDBMovieWithMeta[] | TMDBTvWithMeta[]>>,
 ) => {
-  const { mediaType, query } = req.params;
+  const mediaType = getRouteParam(req, 'mediaType');
+  const query = getRouteParam(req, 'query');
   const { page } = getPaginationParams(req.query);
   const data = await mediaService.searchMedia(requireAuthUser(req).id, mediaType, query, page);
 

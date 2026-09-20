@@ -95,37 +95,41 @@ const MediaTrackingDetailsDialog = ({
         </Tooltip>
       )}
 
-      <SimpleDialog
-        open={open}
-        onOpenChange={(details) => setOpen(details.open)}
-        title="Your tracking"
-        closeButton
-        contentProps={{
-          width: { base: 'calc(100vw - 2rem)', md: 'lg' },
-          maxW: 'lg',
-        }}
-      >
-        <MediaTrackingDetails
-          excludedActions={excludedActions}
-          media={currentTrackingState}
-          onEdit={handleEdit}
-          onRemoveWatched={
-            excludedActions.includes('watched')
-              ? undefined
-              : () => {
-                  setOpen(false);
-                  setRemoveWatchedOpen(true);
-                }
-          }
-        />
-      </SimpleDialog>
+      {!editRequest && !removeWatchedOpen && (
+        <SimpleDialog
+          open={open}
+          onOpenChange={(details) => setOpen(details.open)}
+          title="Your tracking"
+          closeButton
+          contentProps={{
+            width: { base: 'calc(100vw - 2rem)', md: 'lg' },
+            maxW: 'lg',
+          }}
+        >
+          <MediaTrackingDetails
+            excludedActions={excludedActions}
+            media={currentTrackingState}
+            onEdit={handleEdit}
+            onRemoveWatched={
+              excludedActions.includes('watched')
+                ? undefined
+                : () => {
+                    setOpen(false);
+                    setRemoveWatchedOpen(true);
+                  }
+            }
+          />
+        </SimpleDialog>
+      )}
 
       <RemoveWatchedDialog
         media={currentMedia}
         open={removeWatchedOpen}
         onOpenChange={(nextOpen) => {
           setRemoveWatchedOpen(nextOpen);
-          if (!nextOpen) setOpen(true);
+          if (!nextOpen) {
+            setTimeout(() => setOpen(true), 0);
+          }
         }}
         onRemoved={() => setOpen(false)}
       />

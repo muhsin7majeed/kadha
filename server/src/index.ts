@@ -1,5 +1,3 @@
-import 'express-async-errors';
-
 import { envConfig, validateEnvVars } from './config/env';
 import { createApp } from './app';
 import { startMediaMetadataWorker } from './features/media/media-metadata.service';

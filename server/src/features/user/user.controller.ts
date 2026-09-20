@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { envConfig } from '@/config/env';
-import { AppError, badRequest, conflict, notFound, sendMessage, sendResponse } from '@/lib/http';
+import { AppError, badRequest, conflict, getRouteParam, notFound, sendMessage, sendResponse } from '@/lib/http';
 import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
@@ -145,7 +145,7 @@ export const getUserLiked = async (req: Request, res: Response) => {
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
-  const result = await getUserProfileByUsername(req.user?.id, req.params.username);
+  const result = await getUserProfileByUsername(req.user?.id, getRouteParam(req, 'username'));
 
   if (!result) {
     throw notFound('User not found');
@@ -160,7 +160,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
 export const getUserWatchedByUsername = async (req: Request, res: Response) => {
   const { page, limit } = getPaginationParams(req.query);
-  const result = await getUserMediaByUsername(req.user?.id, req.params.username, 'watched', page, limit);
+  const result = await getUserMediaByUsername(req.user?.id, getRouteParam(req, 'username'), 'watched', page, limit);
 
   if (!result) {
     throw notFound('User not found');
@@ -175,7 +175,7 @@ export const getUserWatchedByUsername = async (req: Request, res: Response) => {
 
 export const getUserLikedByUsername = async (req: Request, res: Response) => {
   const { page, limit } = getPaginationParams(req.query);
-  const result = await getUserMediaByUsername(req.user?.id, req.params.username, 'liked', page, limit);
+  const result = await getUserMediaByUsername(req.user?.id, getRouteParam(req, 'username'), 'liked', page, limit);
 
   if (!result) {
     throw notFound('User not found');
@@ -190,7 +190,7 @@ export const getUserLikedByUsername = async (req: Request, res: Response) => {
 
 export const getUserWatchlistByUsername = async (req: Request, res: Response) => {
   const { page, limit } = getPaginationParams(req.query);
-  const result = await getUserMediaByUsername(req.user?.id, req.params.username, 'watchlist', page, limit);
+  const result = await getUserMediaByUsername(req.user?.id, getRouteParam(req, 'username'), 'watchlist', page, limit);
 
   if (!result) {
     throw notFound('User not found');
@@ -204,7 +204,7 @@ export const getUserWatchlistByUsername = async (req: Request, res: Response) =>
 };
 
 export const getUserCollectionsByUsernameController = async (req: Request, res: Response) => {
-  const result = await getUserCollectionsByUsername(req.user?.id, req.params.username);
+  const result = await getUserCollectionsByUsername(req.user?.id, getRouteParam(req, 'username'));
 
   if (!result) {
     throw notFound('User not found');

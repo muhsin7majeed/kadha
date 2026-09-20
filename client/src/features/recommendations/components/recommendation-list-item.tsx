@@ -108,6 +108,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 colorPalette="brand"
                 size="sm"
                 loading={pendingFeedback === 'MORE_LIKE_THIS'}
+                loadingText="More like this"
                 disabled={isButtonDisabled('MORE_LIKE_THIS')}
                 aria-pressed={selectedFeedback === 'MORE_LIKE_THIS'}
                 onClick={() => handleFeedback('MORE_LIKE_THIS')}
@@ -120,6 +121,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 colorPalette="gray"
                 size="sm"
                 loading={pendingFeedback === 'LESS_LIKE_THIS'}
+                loadingText="Less like this"
                 disabled={isButtonDisabled('LESS_LIKE_THIS')}
                 aria-pressed={selectedFeedback === 'LESS_LIKE_THIS'}
                 onClick={() => handleFeedback('LESS_LIKE_THIS')}
@@ -132,6 +134,7 @@ const RecommendationListItem = ({ item }: RecommendationListItemProps) => {
                 colorPalette="gray"
                 size="sm"
                 loading={pendingFeedback === 'HIDE'}
+                loadingText="Hide"
                 disabled={isButtonDisabled('HIDE')}
                 aria-pressed={selectedFeedback === 'HIDE'}
                 onClick={() => handleFeedback('HIDE')}

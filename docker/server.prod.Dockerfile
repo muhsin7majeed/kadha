@@ -1,9 +1,10 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 COPY server/package*.json ./
 
+RUN apk add --no-cache python3 make g++
 RUN npm ci
 
 COPY server ./
@@ -15,13 +16,16 @@ RUN npx prisma generate --schema=./src/prisma/schema.prisma
 RUN npm run build
 
 # Production image
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
 COPY --from=builder /app/package*.json ./
 
-RUN npm ci --omit=dev && npm cache clean --force
+RUN apk add --no-cache python3 make g++ \
+  && npm ci --omit=dev \
+  && npm cache clean --force \
+  && apk del python3 make g++
 
 # Copy built code
 COPY --from=builder /app/dist ./dist

@@ -1,9 +1,10 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
 COPY server/package*.json ./
 
+RUN apk add --no-cache python3 make g++
 RUN npm ci
 
 COPY server ./

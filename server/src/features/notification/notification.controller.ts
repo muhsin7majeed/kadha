@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { notFound, sendData, sendMessage, sendResponse } from '@/lib/http';
+import { getRouteParam, notFound, sendData, sendMessage, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import { pushSubscriptionSchema } from './push.schema';
@@ -29,7 +29,7 @@ export const getUnreadCount = async (req: Request, res: Response) => {
 
 export const markAsRead = async (req: Request, res: Response) => {
   const { id: currentUserId } = requireAuthUser(req);
-  const { id: notificationId } = req.params;
+  const notificationId = getRouteParam(req, 'id');
   const didUpdate = await markNotificationRead(currentUserId, notificationId);
 
   if (!didUpdate) {

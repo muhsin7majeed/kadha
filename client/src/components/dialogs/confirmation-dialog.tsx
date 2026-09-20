@@ -30,6 +30,8 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <Dialog.Root
       role="alertdialog"
       open={isOpen}
+      unmountOnExit
+      immediate
       onOpenChange={(e) => {
         onOpenChange(e.open);
       }}

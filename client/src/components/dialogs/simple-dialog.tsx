@@ -16,7 +16,7 @@ const SimpleDialog: React.FC<SimpleDialogProps> = (props) => {
   const dialogTrigger = trigger ? <Dialog.Trigger asChild>{trigger}</Dialog.Trigger> : null;
 
   return (
-    <Dialog.Root {...rootProps}>
+    <Dialog.Root unmountOnExit immediate {...rootProps}>
       {dialogTrigger && (triggerWrapper ? triggerWrapper(dialogTrigger) : dialogTrigger)}
 
       <Portal>

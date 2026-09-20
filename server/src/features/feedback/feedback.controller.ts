@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 
-import { sendData, sendResponse } from '@/lib/http';
+import { getRouteParam, sendData, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
 import { adminFeedbackQuerySchema, createFeedbackSchema, updateFeedbackSchema } from './feedback.schema';
@@ -27,7 +27,7 @@ export const getUserFeedbackController = async (req: Request, res: Response) => 
 
 export const getUserFeedbackItemController = async (req: Request, res: Response) => {
   const user = requireAuthUser(req);
-  sendData(res, await getUserFeedbackItem(user.id, req.params.id));
+  sendData(res, await getUserFeedbackItem(user.id, getRouteParam(req, 'id')));
 };
 
 export const getAdminFeedbackController = async (req: Request, res: Response) => {
@@ -37,9 +37,9 @@ export const getAdminFeedbackController = async (req: Request, res: Response) =>
 };
 
 export const getAdminFeedbackItemController = async (req: Request, res: Response) => {
-  sendData(res, await getAdminFeedbackItem(req.params.id));
+  sendData(res, await getAdminFeedbackItem(getRouteParam(req, 'id')));
 };
 
 export const updateFeedbackController = async (req: Request, res: Response) => {
-  sendData(res, await updateFeedback(req.params.id, updateFeedbackSchema.parse(req.body)));
+  sendData(res, await updateFeedback(getRouteParam(req, 'id'), updateFeedbackSchema.parse(req.body)));
 };
