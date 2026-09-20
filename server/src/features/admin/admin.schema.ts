@@ -7,3 +7,7 @@ export const adminUsersQuerySchema = z.object({
   order: z.enum(['asc', 'desc']).optional().default('desc'),
   role: z.nativeEnum(UserRole).optional(),
 });
+
+export const updateAdminUserRoleSchema = z.object({
+  role: z.nativeEnum(UserRole),
+});

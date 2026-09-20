@@ -12,6 +12,7 @@ import {
   LuKeyRound,
   LuRefreshCw,
   LuSettings,
+  LuShield,
   LuUserPlus,
   LuX,
 } from 'react-icons/lu';
@@ -143,6 +144,12 @@ const activityCopyByType: Record<UserActivityType, ActivityCopy> = {
     icon: <LuSettings />,
     colorPalette: 'brand',
   },
+  [UserActivityType.AdminRoleChanged]: {
+    label: 'Admin role changed',
+    detail: 'Changed an account role',
+    icon: <LuShield />,
+    colorPalette: 'brand',
+  },
 };
 
 const getActivityCopy = (type: UserActivityType): ActivityCopy => {
@@ -163,6 +170,10 @@ const getActivityTitle = (activity: UserActivity, metadata: ActivityMetadata) =>
 
   if (activity.type === UserActivityType.ProfileUpdated) {
     return 'Profile settings';
+  }
+
+  if (activity.type === UserActivityType.AdminRoleChanged) {
+    return metadata.targetUsername ?? 'User account';
   }
 
   if (activity.type.startsWith('COLLECTION_') && !activity.media_id) {

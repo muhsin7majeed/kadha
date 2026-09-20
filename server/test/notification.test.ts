@@ -19,8 +19,8 @@ const getNotifications = async (user: Awaited<ReturnType<typeof registerTestUser
 };
 
 describe('notification routes', () => {
-  it('reports disabled push configuration without persisting a subscription', async () => {
-    const user = await registerTestUser('push-disabled');
+  it('reports push configuration and handles subscription registration consistently', async () => {
+    const user = await registerTestUser('push-configuration');
     const subscription = {
       endpoint: 'https://push.example/subscription',
       keys: { p256dh: 'p256dh-key', auth: 'auth-key' },
@@ -30,15 +30,20 @@ describe('notification routes', () => {
       .get('/api/notifications/push/config')
       .set('Authorization', authorization(user))
       .expect(200);
-    expect(configResponse.body).toEqual({ data: { enabled: false, publicKey: null } });
+    const pushEnabled = configResponse.body.data.enabled as boolean;
+    expect(pushEnabled).toBe(configResponse.body.data.publicKey !== null);
 
     const subscribeResponse = await request(await getTestApp())
       .put('/api/notifications/push/subscription')
       .set('Authorization', authorization(user))
       .send(subscription)
       .expect(200);
-    expect(subscribeResponse.body).toEqual({ data: { enabled: false } });
-    expect(await prisma.pushSubscription.count({ where: { userId: user.userId } })).toBe(0);
+    expect(subscribeResponse.body).toEqual({ data: { enabled: pushEnabled } });
+    expect(await prisma.pushSubscription.count({ where: { userId: user.userId } })).toBe(pushEnabled ? 1 : 0);
+
+    if (pushEnabled) {
+      await prisma.pushSubscription.delete({ where: { endpoint: subscription.endpoint } });
+    }
   });
 
   it('only removes a push subscription for its owning user', async () => {

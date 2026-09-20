@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { prisma } from '@/lib/prisma';
 import { getTestApp } from './helpers/app';
 import { promoteTestUserToAdmin } from './helpers/admin';
 import { authorization, registerTestUser } from './helpers/auth';
@@ -28,6 +29,54 @@ describe('admin routes', () => {
     expect(response.body).toEqual({
       code: 'FORBIDDEN',
       message: 'Forbidden',
+    });
+  });
+
+  it('allows admins to change user roles and records the transition', async () => {
+    const admin = await registerTestUser('role-management-admin');
+    const target = await registerTestUser('role-management-target');
+
+    await promoteTestUserToAdmin(admin);
+
+    const promoted = await request(await getTestApp())
+      .patch(`/api/admin/users/${target.userId}/role`)
+      .set('Authorization', authorization(admin))
+      .send({ role: 'ADMIN' })
+      .expect(200);
+
+    expect(promoted.body.data).toMatchObject({ id: target.userId, username: target.username, role: 'ADMIN' });
+
+    const activity = await prisma.userActivity.findFirst({
+      where: { userId: admin.userId, type: 'ADMIN_ROLE_CHANGED' },
+      orderBy: { createdAt: 'desc' },
+    });
+    expect(activity).toMatchObject({
+      userId: admin.userId,
+      metadata: JSON.stringify({
+        targetUserId: target.userId,
+        targetUsername: target.username,
+        previousRole: 'USER',
+        newRole: 'ADMIN',
+      }),
+    });
+
+    const demoted = await request(await getTestApp())
+      .patch(`/api/admin/users/${target.userId}/role`)
+      .set('Authorization', authorization(admin))
+      .send({ role: 'USER' })
+      .expect(200);
+
+    expect(demoted.body.data).toMatchObject({ id: target.userId, role: 'USER' });
+
+    const selfDemotion = await request(await getTestApp())
+      .patch(`/api/admin/users/${admin.userId}/role`)
+      .set('Authorization', authorization(admin))
+      .send({ role: 'USER' })
+      .expect(403);
+
+    expect(selfDemotion.body).toEqual({
+      code: 'FORBIDDEN',
+      message: 'You cannot change your own role',
     });
   });
 

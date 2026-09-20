@@ -1,0 +1,1 @@
+-- UserActivityType values are stored as TEXT in SQLite; adding this value requires no table change.

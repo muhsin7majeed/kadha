@@ -4,6 +4,7 @@
 
 ### Feature Changes
 
+- Added admin-panel role management for promoting or demoting existing users, with self-demotion protection and role-change activity records.
 - Added opt-in browser push notifications for friend requests, collection updates, feedback updates, and new feedback alerts for admins.
 
 ### Behavior Fixes

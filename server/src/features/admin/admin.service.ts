@@ -1,9 +1,10 @@
-import { Prisma, UserRole } from '@prisma/client';
+import { Prisma, UserActivityType, UserRole } from '@prisma/client';
 
+import { createUserActivity } from '@/features/activity/activity.service';
 import { envConfig } from '@/config/env';
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
-import { notFound } from '@/lib/http';
+import { conflict, forbidden, notFound } from '@/lib/http';
 import { AdminOverview, AdminUserDetail, AdminUserListParams, AdminUserSummary } from './admin.types';
 
 type CountByUserId = Map<string, number>;
@@ -94,6 +95,57 @@ async function getUserSummaryCounts(userIds: string[]) {
     collectionCounts: countByUserId(collectionRows),
     friendCounts,
   };
+}
+
+export async function updateAdminUserRole(actorId: string, targetId: string, role: UserRole) {
+  return prisma.$transaction(async (tx) => {
+    const target = await tx.user.findUnique({
+      where: { id: targetId },
+      select: { id: true, username: true, role: true },
+    });
+
+    if (!target) {
+      throw notFound('User not found');
+    }
+
+    if (actorId === targetId && target.role !== role) {
+      throw forbidden('You cannot change your own role');
+    }
+
+    if (target.role === role) {
+      return target;
+    }
+
+    if (target.role === UserRole.ADMIN && role === UserRole.USER) {
+      const adminCount = await tx.user.count({ where: { role: UserRole.ADMIN } });
+
+      if (adminCount <= 1) {
+        throw conflict('At least one administrator must remain');
+      }
+    }
+
+    const updatedUser = await tx.user.update({
+      where: { id: targetId },
+      data: { role },
+      select: { id: true, username: true, role: true },
+    });
+
+    await createUserActivity(
+      {
+        userId: actorId,
+        type: UserActivityType.ADMIN_ROLE_CHANGED,
+        metadata: {
+          targetUserId: target.id,
+          targetUsername: target.username,
+          previousRole: target.role,
+          newRole: updatedUser.role,
+        },
+      },
+      tx,
+    );
+
+    return updatedUser;
+  });
 }
 
 export async function getAdminOverview(): Promise<AdminOverview> {

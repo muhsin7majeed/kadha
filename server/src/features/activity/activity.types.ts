@@ -6,6 +6,10 @@ export interface ActivityMetadata {
   collectionName?: string | null;
   collectionDescription?: string | null;
   collectionPrivacy?: string | null;
+  targetUserId?: string | null;
+  targetUsername?: string | null;
+  previousRole?: string | null;
+  newRole?: string | null;
 }
 
 export interface CreateUserActivityInput {

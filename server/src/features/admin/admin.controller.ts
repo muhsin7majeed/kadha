@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 
 import { badRequest, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
-import { adminUsersQuerySchema } from './admin.schema';
-import { getAdminOverview, getAdminUser, getAdminUsers } from './admin.service';
+import { requireAuthUser } from '@/middlewares/auth';
+import { adminUsersQuerySchema, updateAdminUserRoleSchema } from './admin.schema';
+import { getAdminOverview, getAdminUser, getAdminUsers, updateAdminUserRole } from './admin.service';
 
 export const getOverview = async (req: Request, res: Response) => {
   const data = await getAdminOverview();
@@ -30,6 +31,19 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
   const data = await getAdminUser(req.params.id);
+
+  sendResponse(res, { data });
+};
+
+export const updateUserRole = async (req: Request, res: Response) => {
+  const parsedBody = updateAdminUserRoleSchema.safeParse(req.body);
+
+  if (!parsedBody.success) {
+    throw badRequest('Validation failed');
+  }
+
+  const { id: actorId } = requireAuthUser(req);
+  const data = await updateAdminUserRole(actorId, req.params.id, parsedBody.data.role);
 
   sendResponse(res, { data });
 };

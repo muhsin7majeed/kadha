@@ -19,6 +19,7 @@ export enum UserActivityType {
   CollectionItemAdded = 'COLLECTION_ITEM_ADDED',
   CollectionItemRemoved = 'COLLECTION_ITEM_REMOVED',
   ProfileUpdated = 'PROFILE_UPDATED',
+  AdminRoleChanged = 'ADMIN_ROLE_CHANGED',
 }
 
 export interface ActivityMetadata {
@@ -27,6 +28,10 @@ export interface ActivityMetadata {
   collectionName?: string | null;
   collectionDescription?: string | null;
   collectionPrivacy?: string | null;
+  targetUserId?: string | null;
+  targetUsername?: string | null;
+  previousRole?: string | null;
+  newRole?: string | null;
 }
 
 export interface UserActivity {
