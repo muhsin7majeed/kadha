@@ -55,8 +55,8 @@ const response: UpcomingResponse = {
         vote_count: 20,
       },
       episodes: [
-        { seasonNumber: 2, episodeNumber: 1, episodeId: 201, name: 'Return' },
-        { seasonNumber: 2, episodeNumber: 2, episodeId: 202, name: 'Again' },
+        { seasonNumber: 2, episodeNumber: 1, episodeId: 201, name: 'Return', watched: false },
+        { seasonNumber: 2, episodeNumber: 2, episodeId: 202, name: 'Again', watched: false },
       ],
     },
     {
@@ -78,6 +78,7 @@ const response: UpcomingResponse = {
         vote_average: 7,
         vote_count: 10,
       },
+      watched: false,
     },
   ],
 };
@@ -161,7 +162,7 @@ describe('UpcomingPageContent', () => {
 
     try {
       renderContent();
-      expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-21', to: '2026-12-21' });
+      expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-21', to: '2026-12-20' });
     } finally {
       if (originalTimeZone === undefined) {
         delete process.env.TZ;
@@ -187,7 +188,57 @@ describe('UpcomingPageContent', () => {
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Group Drop poster' })).toBeInTheDocument();
     expect(screen.getByText('S2 E1 · Return')).toBeInTheDocument();
-    expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-20', to: '2026-09-30' });
+    expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-01', to: '2026-09-30' });
+  });
+
+  it('allows navigating to a previous month within the history window', async () => {
+    renderContent();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Month' }));
+    const previousMonth = await waitFor(() => screen.getByRole('button', { name: 'Previous month' }));
+    expect(previousMonth).toBeEnabled();
+    fireEvent.click(previousMonth);
+
+    await waitFor(() =>
+      expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-08-01', to: '2026-08-31' }),
+    );
+  });
+
+  it('disables navigation outside the rolling history window', async () => {
+    renderContent();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Month' }));
+    const monthSelect = await waitFor(() => screen.getByRole('combobox', { name: 'Calendar month' }));
+    fireEvent.change(monthSelect, { target: { value: '6' } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Previous month' })).toBeDisabled());
+
+    fireEvent.change(monthSelect, { target: { value: '12' } });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Next month' })).toBeDisabled());
+  });
+
+  it('shows watched state for past releases', () => {
+    mocks.data = {
+      coverage: { trackedTitles: 2, resolvedTitles: 2, failedTitles: 0 },
+      entries: [
+        {
+          kind: 'episode-release',
+          date: '2026-09-15',
+          media: response.entries[0].media,
+          episodes: [{ seasonNumber: 2, episodeNumber: 1, episodeId: 201, name: 'Return', watched: false }],
+        },
+        {
+          kind: 'movie-release',
+          date: '2026-09-16',
+          media: response.entries[1].media,
+          watched: true,
+        },
+      ],
+    };
+
+    renderContent();
+
+    expect(screen.getByText('Unwatched')).toBeInTheDocument();
+    expect(screen.getByText('Watched')).toBeInTheDocument();
   });
 
   it('renders distinct empty and complete error states', () => {

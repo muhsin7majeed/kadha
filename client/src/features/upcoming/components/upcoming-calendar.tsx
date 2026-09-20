@@ -11,6 +11,8 @@ const countLabel = (count: number) => `${count} ${count === 1 ? 'release' : 'rel
 interface UpcomingCalendarProps {
   entries: UpcomingEntryModel[];
   minimumDate: string;
+  maximumDate: string;
+  todayDate: string;
   month: number;
   onPeriodChange: (year: number, month: number) => void;
   onSelectDate: (date: string) => void;
@@ -21,6 +23,8 @@ interface UpcomingCalendarProps {
 const UpcomingCalendar = ({
   entries,
   minimumDate,
+  maximumDate,
+  todayDate,
   month,
   onPeriodChange,
   onSelectDate,
@@ -54,6 +58,7 @@ const UpcomingCalendar = ({
         }}
         hasContent={(date) => counts.has(date)}
         minimumDate={minimumDate}
+        maximumDate={maximumDate}
         month={month}
         onPeriodChange={onPeriodChange}
         onSelectDate={onSelectDate}
@@ -111,12 +116,16 @@ const UpcomingCalendar = ({
               {formatUpcomingDate(selectedDate)}
             </Text>
             <Badge colorPalette="gray" variant="subtle">
-              {formatUpcomingRelativeDate(selectedDate, minimumDate)}
+              {formatUpcomingRelativeDate(selectedDate, todayDate)}
             </Badge>
           </HStack>
           {selectedEntries.length > 0 ? (
             selectedEntries.map((entry) => (
-              <UpcomingEntry key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}`} entry={entry} />
+              <UpcomingEntry
+                key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}`}
+                entry={entry}
+                todayDate={todayDate}
+              />
             ))
           ) : (
             <Text color="fg.muted">Nothing is scheduled for this day.</Text>

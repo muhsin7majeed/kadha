@@ -5,12 +5,14 @@ export interface UpcomingEpisode {
   episodeNumber: number;
   episodeId: number;
   name: string;
+  watched: boolean;
 }
 
 export interface UpcomingMovieRelease {
   kind: 'movie-release';
   date: string;
   media: MediaCardModel;
+  watched: boolean;
 }
 
 export interface UpcomingEpisodeRelease {

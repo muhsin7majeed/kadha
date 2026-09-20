@@ -5,11 +5,12 @@ import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/up
 
 interface UpcomingEntryProps {
   entry: UpcomingEntryModel;
+  todayDate: string;
 }
 
 const posterPlaceholder = '/assets/images/image-placeholder.svg';
 
-const UpcomingEntry = ({ entry }: UpcomingEntryProps) => (
+const UpcomingEntry = ({ entry, todayDate }: UpcomingEntryProps) => (
   <Card.Root as="article" variant="outline">
     <Card.Body>
       <HStack align="stretch" gap={{ base: '3', sm: '4' }}>
@@ -46,15 +47,29 @@ const UpcomingEntry = ({ entry }: UpcomingEntryProps) => (
           </HStack>
 
           {entry.kind === 'movie-release' ? (
-            <Text fontWeight="medium" textStyle="body">
-              Movie release
-            </Text>
+            <HStack gap="2" flexWrap="wrap">
+              <Text fontWeight="medium" textStyle="body">
+                Movie release
+              </Text>
+              {entry.date < todayDate && (
+                <Badge colorPalette={entry.watched ? 'green' : 'orange'} variant="subtle">
+                  {entry.watched ? 'Watched' : 'Unwatched'}
+                </Badge>
+              )}
+            </HStack>
           ) : (
             <Stack gap="1">
               {entry.episodes.map((episode) => (
-                <Text key={episode.episodeId} textStyle="body">
-                  S{episode.seasonNumber} E{episode.episodeNumber} · {episode.name}
-                </Text>
+                <HStack key={episode.episodeId} gap="2" flexWrap="wrap">
+                  <Text textStyle="body">
+                    S{episode.seasonNumber} E{episode.episodeNumber} · {episode.name}
+                  </Text>
+                  {entry.date < todayDate && (
+                    <Badge colorPalette={episode.watched ? 'green' : 'orange'} variant="subtle">
+                      {episode.watched ? 'Watched' : 'Unwatched'}
+                    </Badge>
+                  )}
+                </HStack>
               ))}
             </Stack>
           )}

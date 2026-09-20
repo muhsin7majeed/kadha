@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Feature Changes
+
+- Added 90-day schedule history for tracked TV episodes and watchlisted movie releases, with past-date navigation and local watched/unwatched status.
+
 ### Behavior Fixes
 
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.

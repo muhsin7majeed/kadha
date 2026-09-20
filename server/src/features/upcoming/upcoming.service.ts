@@ -12,10 +12,12 @@ const PROVIDER_CONCURRENCY = 5;
 type TrackedTitle = {
   mediaId: number;
   mediaType: MediaType;
+  watched: boolean;
+  watchedEpisodes: Set<string>;
 };
 
 const mediaKey = (mediaType: MediaType, mediaId: number) => `${mediaType}:${mediaId}`;
-const todayDateOnly = () => new Date().toISOString().slice(0, 10);
+const episodeKey = (seasonNumber: number, episodeNumber: number) => `${seasonNumber}:${episodeNumber}`;
 
 const getTrackedTitles = async (userId: string): Promise<TrackedTitle[]> => {
   const [trackedMedia, episodeWatches] = await prisma.$transaction([
@@ -33,7 +35,7 @@ const getTrackedTitles = async (userId: string): Promise<TrackedTitle[]> => {
           },
         ],
       },
-      select: { media_id: true, media_type: true },
+      select: { media_id: true, media_type: true, watched: true },
     }),
     prisma.watchEvent.findMany({
       where: {
@@ -42,8 +44,7 @@ const getTrackedTitles = async (userId: string): Promise<TrackedTitle[]> => {
         seasonNumber: { not: null },
         episodeNumber: { not: null },
       },
-      distinct: ['media_id'],
-      select: { media_id: true },
+      select: { media_id: true, seasonNumber: true, episodeNumber: true },
     }),
   ]);
   const titles = new Map<string, TrackedTitle>();
@@ -52,13 +53,27 @@ const getTrackedTitles = async (userId: string): Promise<TrackedTitle[]> => {
     titles.set(mediaKey(item.media_type, item.media_id), {
       mediaId: item.media_id,
       mediaType: item.media_type,
+      watched: item.watched,
+      watchedEpisodes: new Set(),
     });
   }
 
   for (const watch of episodeWatches) {
-    titles.set(mediaKey(MediaType.tv, watch.media_id), {
+    if (watch.seasonNumber === null || watch.episodeNumber === null) continue;
+
+    const key = mediaKey(MediaType.tv, watch.media_id);
+    const title = titles.get(key);
+
+    if (title) {
+      title.watchedEpisodes.add(episodeKey(watch.seasonNumber, watch.episodeNumber));
+      continue;
+    }
+
+    titles.set(key, {
       mediaId: watch.media_id,
       mediaType: MediaType.tv,
+      watched: false,
+      watchedEpisodes: new Set([episodeKey(watch.seasonNumber, watch.episodeNumber)]),
     });
   }
 
@@ -101,38 +116,61 @@ const tvMedia = (details: TMDBTvDetails): UpcomingMedia => ({
   original_language: details.original_language ?? null,
 });
 
-const episodeModel = (episode: TMDBTvSeasonEpisode): UpcomingEpisode => ({
+const episodeModel = (episode: TMDBTvSeasonEpisode, watchedEpisodes: Set<string>): UpcomingEpisode => ({
   seasonNumber: episode.season_number,
   episodeNumber: episode.episode_number,
   episodeId: episode.id,
   name: episode.name || `Episode ${episode.episode_number}`,
+  watched: watchedEpisodes.has(episodeKey(episode.season_number, episode.episode_number)),
 });
 
-const resolveMovie = async (mediaId: number, from: string, to: string): Promise<UpcomingEntry[]> => {
-  const details = (await fetchMediaDetails('movie', mediaId)) as TMDBMovieDetails;
+const resolveMovie = async (title: TrackedTitle, from: string, to: string): Promise<UpcomingEntry[]> => {
+  const details = (await fetchMediaDetails('movie', title.mediaId)) as TMDBMovieDetails;
   const date = details.release_date;
 
   if (!date || date < from || date > to) return [];
 
-  return [{ kind: 'movie-release', date, media: movieMedia(details) }];
+  return [{ kind: 'movie-release', date, media: movieMedia(details), watched: title.watched }];
 };
 
-const resolveTv = async (mediaId: number, from: string, to: string): Promise<UpcomingEntry[]> => {
-  const details = (await fetchMediaDetails('tv', mediaId)) as TMDBTvDetails;
-  const nextEpisode = details.next_episode_to_air;
+const getRelevantSeasonNumbers = (details: TMDBTvDetails, from: string, to: string) => {
+  const seasons = details.seasons
+    .filter((season) => season.season_number > 0 && Boolean(season.air_date))
+    .sort((left, right) => left.air_date.localeCompare(right.air_date));
 
-  if (!nextEpisode?.air_date || nextEpisode.season_number <= 0 || nextEpisode.air_date > to) return [];
+  const relevantSeasons = seasons.filter((season, index) => {
+    const nextSeason = seasons[index + 1];
 
-  const season = await fetchTvSeasonDetails(mediaId, nextEpisode.season_number);
+    return season.air_date <= to && (!nextSeason || nextSeason.air_date >= from);
+  });
+
+  if (relevantSeasons.length > 0) return relevantSeasons.map((season) => season.season_number);
+
+  const nextSeason = details.next_episode_to_air;
+  return nextSeason && nextSeason.season_number > 0 && nextSeason.air_date <= to ? [nextSeason.season_number] : [];
+};
+
+const resolveTv = async (title: TrackedTitle, from: string, to: string): Promise<UpcomingEntry[]> => {
+  const details = (await fetchMediaDetails('tv', title.mediaId)) as TMDBTvDetails;
+  if (details.last_air_date && details.last_air_date < from && !details.in_production) return [];
+
   const episodesByDate = new Map<string, Map<string, UpcomingEpisode>>();
+  const seasonNumbers = getRelevantSeasonNumbers(details, from, to);
 
-  for (const episode of season.episodes) {
-    const date = episode.air_date;
-    if (!date || episode.season_number <= 0 || date < from || date > to) continue;
+  for (const seasonNumber of seasonNumbers) {
+    const season = await fetchTvSeasonDetails(title.mediaId, seasonNumber);
 
-    const episodes = episodesByDate.get(date) ?? new Map<string, UpcomingEpisode>();
-    episodes.set(`${episode.season_number}:${episode.episode_number}`, episodeModel(episode));
-    episodesByDate.set(date, episodes);
+    for (const episode of season.episodes) {
+      const date = episode.air_date;
+      if (!date || episode.season_number <= 0 || date < from || date > to) continue;
+
+      const episodes = episodesByDate.get(date) ?? new Map<string, UpcomingEpisode>();
+      episodes.set(
+        episodeKey(episode.season_number, episode.episode_number),
+        episodeModel(episode, title.watchedEpisodes),
+      );
+      episodesByDate.set(date, episodes);
+    }
   }
 
   const media = tvMedia(details);
@@ -147,9 +185,7 @@ const resolveTv = async (mediaId: number, from: string, to: string): Promise<Upc
 };
 
 const resolveTitle = (title: TrackedTitle, from: string, to: string) =>
-  title.mediaType === MediaType.movie
-    ? resolveMovie(title.mediaId, from, to)
-    : resolveTv(title.mediaId, from, to);
+  title.mediaType === MediaType.movie ? resolveMovie(title, from, to) : resolveTv(title, from, to);
 
 const settleInBatches = async (titles: TrackedTitle[], from: string, to: string) => {
   const results: PromiseSettledResult<UpcomingEntry[]>[] = [];
@@ -175,8 +211,7 @@ const sortEntries = (entries: UpcomingEntry[]) =>
 
 export const getUpcomingSchedule = async (userId: string, query: UpcomingQuery): Promise<UpcomingResponse> => {
   const titles = await getTrackedTitles(userId);
-  const effectiveFrom = query.from < todayDateOnly() ? todayDateOnly() : query.from;
-  const results = await settleInBatches(titles, effectiveFrom, query.to);
+  const results = await settleInBatches(titles, query.from, query.to);
   const successful = results.filter(
     (result): result is PromiseFulfilledResult<UpcomingEntry[]> => result.status === 'fulfilled',
   );

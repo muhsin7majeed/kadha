@@ -25,27 +25,31 @@ const monthEnd = (year: number, month: number) =>
 const UpcomingPageContent = () => {
   const [today] = useState(() => new Date());
   const todayDate = utcDateOnly(today);
-  const currentMonthKey = todayDate.slice(0, 7);
+  const minimumDate = utcDateOnly(addUtcDays(today, -90));
+  const maximumDate = utcDateOnly(addUtcDays(today, 90));
+  const minimumMonthKey = minimumDate.slice(0, 7);
+  const maximumMonthKey = maximumDate.slice(0, 7);
   const [view, setView] = useState<UpcomingView>("list");
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
   const range = useMemo(() => {
     if (view === "list") {
-      return { from: todayDate, to: utcDateOnly(addUtcDays(today, 91)) };
+      return { from: todayDate, to: maximumDate };
     }
 
     const monthStart = `${year}-${pad(month)}-01`;
+    const monthEndDate = monthEnd(year, month);
     return {
-      from: monthStart < todayDate ? todayDate : monthStart,
-      to: monthEnd(year, month),
+      from: monthStart < minimumDate ? minimumDate : monthStart,
+      to: monthEndDate > maximumDate ? maximumDate : monthEndDate,
     };
-  }, [month, today, todayDate, view, year]);
+  }, [maximumDate, minimumDate, month, todayDate, view, year]);
   const upcoming = useUpcoming(range);
 
   const changePeriod = (nextYear: number, nextMonth: number) => {
     const nextMonthKey = `${nextYear}-${pad(nextMonth)}`;
-    if (nextMonthKey < currentMonthKey) return;
+    if (nextMonthKey < minimumMonthKey || nextMonthKey > maximumMonthKey) return;
 
     setYear(nextYear);
     setMonth(nextMonth);
@@ -111,7 +115,9 @@ const UpcomingPageContent = () => {
           {view === "month" && (
             <UpcomingCalendar
               entries={upcoming.data.entries}
-              minimumDate={todayDate}
+              minimumDate={minimumDate}
+              maximumDate={maximumDate}
+              todayDate={todayDate}
               month={month}
               onPeriodChange={changePeriod}
               onSelectDate={setSelectedDate}

@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const tmdbClient = vi.hoisted(() => ({
   fetchMediaDetails: vi.fn(),
@@ -81,7 +81,18 @@ const createTvDetails = (id: number, date = '2999-01-10', seasonNumber = 1) => (
   poster_path: null,
   production_companies: [],
   production_countries: [],
-  seasons: [],
+  seasons: [
+    {
+      air_date: date,
+      episode_count: 2,
+      id: id * 10 + seasonNumber,
+      name: `Season ${seasonNumber}`,
+      overview: '',
+      poster_path: null,
+      season_number: seasonNumber,
+      vote_average: 0,
+    },
+  ],
   spoken_languages: [],
   status: 'Returning Series',
   tagline: null,
@@ -90,14 +101,14 @@ const createTvDetails = (id: number, date = '2999-01-10', seasonNumber = 1) => (
   vote_count: 20,
 });
 
-const createEpisode = (showId: number, episodeNumber: number, airDate: string) => ({
+const createEpisode = (showId: number, episodeNumber: number, airDate: string, seasonNumber = 1) => ({
   air_date: airDate,
   episode_number: episodeNumber,
   id: showId * 100 + episodeNumber,
   name: `Episode ${episodeNumber}`,
   overview: '',
   runtime: 45,
-  season_number: 1,
+  season_number: seasonNumber,
   still_path: null,
   vote_average: 0,
   vote_count: 0,
@@ -111,6 +122,15 @@ const createSnapshot = (mediaId: number, mediaType: 'movie' | 'tv') =>
       title: `${mediaType} ${mediaId}`,
     },
   });
+
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2999-01-01T12:00:00.000Z'));
+});
+
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -206,6 +226,72 @@ describe('upcoming tracked schedule', () => {
     ]);
   });
 
+  it('returns historical releases with local watched state', async () => {
+    const user = await registerTestUser('upcoming-history');
+    await Promise.all([createSnapshot(601, 'tv'), createSnapshot(602, 'movie')]);
+    await prisma.userMedia.createMany({
+      data: [
+        { userId: user.userId, media_id: 601, media_type: 'tv', watchlist: true },
+        { userId: user.userId, media_id: 602, media_type: 'movie', watchlist: true, watched: true },
+      ],
+    });
+    await prisma.watchEvent.create({
+      data: {
+        userId: user.userId,
+        media_id: 601,
+        media_type: 'tv',
+        seasonNumber: 1,
+        episodeNumber: 1,
+      },
+    });
+    tmdbClient.fetchMediaDetails.mockImplementation((mediaType: 'movie' | 'tv', id: number) => {
+      if (mediaType === 'movie') return Promise.resolve(createMovieDetails(id, '2998-12-20'));
+
+      return Promise.resolve({
+        ...createTvDetails(id),
+        seasons: [
+          {
+            ...createTvDetails(id).seasons[0],
+            air_date: '2998-12-01',
+          },
+        ],
+      });
+    });
+    tmdbClient.fetchTvSeasonDetails.mockResolvedValue({
+      air_date: '2998-12-01',
+      episodes: [
+        createEpisode(601, 1, '2998-12-15'),
+        createEpisode(601, 2, '2999-01-10'),
+      ],
+      id: 601,
+      name: 'Season 1',
+      overview: '',
+      poster_path: null,
+      season_number: 1,
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/upcoming?from=2998-12-01&to=2999-01-31')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.entries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'episode-release',
+          date: '2998-12-15',
+          episodes: [expect.objectContaining({ episodeNumber: 1, watched: true })],
+        }),
+        expect.objectContaining({
+          kind: 'episode-release',
+          date: '2999-01-10',
+          episodes: [expect.objectContaining({ episodeNumber: 2, watched: false })],
+        }),
+        expect.objectContaining({ kind: 'movie-release', date: '2998-12-20', watched: true }),
+      ]),
+    );
+  });
+
   it('orders same-day entries by stable media identity instead of provider title', async () => {
     const user = await registerTestUser('upcoming-order');
     await Promise.all([createSnapshot(501, 'movie'), createSnapshot(502, 'movie')]);
@@ -277,6 +363,10 @@ describe('upcoming tracked schedule', () => {
     await request(app).get('/api/upcoming?from=2999-01-02&to=2999-01-01').set('Authorization', auth).expect(400);
     await request(app).get('/api/upcoming?from=2999-01-01&to=2999-04-03').set('Authorization', auth).expect(400);
     await request(app).get('/api/upcoming?from=2999-02-30&to=2999-03-01').set('Authorization', auth).expect(400);
+    await request(app).get('/api/upcoming?from=2998-10-02&to=2998-10-02').set('Authorization', auth).expect(400);
+    await request(app).get('/api/upcoming?from=2999-04-02&to=2999-04-02').set('Authorization', auth).expect(400);
+    await request(app).get('/api/upcoming?from=2998-10-03&to=2998-10-03').set('Authorization', auth).expect(200);
+    await request(app).get('/api/upcoming?from=2999-04-01&to=2999-04-01').set('Authorization', auth).expect(200);
   });
 
   it('returns partial coverage and fails only when every tracked title resolution fails', async () => {

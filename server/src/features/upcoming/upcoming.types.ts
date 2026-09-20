@@ -22,12 +22,14 @@ export interface UpcomingEpisode {
   episodeNumber: number;
   episodeId: number;
   name: string;
+  watched: boolean;
 }
 
 export interface UpcomingMovieRelease {
   kind: 'movie-release';
   date: string;
   media: UpcomingMedia;
+  watched: boolean;
 }
 
 export interface UpcomingEpisodeRelease {

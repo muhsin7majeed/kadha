@@ -32,7 +32,11 @@ const UpcomingList = ({ entries, todayDate }: UpcomingListProps) => {
           </HStack>
           <Stack gap="3">
             {datedEntries.map((entry) => (
-              <UpcomingEntry key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}:${entry.date}`} entry={entry} />
+              <UpcomingEntry
+                key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}:${entry.date}`}
+                entry={entry}
+                todayDate={todayDate}
+              />
             ))}
           </Stack>
         </Stack>

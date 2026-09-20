@@ -25,6 +25,7 @@ interface CalendarMonthGridProps {
   getDayLabel: (date: string) => string;
   hasContent?: (date: string) => boolean;
   minimumDate?: string;
+  maximumDate?: string;
   month: number;
   onPeriodChange: (year: number, month: number) => void;
   onSelectDate: (date: string) => void;
@@ -38,6 +39,7 @@ const CalendarMonthGrid = ({
   getDayLabel,
   hasContent = () => false,
   minimumDate,
+  maximumDate,
   month,
   onPeriodChange,
   onSelectDate,
@@ -47,6 +49,11 @@ const CalendarMonthGrid = ({
   year,
 }: CalendarMonthGridProps) => {
   const periodStart = dateKey(year, month, 1);
+  const periodKey = `${year}-${pad(month)}`;
+  const minimumMonthKey = minimumDate?.slice(0, 7);
+  const maximumMonthKey = maximumDate?.slice(0, 7);
+  const previousMonthDisabled = Boolean(minimumMonthKey && periodKey <= minimumMonthKey);
+  const nextMonthDisabled = Boolean(maximumMonthKey && periodKey >= maximumMonthKey);
   const defaultFocusDate =
     minimumDate?.startsWith(`${year}-${pad(month)}-`) && minimumDate > periodStart ? minimumDate : periodStart;
   const focusedDate = selectedDate?.startsWith(`${year}-${pad(month)}-`) ? selectedDate : defaultFocusDate;
@@ -72,6 +79,7 @@ const CalendarMonthGrid = ({
         timeZone="UTC"
         focusedValue={focusedValue}
         min={minimumDate ? parseDate(minimumDate) : undefined}
+        max={maximumDate ? parseDate(maximumDate) : undefined}
         value={selectedDate ? [parseDate(selectedDate)] : []}
         onFocusChange={(details) => handleFocusChange(details.focusedValue)}
         onValueChange={(details) => {
@@ -97,6 +105,7 @@ const CalendarMonthGrid = ({
                     <DatePicker.PrevTrigger asChild>
                       <Button
                         aria-label="Previous month"
+                        disabled={previousMonthDisabled}
                         variant="outline"
                         colorPalette="gray"
                         size="sm"
@@ -119,17 +128,22 @@ const CalendarMonthGrid = ({
                             px="2"
                             onChange={(event) => onPeriodChange(year, Number(event.currentTarget.value))}
                           >
-                            {monthNames.map((name, index) => (
-                              <option
-                                key={name}
-                                value={index + 1}
-                                disabled={
-                                  minimumDate?.startsWith(`${year}-`) && index + 1 < Number(minimumDate.slice(5, 7))
-                                }
-                              >
-                                {name}
-                              </option>
-                            ))}
+                            {monthNames.map((name, index) => {
+                              const monthKey = `${year}-${pad(index + 1)}`;
+
+                              return (
+                                <option
+                                  key={name}
+                                  value={index + 1}
+                                  disabled={
+                                    (minimumMonthKey !== undefined && monthKey < minimumMonthKey) ||
+                                    (maximumMonthKey !== undefined && monthKey > maximumMonthKey)
+                                  }
+                                >
+                                  {name}
+                                </option>
+                              );
+                            })}
                           </NativeSelect.Field>
                           <NativeSelect.Indicator />
                         </NativeSelect.Root>
@@ -144,6 +158,7 @@ const CalendarMonthGrid = ({
                     <DatePicker.NextTrigger asChild>
                       <Button
                         aria-label="Next month"
+                        disabled={nextMonthDisabled}
                         variant="outline"
                         colorPalette="gray"
                         size="sm"
