@@ -14,6 +14,7 @@ const AccountSettings = lazy(() => import('@/pages/settings/account'));
 const Activity = lazy(() => import('@/pages/activity'));
 const AppearanceSettings = lazy(() => import('@/pages/settings/appearance'));
 const Collections = lazy(() => import('@/pages/collections'));
+const CollectionDetails = lazy(() => import('@/pages/collections/collection-details'));
 const DataSettings = lazy(() => import('@/pages/settings/data'));
 const Diary = lazy(() => import('@/pages/diary'));
 const Discover = lazy(() => import('@/pages/discover'));
@@ -58,6 +59,7 @@ export function AppRoutes() {
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />
+            <Route path="collections/:id" element={<CollectionDetails />} />
             <Route path="settings" element={<Settings />}>
               <Route index element={<Navigate to="account" replace />} />
               <Route path="account" element={<AccountSettings />} />

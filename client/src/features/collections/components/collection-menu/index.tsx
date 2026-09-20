@@ -11,9 +11,10 @@ import CollectionMembersDialog from '../collection-members-dialog';
 
 interface CollectionMenuProps {
   collection: Collection;
+  onCollectionUnavailable?: () => void;
 }
 
-const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
+const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection, onCollectionUnavailable }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
@@ -30,6 +31,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
     await deleteCollection(collection.id);
 
     setIsDeleteDialogOpen(false);
+    onCollectionUnavailable?.();
   };
 
   const handleLeaveCollection = async () => {
@@ -38,6 +40,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
     await leaveCollection.mutateAsync(collection.id);
 
     setIsLeaveDialogOpen(false);
+    onCollectionUnavailable?.();
   };
 
   return (
@@ -88,7 +91,7 @@ const CollectionMenu: React.FC<CollectionMenuProps> = ({ collection }) => {
 
       <Menu.Root>
         <Menu.Trigger asChild>
-          <IconButton variant="ghost" aria-label="Open Menu" title="Open Menu">
+          <IconButton variant="ghost" aria-label={`Actions for ${collection.name}`} title="Collection actions">
             <LuEllipsis />
           </IconButton>
         </Menu.Trigger>

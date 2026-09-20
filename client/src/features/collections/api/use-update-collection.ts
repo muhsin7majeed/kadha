@@ -3,7 +3,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { CollectionFormFields } from '@/features/collections/collections.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { invalidateCollections } from './invalidate-collection-queries';
+import { invalidateCollection, invalidateCollections } from './invalidate-collection-queries';
 
 interface UpdateCollectionPayload extends CollectionFormFields {
   id: string;
@@ -21,12 +21,13 @@ const useUpdateCollection = () => {
   return useMutation<unknown, unknown, UpdateCollectionPayload>({
     mutationFn: (payload: UpdateCollectionPayload) => updateCollection(payload),
     onError: useErrorHandler,
-    onSuccess: () => {
+    onSuccess: (_data, payload) => {
       toaster.success({
         title: 'Collection updated successfully',
       });
 
-      invalidateCollections(queryClient);
+      void invalidateCollections(queryClient);
+      void invalidateCollection(queryClient, payload.id);
     },
   });
 };

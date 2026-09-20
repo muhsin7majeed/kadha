@@ -5,9 +5,9 @@ import { Link } from 'react-router';
 import type { Collection, ProfileCollectionSummary } from '@/features/collections/collections.types';
 import {
   getCollectionAccessLabel,
+  getCollectionPrivacyLabel,
   getCollectionSharingLabel,
 } from '@/features/collections/utils/collection-sharing';
-import { DataPrivacy } from '@/types/common';
 
 type CollectionListEntry = Collection | ProfileCollectionSummary;
 
@@ -17,13 +17,6 @@ interface CollectionListProps {
   renderActions?: (collection: CollectionListEntry) => ReactNode;
   showPeople?: boolean;
 }
-
-const privacyLabels: Record<DataPrivacy, string> = {
-  [DataPrivacy.Public]: 'Public',
-  [DataPrivacy.KadhaUsers]: 'Visible to Kadha users',
-  [DataPrivacy.Friends]: 'Visible to friends',
-  [DataPrivacy.OnlyMe]: 'Only you',
-};
 
 const isAuthenticatedCollection = (collection: CollectionListEntry): collection is Collection =>
   'userId' in collection;
@@ -82,7 +75,7 @@ const CollectionList = ({ collections, getDetailsPath, renderActions, showPeople
                     {collection.itemCount ?? 0} {(collection.itemCount ?? 0) === 1 ? 'item' : 'items'}
                   </Badge>
                   <Badge variant="subtle" colorPalette="gray">
-                    {privacyLabels[collection.privacy]}
+                    {getCollectionPrivacyLabel(collection.privacy)}
                   </Badge>
                   {sharingLabel && (
                     <Text color="fg.muted" textStyle="supporting">
