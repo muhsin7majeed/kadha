@@ -48,7 +48,7 @@ const response: UpcomingResponse = {
         original_title: 'Group Drop',
         overview: 'Two episodes arrive together.',
         popularity: 1,
-        poster_path: null,
+        poster_path: '/group-drop.jpg',
         release_date: '2020-01-01',
         title: 'Group Drop',
         vote_average: 8,
@@ -119,6 +119,15 @@ describe('UpcomingPageContent', () => {
     expect(screen.getByText('S2 E2 · Again')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Future Film' })).toHaveAttribute('href', '/app/media/movie/301');
     expect(screen.getAllByRole('link', { name: 'Group Drop' })).toHaveLength(1);
+    const showPoster = screen.getByRole('img', { name: 'Group Drop poster' });
+    expect(showPoster).toHaveAttribute('src', 'https://image.tmdb.org/t/p/w185/group-drop.jpg');
+    expect(screen.getByRole('img', { name: 'Future Film poster' })).toHaveAttribute(
+      'src',
+      '/assets/images/image-placeholder.svg',
+    );
+
+    fireEvent.error(showPoster);
+    expect(showPoster).toHaveAttribute('src', '/assets/images/image-placeholder.svg');
   });
 
   it('keeps successful entries visible while disclosing partial provider coverage', () => {
@@ -172,6 +181,7 @@ describe('UpcomingPageContent', () => {
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Selected day' })).toBeInTheDocument());
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Group Drop poster' })).toBeInTheDocument();
     expect(screen.getByText('S2 E1 · Return')).toBeInTheDocument();
     expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-20', to: '2026-09-30' });
   });
