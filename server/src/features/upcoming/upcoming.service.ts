@@ -167,8 +167,8 @@ const sortEntries = (entries: UpcomingEntry[]) =>
     const dateDifference = left.date.localeCompare(right.date);
     if (dateDifference !== 0) return dateDifference;
 
-    const titleDifference = left.media.title.localeCompare(right.media.title);
-    if (titleDifference !== 0) return titleDifference;
+    const mediaTypeDifference = left.media.media_type.localeCompare(right.media.media_type);
+    if (mediaTypeDifference !== 0) return mediaTypeDifference;
 
     return left.media.media_id - right.media.media_id;
   });

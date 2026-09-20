@@ -12,25 +12,25 @@ import UpcomingCalendar from './upcoming-calendar';
 type UpcomingView = 'agenda' | 'month';
 
 const pad = (value: number) => String(value).padStart(2, '0');
-const localDateOnly = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-const addDays = (date: Date, days: number) => {
+const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
+const addUtcDays = (date: Date, days: number) => {
   const next = new Date(date);
-  next.setDate(next.getDate() + days);
+  next.setUTCDate(next.getUTCDate() + days);
   return next;
 };
-const monthEnd = (year: number, month: number) => localDateOnly(new Date(year, month, 0));
+const monthEnd = (year: number, month: number) => utcDateOnly(new Date(Date.UTC(year, month, 0)));
 
 const UpcomingPageContent = () => {
   const [today] = useState(() => new Date());
-  const todayDate = localDateOnly(today);
+  const todayDate = utcDateOnly(today);
   const currentMonthKey = todayDate.slice(0, 7);
   const [view, setView] = useState<UpcomingView>('agenda');
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1);
+  const [year, setYear] = useState(today.getUTCFullYear());
+  const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
   const range = useMemo(() => {
     if (view === 'agenda') {
-      return { from: todayDate, to: localDateOnly(addDays(today, 91)) };
+      return { from: todayDate, to: utcDateOnly(addUtcDays(today, 91)) };
     }
 
     const monthStart = `${year}-${pad(month)}-01`;
@@ -79,12 +79,6 @@ const UpcomingPageContent = () => {
           description="Could not refresh the schedule for your tracked titles."
           onRetry={upcoming.refetch}
         />
-      ) : upcoming.data.entries.length === 0 && view === 'agenda' ? (
-        <EmptyState
-          title="Nothing scheduled"
-          description="No tracked episodes or watchlist movie releases have dates in this period."
-          icon={<LuPartyPopper />}
-        />
       ) : (
         <Stack gap="5" aria-busy={upcoming.isFetching}>
           {upcoming.data.coverage.failedTitles > 0 && (
@@ -100,9 +94,17 @@ const UpcomingPageContent = () => {
             </Alert.Root>
           )}
 
-          {view === 'agenda' ? (
+          {view === 'agenda' && upcoming.data.entries.length === 0 && (
+            <EmptyState
+              title="Nothing scheduled"
+              description="No tracked episodes or watchlist movie releases have dates in this period."
+              icon={<LuPartyPopper />}
+            />
+          )}
+          {view === 'agenda' && upcoming.data.entries.length > 0 && (
             <UpcomingAgenda entries={upcoming.data.entries} />
-          ) : (
+          )}
+          {view === 'month' && (
             <UpcomingCalendar
               entries={upcoming.data.entries}
               minimumDate={todayDate}

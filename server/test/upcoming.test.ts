@@ -206,6 +206,33 @@ describe('upcoming tracked schedule', () => {
     ]);
   });
 
+  it('orders same-day entries by stable media identity instead of provider title', async () => {
+    const user = await registerTestUser('upcoming-order');
+    await Promise.all([createSnapshot(501, 'movie'), createSnapshot(502, 'movie')]);
+    await prisma.userMedia.createMany({
+      data: [
+        { userId: user.userId, media_id: 501, media_type: 'movie', watchlist: true },
+        { userId: user.userId, media_id: 502, media_type: 'movie', watchlist: true },
+      ],
+    });
+    tmdbClient.fetchMediaDetails.mockImplementation((_mediaType: 'movie' | 'tv', id: number) =>
+      Promise.resolve({
+        ...createMovieDetails(id),
+        original_title: id === 501 ? 'Zulu' : 'Alpha',
+        title: id === 501 ? 'Zulu' : 'Alpha',
+      }),
+    );
+
+    const response = await request(await getTestApp())
+      .get(`/api/upcoming${range}`)
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.entries.map((entry: { media: { media_id: number } }) => entry.media.media_id)).toEqual([
+      501, 502,
+    ]);
+  });
+
   it('validates date ranges and keeps inclusive boundaries while excluding specials', async () => {
     const user = await registerTestUser('upcoming-range');
     await Promise.all([createSnapshot(301, 'tv'), createSnapshot(302, 'tv')]);

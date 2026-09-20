@@ -30,6 +30,8 @@ vi.mock('@/features/upcoming/api/use-upcoming', () => ({
 
 import UpcomingPageContent from './upcoming-page-content';
 
+const testNow = new Date('2026-09-20T12:00:00.000Z');
+
 const response: UpcomingResponse = {
   coverage: { trackedTitles: 2, resolvedTitles: 2, failedTitles: 0 },
   entries: [
@@ -90,7 +92,6 @@ const renderContent = () =>
 describe('UpcomingPageContent', () => {
   beforeAll(() => {
     vi.useFakeTimers({ toFake: ['Date'] });
-    vi.setSystemTime(new Date('2026-09-20T12:00:00.000Z'));
   });
 
   afterAll(() => {
@@ -98,6 +99,7 @@ describe('UpcomingPageContent', () => {
   });
 
   beforeEach(() => {
+    vi.setSystemTime(testNow);
     mocks.data = structuredClone(response);
     mocks.error = null;
     mocks.isFetching = false;
@@ -128,6 +130,35 @@ describe('UpcomingPageContent', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Some upcoming dates could not be refreshed');
     expect(screen.getByRole('link', { name: 'Group Drop' })).toBeInTheDocument();
+  });
+
+  it('discloses partial provider coverage even when the resolved titles have no entries', () => {
+    mocks.data = {
+      entries: [],
+      coverage: { trackedTitles: 2, resolvedTitles: 1, failedTitles: 1 },
+    };
+
+    renderContent();
+
+    expect(screen.getByRole('status')).toHaveTextContent('Some upcoming dates could not be refreshed');
+    expect(screen.getByText('Nothing scheduled')).toBeInTheDocument();
+  });
+
+  it('uses the UTC calendar date for the query boundary', () => {
+    const originalTimeZone = process.env.TZ;
+    process.env.TZ = 'America/Los_Angeles';
+    vi.setSystemTime(new Date('2026-09-21T00:30:00.000Z'));
+
+    try {
+      renderContent();
+      expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-21', to: '2026-12-21' });
+    } finally {
+      if (originalTimeZone === undefined) {
+        delete process.env.TZ;
+      } else {
+        process.env.TZ = originalTimeZone;
+      }
+    }
   });
 
   it('switches to the month grid, selects a populated date, and requests new months', async () => {
