@@ -25,10 +25,10 @@ const InProgressTvCard = ({ item }: { item: TvInProgressItem }) => {
   const nextEpisode = item.tvProgress.nextEpisode;
 
   return (
-    <Stack gap="3" width="full" maxW="220px">
+    <Stack gap="3" width="full" maxW="220px" h="full">
       <MediaCard media={toMediaCardModel(item)} />
 
-      <Stack gap="3" borderWidth="1px" borderColor="border" borderRadius="md" p="3" minH="44">
+      <Stack gap="3" borderWidth="1px" borderColor="border" borderRadius="md" p="3" minH="44" flex="1">
         <HStack gap="2" justify="space-between" align="start">
           <Badge colorPalette={getBadgePalette(item.tvProgress.status)}>
             {tvProgressStatusLabel[item.tvProgress.status]}

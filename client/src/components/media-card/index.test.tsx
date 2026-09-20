@@ -53,8 +53,8 @@ describe('media card metadata', () => {
 
     expect(screen.getByText('7.8')).toBeInTheDocument();
     expect(screen.getByText(/from 123 votes/)).toBeInTheDocument();
+    expect(screen.getByText('2h 12m')).toBeInTheDocument();
     expect(screen.queryByText('TMDB 7.8')).not.toBeInTheDocument();
-    expect(screen.queryByText('2h 12m')).not.toBeInTheDocument();
     expect(screen.queryByText('Your rating 4.5/5')).not.toBeInTheDocument();
   });
 });

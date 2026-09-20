@@ -28,16 +28,22 @@ const MediaCard = ({
   width = { base: '150px', md: '100%' },
 }: MediaCardProps) => {
   const genreMap = useGenreAtom();
+  const runtime = media.runtime && media.runtime > 0 ? media.runtime : null;
 
   return (
     <Box
       aspectRatio="2 / 3"
+      borderWidth="1px"
+      borderColor="border"
       borderRadius="lg"
-      transition="transform 0.2s"
+      overflow="hidden"
+      shadow="sm"
+      transition="transform 0.2s, box-shadow 0.2s"
       position="relative"
       w={width}
       maxW="220px"
       flexShrink={0}
+      _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
     >
       <Image
         src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
@@ -76,24 +82,17 @@ const MediaCard = ({
               </Badge>
             )}
 
-            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
+            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle" colorPalette="gray">
               {media.adult ? 'R' : 'PG-13'}
             </Badge>
 
-            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle">
+            <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle" colorPalette="gray">
               {media.media_type === 'movie' ? 'Movie' : 'TV'}
             </Badge>
 
             {showLibraryMetadata && (
               <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="surface" colorPalette="blackAlpha">
                 TMDB {media.vote_average.toFixed(1)}
-              </Badge>
-            )}
-
-            {showLibraryMetadata && media.runtime !== null && media.runtime !== undefined && media.runtime > 0 && (
-              <Badge size={{ mdDown: 'xs', md: 'sm' }} variant="subtle" colorPalette="gray">
-                {minutesToHours(media.runtime)}
-                {media.media_type === 'tv' ? '/episode' : ''}
               </Badge>
             )}
 
@@ -120,27 +119,40 @@ const MediaCard = ({
           backdropFilter="blur(10px)"
           borderRadius="lg"
           w="100%"
+          minH={{ base: '5rem', md: '6rem' }}
         >
-          <NavLink
-            to={`${detailsPathPrefix}/${media.media_type}/${media.media_id}`}
-            textStyle="cardTitle"
-            lineClamp={2}
-            onClick={onNavigate}
-          >
-            {media.title} ({formatDate(media.release_date, 'YYYY')})
-          </NavLink>
+          <Box minH={{ base: '2.25rem', md: '2.75rem' }}>
+            <NavLink
+              to={`${detailsPathPrefix}/${media.media_type}/${media.media_id}`}
+              textStyle="cardTitle"
+              lineClamp={2}
+              color="inherit"
+              onClick={onNavigate}
+            >
+              {media.title} ({formatDate(media.release_date, 'YYYY')})
+            </NavLink>
+          </Box>
 
           <Flex
             gap={1}
+            align="center"
             w="100%"
             minW={0}
             maxW="100%"
+            minH={{ base: '1.25rem', md: '1.5rem' }}
             overflowX="auto"
             css={{ scrollbarWidth: 'none' }}
             my={{ base: 0, md: 1 }}
           >
+            {runtime !== null && (
+              <Badge flexShrink={0} size={{ mdDown: 'xs', md: 'sm' }} variant="subtle" colorPalette="gray">
+                {minutesToHours(runtime)}
+                {media.media_type === 'tv' ? '/episode' : ''}
+              </Badge>
+            )}
+
             {media.genre_ids.map((genre) => (
-              <Badge key={genre} size={{ mdDown: 'xs', md: 'sm' }} variant="plain" colorPalette="cyan" mr={1}>
+              <Badge key={genre} flexShrink={0} size={{ mdDown: 'xs', md: 'sm' }} variant="plain" colorPalette="gray">
                 {genreMap[genre]}
               </Badge>
             ))}
