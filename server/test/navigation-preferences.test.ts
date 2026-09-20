@@ -11,6 +11,7 @@ const defaultItemIds = [
   'recommendations',
   'watchlist',
   'in-progress',
+  'upcoming',
   'collections',
   'activity',
   'diary',
@@ -20,7 +21,8 @@ const defaultItemIds = [
   'settings',
   'menu',
 ];
-const legacyItemIds = defaultItemIds.filter((id) => id !== 'discover');
+const preUpcomingItemIds = defaultItemIds.filter((id) => id !== 'upcoming');
+const legacyItemIds = defaultItemIds.filter((id) => id !== 'discover' && id !== 'upcoming');
 
 const legacyCompactItems = (visibleIds: string[]) => {
   const visible = new Set(visibleIds);
@@ -159,11 +161,16 @@ describe('navigation preferences', () => {
       .set('Authorization', authorization(user))
       .expect(200);
 
-    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([...legacyItemIds, 'discover']);
+    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([
+      ...legacyItemIds,
+      'discover',
+      'upcoming',
+    ]);
     expect(
       response.body.data.items.filter((item: { visible: boolean }) => item.visible).map((item: { id: string }) => item.id),
     ).toEqual(legacyVisibleIds);
     expect(response.body.data.items.find((item: { id: string }) => item.id === 'discover').visible).toBe(false);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'upcoming').visible).toBe(false);
   });
 
   it('adds Discover to a legacy compact bar with a free slot without replacing For You', async () => {
@@ -185,11 +192,45 @@ describe('navigation preferences', () => {
       .set('Authorization', authorization(user))
       .expect(200);
 
-    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([...legacyItemIds, 'discover']);
+    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([
+      ...legacyItemIds,
+      'discover',
+      'upcoming',
+    ]);
     expect(
       response.body.data.items.filter((item: { visible: boolean }) => item.visible).map((item: { id: string }) => item.id),
     ).toEqual([...legacyVisibleIds, 'discover']);
     expect(response.body.data.items.find((item: { id: string }) => item.id === 'recommendations').visible).toBe(true);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'upcoming').visible).toBe(false);
+  });
+
+  it('appends Upcoming hidden without displacing a saved compact destination', async () => {
+    const user = await registerTestUser('navigation-pre-upcoming');
+    const visibleIds = ['home', 'discover', 'watchlist', 'in-progress', 'collections', 'menu'];
+    await prisma.navigationPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          layout: 'compact',
+          items: preUpcomingItemIds.map((id) => ({ id, visible: visibleIds.includes(id), display: 'both' })),
+        }),
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/navigation-preferences')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body.data.items.map((item: { id: string }) => item.id)).toEqual([
+      ...preUpcomingItemIds,
+      'upcoming',
+    ]);
+    expect(
+      response.body.data.items.filter((item: { visible: boolean }) => item.visible).map((item: { id: string }) => item.id),
+    ).toEqual(visibleIds);
+    expect(response.body.data.items.find((item: { id: string }) => item.id === 'upcoming').visible).toBe(false);
   });
 
   it('normalizes stale stored preferences and appends newly known destinations', async () => {

@@ -4,6 +4,7 @@ export type NavigationItemId =
   | 'recommendations'
   | 'watchlist'
   | 'in-progress'
+  | 'upcoming'
   | 'collections'
   | 'activity'
   | 'diary'
