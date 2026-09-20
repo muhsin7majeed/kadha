@@ -5,6 +5,18 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import packageJson from './package.json';
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (character) => {
+    const entities: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    };
+
+    return entities[character];
+  });
 const getOrigin = (value: string) => value.match(/^https?:\/\/[^/]+/i)?.[0] ?? value.replace(/\/+$/, '');
 const resolveUrl = (value: string, origin: string) => {
   if (/^https?:\/\//i.test(value)) return value.replace(/\/+$/, '');
@@ -83,7 +95,7 @@ export default defineConfig(({ mode }) => {
       {
         name: 'app-html-config',
         transformIndexHtml(html) {
-          return html.replaceAll('__APP_NAME__', appName).replaceAll('__APP_URL__', appUrl);
+          return html.replaceAll('__APP_NAME__', escapeHtml(appName)).replaceAll('__APP_URL__', escapeHtml(appUrl));
         },
       },
     ],
