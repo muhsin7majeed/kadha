@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 
+import { envConfig } from '@/config/env';
 import { AppError, badRequest, conflict, notFound, sendMessage, sendResponse } from '@/lib/http';
 import { DataPrivacy } from '@/types/common';
 import { getPaginationParams } from '@/lib/pagination';
@@ -44,9 +45,13 @@ export const exportMe = async (req: Request, res: Response) => {
   const exportedData = await exportCurrentUserData(id, categories);
   const exportedDate = new Date().toISOString().slice(0, 10);
   const filenameUsername = formatExportFilenamePart(username) || 'user';
+  const filenameAppName = formatExportFilenamePart(envConfig.appName) || 'app';
 
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="kadha-export-${filenameUsername}-${exportedDate}.json"`);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${filenameAppName}-export-${filenameUsername}-${exportedDate}.json"`,
+  );
   res.status(200).send(JSON.stringify(exportedData, null, 2));
 };
 

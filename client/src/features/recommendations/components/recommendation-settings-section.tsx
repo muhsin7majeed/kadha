@@ -13,6 +13,7 @@ import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { LuRefreshCcw } from "react-icons/lu";
 
 import SimpleCheckbox from "@/components/simple-checkbox";
+import { APP_CONFIG } from "@/config/app-config";
 import useRecommendationSettings from "@/features/recommendations/api/use-recommendation-settings";
 import useUpdateRecommendationSettings from "@/features/recommendations/api/use-update-recommendation-settings";
 import {
@@ -145,7 +146,7 @@ const RecommendationSettingsSection = () => {
               Recommendation inputs
             </Heading>
             <Text color="fg.muted" textStyle="supporting" mb="2">
-              Choose which private tracking signals Kadha can use for
+              Choose which private tracking signals {APP_CONFIG.appName} can use for
               recommendations.
             </Text>
           </Card.Header>

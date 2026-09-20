@@ -5,12 +5,12 @@ self.addEventListener("push", (event) => {
     payload = event.data ? event.data.json() : {};
   } catch {
     payload = {
-      title: "Kadha notification",
+      title: "New notification",
       body: event.data?.text() || "You have a new notification",
     };
   }
 
-  const title = payload.title || "Kadha notification";
+  const title = payload.title || "New notification";
   const options = {
     body: payload.body || "You have a new notification",
     icon: "/pwa-192x192.png",

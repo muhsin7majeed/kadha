@@ -18,6 +18,7 @@ import {
 } from 'react-icons/lu';
 
 import EmptyState from '@/components/info-states/empty-state';
+import { APP_CONFIG } from '@/config/app-config';
 import ErrorState from '@/components/info-states/error-state';
 import NavLink from '@/components/nav-link';
 import PageHeader from '@/components/page-header';
@@ -300,7 +301,7 @@ const Activity = () => {
       ) : activities.length === 0 ? (
         <EmptyState
           title="No activity yet"
-          description="Actions you take in Kadha will appear here."
+          description={`Actions you take in ${APP_CONFIG.appName} will appear here.`}
           icon={<LuActivity />}
         />
       ) : (

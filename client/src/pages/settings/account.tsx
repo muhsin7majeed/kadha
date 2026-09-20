@@ -1,6 +1,7 @@
 import { Stack } from '@chakra-ui/react';
 import { useOutletContext } from 'react-router';
 
+import { APP_CONFIG } from '@/config/app-config';
 import AccountSettingsSection from '@/features/user/components/account-settings-section';
 import type { User } from '@/features/user/user.types';
 
@@ -13,7 +14,7 @@ const AccountSettings = () => {
     <Stack gap="5">
       <SettingsSectionHeader
         title="Account"
-        description="Manage the details Kadha uses for your profile and streaming availability."
+        description={`Manage the details ${APP_CONFIG.appName} uses for your profile and streaming availability.`}
       />
       <AccountSettingsSection me={me} />
     </Stack>

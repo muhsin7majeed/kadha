@@ -102,6 +102,12 @@ server/src/features/media/
 - `CLIENT_URL` is the frontend origin allowed by the API for CORS and authenticated cookie requests.
 - Keep secrets out of committed files.
 
+## Instance Branding
+
+- Treat `VITE_APP_NAME` and server-side `APP_NAME` as the configured display name for a self-hosted instance. User-visible runtime copy must use the configured name or avoid naming the product; do not add new hardcoded `Kadha` display strings.
+- Keep compatibility identifiers stable even when display branding changes, including `KADHA_USERS`, `kadha-data-export`, the `KADHA-` recovery-code prefix, storage keys, CSS class or variable names, and import/export schema identifiers.
+- When adding a new user-visible branding surface, check browser metadata, PWA/service-worker notifications, downloaded filenames, auth/recovery copy, and generated links as well as the main UI.
+
 ## Documentation
 
 - Before making changes, read `CHANGELOG.md` when it exists so you understand the latest user-facing and engineering changes.

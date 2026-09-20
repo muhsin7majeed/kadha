@@ -19,6 +19,7 @@ import { LuDownload, LuTrash2, LuTriangleAlert } from "react-icons/lu";
 import { useNavigate } from "react-router";
 
 import SimpleCheckbox from "@/components/simple-checkbox";
+import { APP_CONFIG } from "@/config/app-config";
 import { toaster } from "@/components/ui/toaster-store";
 import PasswordInput from "@/features/auth/components/password-input";
 import { clearSession } from "@/features/auth/session";
@@ -191,7 +192,7 @@ const DeleteAccountSection = ({
         <Stack align="stretch" gap={4}>
           <Text textStyle="body">
             Download an export first if you want to keep a copy of your data.
-            Transferred collections and their items remain in Kadha under their
+            Transferred collections and their items remain in {APP_CONFIG.appName} under their
             new owner.
           </Text>
 

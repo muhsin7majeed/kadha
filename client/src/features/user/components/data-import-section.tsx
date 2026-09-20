@@ -2,6 +2,7 @@ import { Button, Card, Field, Heading, HStack, Input, SimpleGrid, Stack, Text } 
 import { ChangeEvent, useState } from 'react';
 import { LuFileUp, LuUpload } from 'react-icons/lu';
 
+import { APP_CONFIG } from '@/config/app-config';
 import useImportUserData from '@/features/user/api/use-import-user-data';
 import usePreviewUserImport from '@/features/user/api/use-preview-user-import';
 import type { ImportCategory, UserImportPayload, UserImportPreview } from '@/features/user/user-import.types';
@@ -53,11 +54,11 @@ const importOptions: Array<{
 
 const parseImportFile = async (file: File): Promise<UserImportPayload> => {
   if (file.size > MAX_IMPORT_FILE_BYTES) {
-    throw new Error('Choose a Kadha export smaller than 10 MB.');
+    throw new Error(`Choose a ${APP_CONFIG.appName} export smaller than 10 MB.`);
   }
   const parsed = JSON.parse(await file.text()) as unknown;
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('Choose a Kadha JSON export file.');
+    throw new Error(`Choose a ${APP_CONFIG.appName} JSON export file.`);
   }
   return { export: parsed as Record<string, unknown> };
 };
@@ -143,14 +144,14 @@ const DataImportSection = ({ headingAs = 'h2' }: DataImportSectionProps) => {
           </Heading>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
-          Choose a Kadha export to see what can be imported. Some things can be imported, some, not so much. Like
+          Choose a {APP_CONFIG.appName} export to see what can be imported. Some things can be imported, some, not so much. Like
           friendship, which is less portable.
         </Text>
       </Card.Header>
       <Card.Body>
         <Stack gap="4">
           <Field.Root>
-            <Field.Label>Kadha export</Field.Label>
+            <Field.Label>{APP_CONFIG.appName} export</Field.Label>
             <Input type="file" accept="application/json,.json" onChange={handleFileChange} />
             <Field.HelperText>JSON, up to 10 MB.</Field.HelperText>
           </Field.Root>

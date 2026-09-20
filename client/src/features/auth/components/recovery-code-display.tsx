@@ -3,6 +3,7 @@ import { Box, Button, Card, chakra, HStack, Stack, Text } from '@chakra-ui/react
 import { LuClipboard, LuDownload, LuPrinter, LuShieldCheck } from 'react-icons/lu';
 
 import { toaster } from '@/components/ui/toaster-store';
+import { APP_CONFIG } from '@/config/app-config';
 import { buildRecoveryKit, getRecoveryKitFilename } from '@/features/auth/recovery-kit';
 
 interface RecoveryCodeDisplayProps {
@@ -35,7 +36,7 @@ const printRecoveryKit = (contents: string) => {
   }
 
   printWindow.opener = null;
-  printWindow.document.title = 'Kadha account recovery kit';
+  printWindow.document.title = `${APP_CONFIG.appName} account recovery kit`;
 
   const pre = printWindow.document.createElement('pre');
   pre.textContent = contents;
@@ -86,8 +87,8 @@ const RecoveryCodeDisplay = ({
           </Text>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
-          This code is the only way to reset your password. Kadha cannot recover your account if you lose both your
-          password and this code.
+          This code is the only way to reset your password. {APP_CONFIG.appName} cannot recover your account if you
+          lose both your password and this code.
         </Text>
       </Card.Header>
 
@@ -157,7 +158,7 @@ const RecoveryCodeDisplay = ({
                 I saved my recovery code
               </Text>
               <Text color="fg.muted" textStyle="supporting">
-                I understand that Kadha support cannot recover this account without it.
+                I understand that {APP_CONFIG.appName} support cannot recover this account without it.
               </Text>
             </Stack>
           </HStack>

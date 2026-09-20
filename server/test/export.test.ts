@@ -5,6 +5,7 @@ import { getTestApp } from './helpers/app';
 import { authorization, registerTestUser } from './helpers/auth';
 import { createTestCollection } from './helpers/collection';
 import { updateUserMediaFlag } from './helpers/user-media';
+import { envConfig } from '@/config/env';
 import { prisma } from '@/lib/prisma';
 
 describe('user data export', () => {
@@ -92,13 +93,15 @@ describe('user data export', () => {
 
     const exported = response.body;
 
+    const appNameSlug = envConfig.appName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'app';
+
     expect(response.headers['content-type']).toContain('application/json');
-    expect(response.headers['content-disposition']).toContain('kadha-export-export-user-');
+    expect(response.headers['content-disposition']).toContain(`${appNameSlug}-export-export-user-`);
     expect(exported).toMatchObject({
       format: 'kadha-data-export',
       schemaVersion: 2,
       app: {
-        name: 'Kadha',
+        name: envConfig.appName,
         version: expect.any(String),
       },
       manifest: {

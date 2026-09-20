@@ -15,6 +15,7 @@ import {
 import { LuChevronDown, LuChevronRight, LuCopy, LuShare2, LuUserPlus } from 'react-icons/lu';
 
 import { toaster } from '@/components/ui/toaster-store';
+import { APP_CONFIG } from '@/config/app-config';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
@@ -122,7 +123,7 @@ const CollectionSharingDialog: React.FC<CollectionSharingDialogProps> = ({ colle
     try {
       await nativeShare({
         title: collection.name,
-        text: collection.description || `View ${collection.name} on Kadha`,
+        text: collection.description || `View ${collection.name} on ${APP_CONFIG.appName}`,
         url: shareUrl,
       });
     } catch (error) {

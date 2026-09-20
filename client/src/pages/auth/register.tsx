@@ -5,6 +5,7 @@ import { SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import useRegister from '@/features/auth/api/use-register';
+import { APP_CONFIG } from '@/config/app-config';
 import { RegisterInputs, RegisterResponse } from '@/features/auth/auth.types';
 import RecoveryCodeDisplay from '@/features/auth/components/recovery-code-display';
 import { getMe } from '@/features/user/api/use-get-me';
@@ -62,7 +63,7 @@ const Register = () => {
   if (pendingRegistration) {
     return (
       <RecoveryCodeDisplay
-        continueLabel="Continue to Kadha"
+        continueLabel={`Continue to ${APP_CONFIG.appName}`}
         recoveryCode={pendingRegistration.recoveryCode}
         username={pendingRegistration.username}
         onContinue={completeRegistration}
@@ -75,7 +76,7 @@ const Register = () => {
       <VStack align="stretch" gap={4}>
         <Box bg="bg.subtle" borderWidth="1px" borderColor="border" rounded="md" p={4}>
           <Text textStyle="supporting" color="fg.muted">
-            Hosted Kadha is private by default, but not end-to-end encrypted. The instance operator can technically
+            Hosted {APP_CONFIG.appName} is private by default, but not end-to-end encrypted. The instance operator can technically
             access stored data. No email or phone number is required.{' '}
             <ChakraLink asChild color="brand.fg">
               <Link to="/privacy">Learn how privacy and account recovery work.</Link>

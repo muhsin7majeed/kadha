@@ -1,4 +1,5 @@
 import PageHeader from '@/components/page-header';
+import { APP_CONFIG } from '@/config/app-config';
 import { Button, CloseButton, Field, Fieldset, Input, Textarea, useDialogContext } from '@chakra-ui/react';
 import { CollectionFormFields } from '@/features/collections/collections.types';
 import { Flex } from '@chakra-ui/react';
@@ -85,8 +86,8 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialValues, isLoadin
                 <Field.Root>
                   <SimpleRadioGroup {...field} label="Who can see this collection?" options={DATA_PRIVACY_OPTIONS} />
                   <Field.HelperText>
-                    Anyone on the web does not require a Kadha account. Kadha users means signed-in users on this
-                    instance. Collection members retain their invited access.
+                    Anyone on the web does not require a {APP_CONFIG.appName} account. {APP_CONFIG.appName} users means
+                    signed-in users on this instance. Collection members retain their invited access.
                   </Field.HelperText>
                 </Field.Root>
               )}

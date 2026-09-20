@@ -1,5 +1,6 @@
 import { Alert, Button, Card, Stack, Text } from "@chakra-ui/react";
 
+import { APP_CONFIG } from "@/config/app-config";
 import usePushNotifications from "@/features/notifications/api/use-push-notifications";
 import SettingsSectionHeader from "./settings-section-header";
 
@@ -24,7 +25,7 @@ const NotificationsSettings = () => {
     <Stack gap="6">
       <SettingsSectionHeader
         title="Notifications"
-        description="Choose whether Kadha can alert this device when something needs your attention."
+        description={`Choose whether ${APP_CONFIG.appName} can alert this device when something needs your attention.`}
       />
 
       <Card.Root variant="outline">
@@ -43,7 +44,7 @@ const NotificationsSettings = () => {
               <Alert.Content>
                 <Alert.Title>Notifications are blocked</Alert.Title>
                 <Alert.Description>
-                  Allow notifications for Kadha in your browser or Android site
+                  Allow notifications for {APP_CONFIG.appName} in your browser or Android site
                   settings, then try again.
                 </Alert.Description>
               </Alert.Content>
@@ -67,7 +68,7 @@ const NotificationsSettings = () => {
           )}
           {isSupported && config?.enabled === false && (
             <Text color="fg.muted">
-              Push notifications are not configured on this Kadha server.
+              Push notifications are not configured on this {APP_CONFIG.appName} server.
             </Text>
           )}
 

@@ -40,7 +40,7 @@ const FeedbackPage = () => {
 
   return (
     <Box>
-      <PageHeader subHeader="Tell the team what is working, what is not, or what would make Kadha more useful.">
+      <PageHeader subHeader={`Tell the team what is working, what is not, or what would make ${APP_CONFIG.appName} more useful.`}>
         Feedback
       </PageHeader>
 

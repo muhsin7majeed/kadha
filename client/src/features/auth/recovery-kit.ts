@@ -26,5 +26,5 @@ and this recovery code.
 
 export const getRecoveryKitFilename = (username: string) => {
   const safeUsername = username.replace(/[^a-zA-Z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
-  return `${safeUsername || 'account'}-kadha-recovery-kit.txt`;
+  return `${safeUsername || 'account'}-${APP_CONFIG.appNameSlug}-recovery-kit.txt`;
 };

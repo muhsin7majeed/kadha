@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { LuKeyRound } from 'react-icons/lu';
 import { Link, useLocation, useNavigate } from 'react-router';
 
+import { APP_CONFIG } from '@/config/app-config';
 import useRecoverAccount from '@/features/auth/api/use-recover-account';
 import { RecoverAccountInputs } from '@/features/auth/auth.types';
 import RecoveryCodeDisplay from '@/features/auth/components/recovery-code-display';
@@ -72,8 +73,8 @@ const RecoverAccount = () => {
           Recover your account
         </Text>
         <Text color="fg.muted" textStyle="supporting">
-          Enter the recovery code you saved when you created or secured this account. Without it, Kadha cannot reset
-          your password.
+          Enter the recovery code you saved when you created or secured this account. Without it, {APP_CONFIG.appName}
+          cannot reset your password.
         </Text>
       </Stack>
 

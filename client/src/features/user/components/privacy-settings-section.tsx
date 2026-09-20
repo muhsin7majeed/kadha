@@ -11,6 +11,7 @@ import {
 import { useEffect } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 
+import { APP_CONFIG } from '@/config/app-config';
 import {
   DATA_PRIVACY_OPTIONS,
   PROFILE_PRIVACY_OPTIONS,
@@ -44,7 +45,7 @@ const privacySettings: PrivacySetting[] = [
     name: "profilePrivacy",
     label: "Profile",
     description:
-      "Controls who can open your profile. Anyone on the web does not require a Kadha account.",
+      `Controls who can open your profile. Anyone on the web does not require a ${APP_CONFIG.appName} account.`,
     options: PROFILE_PRIVACY_OPTIONS,
   },
   {

@@ -3,6 +3,7 @@ import { LuPencil, LuShield } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import SimpleAvatar from '@/components/simple-avatar';
+import { APP_CONFIG } from '@/config/app-config';
 import FriendshipActions from '@/features/friendship/components/friendship-actions';
 import type { UserProfileResponse } from '@/features/user/user.types';
 import { DataPrivacy, FriendStatus } from '@/types/common';
@@ -14,7 +15,7 @@ interface ProfileHeaderProps {
 
 const profilePrivacyLabel: Record<DataPrivacy, string> = {
   [DataPrivacy.Public]: 'Public profile',
-  [DataPrivacy.KadhaUsers]: 'Kadha users profile',
+  [DataPrivacy.KadhaUsers]: `${APP_CONFIG.appName} users profile`,
   [DataPrivacy.Friends]: 'Friends-only profile',
   [DataPrivacy.OnlyMe]: 'Private profile',
 };

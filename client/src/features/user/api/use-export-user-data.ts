@@ -1,11 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 
 import { toaster } from '@/components/ui/toaster-store';
+import { APP_CONFIG } from '@/config/app-config';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import type { ExportCategory } from '@/features/user/user-import.types';
 
-const fallbackFilename = 'kadha-export.json';
+const fallbackFilename = `${APP_CONFIG.appNameSlug}-export.json`;
 
 const getFilenameFromContentDisposition = (contentDisposition?: string) => {
   if (!contentDisposition) {

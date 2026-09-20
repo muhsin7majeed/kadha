@@ -20,7 +20,7 @@ describe('recovery kit', () => {
   });
 
   it('creates a filesystem-safe download name', () => {
-    expect(getRecoveryKitFilename(' movie/fan ')).toBe('movie-fan-kadha-recovery-kit.txt');
-    expect(getRecoveryKitFilename('***')).toBe('account-kadha-recovery-kit.txt');
+    expect(getRecoveryKitFilename(' movie/fan ')).toBe(`movie-fan-${APP_CONFIG.appNameSlug}-recovery-kit.txt`);
+    expect(getRecoveryKitFilename('***')).toBe(`account-${APP_CONFIG.appNameSlug}-recovery-kit.txt`);
   });
 });

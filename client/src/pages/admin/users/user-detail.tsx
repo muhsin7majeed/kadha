@@ -4,6 +4,7 @@ import { LuArrowLeft, LuUser } from 'react-icons/lu';
 import { Link, useParams } from 'react-router';
 
 import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
+import { APP_CONFIG } from '@/config/app-config';
 import useUpdateAdminUserRole from '@/features/admin/api/use-update-admin-user-role';
 import { useAuth } from '@/features/auth/use-auth';
 import { UserRole } from '@/types/common';
@@ -170,8 +171,8 @@ const AdminUserDetail = () => {
             title={`${roleActionLabel} for ${user.username}?`}
             description={
               nextRole === UserRole.Admin
-                ? 'This gives the user access to the entire Kadha admin panel.'
-                : 'This removes the user’s access to the Kadha admin panel.'
+                ? `This gives the user access to the entire ${APP_CONFIG.appName} admin panel.`
+                : `This removes the user’s access to the ${APP_CONFIG.appName} admin panel.`
             }
             confirmButtonText={roleActionLabel}
             confirmButtonProps={{

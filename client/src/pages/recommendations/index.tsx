@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { LuSparkles } from 'react-icons/lu';
 
 import EmptyState from '@/components/info-states/empty-state';
+import { APP_CONFIG } from '@/config/app-config';
 import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import PaginationControls from '@/components/pagination-controls';
@@ -40,7 +41,7 @@ const Recommendations = () => {
         <Box py={10}>
           <EmptyState
             title="Not enough recommendation signals yet"
-            description="Like, rate, watch, or rewatch titles to teach Kadha what you enjoy. You can choose which signals count in recommendation settings."
+            description={`Like, rate, watch, or rewatch titles to teach ${APP_CONFIG.appName} what you enjoy. You can choose which signals count in recommendation settings.`}
             icon={<LuSparkles />}
           />
           <Center mt="5">
@@ -53,7 +54,7 @@ const Recommendations = () => {
         <Box py={10}>
           <EmptyState
             title="No recommendations found"
-            description="Kadha could not find unwatched matches from your current private signals. Try adjusting settings or adding more ratings and likes."
+            description={`${APP_CONFIG.appName} could not find unwatched matches from your current private signals. Try adjusting settings or adding more ratings and likes.`}
             icon={<LuSparkles />}
           />
         </Box>

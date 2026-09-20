@@ -1,6 +1,8 @@
 import { Card, HStack, Icon, Stack, Text } from '@chakra-ui/react';
 import { LuLock } from 'react-icons/lu';
 
+import { APP_CONFIG } from '@/config/app-config';
+
 interface LockedProfileStateProps {
   lockedReason?: 'FRIENDS_ONLY' | 'PRIVATE' | 'SIGN_IN_REQUIRED';
 }
@@ -10,7 +12,7 @@ const LockedProfileState: React.FC<LockedProfileStateProps> = ({ lockedReason })
   const isFriendsOnly = lockedReason === 'FRIENDS_ONLY';
   const title = isSignInRequired ? 'Sign in required' : isFriendsOnly ? 'Friends-only profile' : 'Private profile';
   const description = isSignInRequired
-    ? 'This user shares profile activity with Kadha users or friends. Sign in to check your access.'
+    ? `This user shares profile activity with ${APP_CONFIG.appName} users or friends. Sign in to check your access.`
     : isFriendsOnly
       ? 'This user only shares profile activity with accepted friends. Use the profile actions above to send a friend request.'
       : 'This user is not sharing profile activity right now.';

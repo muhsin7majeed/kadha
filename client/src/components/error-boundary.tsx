@@ -3,6 +3,8 @@ import { Box, Button, Container, Heading, HStack, Icon, Text, VStack } from '@ch
 import { Link, useLocation } from 'react-router';
 import { LuHouse, LuRefreshCw, LuTriangleAlert } from 'react-icons/lu';
 
+import { APP_CONFIG } from '@/config/app-config';
+
 interface ErrorBoundaryProps {
   children: ReactNode;
   resetKey: string;
@@ -54,7 +56,7 @@ const ErrorFallback = ({ onReset }: { onReset: () => void }) => {
           <VStack gap={3}>
             <Heading textStyle="pageTitle">Something went wrong</Heading>
             <Text color="fg.muted" textStyle="body">
-              Kadha hit an unexpected client error. Try reloading the page or return home.
+              {APP_CONFIG.appName} hit an unexpected client error. Try reloading the page or return home.
             </Text>
           </VStack>
 

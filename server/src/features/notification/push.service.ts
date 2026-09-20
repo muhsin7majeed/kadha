@@ -166,7 +166,7 @@ const buildNotificationPayload = (notification: {
       };
     default:
       return {
-        title: "Kadha notification",
+        title: `${envConfig.appName} notification`,
         body: "You have a new notification",
         url: "/app/notifications",
       };

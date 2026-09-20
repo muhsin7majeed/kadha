@@ -3,6 +3,7 @@ import { Button, Card, Field, Heading, HStack, Input, Spinner, Stack, Text } fro
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { LuKeyRound, LuRefreshCw, LuShieldPlus } from 'react-icons/lu';
 
+import { APP_CONFIG } from '@/config/app-config';
 import useManageRecoveryCode from '@/features/auth/api/use-manage-recovery-code';
 import useRecoveryCodeStatus from '@/features/auth/api/use-recovery-code-status';
 import { ManageRecoveryCodeInputs, ManageRecoveryCodeResponse } from '@/features/auth/auth.types';
@@ -152,7 +153,7 @@ const AccountRecoverySection = ({ headingAs = 'h2' }: AccountRecoverySectionProp
               </Text>
               <Text color="fg.muted" textStyle="supporting">
                 {status?.configured && status.createdAt
-                  ? `Created ${formatCreatedAt(status.createdAt)}. Kadha stores only a one-way verifier and cannot reveal the code.`
+                  ? `Created ${formatCreatedAt(status.createdAt)}. ${APP_CONFIG.appName} stores only a one-way verifier and cannot reveal the code.`
                   : 'Without a recovery code, forgetting your password permanently locks you out of this account.'}
               </Text>
             </Stack>

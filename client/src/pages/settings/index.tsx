@@ -3,6 +3,7 @@ import { LuSettings } from 'react-icons/lu';
 import { Outlet, useLocation } from 'react-router';
 
 import Navbar from '@/components/navbar';
+import { APP_CONFIG } from '@/config/app-config';
 import PageHeader from '@/components/page-header';
 import SettingsNavigation from '@/features/settings/components/settings-navigation';
 import ThemeSettingsSection from '@/features/theme/components/theme-settings-section';
@@ -27,7 +28,7 @@ const Settings = () => {
 
         <Container maxW="4xl" py="6">
           <VStack align="stretch" gap="6">
-            <PageHeader subHeader="Choose how Kadha looks on this device.">
+            <PageHeader subHeader={`Choose how ${APP_CONFIG.appName} looks on this device.`}>
               <SettingsTitle />
             </PageHeader>
             <ThemeSettingsSection />

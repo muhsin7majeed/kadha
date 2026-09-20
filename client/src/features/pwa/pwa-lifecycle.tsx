@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 import { toaster } from '@/components/ui/toaster-store';
+import { APP_CONFIG } from '@/config/app-config';
 
 const UPDATE_TOAST_ID = 'pwa-update-available';
 const OFFLINE_TOAST_ID = 'pwa-offline';
@@ -18,7 +19,7 @@ const PwaLifecycle = () => {
     toaster.create({
       id: UPDATE_TOAST_ID,
       type: 'info',
-      title: 'Kadha update available',
+      title: `${APP_CONFIG.appName} update available`,
       description: 'Update when convenient to use the latest version.',
       duration: 60_000,
       action: {
@@ -27,7 +28,7 @@ const PwaLifecycle = () => {
           void updateServiceWorker(true).catch(() => {
             toaster.error({
               title: 'Update failed',
-              description: 'Reload Kadha to try again.',
+              description: `Reload ${APP_CONFIG.appName} to try again.`,
               meta: { closable: true },
             });
           });
@@ -45,7 +46,7 @@ const PwaLifecycle = () => {
         id: OFFLINE_TOAST_ID,
         type: 'info',
         title: 'You are offline',
-        description: 'Kadha needs a connection to load or update your library.',
+        description: `${APP_CONFIG.appName} needs a connection to load or update your library.`,
         duration: 10_000,
         meta: { closable: true },
       });
@@ -55,7 +56,7 @@ const PwaLifecycle = () => {
       toaster.dismiss(OFFLINE_TOAST_ID);
       toaster.success({
         title: 'Back online',
-        description: 'Kadha can load and update your library again.',
+        description: `${APP_CONFIG.appName} can load and update your library again.`,
       });
     };
 

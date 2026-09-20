@@ -1,9 +1,10 @@
+import { APP_CONFIG } from '@/config/app-config';
 import { DataPrivacy } from '@/types/common';
 import { Collection } from '../collections.types';
 
 const privacyLabels: Record<DataPrivacy, string> = {
   [DataPrivacy.Public]: 'Public',
-  [DataPrivacy.KadhaUsers]: 'Visible to Kadha users',
+  [DataPrivacy.KadhaUsers]: `Visible to ${APP_CONFIG.appName} users`,
   [DataPrivacy.Friends]: 'Visible to friends',
   [DataPrivacy.OnlyMe]: 'Only you',
 };

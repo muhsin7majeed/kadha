@@ -1,4 +1,5 @@
 import EmptyState from '@/components/info-states/empty-state';
+import { APP_CONFIG } from '@/config/app-config';
 import ErrorState from '@/components/info-states/error-state';
 import MediaCard from '@/components/media-card';
 import PageHeader from '@/components/page-header';
@@ -12,7 +13,7 @@ const getLockedCopy = (reason?: string) => {
   if (reason === 'SIGN_IN_REQUIRED') {
     return {
       title: 'Sign in required',
-      description: 'The owner shares this collection with Kadha users or friends. Sign in to check your access.',
+      description: `The owner shares this collection with ${APP_CONFIG.appName} users or friends. Sign in to check your access.`,
     };
   }
 

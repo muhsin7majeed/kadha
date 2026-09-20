@@ -17,6 +17,7 @@ import { Link } from 'react-router';
 import { useParams } from 'react-router';
 
 import ErrorState from '@/components/info-states/error-state';
+import { APP_CONFIG } from '@/config/app-config';
 import InsightSection from '@/features/insights/components/insight-section';
 import DistributionInsightList from '@/features/insights/components/distribution-insight-list';
 import PeopleInsightList from '@/features/insights/components/people-insight-list';
@@ -147,7 +148,7 @@ const ViewingOverview = () => {
                   : `No watched ${mediaType === 'movie' ? 'movies' : 'TV shows'} yet`}
               </Heading>
               <Text color="fg.muted" textStyle="supporting">
-                Mark movies or TV episodes watched and Kadha will turn them into a private picture of your viewing.
+                Mark movies or TV episodes watched and {APP_CONFIG.appName} will turn them into a private picture of your viewing.
               </Text>
             </Stack>
             <Button asChild colorPalette="brand">

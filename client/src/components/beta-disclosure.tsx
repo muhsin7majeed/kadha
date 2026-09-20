@@ -1,6 +1,8 @@
 import { Box, Container, HStack, Icon, Text } from '@chakra-ui/react';
 import { LuInfo } from 'react-icons/lu';
 
+import { APP_CONFIG } from '@/config/app-config';
+
 interface BetaDisclosureProps {
   contained?: boolean;
 }
@@ -11,7 +13,7 @@ const BetaDisclosureContent = () => (
       <LuInfo />
     </Icon>
     <Text textStyle="supporting" color="fg.muted">
-      Kadha is built and operated by a small team. Automated backups are in place, but this is still an early beta and
+      {APP_CONFIG.appName} is built and operated by a small team. Automated backups are in place, but this is still an early beta and
       mistakes or failures could cause data loss. Export anything you would not want to recreate.
     </Text>
   </HStack>

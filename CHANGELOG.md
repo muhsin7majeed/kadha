@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Behavior Fixes
+
+- Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.
+
+### Engineering Changes
+
+- Added instance-branding guidance to the working agreement so new runtime copy uses configured names while stable compatibility identifiers remain unchanged.
+
 ## v0.5.0
 
 ### Feature Changes
