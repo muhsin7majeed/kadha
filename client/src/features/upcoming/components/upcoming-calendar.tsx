@@ -59,10 +59,32 @@ const UpcomingCalendar = ({
         onSelectDate={onSelectDate}
         renderDayContent={(date) => {
           const count = counts.get(date);
-          return count ? (
-            <Text mt="auto" alignSelf="flex-start" fontWeight="semibold" textStyle="compactLabel">
-              {count}
-            </Text>
+          const datedEntries = entriesByDate.get(date) ?? [];
+          const firstEntry = datedEntries[0];
+          const additionalTitles = datedEntries.length - 1;
+
+          return count && firstEntry ? (
+            <Stack mt="auto" gap="0.5" width="full" minW="0" align="stretch">
+              <Text
+                display={{ base: 'none', sm: 'block' }}
+                textAlign="left"
+                textStyle="compactLabel"
+                lineClamp={1}
+                title={firstEntry.media.title}
+              >
+                {firstEntry.media.title}
+              </Text>
+              <HStack justify="space-between" gap="1">
+                <Text fontWeight="semibold" textStyle="compactLabel">
+                  {count}
+                </Text>
+                {additionalTitles > 0 && (
+                  <Text display={{ base: 'none', sm: 'block' }} color="fg.muted" textStyle="compactLabel">
+                    +{additionalTitles} more
+                  </Text>
+                )}
+              </HStack>
+            </Stack>
           ) : null;
         }}
         selectedDate={selectedDate}

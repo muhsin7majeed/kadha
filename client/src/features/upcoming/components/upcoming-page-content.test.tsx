@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -177,7 +177,11 @@ describe('UpcomingPageContent', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Month' }));
     const monthSelect = await waitFor(() => screen.getByRole('combobox', { name: 'Calendar month' }));
     fireEvent.change(monthSelect, { target: { value: '9' } });
-    fireEvent.click(screen.getByRole('button', { name: /September 25, 2026, 3 releases/ }));
+    const populatedDay = screen.getByRole('button', { name: /September 25, 2026, 3 releases/ });
+    expect(within(populatedDay).getByText('Group Drop')).toHaveAttribute('title', 'Group Drop');
+    expect(within(populatedDay).getByText('+1 more')).toBeInTheDocument();
+    expect(within(populatedDay).getByText('3')).toBeInTheDocument();
+    fireEvent.click(populatedDay);
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Selected day' })).toBeInTheDocument());
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
