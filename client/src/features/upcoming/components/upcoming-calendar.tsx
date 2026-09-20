@@ -79,7 +79,16 @@ const UpcomingCalendar = ({
                   {count}
                 </Text>
                 {additionalTitles > 0 && (
-                  <Text display={{ base: 'none', sm: 'block' }} color="fg.muted" textStyle="compactLabel">
+                  <Text
+                    display={{ base: 'none', sm: 'block' }}
+                    color="fg.muted"
+                    textStyle="compactLabel"
+                    minW="0"
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    title={`+${additionalTitles} more`}
+                  >
                     +{additionalTitles} more
                   </Text>
                 )}

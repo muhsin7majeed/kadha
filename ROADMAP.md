@@ -27,7 +27,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Private Viewing Diary with an event timeline, monthly calendar, entry correction, and year-at-a-glance viewing patterns.
 - [x] TV episode and season progress tracking.
 - [x] In Progress TV library with next-episode context, sorting, and pagination.
-- [x] Private tracked-release calendar with agenda and month views for upcoming episodes and watchlisted movies.
+- [x] Private tracked-release calendar with list and month views for upcoming episodes and watchlisted movies.
 - [x] Account-synced customizable Home focused on Continue Watching, Watchlist, private recommendations, and limited discovery fallbacks.
 - [x] Custom collections for movies and TV shows.
 - [x] Private activity timeline for account, media, collection, and profile actions.

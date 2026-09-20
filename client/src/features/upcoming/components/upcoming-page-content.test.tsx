@@ -179,7 +179,7 @@ describe('UpcomingPageContent', () => {
     fireEvent.change(monthSelect, { target: { value: '9' } });
     const populatedDay = screen.getByRole('button', { name: /September 25, 2026, 3 releases/ });
     expect(within(populatedDay).getByText('Group Drop')).toHaveAttribute('title', 'Group Drop');
-    expect(within(populatedDay).getByText('+1 more')).toBeInTheDocument();
+    expect(within(populatedDay).getByText('+1 more')).toHaveAttribute('title', '+1 more');
     expect(within(populatedDay).getByText('3')).toBeInTheDocument();
     fireEvent.click(populatedDay);
 

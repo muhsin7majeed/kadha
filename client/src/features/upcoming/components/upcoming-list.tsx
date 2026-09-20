@@ -4,12 +4,12 @@ import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/up
 import { formatUpcomingDate, formatUpcomingRelativeDate } from './upcoming-date';
 import UpcomingEntry from './upcoming-entry';
 
-interface UpcomingAgendaProps {
+interface UpcomingListProps {
   entries: UpcomingEntryModel[];
   todayDate: string;
 }
 
-const UpcomingAgenda = ({ entries, todayDate }: UpcomingAgendaProps) => {
+const UpcomingList = ({ entries, todayDate }: UpcomingListProps) => {
   const entriesByDate = new Map<string, UpcomingEntryModel[]>();
 
   for (const entry of entries) {
@@ -41,4 +41,4 @@ const UpcomingAgenda = ({ entries, todayDate }: UpcomingAgendaProps) => {
   );
 };
 
-export default UpcomingAgenda;
+export default UpcomingList;

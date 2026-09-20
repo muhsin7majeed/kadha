@@ -6,7 +6,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import useUpcoming from '@/features/upcoming/api/use-upcoming';
-import UpcomingAgenda from './upcoming-agenda';
+import UpcomingList from './upcoming-list';
 import UpcomingCalendar from './upcoming-calendar';
 
 type UpcomingView = 'list' | 'month';
@@ -102,7 +102,7 @@ const UpcomingPageContent = () => {
             />
           )}
           {view === 'list' && upcoming.data.entries.length > 0 && (
-            <UpcomingAgenda entries={upcoming.data.entries} todayDate={todayDate} />
+            <UpcomingList entries={upcoming.data.entries} todayDate={todayDate} />
           )}
           {view === 'month' && (
             <UpcomingCalendar
