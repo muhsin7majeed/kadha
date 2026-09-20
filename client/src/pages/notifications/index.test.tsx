@@ -58,15 +58,10 @@ vi.mock('@/features/collections/api/use-respond-to-collection-invite', () => ({
   default: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
-vi.mock('@/features/collections/components/collection-details-dialog', () => ({
-  default: ({ collectionId, collectionName, open }: { collectionId: string; collectionName: string; open: boolean }) =>
-    open ? <div role="dialog">{`${collectionName}:${collectionId}`}</div> : null,
-}));
-
 describe('system notifications', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('opens surviving collection details from a clickable collection name', () => {
+  it('links surviving collection notifications to the collection details page', () => {
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     renderWithProviders(
       <QueryClientProvider client={queryClient}>
@@ -76,9 +71,10 @@ describe('system notifications', () => {
       </QueryClientProvider>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: '“Weekend Watchlist”' }));
+    const collectionLink = screen.getByRole('link', { name: '“Weekend Watchlist”' });
+    expect(collectionLink).toHaveAttribute('href', '/app/collections/collection-1');
 
-    expect(screen.getByRole('dialog')).toHaveTextContent('Weekend Watchlist:collection-1');
+    fireEvent.click(collectionLink);
     expect(mocks.markRead).toHaveBeenCalledWith('notification-1');
     expect(screen.queryByText(/Sent you a notification/)).not.toBeInTheDocument();
   });
