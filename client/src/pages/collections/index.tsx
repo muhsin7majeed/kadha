@@ -1,19 +1,19 @@
-import PageHeader from '@/components/page-header';
-import useCollections from '@/features/collections/api/use-collections';
-import CommonSpinner from '@/components/spinners/common-spinner';
-import ErrorState from '@/components/info-states/error-state';
-import EmptyState from '@/components/info-states/empty-state';
-import { Accordion, Flex } from '@chakra-ui/react';
-import CollectionItem from './collection-item';
+import { Flex } from '@chakra-ui/react';
 import { useState } from 'react';
-import CreateCollectionButton from '@/features/collections/components/create-collection-button';
+
+import EmptyState from '@/components/info-states/empty-state';
+import ErrorState from '@/components/info-states/error-state';
+import PageHeader from '@/components/page-header';
 import SimpleTabs from '@/components/simple-tabs';
+import CommonSpinner from '@/components/spinners/common-spinner';
+import useCollections from '@/features/collections/api/use-collections';
+import CollectionList from '@/features/collections/components/collection-list';
+import CollectionMenu from '@/features/collections/components/collection-menu';
+import CreateCollectionButton from '@/features/collections/components/create-collection-button';
 import { CollectionScope } from '@/features/collections/collections.types';
 
 const Collections = () => {
-  const [openedCollections, setOpenedCollections] = useState<string[]>([]);
   const [scope, setScope] = useState<CollectionScope>('all');
-
   const { data: collections, isLoading, isFetching, error, refetch } = useCollections({ scope });
 
   const emptyStateByScope: Record<CollectionScope, { title: string; description: string }> = {
@@ -43,10 +43,7 @@ const Collections = () => {
           { value: 'shared', label: 'Shared' },
         ]}
         value={scope}
-        onValueChange={(value) => {
-          setScope(value as CollectionScope);
-          setOpenedCollections([]);
-        }}
+        onValueChange={(value) => setScope(value as CollectionScope)}
       />
 
       {isLoading ? (
@@ -55,27 +52,16 @@ const Collections = () => {
         <ErrorState title="Error" description="Error fetching collections" onRetry={refetch} />
       ) : collections?.length === 0 ? (
         <EmptyState title={emptyStateByScope[scope].title} description={emptyStateByScope[scope].description} />
-      ) : (
-        <Accordion.Root
-          spaceY="6"
-          variant="plain"
-          collapsible
-          size="lg"
-          value={openedCollections}
-          onValueChange={(e) => {
-            setOpenedCollections(e.value);
-          }}
-        >
-          {collections?.map((collection, index) => (
-            <CollectionItem
-              key={collection.id}
-              collection={collection}
-              index={index}
-              isOpened={openedCollections.includes(collection.id)}
-            />
-          ))}
-        </Accordion.Root>
-      )}
+      ) : collections ? (
+        <CollectionList
+          collections={collections}
+          getDetailsPath={(collection) => `/app/collections/${collection.id}`}
+          showPeople
+          renderActions={(collection) =>
+            'userId' in collection ? <CollectionMenu collection={collection} /> : null
+          }
+        />
+      ) : null}
     </>
   );
 };

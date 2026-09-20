@@ -569,10 +569,16 @@ export async function getUserCollectionsByUsername(viewerId: string | undefined,
             ],
           }),
     },
-    include: {
-      items: {
-        include: {
-          media: true,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      privacy: true,
+      created_at: true,
+      updated_at: true,
+      _count: {
+        select: {
+          items: true,
         },
       },
     },
@@ -582,9 +588,9 @@ export async function getUserCollectionsByUsername(viewerId: string | undefined,
   });
 
   return viewableResource(
-    collections.map(({ items, ...collection }) => ({
+    collections.map(({ _count, ...collection }) => ({
       ...collection,
-      media: items.map(flattenMediaSnapshot),
+      itemCount: _count.items,
     })),
   );
 }

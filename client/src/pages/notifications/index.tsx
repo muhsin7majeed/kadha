@@ -19,14 +19,8 @@ import {
   parseFeedbackNotificationMetadata,
   parseSystemNotificationMetadata,
 } from '@/features/notifications/utils/notification-metadata';
-import CollectionDetailsDialog from '@/features/collections/components/collection-details-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { invalidateCollection, invalidateCollections } from '@/features/collections/api/invalidate-collection-queries';
-
-interface SelectedCollection {
-  id: string;
-  name: string;
-}
 
 const getNotificationMessage = (notification: Notification) => {
   switch (notification.type) {
@@ -55,7 +49,6 @@ const getNotificationMessage = (notification: Notification) => {
 
 const Notifications = () => {
   const [page, setPage] = useState(1);
-  const [selectedCollection, setSelectedCollection] = useState<SelectedCollection | null>(null);
   const queryClient = useQueryClient();
   const { data, isLoading, isError, isFetching, refetch } = useNotifications(page);
   const markNotificationRead = useMarkNotificationRead();
@@ -69,6 +62,7 @@ const Notifications = () => {
     const collectionButton =
       notification.entityId && metadata.collectionName ? (
         <Button
+          asChild
           variant="plain"
           colorPalette="brand"
           h="auto"
@@ -76,14 +70,17 @@ const Notifications = () => {
           p="0"
           verticalAlign="baseline"
           textDecoration="underline"
-          onClick={() => {
-            void invalidateCollection(queryClient, notification.entityId!);
-            void invalidateCollections(queryClient);
-            setSelectedCollection({ id: notification.entityId!, name: metadata.collectionName! });
-            if (!notification.read) markNotificationRead.mutate(notification.id);
-          }}
         >
-          “{metadata.collectionName}”
+          <Link
+            to={`/app/collections/${notification.entityId}`}
+            onClick={() => {
+              void invalidateCollection(queryClient, notification.entityId!);
+              void invalidateCollections(queryClient);
+              if (!notification.read) markNotificationRead.mutate(notification.id);
+            }}
+          >
+            “{metadata.collectionName}”
+          </Link>
         </Button>
       ) : null;
 
@@ -230,14 +227,6 @@ const Notifications = () => {
         </Stack>
       )}
 
-      {selectedCollection && (
-        <CollectionDetailsDialog
-          collectionId={selectedCollection.id}
-          collectionName={selectedCollection.name}
-          open
-          onClose={() => setSelectedCollection(null)}
-        />
-      )}
     </>
   );
 };

@@ -1,4 +1,14 @@
+import { DataPrivacy } from '@/types/common';
 import { Collection } from '../collections.types';
+
+const privacyLabels: Record<DataPrivacy, string> = {
+  [DataPrivacy.Public]: 'Public',
+  [DataPrivacy.KadhaUsers]: 'Visible to Kadha users',
+  [DataPrivacy.Friends]: 'Visible to friends',
+  [DataPrivacy.OnlyMe]: 'Only you',
+};
+
+export const getCollectionPrivacyLabel = (privacy: DataPrivacy) => privacyLabels[privacy];
 
 export const getSharedMemberCount = (collection: Collection) => Math.max((collection.memberCount ?? 1) - 1, 0);
 

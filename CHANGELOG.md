@@ -19,6 +19,12 @@
 - Grouped same-day episode drops for one show into a single entry and kept incomplete provider refreshes visible with honest coverage messaging.
 - Added Upcoming to Menu and Navigation settings without replacing existing compact-navigation shortcuts.
 
+#### Collections
+
+- Replaced expandable collection panels with concise, responsive lists and dedicated collection details pages.
+- Added item, visibility, sharing, access, and people summaries while keeping collaborator identities private on public profile lists.
+- Made profile collections and collection notifications navigate to full details instead of opening embedded or dialog views.
+
 ### Engineering Changes
 
 #### Home And Discover
