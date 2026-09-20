@@ -12,12 +12,24 @@
 - Made Discover a default compact-navigation shortcut for new configurations while keeping For You available from Menu and preserving existing saved navigation choices.
 - Included Home preferences in selectable account-preference exports and imports.
 
+#### Upcoming
+
+- Added a private Upcoming page with list and month views for scheduled episodes from tracked shows and future releases from watchlisted movies.
+- Made schedules easier to scan with poster-backed entries, exact relative-day labels, and responsive title previews in populated calendar days.
+- Grouped same-day episode drops for one show into a single entry and kept incomplete provider refreshes visible with honest coverage messaging.
+- Added Upcoming to Menu and Navigation settings without replacing existing compact-navigation shortcuts.
+
 ### Engineering Changes
 
 #### Home And Discover
 
 - Added a versioned Home-preference domain with strict validation, forward-compatible normalization, owner isolation, account-deletion cascading, and an additive SQLite migration.
 - Consolidated discovery-feed presentation, normalized shared carousel inputs, and reused accessible ordering controls across Home and Navigation settings.
+
+#### Upcoming
+
+- Added an authenticated owner-scoped schedule API over tracked media, with bounded provider concurrency, partial-failure reporting, date-range validation, and no new persisted user data.
+- Extracted the Diary calendar's accessible month-grid mechanics for reuse while retaining feature-specific diary and schedule rendering.
 
 ## v0.3.0
 

@@ -116,6 +116,10 @@ const Privacy = () => {
                 signed-in user's own allowed tracking signals, settings, and recommendation feedback. One user's
                 preferences or location do not affect another user's recommendations.
               </Text>
+              <Text>
+                Upcoming schedules are derived from the signed-in user's tracked titles and current media metadata. They
+                are private, are not exposed on profiles, and do not create a new shared or portable data category.
+              </Text>
             </Section>
 
             <Section title="Data Kadha Does Not Currently Request">

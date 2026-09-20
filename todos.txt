@@ -6,3 +6,4 @@
 - Package audit / upgrades
 - Separate page for collection and collection details
 - server/src/features/user/user.service.ts questionable chaining
+- Notify admin on feedback request

@@ -97,6 +97,7 @@ packages/contracts/
 - Feature-owned client types belong near the feature, using `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned client utilities and hooks belong near the feature, not in generic `client/src/utils` or `client/src/hooks`.
 - Home section preferences, the typed Home registry, and personal Home previews belong in `client/src/features/home`; reusable global catalog rows belong in `client/src/features/discovery`.
+- Owner-scoped tracked schedule resolution belongs in `server/src/features/upcoming`; Upcoming query state, list entries, and calendar rendering belong in `client/src/features/upcoming`.
 - Shared UI-only components can remain in `client/src/components`.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.

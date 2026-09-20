@@ -4,6 +4,7 @@ export const NAVIGATION_ITEM_IDS = [
   'recommendations',
   'watchlist',
   'in-progress',
+  'upcoming',
   'collections',
   'activity',
   'diary',

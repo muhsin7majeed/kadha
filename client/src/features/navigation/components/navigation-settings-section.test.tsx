@@ -44,6 +44,7 @@ describe('NavigationSettingsSection', () => {
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Navigation layout' }), 'scrollable');
     await user.selectOptions(screen.getByRole('combobox', { name: 'Home appearance' }), 'icon');
+    expect(screen.getByRole('checkbox', { name: 'Show Upcoming in navigation' })).not.toBeChecked();
     await user.click(screen.getByRole('checkbox', { name: 'Show Diary in navigation' }));
 
     const preview = screen.getByRole('navigation', { name: 'Navigation preview' });

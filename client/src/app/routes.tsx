@@ -31,6 +31,7 @@ const Recommendations = lazy(() => import('@/pages/recommendations'));
 const RecommendationSettings = lazy(() => import('@/pages/settings/recommendations'));
 const SecuritySettings = lazy(() => import('@/pages/settings/security'));
 const Settings = lazy(() => import('@/pages/settings'));
+const Upcoming = lazy(() => import('@/pages/upcoming'));
 const Watched = lazy(() => import('@/pages/watched'));
 const Watchlist = lazy(() => import('@/pages/watchlist'));
 
@@ -53,6 +54,7 @@ export function AppRoutes() {
             <Route path="watched" element={<Watched />} />
             <Route path="watchlist" element={<Watchlist />} />
             <Route path="in-progress" element={<InProgress />} />
+            <Route path="upcoming" element={<Upcoming />} />
             <Route path="liked" element={<Liked />} />
             <Route path="media/:mediaType/:id" element={<MediaDetails />} />
             <Route path="collections" element={<Collections />} />

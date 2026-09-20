@@ -52,6 +52,7 @@ describe('TabBar', () => {
     expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Collections' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Upcoming' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Diary' })).not.toBeInTheDocument();
   });
 
@@ -63,6 +64,7 @@ describe('TabBar', () => {
 
     expect(screen.getByRole('menuitem', { name: 'For You' })).toHaveAttribute('href', '/app/recommendations');
     expect(screen.getByRole('menuitem', { name: 'Activity' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Upcoming' })).toHaveAttribute('href', '/app/upcoming');
     expect(screen.getByRole('menuitem', { name: 'Diary' })).toHaveAttribute('href', '/app/diary');
     expect(screen.getByRole('menuitem', { name: 'Watched' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Liked' })).toBeInTheDocument();

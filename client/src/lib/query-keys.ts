@@ -1,4 +1,5 @@
 import type { AdminFeedbackParams } from '@/features/feedback/feedback.types';
+import type { UpcomingRange } from '@/features/upcoming/upcoming.types';
 import type { OwnerMediaQuery } from '@/features/user-media/user-media.types';
 import { MediaType, UserRole } from '@/types/common';
 
@@ -124,6 +125,11 @@ export const userQueryKeys = {
   viewingInsights: (mediaType: 'all' | MediaType = 'all') => ['viewing-insights', mediaType] as const,
 };
 
+export const upcomingQueryKeys = {
+  root: ['upcoming'] as const,
+  schedule: (range: UpcomingRange) => ['upcoming', range] as const,
+};
+
 export const userMediaQueryKeys = {
   inProgressTvRoot: ['in-progress-tv'] as const,
   inProgressTv: (page = 1, sort = 'recent', limit = 20) => ['in-progress-tv', page, sort, limit] as const,
@@ -158,6 +164,7 @@ export const queryKeys = {
   ...notificationQueryKeys,
   ...recommendationQueryKeys,
   ...searchQueryKeys,
+  ...upcomingQueryKeys,
   ...userQueryKeys,
   ...userMediaQueryKeys,
 };
