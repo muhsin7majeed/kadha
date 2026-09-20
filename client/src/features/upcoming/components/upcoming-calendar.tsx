@@ -1,9 +1,9 @@
-import { Heading, Stack, Text } from '@chakra-ui/react';
+import { Badge, Heading, HStack, Stack, Text } from '@chakra-ui/react';
 
 import CalendarMonthGrid from '@/components/calendar-month-grid';
 import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
 import UpcomingEntry from './upcoming-entry';
-import { formatUpcomingDate } from './upcoming-date';
+import { formatUpcomingDate, formatUpcomingRelativeDate } from './upcoming-date';
 
 const releaseCount = (entry: UpcomingEntryModel) => (entry.kind === 'episode-release' ? entry.episodes.length : 1);
 const countLabel = (count: number) => `${count} ${count === 1 ? 'release' : 'releases'}`;
@@ -75,9 +75,14 @@ const UpcomingCalendar = ({
           <Heading as="h2" textStyle="sectionTitle">
             Selected day
           </Heading>
-          <Text color="fg.muted" textStyle="supporting">
-            {formatUpcomingDate(selectedDate)}
-          </Text>
+          <HStack gap="2" flexWrap="wrap">
+            <Text color="fg.muted" textStyle="supporting">
+              {formatUpcomingDate(selectedDate)}
+            </Text>
+            <Badge colorPalette="gray" variant="subtle">
+              {formatUpcomingRelativeDate(selectedDate, minimumDate)}
+            </Badge>
+          </HStack>
           {selectedEntries.length > 0 ? (
             selectedEntries.map((entry) => (
               <UpcomingEntry key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}`} entry={entry} />

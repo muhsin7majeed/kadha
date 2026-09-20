@@ -1,14 +1,15 @@
-import { Heading, Stack } from '@chakra-ui/react';
+import { Badge, Heading, HStack, Stack } from '@chakra-ui/react';
 
 import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
-import { formatUpcomingDate } from './upcoming-date';
+import { formatUpcomingDate, formatUpcomingRelativeDate } from './upcoming-date';
 import UpcomingEntry from './upcoming-entry';
 
 interface UpcomingAgendaProps {
   entries: UpcomingEntryModel[];
+  todayDate: string;
 }
 
-const UpcomingAgenda = ({ entries }: UpcomingAgendaProps) => {
+const UpcomingAgenda = ({ entries, todayDate }: UpcomingAgendaProps) => {
   const entriesByDate = new Map<string, UpcomingEntryModel[]>();
 
   for (const entry of entries) {
@@ -21,9 +22,14 @@ const UpcomingAgenda = ({ entries }: UpcomingAgendaProps) => {
     <Stack gap="7">
       {[...entriesByDate.entries()].map(([date, datedEntries]) => (
         <Stack as="section" key={date} gap="3" aria-labelledby={`upcoming-${date}`}>
-          <Heading id={`upcoming-${date}`} as="h2" textStyle="sectionTitle">
-            {formatUpcomingDate(date)}
-          </Heading>
+          <HStack gap="2" flexWrap="wrap">
+            <Heading id={`upcoming-${date}`} as="h2" textStyle="sectionTitle">
+              {formatUpcomingDate(date)}
+            </Heading>
+            <Badge colorPalette="gray" variant="subtle">
+              {formatUpcomingRelativeDate(date, todayDate)}
+            </Badge>
+          </HStack>
           <Stack gap="3">
             {datedEntries.map((entry) => (
               <UpcomingEntry key={`${entry.kind}:${entry.media.media_type}:${entry.media.media_id}:${entry.date}`} entry={entry} />

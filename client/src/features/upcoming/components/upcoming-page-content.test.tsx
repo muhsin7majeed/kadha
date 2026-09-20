@@ -108,11 +108,12 @@ describe('UpcomingPageContent', () => {
     mocks.useUpcoming.mockReset();
   });
 
-  it('defaults to a chronological agenda with grouped episodes and media links', () => {
+  it('defaults to a chronological list with grouped episodes, date context, and media links', () => {
     renderContent();
 
-    expect(screen.getByRole('tab', { name: 'Agenda' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'List' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('heading', { name: 'Friday, September 25, 2026' })).toBeInTheDocument();
+    expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Group Drop' })).toHaveAttribute('href', '/app/media/tv/101');
     expect(screen.getByText('S2 E1 · Return')).toBeInTheDocument();
     expect(screen.getByText('S2 E2 · Again')).toBeInTheDocument();
@@ -170,6 +171,7 @@ describe('UpcomingPageContent', () => {
     fireEvent.click(screen.getByRole('button', { name: /September 25, 2026, 3 releases/ }));
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Selected day' })).toBeInTheDocument());
+    expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByText('S2 E1 · Return')).toBeInTheDocument();
     expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-20', to: '2026-09-30' });
   });

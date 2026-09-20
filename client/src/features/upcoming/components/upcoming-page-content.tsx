@@ -9,7 +9,7 @@ import useUpcoming from '@/features/upcoming/api/use-upcoming';
 import UpcomingAgenda from './upcoming-agenda';
 import UpcomingCalendar from './upcoming-calendar';
 
-type UpcomingView = 'agenda' | 'month';
+type UpcomingView = 'list' | 'month';
 
 const pad = (value: number) => String(value).padStart(2, '0');
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
@@ -24,12 +24,12 @@ const UpcomingPageContent = () => {
   const [today] = useState(() => new Date());
   const todayDate = utcDateOnly(today);
   const currentMonthKey = todayDate.slice(0, 7);
-  const [view, setView] = useState<UpcomingView>('agenda');
+  const [view, setView] = useState<UpcomingView>('list');
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
   const range = useMemo(() => {
-    if (view === 'agenda') {
+    if (view === 'list') {
       return { from: todayDate, to: utcDateOnly(addUtcDays(today, 91)) };
     }
 
@@ -61,8 +61,8 @@ const UpcomingPageContent = () => {
     >
       <Box overflowX="auto" mb="5">
         <Tabs.List minW="fit-content">
-          <Tabs.Trigger value="agenda" textStyle="compactLabel">
-            <LuList aria-hidden /> Agenda
+          <Tabs.Trigger value="list" textStyle="compactLabel">
+            <LuList aria-hidden /> List
           </Tabs.Trigger>
           <Tabs.Trigger value="month" textStyle="compactLabel">
             <LuCalendarDays aria-hidden /> Month
@@ -94,15 +94,15 @@ const UpcomingPageContent = () => {
             </Alert.Root>
           )}
 
-          {view === 'agenda' && upcoming.data.entries.length === 0 && (
+          {view === 'list' && upcoming.data.entries.length === 0 && (
             <EmptyState
               title="Nothing scheduled"
               description="No tracked episodes or watchlist movie releases have dates in this period."
               icon={<LuPartyPopper />}
             />
           )}
-          {view === 'agenda' && upcoming.data.entries.length > 0 && (
-            <UpcomingAgenda entries={upcoming.data.entries} />
+          {view === 'list' && upcoming.data.entries.length > 0 && (
+            <UpcomingAgenda entries={upcoming.data.entries} todayDate={todayDate} />
           )}
           {view === 'month' && (
             <UpcomingCalendar
