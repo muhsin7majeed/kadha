@@ -15,5 +15,7 @@ export const formatUpcomingRelativeDate = (date: string, today = utcDateOnly(new
 
   if (days === 0) return 'Today';
   if (days === 1) return 'Tomorrow';
+  if (days === -1) return 'Yesterday';
+  if (days < 0) return `${Math.abs(days)} days ago`;
   return `In ${days} days`;
 };

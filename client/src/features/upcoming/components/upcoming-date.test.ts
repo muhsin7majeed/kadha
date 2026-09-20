@@ -24,5 +24,7 @@ describe('formatUpcomingRelativeDate', () => {
     expect(formatUpcomingRelativeDate('2026-09-21')).toBe('Today');
     expect(formatUpcomingRelativeDate('2026-09-22')).toBe('Tomorrow');
     expect(formatUpcomingRelativeDate('2026-09-24')).toBe('In 3 days');
+    expect(formatUpcomingRelativeDate('2026-09-20')).toBe('Yesterday');
+    expect(formatUpcomingRelativeDate('2026-08-22')).toBe('30 days ago');
   });
 });
