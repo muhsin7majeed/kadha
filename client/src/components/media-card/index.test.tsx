@@ -23,13 +23,11 @@ const movie: MediaCardModel = {
 const renderCard = (card: React.ReactElement) => renderWithProviders(<MemoryRouter>{card}</MemoryRouter>);
 
 describe('media card metadata', () => {
-  it('shows owner-library metadata below the media-type pill', () => {
+  it('shows owner-library metadata and runtime', () => {
     renderCard(<MediaCard media={movie} showActions={false} showLibraryMetadata showPersonalRating />);
 
-    const mediaType = screen.getByText('Movie');
-    const tmdbScore = screen.getByText('TMDB 7.8');
-
-    expect(mediaType.compareDocumentPosition(tmdbScore) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText('Movie')).toBeInTheDocument();
+    expect(screen.getByText('TMDB 7.8')).toBeInTheDocument();
     expect(screen.getByText('2h 12m')).toBeInTheDocument();
     expect(screen.getByText('Your rating 4.5/5')).toBeInTheDocument();
     expect(screen.queryByText(/from 123 votes/)).not.toBeInTheDocument();

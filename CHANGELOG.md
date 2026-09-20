@@ -6,7 +6,7 @@
 
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.
 - Preserved accessible loading labels and single-dialog transitions after the Chakra UI refresh.
-- Stabilized media cards with neutral metadata, consistent title and genre space, visible runtime when available, and equalized Continue Watching details.
+- Reworked media cards into separate poster and body surfaces, grouped runtime with poster metadata, and aligned Continue Watching detail panels across themes.
 
 ### Engineering Changes
 

@@ -1,4 +1,4 @@
-import { Badge, Button, HStack, Stack, Text } from '@chakra-ui/react';
+import { Badge, Button, Card, HStack, Stack, Text } from '@chakra-ui/react';
 import { LuCheck, LuExternalLink } from 'react-icons/lu';
 import { Link } from 'react-router';
 
@@ -25,59 +25,68 @@ const InProgressTvCard = ({ item }: { item: TvInProgressItem }) => {
   const nextEpisode = item.tvProgress.nextEpisode;
 
   return (
-    <Stack gap="3" width="full" maxW="220px" h="full">
+    <Stack
+      gap="3"
+      width="full"
+      maxW="220px"
+      alignSelf="stretch"
+      display="grid"
+      gridTemplateRows="auto minmax(0, 1fr)"
+    >
       <MediaCard media={toMediaCardModel(item)} />
 
-      <Stack gap="3" borderWidth="1px" borderColor="border" borderRadius="md" p="3" minH="44" flex="1">
-        <HStack gap="2" justify="space-between" align="start">
-          <Badge colorPalette={getBadgePalette(item.tvProgress.status)}>
-            {tvProgressStatusLabel[item.tvProgress.status]}
-          </Badge>
-          <Text color="fg.muted" textStyle="supporting" whiteSpace="nowrap">
-            {formatTimeAgo(item.tvProgress.lastWatchedAt)}
-          </Text>
-        </HStack>
+      <Card.Root variant="outline" minH="44" display="flex" flexDirection="column">
+        <Card.Body gap="3" p="3" display="flex" flexDirection="column" flex="1">
+          <HStack gap="2" justify="space-between" align="start">
+            <Badge colorPalette={getBadgePalette(item.tvProgress.status)}>
+              {tvProgressStatusLabel[item.tvProgress.status]}
+            </Badge>
+            <Text color="fg.muted" textStyle="supporting" whiteSpace="nowrap">
+              {formatTimeAgo(item.tvProgress.lastWatchedAt)}
+            </Text>
+          </HStack>
 
-        <Stack gap="1" flex="1">
-          {nextEpisode ? (
-            <>
-              <Text textStyle="compactLabel">
-                {nextEpisodeLabel}: {nextEpisode.name}
-              </Text>
-              {nextEpisode.airDate ? (
-                <Text color="fg.muted" textStyle="supporting">
-                  Aired {formatDate(nextEpisode.airDate)}
+          <Stack gap="1" flex="1">
+            {nextEpisode ? (
+              <>
+                <Text textStyle="compactLabel">
+                  {nextEpisodeLabel}: {nextEpisode.name}
                 </Text>
-              ) : null}
-            </>
-          ) : (
-            <Text textStyle="compactLabel">No aired episodes left</Text>
-          )}
-          <Text color="fg.muted" textStyle="supporting">
-            {item.tvProgress.watchedEpisodeCount} of {item.tvProgress.totalAiredEpisodeCount} aired watched
-          </Text>
-        </Stack>
+                {nextEpisode.airDate ? (
+                  <Text color="fg.muted" textStyle="supporting">
+                    Aired {formatDate(nextEpisode.airDate)}
+                  </Text>
+                ) : null}
+              </>
+            ) : (
+              <Text textStyle="compactLabel">No aired episodes left</Text>
+            )}
+            <Text color="fg.muted" textStyle="supporting">
+              {item.tvProgress.watchedEpisodeCount} of {item.tvProgress.totalAiredEpisodeCount} aired watched
+            </Text>
+          </Stack>
 
-        <HStack gap="2" flexWrap="wrap">
-          {nextEpisode ? (
-            <Button
-              size="xs"
-              colorPalette="blue"
-              loading={markNextEpisodeWatched.isPending}
-              onClick={() => markNextEpisodeWatched.mutate()}
-            >
-              <LuCheck />
-              Mark next
+          <HStack gap="2" flexWrap="wrap">
+            {nextEpisode ? (
+              <Button
+                size="xs"
+                colorPalette="blue"
+                loading={markNextEpisodeWatched.isPending}
+                onClick={() => markNextEpisodeWatched.mutate()}
+              >
+                <LuCheck />
+                Mark next
+              </Button>
+            ) : null}
+            <Button size="xs" variant="outline" colorPalette="gray" asChild>
+              <Link to={`/app/media/tv/${item.media_id}`} viewTransition>
+                <LuExternalLink />
+                Open
+              </Link>
             </Button>
-          ) : null}
-          <Button size="xs" variant="outline" colorPalette="gray" asChild>
-            <Link to={`/app/media/tv/${item.media_id}`} viewTransition>
-              <LuExternalLink />
-              Open
-            </Link>
-          </Button>
-        </HStack>
-      </Stack>
+          </HStack>
+        </Card.Body>
+      </Card.Root>
     </Stack>
   );
 };
