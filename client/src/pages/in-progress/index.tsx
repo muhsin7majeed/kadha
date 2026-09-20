@@ -1,19 +1,35 @@
-import { Box, Center, Field, HStack, NativeSelect, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
-import { LuListChecks } from 'react-icons/lu';
+import {
+  Box,
+  Center,
+  Field,
+  HStack,
+  NativeSelect,
+  SimpleGrid,
+  Spinner,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { useState } from "react";
+import { LuListChecks } from "react-icons/lu";
 
-import EmptyState from '@/components/info-states/empty-state';
-import ErrorState from '@/components/info-states/error-state';
-import PageHeader from '@/components/page-header';
-import PaginationControls from '@/components/pagination-controls';
-import useInProgressTv from '@/features/user-media/api/use-in-progress-tv';
-import InProgressTvCard from '@/features/user-media/components/in-progress-tv-card';
-import type { InProgressTvSort } from '@/features/user-media/user-media.types';
+import EmptyState from "@/components/info-states/empty-state";
+import ErrorState from "@/components/info-states/error-state";
+import PageHeader from "@/components/page-header";
+import PaginationControls from "@/components/pagination-controls";
+import useInProgressTv from "@/features/user-media/api/use-in-progress-tv";
+import InProgressTvCard from "@/features/user-media/components/in-progress-tv-card";
+import type { InProgressTvSort } from "@/features/user-media/user-media.types";
 
 const InProgress = () => {
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<InProgressTvSort>('recent');
-  const { data: inProgressTv, isLoading, isFetching, error, refetch } = useInProgressTv({ page, sort });
+  const [sort, setSort] = useState<InProgressTvSort>("recent");
+  const {
+    data: inProgressTv,
+    isLoading,
+    isFetching,
+    error,
+    refetch,
+  } = useInProgressTv({ page, sort });
 
   return (
     <Box>
@@ -25,7 +41,7 @@ const InProgress = () => {
       </PageHeader>
 
       <HStack justify="flex-end" mb="5">
-        <Field.Root width={{ base: 'full', sm: '64' }}>
+        <Field.Root width={{ base: "full", sm: "64" }}>
           <Field.Label>Sort</Field.Label>
           <NativeSelect.Root disabled={isFetching}>
             <NativeSelect.Field
@@ -46,13 +62,17 @@ const InProgress = () => {
       {isLoading ? (
         <Center py={20}>
           <VStack gap={4}>
-            <Spinner size="xl" color="blue.500" />
+            <Spinner size="xl" color="brand.solid" />
             <Text color="fg.muted">Loading your TV progress...</Text>
           </VStack>
         </Center>
       ) : error ? (
         <Box py={10}>
-          <ErrorState title="Error" description="Failed to fetch in-progress shows" onRetry={refetch} />
+          <ErrorState
+            title="Error"
+            description="Failed to fetch in-progress shows"
+            onRetry={refetch}
+          />
         </Box>
       ) : inProgressTv?.data.length === 0 ? (
         <Box py={10}>
@@ -64,12 +84,23 @@ const InProgress = () => {
         </Box>
       ) : (
         <>
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6} justifyItems="center">
+          <SimpleGrid
+            columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
+            gap={6}
+            justifyItems="center"
+          >
             {inProgressTv?.data.map((item) => (
-              <InProgressTvCard key={`${item.media_type}:${item.media_id}`} item={item} />
+              <InProgressTvCard
+                key={`${item.media_type}:${item.media_id}`}
+                item={item}
+              />
             ))}
           </SimpleGrid>
-          <PaginationControls pagination={inProgressTv?.pagination} isDisabled={isFetching} onPageChange={setPage} />
+          <PaginationControls
+            pagination={inProgressTv?.pagination}
+            isDisabled={isFetching}
+            onPageChange={setPage}
+          />
         </>
       )}
     </Box>

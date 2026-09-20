@@ -1,7 +1,7 @@
-import useUnreadNotificationsCount from '@/features/notifications/api/use-unread-notifications-count';
-import NavLink from './nav-link';
-import { Flex, IconButton } from '@chakra-ui/react';
-import { LuBell } from 'react-icons/lu';
+import useUnreadNotificationsCount from "@/features/notifications/api/use-unread-notifications-count";
+import NavLink from "./nav-link";
+import { Flex, IconButton } from "@chakra-ui/react";
+import { LuBell } from "react-icons/lu";
 
 const NotificationButton = () => {
   const { data, isLoading } = useUnreadNotificationsCount();
@@ -11,7 +11,13 @@ const NotificationButton = () => {
   return (
     <>
       <NavLink to="/app/notifications" position="relative">
-        <IconButton aria-label="Notifications" variant="ghost" size="sm" loading={isLoading}>
+        <IconButton
+          colorPalette="gray"
+          aria-label="Notifications"
+          variant="ghost"
+          size="sm"
+          loading={isLoading}
+        >
           <LuBell />
         </IconButton>
 
@@ -31,7 +37,7 @@ const NotificationButton = () => {
             fontSize="2xs"
             fontWeight="semibold"
           >
-            {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+            {unreadNotificationsCount > 99 ? "99+" : unreadNotificationsCount}
           </Flex>
         )}
       </NavLink>

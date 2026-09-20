@@ -101,16 +101,20 @@ packages/contracts/
 - Public profile collection lists return privacy-safe summaries and item counts rather than embedded media or collaborator details; full collection data is loaded only on an authorized details route.
 - Owner-scoped tracked schedule resolution belongs in `server/src/features/upcoming`; Upcoming query state, list entries, and calendar rendering belong in `client/src/features/upcoming`.
 - Shared UI-only components can remain in `client/src/components`.
+- Repeated compound controls with Kadha-specific behavior or palette defaults belong in `client/src/components` using the `SimpleX` naming convention. The current canonical wrappers are `SimpleTabs`, `SimpleCheckbox`, `SimpleRadioGroup`, and `SimpleCheckboxCard`.
+- Ordinary Chakra `Button`, `IconButton`, `Input`, and `NativeSelect` usage does not require a wrapper; use the global theme default and explicit semantic `colorPalette` values at the call site.
 - Shared generic utilities can remain in `client/src/utils`.
 - Shared generic hooks can remain in `client/src/hooks`.
 - Query keys should be centralized or colocated consistently by feature, not mixed inline.
 
 ## Enforcement Plan
 
-Use this document and code review discipline as the primary enforcement mechanism for now.
+The client theme sets `brand` as the global interactive palette, while explicit semantic palettes document deliberate neutral, destructive, status, media, and presentation exceptions.
 
-Potential future enforcement steps:
+The client ESLint configuration currently enforces:
 
-1. Add CI checks when the project needs stronger automated gates.
-2. Add import-boundary lint rules after lint is clean enough to be a reliable gate.
-3. Add tests around the service layer before major behavioral refactors.
+1. Direct production `Button` and `IconButton` usage declares an intentional `colorPalette`.
+2. Production code uses Chakra primitives instead of raw HTML `button`, `input`, `select`, or `textarea` controls.
+3. Standard repeated compound controls use the canonical `SimpleX` wrappers where their API fits.
+
+Theme contract tests cover the global palette and shared wrapper defaults. Continue adding focused tests when a new reusable control or theme behavior is introduced. Import-boundary lint rules remain a future step after the client feature boundaries need stronger enforcement.

@@ -1,11 +1,18 @@
-import { LuHeart } from 'react-icons/lu';
-import useLiked from '@/features/user-media/api/use-liked';
-import useOwnerMediaQuery from '@/features/user-media/api/use-owner-media-query';
-import OwnerMediaLibrary from '@/features/user-media/components/owner-media-library';
+import { LuHeart } from "react-icons/lu";
+import useLiked from "@/features/user-media/api/use-liked";
+import useOwnerMediaQuery from "@/features/user-media/api/use-owner-media-query";
+import OwnerMediaLibrary from "@/features/user-media/components/owner-media-library";
 
 const Liked = () => {
   const { query, updateQuery } = useOwnerMediaQuery();
-  const { data: liked, isLoading, isFetching, isPlaceholderData, error, refetch } = useLiked(undefined, { ownerQuery: query });
+  const {
+    data: liked,
+    isLoading,
+    isFetching,
+    isPlaceholderData,
+    error,
+    refetch,
+  } = useLiked(undefined, { ownerQuery: query });
 
   return (
     <OwnerMediaLibrary
@@ -20,14 +27,14 @@ const Liked = () => {
       error={error}
       refetch={refetch}
       emptyState={{
-        title: 'No favorites yet',
-        description: 'Like movies and shows to add them here. Build your collection of all-time favorites!',
+        title: "No favorites yet",
+        description:
+          "Like movies and shows to add them here. Build your collection of all-time favorites!",
         icon: <LuHeart />,
       }}
       errorDescription="Failed to fetch liked"
       loadingText="Loading your favorites..."
       libraryKey="liked"
-      spinnerColor="red.500"
       query={query}
       updateQuery={updateQuery}
     />

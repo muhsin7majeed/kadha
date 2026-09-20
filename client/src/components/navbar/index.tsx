@@ -1,19 +1,35 @@
-import { Box, Button, Container, Flex, Heading, HStack, Icon, IconButton, Menu, Portal } from '@chakra-ui/react';
-import { LuMenu, LuTv } from 'react-icons/lu';
-import { Link } from 'react-router';
-import { APP_CONFIG } from '@/config/app-config';
-import GlobalSearchDialog from '@/features/search/global-search-dialog';
-import { useAuth } from '@/features/auth/use-auth';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  Icon,
+  IconButton,
+  Menu,
+  Portal,
+} from "@chakra-ui/react";
+import { LuMenu, LuTv } from "react-icons/lu";
+import { Link } from "react-router";
+import { APP_CONFIG } from "@/config/app-config";
+import GlobalSearchDialog from "@/features/search/global-search-dialog";
+import { useAuth } from "@/features/auth/use-auth";
 
-import NotificationButton from '../notification-button';
-import ProfileMenu from './profile-menu';
-import UtilityMenuItems from './utility-menu-items';
+import NotificationButton from "../notification-button";
+import ProfileMenu from "./profile-menu";
+import UtilityMenuItems from "./utility-menu-items";
 
 const UtilityMenu = () => {
   return (
     <Menu.Root>
       <Menu.Trigger asChild>
-        <IconButton variant="ghost" size="sm" aria-label="Open menu">
+        <IconButton
+          colorPalette="gray"
+          variant="ghost"
+          size="sm"
+          aria-label="Open menu"
+        >
           <LuMenu />
         </IconButton>
       </Menu.Trigger>
@@ -32,7 +48,7 @@ const UtilityMenu = () => {
 const Navbar = () => {
   const auth = useAuth();
 
-  const isAuthenticated = auth.status === 'authenticated';
+  const isAuthenticated = auth.status === "authenticated";
 
   return (
     <>
@@ -49,11 +65,16 @@ const Navbar = () => {
         <Container maxW="6xl" px="4" py={3}>
           <Flex justify="space-between" align="center">
             <HStack gap={2} minW={0} asChild>
-              <Link to={isAuthenticated ? '/app' : '/'}>
-                <Icon fontSize={['sm', '2xl']} color="brand.fg">
+              <Link to={isAuthenticated ? "/app" : "/"}>
+                <Icon fontSize={["sm", "2xl"]} color="brand.fg">
                   <LuTv />
                 </Icon>
-                <Heading as="span" size={['sm', 'lg']} truncate maxW={{ base: '42vw', sm: 'none' }}>
+                <Heading
+                  as="span"
+                  size={["sm", "lg"]}
+                  truncate
+                  maxW={{ base: "42vw", sm: "none" }}
+                >
                   {APP_CONFIG.appName}
                 </Heading>
               </Link>

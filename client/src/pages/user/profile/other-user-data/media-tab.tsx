@@ -1,14 +1,14 @@
-import EmptyState from '@/components/info-states/empty-state';
-import MediaListPage from '@/components/media-list-page';
-import useLiked from '@/features/user-media/api/use-liked';
-import useWatched from '@/features/user-media/api/use-watched';
-import useWatchList from '@/features/user-media/api/use-watch-list';
-import { Box, Text } from '@chakra-ui/react';
-import { LuBookmark, LuCheck, LuHeart } from 'react-icons/lu';
-import { useLocation, useParams } from 'react-router';
-import { useEffect, useState } from 'react';
+import EmptyState from "@/components/info-states/empty-state";
+import MediaListPage from "@/components/media-list-page";
+import useLiked from "@/features/user-media/api/use-liked";
+import useWatched from "@/features/user-media/api/use-watched";
+import useWatchList from "@/features/user-media/api/use-watch-list";
+import { Box, Text } from "@chakra-ui/react";
+import { LuBookmark, LuCheck, LuHeart } from "react-icons/lu";
+import { useLocation, useParams } from "react-router";
+import { useEffect, useState } from "react";
 
-type MediaTabType = 'watched' | 'liked' | 'watchlist';
+type MediaTabType = "watched" | "liked" | "watchlist";
 
 interface OtherUserMediaTabProps {
   type: MediaTabType;
@@ -16,46 +16,47 @@ interface OtherUserMediaTabProps {
 
 const meta = {
   watched: {
-    title: 'Watched',
-    description: 'Movies and shows marked as watched.',
-    emptyTitle: 'Nothing watched',
-    emptyDescription: 'No watched activity here yet.',
-    errorDescription: 'Failed to fetch watched',
-    loadingText: 'Loading watched...',
+    title: "Watched",
+    description: "Movies and shows marked as watched.",
+    emptyTitle: "Nothing watched",
+    emptyDescription: "No watched activity here yet.",
+    errorDescription: "Failed to fetch watched",
+    loadingText: "Loading watched...",
     icon: <LuCheck />,
-    spinnerColor: 'green.500',
   },
   liked: {
-    title: 'Liked',
-    description: 'Movies and shows marked as liked.',
-    emptyTitle: 'Nothing liked',
-    emptyDescription: 'No liked activity here yet.',
-    errorDescription: 'Failed to fetch liked',
-    loadingText: 'Loading liked...',
+    title: "Liked",
+    description: "Movies and shows marked as liked.",
+    emptyTitle: "Nothing liked",
+    emptyDescription: "No liked activity here yet.",
+    errorDescription: "Failed to fetch liked",
+    loadingText: "Loading liked...",
     icon: <LuHeart />,
-    spinnerColor: 'red.500',
   },
   watchlist: {
-    title: 'Watchlist',
-    description: 'Movies and shows saved for later.',
-    emptyTitle: 'Empty watchlist',
-    emptyDescription: 'No watchlist items here yet.',
-    errorDescription: 'Failed to fetch watchlist',
-    loadingText: 'Loading watchlist...',
+    title: "Watchlist",
+    description: "Movies and shows saved for later.",
+    emptyTitle: "Empty watchlist",
+    emptyDescription: "No watchlist items here yet.",
+    errorDescription: "Failed to fetch watchlist",
+    loadingText: "Loading watchlist...",
     icon: <LuBookmark />,
-    spinnerColor: 'brand.solid',
   },
 };
 
 const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
-  const { username = '' } = useParams();
+  const { username = "" } = useParams();
   const location = useLocation();
-  const isPublicRead = location.pathname.startsWith('/u/');
+  const isPublicRead = location.pathname.startsWith("/u/");
   const [page, setPage] = useState(1);
-  const watched = useWatched(username, { enabled: type === 'watched', page });
-  const liked = useLiked(username, { enabled: type === 'liked', page });
-  const watchlist = useWatchList(username, { enabled: type === 'watchlist', page });
-  const query = type === 'watched' ? watched : type === 'liked' ? liked : watchlist;
+  const watched = useWatched(username, { enabled: type === "watched", page });
+  const liked = useLiked(username, { enabled: type === "liked", page });
+  const watchlist = useWatchList(username, {
+    enabled: type === "watchlist",
+    page,
+  });
+  const query =
+    type === "watched" ? watched : type === "liked" ? liked : watchlist;
   const tabMeta = meta[type];
 
   useEffect(() => {
@@ -63,17 +64,24 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
   }, [type, username]);
 
   if (query.data?.access.canView === false) {
-    const signInRequired = query.data.access.lockedReason === 'SIGN_IN_REQUIRED';
-    const friendsOnly = query.data.access.lockedReason === 'FRIENDS_ONLY';
+    const signInRequired =
+      query.data.access.lockedReason === "SIGN_IN_REQUIRED";
+    const friendsOnly = query.data.access.lockedReason === "FRIENDS_ONLY";
 
     return (
       <Box py="10">
         <EmptyState
-          title={signInRequired ? 'Sign in required' : friendsOnly ? 'Friends only' : 'Private'}
+          title={
+            signInRequired
+              ? "Sign in required"
+              : friendsOnly
+                ? "Friends only"
+                : "Private"
+          }
           description={
             signInRequired
-              ? 'Sign in to check whether this activity is visible to you.'
-              : 'This activity is not visible to you.'
+              ? "Sign in to check whether this activity is visible to you."
+              : "This activity is not visible to you."
           }
         />
       </Box>
@@ -87,7 +95,7 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
         title={tabMeta.title}
         description={tabMeta.description}
         data={query.data?.data}
-        detailsPathPrefix={isPublicRead ? '/media' : undefined}
+        detailsPathPrefix={isPublicRead ? "/media" : undefined}
         showActions={!isPublicRead}
         isLoading={query.isLoading}
         isFetching={query.isFetching}
@@ -100,7 +108,6 @@ const OtherUserMediaTab: React.FC<OtherUserMediaTabProps> = ({ type }) => {
         }}
         errorDescription={tabMeta.errorDescription}
         loadingText={tabMeta.loadingText}
-        spinnerColor={tabMeta.spinnerColor}
         pagination={query.data?.pagination}
         onPageChange={setPage}
       />

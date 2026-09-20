@@ -1,9 +1,10 @@
 import {
   Badge,
   Button,
+  Checkbox,
   CloseButton,
   Field,
-  Flex,
+  Fieldset,
   Input,
   NativeSelect,
   Popover,
@@ -113,19 +114,22 @@ const MediaLibraryFilters = ({
 
   const filterFields = (
     <Stack gap="6">
-      <Field.Root>
-        <Field.Label>Genres</Field.Label>
+      <Fieldset.Root>
+        <Fieldset.Legend>Genres</Fieldset.Legend>
         {facets?.genres.length ? (
           <SimpleGrid columns={{ base: 1, sm: 2 }} gap="3">
             {facets.genres.map((genre) => (
-              <Flex key={genre.id} as="label" align="center" gap="2" cursor="pointer" textStyle="body">
-                <input
-                  type="checkbox"
-                  checked={draft.genres.includes(genre.id)}
-                  onChange={(event) => toggleGenre(genre.id, event.currentTarget.checked)}
-                />
-                {genre.name}
-              </Flex>
+              <Checkbox.Root
+                key={genre.id}
+                checked={draft.genres.includes(genre.id)}
+                colorPalette="brand"
+                gap="2"
+                onCheckedChange={(details) => toggleGenre(genre.id, details.checked === true)}
+              >
+                <Checkbox.HiddenInput />
+                <Checkbox.Control />
+                <Checkbox.Label textStyle="body">{genre.name}</Checkbox.Label>
+              </Checkbox.Root>
             ))}
           </SimpleGrid>
         ) : (
@@ -133,8 +137,8 @@ const MediaLibraryFilters = ({
             Genre options will appear when this library has enriched titles.
           </Text>
         )}
-        <Field.HelperText>Selected genres must all match.</Field.HelperText>
-      </Field.Root>
+        <Fieldset.HelperText>Selected genres must all match.</Fieldset.HelperText>
+      </Fieldset.Root>
 
       <SimpleGrid columns={{ base: 1, sm: 2 }} gap="4">
         <Field.Root invalid={invalidYears}>
@@ -142,6 +146,7 @@ const MediaLibraryFilters = ({
           <Input
             aria-describedby={invalidYears ? yearErrorId : undefined}
             aria-label="From year"
+            colorPalette="brand"
             type="number"
             min={minimumYear}
             max={maximumYear}
@@ -159,6 +164,7 @@ const MediaLibraryFilters = ({
           <Input
             aria-describedby={invalidYears ? yearErrorId : undefined}
             aria-label="Through year"
+            colorPalette="brand"
             type="number"
             min={minimumYear}
             max={maximumYear}
@@ -181,7 +187,7 @@ const MediaLibraryFilters = ({
       {supportsPersonalRating && (
         <Field.Root>
           <Field.Label>Personal rating</Field.Label>
-          <NativeSelect.Root>
+          <NativeSelect.Root colorPalette="brand">
             <NativeSelect.Field
               aria-label="Personal rating"
               value={draft.rating}
@@ -213,8 +219,8 @@ const MediaLibraryFilters = ({
   );
 
   return (
-    <Field.Root w={{ lg: 'auto' }}>
-      <Field.Label>More filters</Field.Label>
+    <Stack gap="1.5" w={{ lg: 'auto' }}>
+      <Text textStyle="compactLabel">More filters</Text>
       {useDesktopPopover ? (
         <Popover.Root
           open={open}
@@ -258,7 +264,7 @@ const MediaLibraryFilters = ({
           {filterFields}
         </SimpleDialog>
       )}
-    </Field.Root>
+    </Stack>
   );
 };
 

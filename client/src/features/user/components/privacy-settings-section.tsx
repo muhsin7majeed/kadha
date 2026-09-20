@@ -1,12 +1,24 @@
-import { Box, Button, Card, Field, Heading, RadioGroup, SimpleGrid, Stack } from '@chakra-ui/react';
-import { useEffect } from 'react';
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
+import {
+  Box,
+  Button,
+  Card,
+  Field,
+  Heading,
+  RadioGroup,
+  SimpleGrid,
+  Stack,
+} from "@chakra-ui/react";
+import { useEffect } from "react";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 
-import { DATA_PRIVACY_OPTIONS, PROFILE_PRIVACY_OPTIONS } from '@/constants/common';
-import useUpdateMe from '@/features/user/api/use-update-me';
-import { getUpdateUserPayload } from '@/features/user/user-settings';
-import type { User } from '@/features/user/user.types';
-import { DataPrivacy } from '@/types/common';
+import {
+  DATA_PRIVACY_OPTIONS,
+  PROFILE_PRIVACY_OPTIONS,
+} from "@/constants/common";
+import useUpdateMe from "@/features/user/api/use-update-me";
+import { getUpdateUserPayload } from "@/features/user/user-settings";
+import type { User } from "@/features/user/user.types";
+import { DataPrivacy } from "@/types/common";
 
 interface PrivacyInputs {
   profilePrivacy: DataPrivacy;
@@ -29,27 +41,28 @@ interface PrivacySetting {
 
 const privacySettings: PrivacySetting[] = [
   {
-    name: 'profilePrivacy',
-    label: 'Profile',
-    description: 'Controls who can open your profile. Anyone on the web does not require a Kadha account.',
+    name: "profilePrivacy",
+    label: "Profile",
+    description:
+      "Controls who can open your profile. Anyone on the web does not require a Kadha account.",
     options: PROFILE_PRIVACY_OPTIONS,
   },
   {
-    name: 'watchedPrivacy',
-    label: 'Watched list',
-    description: 'Controls visibility for movies and shows marked as watched.',
+    name: "watchedPrivacy",
+    label: "Watched list",
+    description: "Controls visibility for movies and shows marked as watched.",
     options: DATA_PRIVACY_OPTIONS,
   },
   {
-    name: 'likedPrivacy',
-    label: 'Liked list',
-    description: 'Controls visibility for movies and shows you liked.',
+    name: "likedPrivacy",
+    label: "Liked list",
+    description: "Controls visibility for movies and shows you liked.",
     options: DATA_PRIVACY_OPTIONS,
   },
   {
-    name: 'watchlistPrivacy',
-    label: 'Watchlist',
-    description: 'Controls visibility for movies and shows you plan to watch.',
+    name: "watchlistPrivacy",
+    label: "Watchlist",
+    description: "Controls visibility for movies and shows you plan to watch.",
     options: DATA_PRIVACY_OPTIONS,
   },
 ];
@@ -60,7 +73,7 @@ interface PrivacyRadioGroupProps {
   name: string;
   onBlur: () => void;
   onChange: (value: DataPrivacy) => void;
-  options: PrivacySetting['options'];
+  options: PrivacySetting["options"];
   value: DataPrivacy;
 }
 
@@ -74,6 +87,7 @@ const PrivacyRadioGroup = ({
   value,
 }: PrivacyRadioGroupProps) => (
   <RadioGroup.Root
+    colorPalette="brand"
     aria-label={ariaLabel}
     disabled={disabled}
     name={name}
@@ -90,14 +104,14 @@ const PrivacyRadioGroup = ({
             key={option.value}
             value={option.value}
             alignItems="center"
-            bg={isSelected ? 'brand.subtle' : 'transparent'}
+            bg={isSelected ? "brand.subtle" : "transparent"}
             borderWidth="1px"
-            borderColor={isSelected ? 'brand.solid' : 'border.muted'}
+            borderColor={isSelected ? "brand.solid" : "border.muted"}
             borderRadius="md"
-            cursor={disabled ? 'not-allowed' : 'pointer'}
+            cursor={disabled ? "not-allowed" : "pointer"}
             justifyContent="center"
             minW="0"
-            px={{ base: '2', sm: '3' }}
+            px={{ base: "2", sm: "3" }}
             py="2.5"
           >
             <RadioGroup.ItemHiddenInput />
@@ -165,10 +179,10 @@ const PrivacySettingsSection = ({ me }: PrivacySettingsSectionProps) => {
               {privacySettings.map((setting, index) => (
                 <Box
                   key={setting.name}
-                  borderTopWidth={index === 0 ? '0' : '1px'}
+                  borderTopWidth={index === 0 ? "0" : "1px"}
                   borderColor="border.muted"
                   py="5"
-                  _first={{ pt: '0' }}
+                  _first={{ pt: "0" }}
                 >
                   <Controller
                     control={control}
@@ -176,7 +190,9 @@ const PrivacySettingsSection = ({ me }: PrivacySettingsSectionProps) => {
                     render={({ field }) => (
                       <Field.Root>
                         <Field.Label>{setting.label}</Field.Label>
-                        <Field.HelperText mb="3">{setting.description}</Field.HelperText>
+                        <Field.HelperText mb="3">
+                          {setting.description}
+                        </Field.HelperText>
                         <PrivacyRadioGroup
                           ariaLabel={`${setting.label} visibility`}
                           disabled={isUpdatingMe}
@@ -198,7 +214,7 @@ const PrivacySettingsSection = ({ me }: PrivacySettingsSectionProps) => {
               colorPalette="brand"
               loading={isUpdatingMe}
               disabled={isUpdatingMe || !isDirty}
-              alignSelf={{ base: 'stretch', sm: 'start' }}
+              alignSelf={{ base: "stretch", sm: "start" }}
             >
               Save privacy settings
             </Button>

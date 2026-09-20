@@ -1,15 +1,24 @@
-import { useState } from 'react';
-import { Button, HStack, IconButton, Menu, Portal } from '@chakra-ui/react';
-import { LuBan, LuCheck, LuClock, LuEllipsis, LuShieldOff, LuUserMinus, LuUserPlus, LuX } from 'react-icons/lu';
+import { useState } from "react";
+import { Button, HStack, IconButton, Menu, Portal } from "@chakra-ui/react";
+import {
+  LuBan,
+  LuCheck,
+  LuClock,
+  LuEllipsis,
+  LuShieldOff,
+  LuUserMinus,
+  LuUserPlus,
+  LuX,
+} from "react-icons/lu";
 
-import ConfirmationDialog from '@/components/dialogs/confirmation-dialog';
-import useAcceptFriendRequest from '@/features/friendship/api/use-accept-friend-request';
-import useBlock from '@/features/friendship/api/use-block';
-import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-request';
-import useSendFriendRequest from '@/features/friendship/api/use-send-friend-request';
-import useUnblock from '@/features/friendship/api/use-unblock';
-import useUnfriend from '@/features/friendship/api/use-unfriend';
-import { FriendStatus } from '@/types/common';
+import ConfirmationDialog from "@/components/dialogs/confirmation-dialog";
+import useAcceptFriendRequest from "@/features/friendship/api/use-accept-friend-request";
+import useBlock from "@/features/friendship/api/use-block";
+import useRejectFriendRequest from "@/features/friendship/api/use-reject-friend-request";
+import useSendFriendRequest from "@/features/friendship/api/use-send-friend-request";
+import useUnblock from "@/features/friendship/api/use-unblock";
+import useUnfriend from "@/features/friendship/api/use-unfriend";
+import { FriendStatus } from "@/types/common";
 
 interface FriendshipActionsUser {
   id: string;
@@ -22,14 +31,26 @@ interface FriendshipActionsProps {
   user: FriendshipActionsUser;
 }
 
-const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog = false, user }) => {
-  const { mutateAsync: sendFriendRequest, isPending: isSendingFriendRequest } = useSendFriendRequest();
-  const { mutateAsync: acceptFriendRequest, isPending: isAcceptingFriendRequest } = useAcceptFriendRequest();
-  const { mutateAsync: rejectFriendRequest, isPending: isRejectingFriendRequest } = useRejectFriendRequest();
+const FriendshipActions: React.FC<FriendshipActionsProps> = ({
+  menuWithinDialog = false,
+  user,
+}) => {
+  const { mutateAsync: sendFriendRequest, isPending: isSendingFriendRequest } =
+    useSendFriendRequest();
+  const {
+    mutateAsync: acceptFriendRequest,
+    isPending: isAcceptingFriendRequest,
+  } = useAcceptFriendRequest();
+  const {
+    mutateAsync: rejectFriendRequest,
+    isPending: isRejectingFriendRequest,
+  } = useRejectFriendRequest();
   const { mutateAsync: unfriend, isPending: isUnfriending } = useUnfriend();
   const { mutateAsync: block, isPending: isBlocking } = useBlock();
   const { mutateAsync: unblock, isPending: isUnblocking } = useUnblock();
-  const [dialogAction, setDialogAction] = useState<'unfriend' | 'block' | null>(null);
+  const [dialogAction, setDialogAction] = useState<"unfriend" | "block" | null>(
+    null,
+  );
 
   const handleSendFriendRequest = async (userId: string) => {
     if (isSendingFriendRequest) return;
@@ -101,7 +122,13 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
 
     if (friendshipStatus === FriendStatus.Accepted) {
       return (
-        <Menu.Root positioning={menuWithinDialog ? { strategy: 'fixed', hideWhenDetached: true } : undefined}>
+        <Menu.Root
+          positioning={
+            menuWithinDialog
+              ? { strategy: "fixed", hideWhenDetached: true }
+              : undefined
+          }
+        >
           <Menu.Trigger asChild>
             <Button variant="subtle" colorPalette="gray" size="sm">
               Friends
@@ -112,11 +139,18 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
           {renderMenuPositioner(
             <Menu.Positioner>
               <Menu.Content>
-                <Menu.Item value="unfriend" onClick={() => setDialogAction('unfriend')}>
+                <Menu.Item
+                  value="unfriend"
+                  onClick={() => setDialogAction("unfriend")}
+                >
                   <LuUserMinus />
                   Unfriend
                 </Menu.Item>
-                <Menu.Item value="block" color="fg.error" onClick={() => setDialogAction('block')}>
+                <Menu.Item
+                  value="block"
+                  color="fg.error"
+                  onClick={() => setDialogAction("block")}
+                >
                   <LuBan />
                   Block user
                 </Menu.Item>
@@ -182,9 +216,20 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
           <LuUserPlus />
           Add Friend
         </Button>
-        <Menu.Root positioning={menuWithinDialog ? { strategy: 'fixed', hideWhenDetached: true } : undefined}>
+        <Menu.Root
+          positioning={
+            menuWithinDialog
+              ? { strategy: "fixed", hideWhenDetached: true }
+              : undefined
+          }
+        >
           <Menu.Trigger asChild>
-            <IconButton variant="ghost" size="sm" aria-label="More user actions">
+            <IconButton
+              colorPalette="gray"
+              variant="ghost"
+              size="sm"
+              aria-label="More user actions"
+            >
               <LuEllipsis />
             </IconButton>
           </Menu.Trigger>
@@ -192,7 +237,11 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
           {renderMenuPositioner(
             <Menu.Positioner>
               <Menu.Content>
-                <Menu.Item value="block" color="fg.error" onClick={() => setDialogAction('block')}>
+                <Menu.Item
+                  value="block"
+                  color="fg.error"
+                  onClick={() => setDialogAction("block")}
+                >
                   <LuBan />
                   Block user
                 </Menu.Item>
@@ -208,11 +257,11 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
     <>
       {renderFriendshipActions(user)}
       <ConfirmationDialog
-        isOpen={dialogAction === 'unfriend'}
+        isOpen={dialogAction === "unfriend"}
         title="Remove friend?"
         description="They will no longer be able to see friend-only activity."
         confirmButtonText="Unfriend"
-        confirmButtonProps={{ colorPalette: 'red', loading: isUnfriending }}
+        confirmButtonProps={{ colorPalette: "red", loading: isUnfriending }}
         onOpenChange={(open) => {
           if (!open) setDialogAction(null);
         }}
@@ -221,11 +270,11 @@ const FriendshipActions: React.FC<FriendshipActionsProps> = ({ menuWithinDialog 
         }}
       />
       <ConfirmationDialog
-        isOpen={dialogAction === 'block'}
+        isOpen={dialogAction === "block"}
         title="Block user?"
         description="They will not be able to find you, request you, or view your profile."
         confirmButtonText="Block"
-        confirmButtonProps={{ colorPalette: 'red', loading: isBlocking }}
+        confirmButtonProps={{ colorPalette: "red", loading: isBlocking }}
         onOpenChange={(open) => {
           if (!open) setDialogAction(null);
         }}

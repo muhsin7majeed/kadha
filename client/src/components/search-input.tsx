@@ -1,6 +1,11 @@
-import { IconButton, Input, InputGroup, InputGroupProps } from '@chakra-ui/react';
-import { forwardRef, useEffect, useState } from 'react';
-import { LuSearch, LuX } from 'react-icons/lu';
+import {
+  IconButton,
+  Input,
+  InputGroup,
+  InputGroupProps,
+} from "@chakra-ui/react";
+import { forwardRef, useEffect, useState } from "react";
+import { LuSearch, LuX } from "react-icons/lu";
 
 interface SearchInputProps extends Partial<InputGroupProps> {
   inputAriaLabel?: string;
@@ -11,7 +16,17 @@ interface SearchInputProps extends Partial<InputGroupProps> {
 }
 
 const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ inputAriaLabel, onSearchChange, placeholder = 'Search', debounceMs = 300, defaultValue = '', ...props }, ref) => {
+  (
+    {
+      inputAriaLabel,
+      onSearchChange,
+      placeholder = "Search",
+      debounceMs = 300,
+      defaultValue = "",
+      ...props
+    },
+    ref,
+  ) => {
     const [searchQuery, setSearchQuery] = useState(defaultValue);
 
     useEffect(() => {
@@ -29,14 +44,19 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     };
 
     const handleClearSearch = () => {
-      setSearchQuery('');
+      setSearchQuery("");
     };
 
     return (
       <InputGroup
         endElement={
           searchQuery ? (
-            <IconButton aria-label="Clear search" variant="plain" onClick={handleClearSearch}>
+            <IconButton
+              colorPalette="gray"
+              aria-label="Clear search"
+              variant="plain"
+              onClick={handleClearSearch}
+            >
               <LuX />
             </IconButton>
           ) : (
@@ -58,6 +78,6 @@ const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
   },
 );
 
-SearchInput.displayName = 'SearchInput';
+SearchInput.displayName = "SearchInput";
 
 export default SearchInput;

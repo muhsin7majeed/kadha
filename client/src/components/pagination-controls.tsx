@@ -1,7 +1,7 @@
-import { HStack, IconButton, Text } from '@chakra-ui/react';
-import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
+import { HStack, IconButton, Text } from "@chakra-ui/react";
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
-import { PaginationMeta } from '@/types/common';
+import { PaginationMeta } from "@/types/common";
 
 interface PaginationControlsProps {
   pagination?: PaginationMeta;
@@ -9,7 +9,11 @@ interface PaginationControlsProps {
   isDisabled?: boolean;
 }
 
-const PaginationControls = ({ pagination, onPageChange, isDisabled }: PaginationControlsProps) => {
+const PaginationControls = ({
+  pagination,
+  onPageChange,
+  isDisabled,
+}: PaginationControlsProps) => {
   if (!pagination || pagination.totalPages <= 1) {
     return null;
   }
@@ -19,6 +23,7 @@ const PaginationControls = ({ pagination, onPageChange, isDisabled }: Pagination
   return (
     <HStack justifyContent="center" gap="3" pt="6">
       <IconButton
+        colorPalette="gray"
         aria-label="Previous page"
         variant="outline"
         size="sm"
@@ -27,10 +32,16 @@ const PaginationControls = ({ pagination, onPageChange, isDisabled }: Pagination
       >
         <LuChevronLeft />
       </IconButton>
-      <Text minW="24" textAlign="center" color="fg.muted" textStyle="supporting">
+      <Text
+        minW="24"
+        textAlign="center"
+        color="fg.muted"
+        textStyle="supporting"
+      >
         Page {page} of {totalPages}
       </Text>
       <IconButton
+        colorPalette="gray"
         aria-label="Next page"
         variant="outline"
         size="sm"

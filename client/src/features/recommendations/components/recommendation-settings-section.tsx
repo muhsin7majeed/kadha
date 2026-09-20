@@ -1,15 +1,25 @@
-import { Alert, Box, Button, Card, Checkbox, Heading, SimpleGrid, Stack, Text } from '@chakra-ui/react';
-import { useEffect } from 'react';
-import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
-import { LuRefreshCcw } from 'react-icons/lu';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Heading,
+  SimpleGrid,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { useEffect } from "react";
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
+import { LuRefreshCcw } from "react-icons/lu";
 
-import useRecommendationSettings from '@/features/recommendations/api/use-recommendation-settings';
-import useUpdateRecommendationSettings from '@/features/recommendations/api/use-update-recommendation-settings';
+import SimpleCheckbox from "@/components/simple-checkbox";
+import useRecommendationSettings from "@/features/recommendations/api/use-recommendation-settings";
+import useUpdateRecommendationSettings from "@/features/recommendations/api/use-update-recommendation-settings";
 import {
   useResetRecommendationFeedback,
   useResetRecommendationSettings,
-} from '@/features/recommendations/api/use-reset-recommendations';
-import type { RecommendationSettings } from '@/features/recommendations/recommendations.types';
+} from "@/features/recommendations/api/use-reset-recommendations";
+import type { RecommendationSettings } from "@/features/recommendations/recommendations.types";
 
 interface RecommendationSettingOption {
   name: keyof RecommendationSettings;
@@ -19,37 +29,42 @@ interface RecommendationSettingOption {
 
 const signalOptions: RecommendationSettingOption[] = [
   {
-    name: 'useLiked',
-    label: 'Liked titles',
-    description: 'Use titles you liked as a strong positive taste signal.',
+    name: "useLiked",
+    label: "Liked titles",
+    description: "Use titles you liked as a strong positive taste signal.",
   },
   {
-    name: 'useRatings',
-    label: 'Ratings',
-    description: 'Use high ratings as positive signals and low ratings as negative signals.',
+    name: "useRatings",
+    label: "Ratings",
+    description:
+      "Use high ratings as positive signals and low ratings as negative signals.",
   },
   {
-    name: 'useWatched',
-    label: 'Watched titles',
-    description: 'Use watched titles as a weak signal. Watched recommendations are still excluded by default.',
+    name: "useWatched",
+    label: "Watched titles",
+    description:
+      "Use watched titles as a weak signal. Watched recommendations are still excluded by default.",
   },
   {
-    name: 'useRewatchHistory',
-    label: 'Rewatch history',
-    description: 'Use repeat watches as a strong signal, capped so one title does not dominate.',
+    name: "useRewatchHistory",
+    label: "Rewatch history",
+    description:
+      "Use repeat watches as a strong signal, capped so one title does not dominate.",
   },
   {
-    name: 'useWatchlist',
-    label: 'Watchlist',
-    description: 'Optional. Watchlist reflects future interest, not proven taste, so it may skew recommendations.',
+    name: "useWatchlist",
+    label: "Watchlist",
+    description:
+      "Optional. Watchlist reflects future interest, not proven taste, so it may skew recommendations.",
   },
 ];
 
 const resultOptions: RecommendationSettingOption[] = [
   {
-    name: 'excludeWatched',
-    label: 'Exclude watched titles',
-    description: 'Keep recommendations focused on things you have not already watched.',
+    name: "excludeWatched",
+    label: "Exclude watched titles",
+    description:
+      "Keep recommendations focused on things you have not already watched.",
   },
 ];
 
@@ -61,34 +76,35 @@ interface SettingsCheckboxProps {
   onChange: (value: boolean) => void;
 }
 
-const SettingsCheckbox = ({ description, disabled, label, onChange, value }: SettingsCheckboxProps) => (
-  <Checkbox.Root
+const SettingsCheckbox = ({
+  description,
+  disabled,
+  label,
+  onChange,
+  value,
+}: SettingsCheckboxProps) => (
+  <SimpleCheckbox
     checked={value}
     disabled={disabled}
-    onCheckedChange={(details) => onChange(details.checked === true)}
-    alignItems="flex-start"
+    label={label}
+    description={description}
     borderWidth="1px"
-    borderColor={value ? 'brand.solid' : 'border.muted'}
-    bg={value ? 'brand.subtle' : 'transparent'}
+    borderColor={value ? "brand.solid" : "border.muted"}
+    bg={value ? "brand.subtle" : "transparent"}
     borderRadius="lg"
     p="4"
-  >
-    <Checkbox.HiddenInput />
-    <Checkbox.Control mt="0.5" />
-    <Box>
-      <Checkbox.Label fontWeight="medium">{label}</Checkbox.Label>
-      <Text color="fg.muted" textStyle="supporting" mt="1">
-        {description}
-      </Text>
-    </Box>
-  </Checkbox.Root>
+    onCheckedChange={(details) => onChange(details.checked === true)}
+  />
 );
 
 const RecommendationSettingsSection = () => {
   const { data: settings, isLoading } = useRecommendationSettings();
-  const { mutateAsync: updateSettings, isPending: isUpdating } = useUpdateRecommendationSettings();
-  const { mutate: resetFeedback, isPending: isResettingFeedback } = useResetRecommendationFeedback();
-  const { mutate: resetSettings, isPending: isResettingSettings } = useResetRecommendationSettings();
+  const { mutateAsync: updateSettings, isPending: isUpdating } =
+    useUpdateRecommendationSettings();
+  const { mutate: resetFeedback, isPending: isResettingFeedback } =
+    useResetRecommendationFeedback();
+  const { mutate: resetSettings, isPending: isResettingSettings } =
+    useResetRecommendationSettings();
   const {
     control,
     handleSubmit,
@@ -105,7 +121,7 @@ const RecommendationSettingsSection = () => {
       excludeWatched: true,
     },
   });
-  const useWatchlist = watch('useWatchlist');
+  const useWatchlist = watch("useWatchlist");
 
   useEffect(() => {
     if (!settings) return;
@@ -117,7 +133,8 @@ const RecommendationSettingsSection = () => {
     reset(data);
   };
 
-  const controlsDisabled = isLoading || isUpdating || isResettingFeedback || isResettingSettings;
+  const controlsDisabled =
+    isLoading || isUpdating || isResettingFeedback || isResettingSettings;
 
   return (
     <Stack gap="5">
@@ -128,7 +145,8 @@ const RecommendationSettingsSection = () => {
               Recommendation inputs
             </Heading>
             <Text color="fg.muted" textStyle="supporting" mb="2">
-              Choose which private tracking signals Kadha can use for recommendations.
+              Choose which private tracking signals Kadha can use for
+              recommendations.
             </Text>
           </Card.Header>
 
@@ -157,9 +175,12 @@ const RecommendationSettingsSection = () => {
                 <Alert.Root status="warning" role="alert">
                   <Alert.Indicator />
                   <Alert.Content>
-                    <Alert.Title>Watchlist can skew recommendations</Alert.Title>
+                    <Alert.Title>
+                      Watchlist can skew recommendations
+                    </Alert.Title>
                     <Alert.Description>
-                      Watchlist items are things you may want to try, not proof that you enjoyed similar titles.
+                      Watchlist items are things you may want to try, not proof
+                      that you enjoyed similar titles.
                     </Alert.Description>
                   </Alert.Content>
                 </Alert.Root>
@@ -194,7 +215,7 @@ const RecommendationSettingsSection = () => {
                 colorPalette="brand"
                 loading={isUpdating}
                 disabled={controlsDisabled || !isDirty}
-                alignSelf={{ base: 'stretch', sm: 'start' }}
+                alignSelf={{ base: "stretch", sm: "start" }}
               >
                 Save recommendation settings
               </Button>
@@ -213,7 +234,7 @@ const RecommendationSettingsSection = () => {
           </Text>
         </Card.Header>
         <Card.Body pt="0">
-          <Stack direction={{ base: 'column', sm: 'row' }} gap="3">
+          <Stack direction={{ base: "column", sm: "row" }} gap="3">
             <Button
               variant="outline"
               colorPalette="gray"

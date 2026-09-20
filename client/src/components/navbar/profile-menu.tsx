@@ -1,14 +1,21 @@
-import { Button, Menu, Portal } from '@chakra-ui/react';
-import SimpleAvatar from '../simple-avatar';
-import { NavLink, useLocation } from 'react-router';
-import useLogout from '@/features/auth/api/use-logout';
-import { useState } from 'react';
-import ConfirmationDialog from '../dialogs/confirmation-dialog';
-import { LuBell, LuLayoutDashboard, LuLogOut, LuMessageSquare, LuUser, LuUsers } from 'react-icons/lu';
-import UtilityMenuItems, { MenuSectionSeparator } from './utility-menu-items';
-import { UserRole } from '@/types/common';
-import { useAuth } from '@/features/auth/use-auth';
-import { clearSession } from '@/features/auth/session';
+import { Button, Menu, Portal } from "@chakra-ui/react";
+import SimpleAvatar from "../simple-avatar";
+import { NavLink, useLocation } from "react-router";
+import useLogout from "@/features/auth/api/use-logout";
+import { useState } from "react";
+import ConfirmationDialog from "../dialogs/confirmation-dialog";
+import {
+  LuBell,
+  LuLayoutDashboard,
+  LuLogOut,
+  LuMessageSquare,
+  LuUser,
+  LuUsers,
+} from "react-icons/lu";
+import UtilityMenuItems, { MenuSectionSeparator } from "./utility-menu-items";
+import { UserRole } from "@/types/common";
+import { useAuth } from "@/features/auth/use-auth";
+import { clearSession } from "@/features/auth/session";
 
 const ProfileMenu = () => {
   const location = useLocation();
@@ -46,12 +53,12 @@ const ProfileMenu = () => {
         onConfirm={handleLogoutConfirm}
         confirmButtonText="Confirm"
         cancelButtonText="Cancel"
-        confirmButtonProps={{ colorPalette: 'red' }}
+        confirmButtonProps={{ colorPalette: "red" }}
       />
 
       <Menu.Root>
         <Menu.Trigger asChild>
-          <Button unstyled cursor="pointer">
+          <Button colorPalette="gray" unstyled cursor="pointer">
             <SimpleAvatar fallbackName={auth.user?.username} />
           </Button>
         </Menu.Trigger>
@@ -88,7 +95,10 @@ const ProfileMenu = () => {
               <MenuSectionSeparator />
 
               <Menu.Item value="feedback" asChild>
-                <NavLink to="/app/feedback" state={{ sourcePath: location.pathname }}>
+                <NavLink
+                  to="/app/feedback"
+                  state={{ sourcePath: location.pathname }}
+                >
                   <LuMessageSquare /> Send feedback
                 </NavLink>
               </Menu.Item>
@@ -101,7 +111,7 @@ const ProfileMenu = () => {
                 value="logout"
                 onClick={handleLogout}
                 color="fg.error"
-                _hover={{ bg: 'bg.error', color: 'fg.error' }}
+                _hover={{ bg: "bg.error", color: "fg.error" }}
               >
                 <LuLogOut /> Logout
               </Menu.Item>

@@ -1,7 +1,7 @@
-import { Button, Group, HStack, Text } from '@chakra-ui/react';
-import { LuLayoutGrid, LuList, LuTable2 } from 'react-icons/lu';
+import { Button, Group, HStack, Text } from "@chakra-ui/react";
+import { LuLayoutGrid, LuList, LuTable2 } from "react-icons/lu";
 
-import type { OwnerMediaView } from '@/features/user-media/user-media.types';
+import type { OwnerMediaView } from "@/features/user-media/user-media.types";
 
 interface MediaLibraryViewSwitcherProps {
   value: OwnerMediaView;
@@ -9,12 +9,15 @@ interface MediaLibraryViewSwitcherProps {
 }
 
 const options = [
-  { value: 'grid', label: 'Grid', icon: LuLayoutGrid },
-  { value: 'list', label: 'List', icon: LuList },
-  { value: 'table', label: 'Table', icon: LuTable2 },
+  { value: "grid", label: "Grid", icon: LuLayoutGrid },
+  { value: "list", label: "List", icon: LuList },
+  { value: "table", label: "Table", icon: LuTable2 },
 ] as const;
 
-const MediaLibraryViewSwitcher = ({ value, onChange }: MediaLibraryViewSwitcherProps) => (
+const MediaLibraryViewSwitcher = ({
+  value,
+  onChange,
+}: MediaLibraryViewSwitcherProps) => (
   <HStack gap="2">
     <Text color="fg.muted" textStyle="compactLabel">
       View
@@ -29,13 +32,13 @@ const MediaLibraryViewSwitcher = ({ value, onChange }: MediaLibraryViewSwitcherP
             key={option.value}
             aria-label={`${option.label} view`}
             aria-pressed={selected}
-            colorPalette="gray"
+            colorPalette={selected ? "brand" : "gray"}
             size="sm"
-            variant={selected ? 'solid' : 'outline'}
+            variant={selected ? "solid" : "outline"}
             onClick={() => onChange(option.value)}
           >
             <Icon aria-hidden />
-            <Text as="span" display={{ base: 'none', sm: 'inline' }}>
+            <Text as="span" display={{ base: "none", sm: "inline" }}>
               {option.label}
             </Text>
           </Button>

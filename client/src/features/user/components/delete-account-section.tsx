@@ -2,7 +2,6 @@ import {
   Alert,
   Button,
   Card,
-  Checkbox,
   CloseButton,
   Code,
   Dialog,
@@ -13,32 +12,38 @@ import {
   Portal,
   Stack,
   Text,
-} from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { LuDownload, LuTrash2, LuTriangleAlert } from 'react-icons/lu';
-import { useNavigate } from 'react-router';
+} from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { LuDownload, LuTrash2, LuTriangleAlert } from "react-icons/lu";
+import { useNavigate } from "react-router";
 
-import { toaster } from '@/components/ui/toaster-store';
-import PasswordInput from '@/features/auth/components/password-input';
-import { clearSession } from '@/features/auth/session';
+import SimpleCheckbox from "@/components/simple-checkbox";
+import { toaster } from "@/components/ui/toaster-store";
+import PasswordInput from "@/features/auth/components/password-input";
+import { clearSession } from "@/features/auth/session";
 import {
   keepValidOwnershipOverrides,
   resolveDeletionPlan,
   toOwnershipPlan,
-} from '@/features/user/account-deletion-plan';
-import { OwnershipOverridesByCollection } from '@/features/user/account-deletion.types';
-import useDeleteAccount from '@/features/user/api/use-delete-account';
-import useDeletionImpact from '@/features/user/api/use-deletion-impact';
-import useExportUserData from '@/features/user/api/use-export-user-data';
-import CollectionOwnershipPlanDialog from '@/features/user/components/collection-ownership-plan-dialog';
-import DeletionImpactSummary from '@/features/user/components/deletion-impact-summary';
-import { getApiErrorCode, getApiErrorMessage, getApiFieldError } from '@/hooks/use-error-handler';
+} from "@/features/user/account-deletion-plan";
+import { OwnershipOverridesByCollection } from "@/features/user/account-deletion.types";
+import useDeleteAccount from "@/features/user/api/use-delete-account";
+import useDeletionImpact from "@/features/user/api/use-deletion-impact";
+import useExportUserData from "@/features/user/api/use-export-user-data";
+import CollectionOwnershipPlanDialog from "@/features/user/components/collection-ownership-plan-dialog";
+import DeletionImpactSummary from "@/features/user/components/deletion-impact-summary";
+import {
+  getApiErrorCode,
+  getApiErrorMessage,
+  getApiFieldError,
+} from "@/hooks/use-error-handler";
 
-export const DELETE_ACCOUNT_CONFIRMATION = 'I understand this account cannot be recovered';
+export const DELETE_ACCOUNT_CONFIRMATION =
+  "I understand this account cannot be recovered";
 
 interface DeleteAccountSectionProps {
-  headingAs?: 'h2' | 'h3';
+  headingAs?: "h2" | "h3";
 }
 
 interface ConfirmationInputs {
@@ -46,17 +51,27 @@ interface ConfirmationInputs {
   confirmation: string;
 }
 
-const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) => {
+const DeleteAccountSection = ({
+  headingAs = "h2",
+}: DeleteAccountSectionProps) => {
   const navigate = useNavigate();
   const lastFingerprint = useRef<string | undefined>(undefined);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [isPlanOpen, setIsPlanOpen] = useState(false);
   const [automaticallyTransfer, setAutomaticallyTransfer] = useState(false);
-  const [overrides, setOverrides] = useState<OwnershipOverridesByCollection>({});
+  const [overrides, setOverrides] = useState<OwnershipOverridesByCollection>(
+    {},
+  );
   const [requiresImpactReview, setRequiresImpactReview] = useState(false);
   const deletionImpact = useDeletionImpact();
-  const { mutate: deleteAccount, error, isPending, reset: resetMutation } = useDeleteAccount();
-  const { mutate: exportUserData, isPending: isExporting } = useExportUserData();
+  const {
+    mutate: deleteAccount,
+    error,
+    isPending,
+    reset: resetMutation,
+  } = useDeleteAccount();
+  const { mutate: exportUserData, isPending: isExporting } =
+    useExportUserData();
   const {
     register,
     handleSubmit,
@@ -64,16 +79,21 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
     watch,
     formState: { errors },
   } = useForm<ConfirmationInputs>({
-    defaultValues: { currentPassword: '', confirmation: '' },
+    defaultValues: { currentPassword: "", confirmation: "" },
   });
-  const confirmation = watch('confirmation');
+  const confirmation = watch("confirmation");
   const impact = deletionImpact.data;
-  const plan = impact ? resolveDeletionPlan(impact, automaticallyTransfer, overrides) : null;
+  const plan = impact
+    ? resolveDeletionPlan(impact, automaticallyTransfer, overrides)
+    : null;
 
   useEffect(() => {
     if (!impact) return;
 
-    if (lastFingerprint.current && lastFingerprint.current !== impact.impactFingerprint) {
+    if (
+      lastFingerprint.current &&
+      lastFingerprint.current !== impact.impactFingerprint
+    ) {
       setOverrides((current) => keepValidOwnershipOverrides(impact, current));
       setRequiresImpactReview(true);
       setIsConfirmationOpen(false);
@@ -96,8 +116,13 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
     const refreshed = await deletionImpact.refetch();
 
     if (!refreshed.data || refreshed.isError) return;
-    if (previousFingerprint && refreshed.data.impactFingerprint !== previousFingerprint) {
-      setOverrides((current) => keepValidOwnershipOverrides(refreshed.data!, current));
+    if (
+      previousFingerprint &&
+      refreshed.data.impactFingerprint !== previousFingerprint
+    ) {
+      setOverrides((current) =>
+        keepValidOwnershipOverrides(refreshed.data!, current),
+      );
       setRequiresImpactReview(true);
       return;
     }
@@ -121,18 +146,23 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
           reset();
           resetMutation();
           await clearSession();
-          toaster.success({ title: 'Your account has been permanently deleted.' });
-          navigate('/', { replace: true });
+          toaster.success({
+            title: "Your account has been permanently deleted.",
+          });
+          navigate("/", { replace: true });
         },
         onError: async (mutationError) => {
-          if (getApiErrorCode(mutationError) !== 'DELETION_IMPACT_CHANGED') return;
+          if (getApiErrorCode(mutationError) !== "DELETION_IMPACT_CHANGED")
+            return;
 
           reset();
           resetMutation();
           setIsConfirmationOpen(false);
           const refreshed = await deletionImpact.refetch();
           if (refreshed.data) {
-            setOverrides((current) => keepValidOwnershipOverrides(refreshed.data!, current));
+            setOverrides((current) =>
+              keepValidOwnershipOverrides(refreshed.data!, current),
+            );
           }
           setRequiresImpactReview(true);
         },
@@ -152,15 +182,17 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
           </Heading>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
-          Permanently delete your account, saved media, activity, social connections, and collections you own.
+          Permanently delete your account, saved media, activity, social
+          connections, and collections you own.
         </Text>
       </Card.Header>
 
       <Card.Body>
         <Stack align="stretch" gap={4}>
           <Text textStyle="body">
-            Download an export first if you want to keep a copy of your data. Transferred collections and their items
-            remain in Kadha under their new owner.
+            Download an export first if you want to keep a copy of your data.
+            Transferred collections and their items remain in Kadha under their
+            new owner.
           </Text>
 
           {deletionImpact.isLoading ? (
@@ -172,9 +204,17 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
               <Alert.Indicator />
               <Alert.Content>
                 <Alert.Title>Deletion impact could not be loaded</Alert.Title>
-                <Alert.Description>Account deletion is unavailable until the impact can be reviewed.</Alert.Description>
+                <Alert.Description>
+                  Account deletion is unavailable until the impact can be
+                  reviewed.
+                </Alert.Description>
               </Alert.Content>
-              <Button size="sm" variant="outline" colorPalette="red" onClick={() => deletionImpact.refetch()}>
+              <Button
+                size="sm"
+                variant="outline"
+                colorPalette="red"
+                onClick={() => deletionImpact.refetch()}
+              >
                 Retry
               </Button>
             </Alert.Root>
@@ -186,8 +226,13 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                 <Alert.Root status="warning" role="alert">
                   <Alert.Indicator />
                   <Alert.Content>
-                    <Alert.Title>This is the final administrator account</Alert.Title>
-                    <Alert.Description>Promote another administrator before deleting this account.</Alert.Description>
+                    <Alert.Title>
+                      This is the final administrator account
+                    </Alert.Title>
+                    <Alert.Description>
+                      Promote another administrator before deleting this
+                      account.
+                    </Alert.Description>
                   </Alert.Content>
                 </Alert.Root>
               )}
@@ -198,7 +243,8 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                   <Alert.Content>
                     <Alert.Title>Your collaboration impact changed</Alert.Title>
                     <Alert.Description>
-                      Review the updated outcome before trying account deletion again.
+                      Review the updated outcome before trying account deletion
+                      again.
                     </Alert.Description>
                   </Alert.Content>
                   {!hasSharedCollections && (
@@ -215,27 +261,35 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
               )}
 
               {hasSharedCollections && (
-                <Checkbox.Root
+                <SimpleCheckbox
                   checked={automaticallyTransfer}
-                  onCheckedChange={(event) => setAutomaticallyTransfer(event.checked === true)}
-                >
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control />
-                  <Checkbox.Label>
+                  label={
                     <Stack gap="1">
-                      <Text>Automatically transfer each shared collection to its earliest-added eligible member</Text>
+                      <Text>
+                        Automatically transfer each shared collection to its
+                        earliest-added eligible member
+                      </Text>
                       <Text color="fg.muted" textStyle="supporting">
-                        You can review or change the selected owner for each collection. Collections without an accepted
-                        member will still be deleted.
+                        You can review or change the selected owner for each
+                        collection. Collections without an accepted member will
+                        still be deleted.
                       </Text>
                     </Stack>
-                  </Checkbox.Label>
-                </Checkbox.Root>
+                  }
+                  onCheckedChange={(event) =>
+                    setAutomaticallyTransfer(event.checked === true)
+                  }
+                />
               )}
 
               <HStack gap="2" flexWrap="wrap">
                 {hasSharedCollections && (
-                  <Button type="button" variant="outline" colorPalette="gray" onClick={() => setIsPlanOpen(true)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    colorPalette="gray"
+                    onClick={() => setIsPlanOpen(true)}
+                  >
                     Review shared collections
                   </Button>
                 )}
@@ -243,7 +297,10 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                   type="button"
                   colorPalette="red"
                   disabled={
-                    impact.isFinalAdministrator || requiresImpactReview || deletionImpact.isFetching || isExporting
+                    impact.isFinalAdministrator ||
+                    requiresImpactReview ||
+                    deletionImpact.isFetching ||
+                    isExporting
                   }
                   onClick={openConfirmation}
                 >
@@ -275,28 +332,45 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                 <Portal>
                   <Dialog.Backdrop />
                   <Dialog.Positioner>
-                    <Dialog.Content maxW={{ base: 'calc(100vw - 2rem)', md: 'lg' }}>
+                    <Dialog.Content
+                      maxW={{ base: "calc(100vw - 2rem)", md: "lg" }}
+                    >
                       <form noValidate onSubmit={handleSubmit(onSubmit)}>
                         <Dialog.Header>
-                          <Dialog.Title textStyle="sectionTitle">Permanently delete your account?</Dialog.Title>
+                          <Dialog.Title textStyle="sectionTitle">
+                            Permanently delete your account?
+                          </Dialog.Title>
                         </Dialog.Header>
 
                         <Dialog.Body>
                           <Stack gap={4}>
-                            <DeletionImpactSummary impact={impact} plan={plan} compact />
+                            <DeletionImpactSummary
+                              impact={impact}
+                              plan={plan}
+                              compact
+                            />
                             <Text textStyle="body">
-                              This cannot be undone. Your account cannot be recovered after deletion, even with your
-                              recovery code.
+                              This cannot be undone. Your account cannot be
+                              recovered after deletion, even with your recovery
+                              code.
                             </Text>
 
-                            {getApiErrorMessage(error) && !getApiFieldError(error, 'currentPassword') && (
-                              <Text role="alert" color="fg.error" textStyle="supporting">
-                                {getApiErrorMessage(error)}
-                              </Text>
-                            )}
+                            {getApiErrorMessage(error) &&
+                              !getApiFieldError(error, "currentPassword") && (
+                                <Text
+                                  role="alert"
+                                  color="fg.error"
+                                  textStyle="supporting"
+                                >
+                                  {getApiErrorMessage(error)}
+                                </Text>
+                              )}
 
                             <Field.Root
-                              invalid={Boolean(errors.currentPassword || getApiFieldError(error, 'currentPassword'))}
+                              invalid={Boolean(
+                                errors.currentPassword ||
+                                getApiFieldError(error, "currentPassword"),
+                              )}
                               required
                             >
                               <Field.Label>Current password</Field.Label>
@@ -305,28 +379,40 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                                 autoCapitalize="none"
                                 spellCheck={false}
                                 disabled={isPending}
-                                {...register('currentPassword', { required: 'Current password is required' })}
+                                {...register("currentPassword", {
+                                  required: "Current password is required",
+                                })}
                               />
                               <Field.ErrorText>
-                                {errors.currentPassword?.message || getApiFieldError(error, 'currentPassword')}
+                                {errors.currentPassword?.message ||
+                                  getApiFieldError(error, "currentPassword")}
                               </Field.ErrorText>
                             </Field.Root>
 
-                            <Field.Root invalid={Boolean(errors.confirmation)} required>
-                              <Field.Label>Type the confirmation phrase</Field.Label>
+                            <Field.Root
+                              invalid={Boolean(errors.confirmation)}
+                              required
+                            >
+                              <Field.Label>
+                                Type the confirmation phrase
+                              </Field.Label>
                               <Field.HelperText>
-                                Enter <Code>{DELETE_ACCOUNT_CONFIRMATION}</Code> exactly as shown.
+                                Enter <Code>{DELETE_ACCOUNT_CONFIRMATION}</Code>{" "}
+                                exactly as shown.
                               </Field.HelperText>
                               <Input
                                 autoComplete="off"
                                 disabled={isPending}
-                                {...register('confirmation', {
-                                  required: 'Confirmation is required',
+                                {...register("confirmation", {
+                                  required: "Confirmation is required",
                                   validate: (value) =>
-                                    value === DELETE_ACCOUNT_CONFIRMATION || 'The confirmation phrase does not match',
+                                    value === DELETE_ACCOUNT_CONFIRMATION ||
+                                    "The confirmation phrase does not match",
                                 })}
                               />
-                              <Field.ErrorText>{errors.confirmation?.message}</Field.ErrorText>
+                              <Field.ErrorText>
+                                {errors.confirmation?.message}
+                              </Field.ErrorText>
                             </Field.Root>
                           </Stack>
                         </Dialog.Body>
@@ -345,7 +431,10 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
                             type="submit"
                             colorPalette="red"
                             loading={isPending}
-                            disabled={isPending || confirmation !== DELETE_ACCOUNT_CONFIRMATION}
+                            disabled={
+                              isPending ||
+                              confirmation !== DELETE_ACCOUNT_CONFIRMATION
+                            }
                           >
                             Permanently delete account
                           </Button>
@@ -364,7 +453,7 @@ const DeleteAccountSection = ({ headingAs = 'h2' }: DeleteAccountSectionProps) =
 
           <Button
             type="button"
-            alignSelf={{ base: 'stretch', md: 'flex-start' }}
+            alignSelf={{ base: "stretch", md: "flex-start" }}
             variant="outline"
             colorPalette="gray"
             loading={isExporting}

@@ -1,9 +1,9 @@
-import { Box, Tabs } from '@chakra-ui/react';
-import type { ReactNode } from 'react';
+import { Box, Tabs } from "@chakra-ui/react";
+import type { ReactNode } from "react";
 
-import MediaSearchResults from '@/features/search/components/media-search-results';
-import UserSearchResults from '@/features/search/components/user-search-results';
-import { SearchTab, SearchTabOption } from '@/features/search/search.types';
+import MediaSearchResults from "@/features/search/components/media-search-results";
+import UserSearchResults from "@/features/search/components/user-search-results";
+import { SearchTab, SearchTabOption } from "@/features/search/search.types";
 
 interface SearchTabsProps {
   activeTab: SearchTab;
@@ -39,15 +39,31 @@ const SearchTabs = ({
   };
 
   return (
-    <Tabs.Root value={activeTab} onValueChange={handleTabChange}>
-      <Box position="sticky" top={0} zIndex="sticky" bg="bg" borderBottomWidth="1px" borderColor="border" pb={3}>
+    <Tabs.Root
+      colorPalette="brand"
+      value={activeTab}
+      onValueChange={handleTabChange}
+    >
+      <Box
+        position="sticky"
+        top={0}
+        zIndex="sticky"
+        bg="bg"
+        borderBottomWidth="1px"
+        borderColor="border"
+        pb={3}
+      >
         {controls}
 
         {hasSearchQuery && (
           <Box overflowX="auto" mt={4}>
             <Tabs.List minW="fit-content" whiteSpace="nowrap">
               {tabs.map((tab) => (
-                <Tabs.Trigger key={tab.value} value={tab.value} textStyle="compactLabel">
+                <Tabs.Trigger
+                  key={tab.value}
+                  value={tab.value}
+                  textStyle="compactLabel"
+                >
                   {tab.label}
                 </Tabs.Trigger>
               ))}

@@ -65,6 +65,7 @@ const MediaLibraryToolbar = ({
         <InputGroup startElement={<LuSearch aria-hidden />}>
           <Input
             aria-label="Search this library"
+            colorPalette="brand"
             maxLength={120}
             placeholder="Search by title"
             value={searchValue}
@@ -80,7 +81,7 @@ const MediaLibraryToolbar = ({
             <Button
               key={item.value}
               aria-pressed={query.mediaType === item.value}
-              colorPalette="gray"
+              colorPalette={query.mediaType === item.value ? 'brand' : 'gray'}
               disabled={disabled}
               flex="1"
               size="sm"
@@ -95,7 +96,7 @@ const MediaLibraryToolbar = ({
 
       <Field.Root w={{ lg: '64' }}>
         <Field.Label>Sort by</Field.Label>
-        <NativeSelect.Root disabled={disabled}>
+        <NativeSelect.Root colorPalette="brand" disabled={disabled}>
           <NativeSelect.Field
             aria-label="Sort library"
             value={sortValue}
