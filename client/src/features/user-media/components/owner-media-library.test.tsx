@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { LuHeart } from 'react-icons/lu';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -119,6 +120,17 @@ describe('owner media library', () => {
     expect(screen.queryByText(media.overview)).not.toBeInTheDocument();
   });
 
+  it('uses a theme-aware Chakra checkbox for genre filters', async () => {
+    renderWithProviders(<OwnerMediaLibrary {...baseProps} updateQuery={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Filters' }));
+    const genreCheckbox = await screen.findByRole('checkbox', { name: 'Drama' });
+    const checkboxRoot = genreCheckbox.closest('[data-scope="checkbox"][data-part="root"]');
+
+    expect(checkboxRoot).not.toBeNull();
+    expect(checkboxRoot?.querySelector('[data-part="control"]')).toBeInTheDocument();
+  });
+
   it('debounces title search and commits type and sort controls', async () => {
     const updateQuery = vi.fn();
     renderWithProviders(<OwnerMediaLibrary {...baseProps} updateQuery={updateQuery} />);
@@ -160,11 +172,13 @@ describe('owner media library', () => {
   });
 
   it('batches match-all genres, years, and rating behind Apply', async () => {
+    const user = userEvent.setup();
     const updateQuery = vi.fn();
     renderWithProviders(<OwnerMediaLibrary {...baseProps} updateQuery={updateQuery} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Filters' }));
-    fireEvent.click(await screen.findByRole('checkbox', { name: 'Drama' }));
+    const dramaCheckbox = await screen.findByRole('checkbox', { name: 'Drama' });
+    await user.click(dramaCheckbox);
     fireEvent.change(screen.getByLabelText('From year'), { target: { value: '2000' } });
     fireEvent.change(screen.getByLabelText('Through year'), { target: { value: '2020' } });
     fireEvent.change(screen.getByLabelText('Personal rating'), { target: { value: '8' } });

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Behavior Fixes
+
+- Made Watchlist, Watched, and Liked filter and sorting controls follow the selected color theme.
+
 ## v0.4.0
 
 ### Feature Changes
