@@ -12,19 +12,29 @@ const mocks = vi.hoisted(() => ({
   isLoading: false,
   refetch: vi.fn(),
   useUpcoming: vi.fn(),
+  useUpcomingWindows: vi.fn(),
 }));
 
+const queryState = () => ({
+  data: mocks.data,
+  error: mocks.error,
+  isError: Boolean(mocks.error),
+  isFetching: mocks.isFetching,
+  isLoading: mocks.isLoading,
+  refetch: mocks.refetch,
+});
+
 vi.mock('@/features/upcoming/api/use-upcoming', () => ({
-  default: (range: { from: string; to: string }) => {
-    mocks.useUpcoming(range);
-    return {
-      data: mocks.data,
-      error: mocks.error,
-      isError: Boolean(mocks.error),
-      isFetching: mocks.isFetching,
-      isLoading: mocks.isLoading,
-      refetch: mocks.refetch,
-    };
+  default: (range: { from: string; to: string }, options?: { enabled?: boolean }) => {
+    if (options?.enabled !== false) mocks.useUpcoming(range);
+    return queryState();
+  },
+  useUpcomingWindows: (
+    ranges: Array<{ from: string; to: string }>,
+    options?: { enabled?: boolean },
+  ) => {
+    if (options?.enabled !== false) mocks.useUpcomingWindows(ranges);
+    return queryState();
   },
 }));
 
@@ -113,6 +123,8 @@ describe('UpcomingPageContent', () => {
     renderContent();
 
     expect(screen.getByRole('tab', { name: 'List' })).toHaveAttribute('aria-selected', 'true');
+    expect(mocks.useUpcomingWindows).toHaveBeenCalledWith([{ from: '2026-09-01', to: '2026-09-30' }]);
+    expect(screen.getByText('Today')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Friday, September 25, 2026' })).toBeInTheDocument();
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Group Drop' })).toHaveAttribute('href', '/app/media/tv/101');
@@ -129,6 +141,27 @@ describe('UpcomingPageContent', () => {
 
     fireEvent.error(showPoster);
     expect(showPoster).toHaveAttribute('src', '/assets/images/image-placeholder.svg');
+  });
+
+  it('loads adjacent calendar months in either direction', async () => {
+    renderContent();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Load earlier' }));
+    await waitFor(() =>
+      expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
+        { from: '2026-08-01', to: '2026-08-31' },
+        { from: '2026-09-01', to: '2026-09-30' },
+      ]),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Load later' }));
+    await waitFor(() =>
+      expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
+        { from: '2026-08-01', to: '2026-08-31' },
+        { from: '2026-09-01', to: '2026-09-30' },
+        { from: '2026-10-01', to: '2026-10-31' },
+      ]),
+    );
   });
 
   it('keeps successful entries visible while disclosing partial provider coverage', () => {
@@ -162,7 +195,7 @@ describe('UpcomingPageContent', () => {
 
     try {
       renderContent();
-      expect(mocks.useUpcoming).toHaveBeenCalledWith({ from: '2026-09-21', to: '2026-12-20' });
+      expect(mocks.useUpcomingWindows).toHaveBeenCalledWith([{ from: '2026-09-01', to: '2026-09-30' }]);
     } finally {
       if (originalTimeZone === undefined) {
         delete process.env.TZ;

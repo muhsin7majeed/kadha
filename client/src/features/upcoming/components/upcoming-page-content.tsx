@@ -1,4 +1,4 @@
-import { Alert, Stack } from "@chakra-ui/react";
+import { Alert, Button, Stack } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import { LuCalendarDays, LuList, LuPartyPopper } from "react-icons/lu";
 
@@ -6,11 +6,12 @@ import EmptyState from "@/components/info-states/empty-state";
 import SimpleTabs from "@/components/simple-tabs";
 import ErrorState from "@/components/info-states/error-state";
 import CommonSpinner from "@/components/spinners/common-spinner";
-import useUpcoming from "@/features/upcoming/api/use-upcoming";
+import useUpcoming, { useUpcomingWindows } from "@/features/upcoming/api/use-upcoming";
 import UpcomingList from "./upcoming-list";
 import UpcomingCalendar from "./upcoming-calendar";
 
 type UpcomingView = "list" | "month";
+type WindowDirection = "earlier" | "later";
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
@@ -21,6 +22,22 @@ const addUtcDays = (date: Date, days: number) => {
 };
 const monthEnd = (year: number, month: number) =>
   utcDateOnly(new Date(Date.UTC(year, month, 0)));
+const monthKey = (date: Date) => `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}`;
+const shiftMonthKey = (value: string, offset: number) => {
+  const [year, month] = value.split("-").map(Number);
+  return monthKey(new Date(Date.UTC(year, month - 1 + offset, 1)));
+};
+
+const getMonthRange = (key: string, minimumDate: string, maximumDate: string) => {
+  const [year, month] = key.split("-").map(Number);
+  const start = `${key}-01`;
+  const end = monthEnd(year, month);
+
+  return {
+    from: start < minimumDate ? minimumDate : start,
+    to: end > maximumDate ? maximumDate : end,
+  };
+};
 
 const UpcomingPageContent = () => {
   const [today] = useState(() => new Date());
@@ -29,23 +46,27 @@ const UpcomingPageContent = () => {
   const maximumDate = utcDateOnly(addUtcDays(today, 90));
   const minimumMonthKey = minimumDate.slice(0, 7);
   const maximumMonthKey = maximumDate.slice(0, 7);
+  const todayMonthKey = monthKey(today);
   const [view, setView] = useState<UpcomingView>("list");
+  const [listMonthKeys, setListMonthKeys] = useState([todayMonthKey]);
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
-  const range = useMemo(() => {
-    if (view === "list") {
-      return { from: todayDate, to: maximumDate };
-    }
-
-    const monthStart = `${year}-${pad(month)}-01`;
-    const monthEndDate = monthEnd(year, month);
-    return {
-      from: monthStart < minimumDate ? minimumDate : monthStart,
-      to: monthEndDate > maximumDate ? maximumDate : monthEndDate,
-    };
-  }, [maximumDate, minimumDate, month, todayDate, view, year]);
-  const upcoming = useUpcoming(range);
+  const listRanges = useMemo(
+    () => listMonthKeys.map((key) => getMonthRange(key, minimumDate, maximumDate)),
+    [listMonthKeys, maximumDate, minimumDate],
+  );
+  const monthRange = useMemo(
+    () => getMonthRange(`${year}-${pad(month)}`, minimumDate, maximumDate),
+    [maximumDate, minimumDate, month, year],
+  );
+  const listUpcoming = useUpcomingWindows(listRanges, { enabled: view === "list" });
+  const monthUpcoming = useUpcoming(monthRange, { enabled: view === "month" });
+  const upcoming = view === "list" ? listUpcoming : monthUpcoming;
+  const earliestListMonth = listMonthKeys[0];
+  const latestListMonth = listMonthKeys[listMonthKeys.length - 1];
+  const canLoadEarlier = earliestListMonth > minimumMonthKey;
+  const canLoadLater = latestListMonth < maximumMonthKey;
 
   const changePeriod = (nextYear: number, nextMonth: number) => {
     const nextMonthKey = `${nextYear}-${pad(nextMonth)}`;
@@ -54,6 +75,23 @@ const UpcomingPageContent = () => {
     setYear(nextYear);
     setMonth(nextMonth);
     setSelectedDate(undefined);
+  };
+
+  const loadAdjacentMonth = (direction: WindowDirection) => {
+    const boundary = direction === "earlier" ? earliestListMonth : latestListMonth;
+    const nextMonthKey = shiftMonthKey(boundary, direction === "earlier" ? -1 : 1);
+
+    if (
+      nextMonthKey < minimumMonthKey ||
+      nextMonthKey > maximumMonthKey ||
+      listMonthKeys.includes(nextMonthKey)
+    ) {
+      return;
+    }
+
+    setListMonthKeys((current) =>
+      [...current, nextMonthKey].sort((left, right) => left.localeCompare(right)),
+    );
   };
 
   return (
@@ -98,18 +136,42 @@ const UpcomingPageContent = () => {
               </Alert.Content>
             </Alert.Root>
           )}
-
-          {view === "list" && upcoming.data.entries.length === 0 && (
+          {view === "list" && listUpcoming.hasRangeError && (
+            <Alert.Root role="status" status="warning" variant="subtle">
+              <Alert.Indicator />
+              <Alert.Content>
+                <Alert.Title>Some schedule dates could not be loaded</Alert.Title>
+                <Alert.Description>
+                  Try again to refresh the missing date range.
+                </Alert.Description>
+                <Button
+                  alignSelf="flex-start"
+                  size="sm"
+                  variant="outline"
+                  colorPalette="gray"
+                  onClick={() => void listUpcoming.refetch()}
+                >
+                  Try again
+                </Button>
+              </Alert.Content>
+            </Alert.Root>
+          )}
+          {view === "list" && (
+            <UpcomingList
+              entries={upcoming.data.entries}
+              todayDate={todayDate}
+              canLoadEarlier={canLoadEarlier}
+              canLoadLater={canLoadLater}
+              isLoading={upcoming.isFetching}
+              onLoadEarlier={() => loadAdjacentMonth("earlier")}
+              onLoadLater={() => loadAdjacentMonth("later")}
+            />
+          )}
+          {view === "month" && upcoming.data.entries.length === 0 && (
             <EmptyState
               title="Nothing scheduled"
               description="No tracked episodes or watchlist movie releases have dates in this period."
               icon={<LuPartyPopper />}
-            />
-          )}
-          {view === "list" && upcoming.data.entries.length > 0 && (
-            <UpcomingList
-              entries={upcoming.data.entries}
-              todayDate={todayDate}
             />
           )}
           {view === "month" && (

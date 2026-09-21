@@ -122,7 +122,8 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 
 - [x] Add movie watch-history management to the media details experience, including explicit rewatch logging and
   individual event editing and removal.
-- [ ] Reduce duplicate TMDB schedule requests through stronger shared or persistent caching and reusable episode metadata.
+- [ ] Add schedule-call, latency, cache-hit, stale-data, and provider-failure metrics, plus global TMDB rate limiting and backoff before materially increasing tracked-title volume or the rolling range.
+- [ ] Replace on-demand TMDB schedule resolution with persistent reusable episode and release metadata, stale-while-revalidate background refresh, and a measured revisit of the rolling range.
 - [ ] Extend compatible URL-backed browsing controls where list size justifies them: custom and public collection contents; visible profile/public Watched, Liked, and Watchlist sections; and stronger filtering or search for In Progress TV and Diary. Keep Home carousels, generated Recommendations, and global Search on their purpose-built interaction models.
 
 ### Social
