@@ -1,5 +1,5 @@
 import { Alert, Button, Stack } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LuCalendarDays, LuList, LuPartyPopper } from "react-icons/lu";
 
 import EmptyState from "@/components/info-states/empty-state";
@@ -49,6 +49,7 @@ const UpcomingPageContent = () => {
   const todayMonthKey = monthKey(today);
   const [view, setView] = useState<UpcomingView>("list");
   const [listMonthKeys, setListMonthKeys] = useState([todayMonthKey]);
+  const [loadingDirection, setLoadingDirection] = useState<WindowDirection>();
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
@@ -67,6 +68,10 @@ const UpcomingPageContent = () => {
   const latestListMonth = listMonthKeys[listMonthKeys.length - 1];
   const canLoadEarlier = earliestListMonth > minimumMonthKey;
   const canLoadLater = latestListMonth < maximumMonthKey;
+
+  useEffect(() => {
+    if (!listUpcoming.isFetching) setLoadingDirection(undefined);
+  }, [listUpcoming.isFetching]);
 
   const changePeriod = (nextYear: number, nextMonth: number) => {
     const nextMonthKey = `${nextYear}-${pad(nextMonth)}`;
@@ -89,6 +94,7 @@ const UpcomingPageContent = () => {
       return;
     }
 
+    setLoadingDirection(direction);
     setListMonthKeys((current) =>
       [...current, nextMonthKey].sort((left, right) => left.localeCompare(right)),
     );
@@ -163,6 +169,7 @@ const UpcomingPageContent = () => {
               canLoadEarlier={canLoadEarlier}
               canLoadLater={canLoadLater}
               isLoading={upcoming.isFetching}
+              loadingDirection={loadingDirection}
               onLoadEarlier={() => loadAdjacentMonth("earlier")}
               onLoadLater={() => loadAdjacentMonth("later")}
             />

@@ -19,8 +19,9 @@ describe('Upcoming page', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Upcoming' })).toBeInTheDocument();
-    expect(screen.getByText(/shows and watchlist movies you already track/i)).toBeInTheDocument();
-    expect(screen.getByText(/visible only to you/i)).toBeInTheDocument();
+    expect(screen.getByText(/episodes and releases for titles you track/i)).toBeInTheDocument();
+    expect(screen.getByText(/dates can change as providers update their listings/i)).toBeInTheDocument();
+    expect(screen.queryByText(/visible only to you/i)).not.toBeInTheDocument();
     expect(screen.getByText('Upcoming schedule content')).toBeInTheDocument();
   });
 });

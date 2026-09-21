@@ -5,7 +5,7 @@
 ### Feature Changes
 
 - Added 90-day schedule history for tracked TV episodes and watchlisted movie releases, with past-date navigation and local watched/unwatched status.
-- Made Upcoming List browse backward and forward from today in bounded calendar-month windows with accessible loading controls and retained client-side query data.
+- Made Upcoming List browse backward and forward from today in bounded calendar-month windows with edge-relative Load more controls, a sticky Today action, and retained client-side query data.
 
 ### Behavior Fixes
 

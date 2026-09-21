@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Heading, HStack, Separator, Stack, Text } from '@chakra-ui/react';
 import { Fragment, useEffect, useRef } from 'react';
+import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 
 import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
 import { formatUpcomingDate, formatUpcomingRelativeDate } from './upcoming-date';
@@ -10,18 +11,18 @@ interface UpcomingListProps {
   canLoadLater: boolean;
   entries: UpcomingEntryModel[];
   isLoading: boolean;
+  loadingDirection?: 'earlier' | 'later';
   onLoadEarlier: () => void;
   onLoadLater: () => void;
   todayDate: string;
 }
-
-const todayAnchorId = 'upcoming-today-anchor';
 
 const UpcomingList = ({
   canLoadEarlier,
   canLoadLater,
   entries,
   isLoading,
+  loadingDirection,
   onLoadEarlier,
   onLoadLater,
   todayDate,
@@ -49,10 +50,10 @@ const UpcomingList = ({
 
   const renderTodayAnchor = () => (
     <Box
-      id={todayAnchorId}
+      id="upcoming-today-anchor"
       ref={todayAnchorRef}
       tabIndex={-1}
-      scrollMarginTop="6"
+      scrollMarginTop="20"
       outline="none"
       aria-label="Today"
     >
@@ -66,37 +67,45 @@ const UpcomingList = ({
     </Box>
   );
 
+  const renderLoadMoreButton = (direction: 'earlier' | 'later') => {
+    const isEarlier = direction === 'earlier';
+    const canLoad = isEarlier ? canLoadEarlier : canLoadLater;
+
+    return (
+      <Button
+        alignSelf="center"
+        size="sm"
+        variant="ghost"
+        colorPalette="gray"
+        aria-label={isEarlier ? 'Load earlier dates' : 'Load later dates'}
+        disabled={!canLoad || isLoading}
+        loading={loadingDirection === direction}
+        onClick={isEarlier ? onLoadEarlier : onLoadLater}
+      >
+        {isEarlier ? <LuChevronUp aria-hidden /> : null}
+        Load more
+        {!isEarlier ? <LuChevronDown aria-hidden /> : null}
+      </Button>
+    );
+  };
+
   return (
     <Stack gap="7">
-      <HStack justify="space-between" gap="2" flexWrap="wrap">
+      <Box position="sticky" top="4" zIndex="1" display="flex" justifyContent="flex-end" pointerEvents="none">
         <Button
           size="sm"
           variant="outline"
           colorPalette="gray"
-          disabled={!canLoadEarlier || isLoading}
-          onClick={onLoadEarlier}
-        >
-          Load earlier
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          colorPalette="gray"
+          borderRadius="full"
+          shadow="sm"
+          pointerEvents="auto"
           onClick={scrollToToday}
         >
-          Jump to today
+          Today
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          colorPalette="gray"
-          disabled={!canLoadLater || isLoading}
-          onClick={onLoadLater}
-        >
-          Load later
-        </Button>
-      </HStack>
+      </Box>
 
+      {renderLoadMoreButton('earlier')}
       {dates.length === 0 && (
         <Text color="fg.muted" textAlign="center">
           Nothing scheduled
@@ -131,6 +140,7 @@ const UpcomingList = ({
         );
       })}
       {todayIndex === -1 || todayIndex === dates.length ? renderTodayAnchor() : null}
+      {renderLoadMoreButton('later')}
     </Stack>
   );
 };

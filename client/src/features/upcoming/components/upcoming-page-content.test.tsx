@@ -124,7 +124,7 @@ describe('UpcomingPageContent', () => {
 
     expect(screen.getByRole('tab', { name: 'List' })).toHaveAttribute('aria-selected', 'true');
     expect(mocks.useUpcomingWindows).toHaveBeenCalledWith([{ from: '2026-09-01', to: '2026-09-30' }]);
-    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Today' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Friday, September 25, 2026' })).toBeInTheDocument();
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Group Drop' })).toHaveAttribute('href', '/app/media/tv/101');
@@ -146,7 +146,7 @@ describe('UpcomingPageContent', () => {
   it('loads adjacent calendar months in either direction', async () => {
     renderContent();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Load earlier' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Load earlier dates' }));
     await waitFor(() =>
       expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
         { from: '2026-08-01', to: '2026-08-31' },
@@ -154,7 +154,7 @@ describe('UpcomingPageContent', () => {
       ]),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Load later' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
     await waitFor(() =>
       expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
         { from: '2026-08-01', to: '2026-08-31' },
