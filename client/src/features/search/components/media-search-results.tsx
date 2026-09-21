@@ -52,7 +52,7 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
         {data.pagination.total} results
       </Text>
 
-      <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap={4}>
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
         {data.data.map((media) => (
           <MediaCard
             key={`${media.media_type}:${media.media_id}`}
