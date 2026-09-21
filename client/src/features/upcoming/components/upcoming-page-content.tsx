@@ -12,7 +12,7 @@ import UpcomingCalendar from "./upcoming-calendar";
 
 type UpcomingView = "list" | "month";
 type WindowDirection = "earlier" | "later";
-type PendingLoad = { monthKey: string };
+type PendingLoad = { direction: WindowDirection; monthKey: string };
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
@@ -52,6 +52,7 @@ const UpcomingPageContent = () => {
   const [listMonthKeys, setListMonthKeys] = useState([todayMonthKey]);
   const [loadingDirection, setLoadingDirection] = useState<WindowDirection>();
   const [pendingLoad, setPendingLoad] = useState<PendingLoad>();
+  const [emptyLoad, setEmptyLoad] = useState<PendingLoad>();
   const [scrollTargetDate, setScrollTargetDate] = useState<string>();
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
@@ -73,15 +74,26 @@ const UpcomingPageContent = () => {
   const canLoadLater = latestListMonth < maximumMonthKey;
 
   useEffect(() => {
+    if (!listUpcoming.isFetching) setLoadingDirection(undefined);
+  }, [listUpcoming.isFetching]);
+
+  useEffect(() => {
     if (!pendingLoad || listUpcoming.isFetching || !listUpcoming.data) return;
 
     const range = getMonthRange(pendingLoad.monthKey, minimumDate, maximumDate);
-    const firstLoadedDate = listUpcoming.data.entries
+    const loadedDates = listUpcoming.data.entries
       .map((entry) => entry.date)
       .filter((date) => date >= range.from && date <= range.to)
-      .sort((left, right) => left.localeCompare(right))[0];
+      .sort((left, right) => left.localeCompare(right));
+    const targetDate =
+      pendingLoad.direction === "earlier" ? loadedDates[loadedDates.length - 1] : loadedDates[0];
 
-    if (firstLoadedDate) setScrollTargetDate(firstLoadedDate);
+    if (targetDate) {
+      setScrollTargetDate(targetDate);
+      setEmptyLoad(undefined);
+    } else {
+      setEmptyLoad(pendingLoad);
+    }
     setPendingLoad(undefined);
   }, [listUpcoming.data, listUpcoming.isFetching, maximumDate, minimumDate, pendingLoad]);
 
@@ -107,7 +119,8 @@ const UpcomingPageContent = () => {
     }
 
     setLoadingDirection(direction);
-    setPendingLoad({ monthKey: nextMonthKey });
+    setEmptyLoad(undefined);
+    setPendingLoad({ direction, monthKey: nextMonthKey });
     setListMonthKeys((current) =>
       [...current, nextMonthKey].sort((left, right) => left.localeCompare(right)),
     );
@@ -145,12 +158,10 @@ const UpcomingPageContent = () => {
             <Alert.Root role="status" status="warning" variant="subtle">
               <Alert.Indicator />
               <Alert.Content>
-                <Alert.Title>
-                  Some upcoming dates could not be refreshed
-                </Alert.Title>
+                <Alert.Title>Some tracked titles couldn’t be checked</Alert.Title>
                 <Alert.Description>
                   Showing dates from {upcoming.data.coverage.resolvedTitles} of{" "}
-                  {upcoming.data.coverage.trackedTitles} tracked titles.
+                  {upcoming.data.coverage.trackedTitles} tracked titles. The schedule may be incomplete.
                 </Alert.Description>
               </Alert.Content>
             </Alert.Root>
@@ -184,6 +195,7 @@ const UpcomingPageContent = () => {
               isLoading={upcoming.isFetching}
               loadingDirection={loadingDirection}
               scrollTargetDate={scrollTargetDate}
+              emptyLoad={emptyLoad}
               onLoadEarlier={() => loadAdjacentMonth("earlier")}
               onLoadLater={() => loadAdjacentMonth("later")}
             />

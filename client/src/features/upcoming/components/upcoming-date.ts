@@ -10,6 +10,13 @@ export const formatUpcomingDate = (date: string) =>
     timeZone: 'UTC',
   }).format(new Date(`${date}T00:00:00.000Z`));
 
+export const formatUpcomingMonth = (monthKey: string) =>
+  new Intl.DateTimeFormat(locale, {
+    month: 'long',
+    timeZone: 'UTC',
+    year: 'numeric',
+  }).format(new Date(`${monthKey}-01T00:00:00.000Z`));
+
 export const formatUpcomingRelativeDate = (date: string, today = utcDateOnly(new Date())) => {
   const days = Math.round((dateValue(date) - dateValue(today)) / millisecondsPerDay);
 

@@ -3,12 +3,13 @@ import { Fragment, useEffect, useRef } from 'react';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 
 import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
-import { formatUpcomingDate, formatUpcomingRelativeDate } from './upcoming-date';
+import { formatUpcomingDate, formatUpcomingMonth, formatUpcomingRelativeDate } from './upcoming-date';
 import UpcomingEntry from './upcoming-entry';
 
 interface UpcomingListProps {
   canLoadEarlier: boolean;
   canLoadLater: boolean;
+  emptyLoad?: { direction: 'earlier' | 'later'; monthKey: string };
   entries: UpcomingEntryModel[];
   isLoading: boolean;
   loadingDirection?: 'earlier' | 'later';
@@ -21,6 +22,7 @@ interface UpcomingListProps {
 const UpcomingList = ({
   canLoadEarlier,
   canLoadLater,
+  emptyLoad,
   entries,
   isLoading,
   loadingDirection,
@@ -57,6 +59,16 @@ const UpcomingList = ({
   const scrollToToday = () => {
     todayAnchorRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
     todayAnchorRef.current?.focus({ preventScroll: true });
+  };
+
+  const renderEmptyLoadMessage = (direction: 'earlier' | 'later') => {
+    if (emptyLoad?.direction !== direction) return null;
+
+    return (
+      <Text color="fg.muted" textAlign="center" textStyle="supporting" aria-live="polite">
+        No dates found in {formatUpcomingMonth(emptyLoad.monthKey)}. More dates may still be available in other months.
+      </Text>
+    );
   };
 
   const renderTodayAnchor = () => (
@@ -117,6 +129,7 @@ const UpcomingList = ({
       </Box>
 
       {renderLoadMoreButton('earlier')}
+      {renderEmptyLoadMessage('earlier')}
       {dates.length === 0 && (
         <Text color="fg.muted" textAlign="center">
           Nothing scheduled
@@ -151,6 +164,7 @@ const UpcomingList = ({
         );
       })}
       {todayIndex === -1 || todayIndex === dates.length ? renderTodayAnchor() : null}
+      {renderEmptyLoadMessage('later')}
       {renderLoadMoreButton('later')}
     </Stack>
   );

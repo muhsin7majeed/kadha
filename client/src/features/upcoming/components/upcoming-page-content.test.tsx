@@ -164,21 +164,27 @@ describe('UpcomingPageContent', () => {
     );
   });
 
-  it('scrolls to the first returned date after loading in either direction', async () => {
+  it('scrolls to the directional boundary after loading and clears loading state', async () => {
     const scrollIntoView = vi.fn();
     Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
       configurable: true,
       value: scrollIntoView,
     });
+    const getElementById = vi.spyOn(document, 'getElementById');
     const rendered = renderContent();
 
     await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
     scrollIntoView.mockClear();
+    getElementById.mockClear();
     mocks.isFetching = true;
     fireEvent.click(screen.getByRole('button', { name: 'Load earlier dates' }));
     mocks.data = {
       ...structuredClone(response),
-      entries: [...response.entries, { ...response.entries[0], date: '2026-08-12' }],
+      entries: [
+        ...response.entries,
+        { ...response.entries[0], date: '2026-08-12' },
+        { ...response.entries[0], date: '2026-08-20' },
+      ],
     };
     mocks.isFetching = false;
     rendered.rerender(
@@ -188,14 +194,20 @@ describe('UpcomingPageContent', () => {
     );
 
     await waitFor(() =>
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' }),
+      expect(getElementById).toHaveBeenCalledWith('upcoming-2026-08-20'),
     );
+    expect(screen.getByRole('button', { name: 'Load earlier dates' })).not.toHaveAttribute('data-loading');
     scrollIntoView.mockClear();
+    getElementById.mockClear();
     mocks.isFetching = true;
     fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
     mocks.data = {
       ...mocks.data,
-      entries: [...(mocks.data?.entries ?? []), { ...response.entries[0], date: '2026-10-03' }],
+      entries: [
+        ...(mocks.data?.entries ?? []),
+        { ...response.entries[0], date: '2026-10-03' },
+        { ...response.entries[0], date: '2026-10-10' },
+      ],
     };
     mocks.isFetching = false;
     rendered.rerender(
@@ -205,7 +217,22 @@ describe('UpcomingPageContent', () => {
     );
 
     await waitFor(() =>
-      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' }),
+      expect(getElementById).toHaveBeenCalledWith('upcoming-2026-10-03'),
+    );
+    expect(screen.getByRole('button', { name: 'Load later dates' })).not.toHaveAttribute('data-loading');
+  });
+
+  it('explains when a loaded month has no dates', async () => {
+    renderContent();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(
+          'No dates found in October 2026. More dates may still be available in other months.',
+        ),
+      ).toBeInTheDocument(),
     );
   });
 
@@ -217,7 +244,7 @@ describe('UpcomingPageContent', () => {
 
     renderContent();
 
-    expect(screen.getByRole('status')).toHaveTextContent('Some upcoming dates could not be refreshed');
+    expect(screen.getByRole('status')).toHaveTextContent('Some tracked titles couldn’t be checked');
     expect(screen.getByRole('link', { name: 'Group Drop' })).toBeInTheDocument();
   });
 
@@ -229,7 +256,7 @@ describe('UpcomingPageContent', () => {
 
     renderContent();
 
-    expect(screen.getByRole('status')).toHaveTextContent('Some upcoming dates could not be refreshed');
+    expect(screen.getByRole('status')).toHaveTextContent('Some tracked titles couldn’t be checked');
     expect(screen.getByText('Nothing scheduled')).toBeInTheDocument();
   });
 
