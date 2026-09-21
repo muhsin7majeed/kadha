@@ -8,6 +8,7 @@ import { renderWithProviders } from '@/test/render';
 const mocks = vi.hoisted(() => ({
   data: undefined as UpcomingResponse | undefined,
   error: null as Error | null,
+  failedRangeFrom: null as string | null,
   isFetching: false,
   isLoading: false,
   refetch: vi.fn(),
@@ -15,12 +16,26 @@ const mocks = vi.hoisted(() => ({
   useUpcomingWindows: vi.fn(),
 }));
 
-const queryState = () => ({
+const queryState = (ranges: Array<{ from: string; to: string }> = []) => ({
   data: mocks.data,
   error: mocks.error,
+  hasPartialCoverage: Boolean(mocks.data?.coverage.failedTitles),
+  hasRangeError: Boolean(mocks.error || mocks.failedRangeFrom),
   isError: Boolean(mocks.error),
   isFetching: mocks.isFetching,
   isLoading: mocks.isLoading,
+  rangeResults: ranges.map((range) => {
+    const rangeFailed = mocks.failedRangeFrom === range.from;
+
+    return {
+      data: rangeFailed ? undefined : mocks.data,
+      error: rangeFailed ? new Error('range failed') : mocks.error,
+      isError: rangeFailed || Boolean(mocks.error),
+      isFetching: mocks.isFetching,
+      isLoading: mocks.isLoading,
+      range,
+    };
+  }),
   refetch: mocks.refetch,
 });
 
@@ -34,7 +49,7 @@ vi.mock('@/features/upcoming/api/use-upcoming', () => ({
     options?: { enabled?: boolean },
   ) => {
     if (options?.enabled !== false) mocks.useUpcomingWindows(ranges);
-    return queryState();
+    return queryState(ranges);
   },
 }));
 
@@ -113,6 +128,7 @@ describe('UpcomingPageContent', () => {
     vi.setSystemTime(testNow);
     mocks.data = structuredClone(response);
     mocks.error = null;
+    mocks.failedRangeFrom = null;
     mocks.isFetching = false;
     mocks.isLoading = false;
     mocks.refetch.mockReset();
@@ -125,6 +141,8 @@ describe('UpcomingPageContent', () => {
     expect(screen.getByRole('tab', { name: 'List' })).toHaveAttribute('aria-selected', 'true');
     expect(mocks.useUpcomingWindows).toHaveBeenCalledWith([{ from: '2026-09-01', to: '2026-09-30' }]);
     expect(screen.getByRole('button', { name: 'Today' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Load earlier dates/ })).toHaveTextContent('71 days available');
+    expect(screen.getByRole('button', { name: /Load later dates/ })).toHaveTextContent('80 days available');
     expect(screen.getByRole('heading', { name: 'Friday, September 25, 2026' })).toBeInTheDocument();
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Group Drop' })).toHaveAttribute('href', '/app/media/tv/101');
@@ -146,7 +164,7 @@ describe('UpcomingPageContent', () => {
   it('loads adjacent calendar months in either direction', async () => {
     renderContent();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Load earlier dates' }));
+    fireEvent.click(screen.getByRole('button', { name: /Load earlier dates/ }));
     await waitFor(() =>
       expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
         { from: '2026-08-01', to: '2026-08-31' },
@@ -154,7 +172,7 @@ describe('UpcomingPageContent', () => {
       ]),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
     await waitFor(() =>
       expect(mocks.useUpcomingWindows).toHaveBeenLastCalledWith([
         { from: '2026-08-01', to: '2026-08-31' },
@@ -162,6 +180,41 @@ describe('UpcomingPageContent', () => {
         { from: '2026-10-01', to: '2026-10-31' },
       ]),
     );
+  });
+
+  it('shows remaining days and removes controls at rolling-window boundaries', async () => {
+    const rendered = renderContent();
+    const settleLoad = async (message: string) => {
+      mocks.isFetching = true;
+      rendered.rerender(
+        <MemoryRouter>
+          <UpcomingPageContent />
+        </MemoryRouter>,
+      );
+      mocks.isFetching = false;
+      rendered.rerender(
+        <MemoryRouter>
+          <UpcomingPageContent />
+        </MemoryRouter>,
+      );
+      await waitFor(() => expect(screen.getByText(message)).toBeInTheDocument());
+    };
+
+    fireEvent.click(screen.getByRole('button', { name: /Load earlier dates/ }));
+    await settleLoad('No releases from your tracked titles in August 2026.');
+    fireEvent.click(screen.getByRole('button', { name: /Load earlier dates/ }));
+    await settleLoad('No releases from your tracked titles in July 2026.');
+    fireEvent.click(screen.getByRole('button', { name: /Load earlier dates/ }));
+    await settleLoad('No releases from your tracked titles in June 2026.');
+    expect(screen.queryByRole('button', { name: /Load earlier dates/ })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
+    await settleLoad('No releases from your tracked titles in October 2026.');
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
+    await settleLoad('No releases from your tracked titles in November 2026.');
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
+    await settleLoad('No releases from your tracked titles in December 2026.');
+    expect(screen.queryByRole('button', { name: /Load later dates/ })).not.toBeInTheDocument();
   });
 
   it('scrolls to the directional boundary after loading and clears loading state', async () => {
@@ -177,7 +230,7 @@ describe('UpcomingPageContent', () => {
     scrollIntoView.mockClear();
     getElementById.mockClear();
     mocks.isFetching = true;
-    fireEvent.click(screen.getByRole('button', { name: 'Load earlier dates' }));
+    fireEvent.click(screen.getByRole('button', { name: /Load earlier dates/ }));
     mocks.data = {
       ...structuredClone(response),
       entries: [
@@ -196,11 +249,11 @@ describe('UpcomingPageContent', () => {
     await waitFor(() =>
       expect(getElementById).toHaveBeenCalledWith('upcoming-2026-08-20'),
     );
-    expect(screen.getByRole('button', { name: 'Load earlier dates' })).not.toHaveAttribute('data-loading');
+    expect(screen.getByRole('button', { name: /Load earlier dates/ })).not.toHaveAttribute('data-loading');
     scrollIntoView.mockClear();
     getElementById.mockClear();
     mocks.isFetching = true;
-    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
     mocks.data = {
       ...mocks.data,
       entries: [
@@ -219,21 +272,37 @@ describe('UpcomingPageContent', () => {
     await waitFor(() =>
       expect(getElementById).toHaveBeenCalledWith('upcoming-2026-10-03'),
     );
-    expect(screen.getByRole('button', { name: 'Load later dates' })).not.toHaveAttribute('data-loading');
+    expect(screen.getByRole('button', { name: /Load later dates/ })).not.toHaveAttribute('data-loading');
   });
 
   it('explains when a loaded month has no dates', async () => {
     renderContent();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
 
     await waitFor(() =>
       expect(
         screen.getByText(
-          'No dates found in October 2026. More dates may still be available in other months.',
+          'No releases from your tracked titles in October 2026.',
         ),
       ).toBeInTheDocument(),
     );
+  });
+
+  it('does not describe a failed month as empty', async () => {
+    const rendered = renderContent();
+    mocks.failedRangeFrom = '2026-10-01';
+    mocks.isFetching = true;
+    fireEvent.click(screen.getByRole('button', { name: /Load later dates/ }));
+    mocks.isFetching = false;
+    rendered.rerender(
+      <MemoryRouter>
+        <UpcomingPageContent />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(screen.getByText('Some schedule dates could not be loaded')).toBeInTheDocument());
+    expect(screen.queryByText('No releases from your tracked titles in October 2026.')).not.toBeInTheDocument();
   });
 
   it('keeps successful entries visible while disclosing partial provider coverage', () => {

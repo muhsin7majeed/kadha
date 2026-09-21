@@ -1,5 +1,5 @@
 import { Alert, Button, Stack } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LuCalendarDays, LuList, LuPartyPopper } from "react-icons/lu";
 
 import EmptyState from "@/components/info-states/empty-state";
@@ -16,6 +16,9 @@ type PendingLoad = { direction: WindowDirection; monthKey: string };
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
+const dateValue = (date: string) => Date.parse(`${date}T00:00:00.000Z`);
+const daysBetween = (from: string, to: string) =>
+  Math.max(0, Math.round((dateValue(to) - dateValue(from)) / (24 * 60 * 60 * 1000)));
 const addUtcDays = (date: Date, days: number) => {
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + days);
@@ -41,7 +44,7 @@ const getMonthRange = (key: string, minimumDate: string, maximumDate: string) =>
 };
 
 const UpcomingPageContent = () => {
-  const [today] = useState(() => new Date());
+  const [today, setToday] = useState(() => new Date());
   const todayDate = utcDateOnly(today);
   const minimumDate = utcDateOnly(addUtcDays(today, -90));
   const maximumDate = utcDateOnly(addUtcDays(today, 90));
@@ -57,9 +60,15 @@ const UpcomingPageContent = () => {
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
+  const previousTodayDate = useRef(todayDate);
+  const activeListMonthKeys = useMemo(() => {
+    if (previousTodayDate.current !== todayDate) return [todayMonthKey];
+
+    return listMonthKeys.filter((key) => key >= minimumMonthKey && key <= maximumMonthKey);
+  }, [listMonthKeys, maximumMonthKey, minimumMonthKey, todayDate, todayMonthKey]);
   const listRanges = useMemo(
-    () => listMonthKeys.map((key) => getMonthRange(key, minimumDate, maximumDate)),
-    [listMonthKeys, maximumDate, minimumDate],
+    () => activeListMonthKeys.map((key) => getMonthRange(key, minimumDate, maximumDate)),
+    [activeListMonthKeys, maximumDate, minimumDate],
   );
   const monthRange = useMemo(
     () => getMonthRange(`${year}-${pad(month)}`, minimumDate, maximumDate),
@@ -68,20 +77,63 @@ const UpcomingPageContent = () => {
   const listUpcoming = useUpcomingWindows(listRanges, { enabled: view === "list" });
   const monthUpcoming = useUpcoming(monthRange, { enabled: view === "month" });
   const upcoming = view === "list" ? listUpcoming : monthUpcoming;
-  const earliestListMonth = listMonthKeys[0];
-  const latestListMonth = listMonthKeys[listMonthKeys.length - 1];
+  const earliestListMonth = activeListMonthKeys[0];
+  const latestListMonth = activeListMonthKeys[activeListMonthKeys.length - 1];
   const canLoadEarlier = earliestListMonth > minimumMonthKey;
   const canLoadLater = latestListMonth < maximumMonthKey;
+  const earliestListRange = getMonthRange(earliestListMonth, minimumDate, maximumDate);
+  const latestListRange = getMonthRange(latestListMonth, minimumDate, maximumDate);
+  const earlierDaysAvailable = daysBetween(minimumDate, earliestListRange.from);
+  const laterDaysAvailable = daysBetween(latestListRange.to, maximumDate);
+  const hasCoverageWarning =
+    (upcoming.data?.coverage.failedTitles ?? 0) > 0 || (view === "list" && listUpcoming.hasPartialCoverage);
+  const coverageDescription =
+    view === "list" && listRanges.length > 1
+      ? "Some tracked titles could not be checked for one or more loaded months. The schedule may be incomplete."
+      : `Showing dates from ${upcoming.data?.coverage.resolvedTitles ?? 0} of ${upcoming.data?.coverage.trackedTitles ?? 0} tracked titles. The schedule may be incomplete.`;
+
+  useEffect(() => {
+    const nextUtcMidnight = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1);
+    const timeout = window.setTimeout(
+      () => setToday(new Date()),
+      Math.max(nextUtcMidnight - Date.now() + 1, 1),
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [today]);
+
+  useEffect(() => {
+    if (previousTodayDate.current === todayDate) return;
+
+    previousTodayDate.current = todayDate;
+    setListMonthKeys([todayMonthKey]);
+    setLoadingDirection(undefined);
+    setPendingLoad(undefined);
+    setEmptyLoad(undefined);
+    setScrollTargetDate(undefined);
+    setSelectedDate(undefined);
+    setYear(today.getUTCFullYear());
+    setMonth(today.getUTCMonth() + 1);
+  }, [today, todayDate, todayMonthKey]);
 
   useEffect(() => {
     if (!listUpcoming.isFetching) setLoadingDirection(undefined);
   }, [listUpcoming.isFetching]);
 
   useEffect(() => {
-    if (!pendingLoad || listUpcoming.isFetching || !listUpcoming.data) return;
+    if (!pendingLoad) return;
 
     const range = getMonthRange(pendingLoad.monthKey, minimumDate, maximumDate);
-    const loadedDates = listUpcoming.data.entries
+    const rangeResult = listUpcoming.rangeResults.find(
+      (result) => result.range.from === range.from && result.range.to === range.to,
+    );
+
+    if (!rangeResult || rangeResult.isFetching || rangeResult.isLoading) return;
+
+    setPendingLoad(undefined);
+    if (rangeResult.isError || !rangeResult.data) return;
+
+    const loadedDates = rangeResult.data.entries
       .map((entry) => entry.date)
       .filter((date) => date >= range.from && date <= range.to)
       .sort((left, right) => left.localeCompare(right));
@@ -94,8 +146,7 @@ const UpcomingPageContent = () => {
     } else {
       setEmptyLoad(pendingLoad);
     }
-    setPendingLoad(undefined);
-  }, [listUpcoming.data, listUpcoming.isFetching, maximumDate, minimumDate, pendingLoad]);
+  }, [listUpcoming.rangeResults, maximumDate, minimumDate, pendingLoad]);
 
   const changePeriod = (nextYear: number, nextMonth: number) => {
     const nextMonthKey = `${nextYear}-${pad(nextMonth)}`;
@@ -113,7 +164,7 @@ const UpcomingPageContent = () => {
     if (
       nextMonthKey < minimumMonthKey ||
       nextMonthKey > maximumMonthKey ||
-      listMonthKeys.includes(nextMonthKey)
+      activeListMonthKeys.includes(nextMonthKey)
     ) {
       return;
     }
@@ -154,15 +205,12 @@ const UpcomingPageContent = () => {
         />
       ) : (
         <Stack gap="5" aria-busy={upcoming.isFetching}>
-          {upcoming.data.coverage.failedTitles > 0 && (
+          {hasCoverageWarning && (
             <Alert.Root role="status" status="warning" variant="subtle">
               <Alert.Indicator />
               <Alert.Content>
                 <Alert.Title>Some tracked titles couldn’t be checked</Alert.Title>
-                <Alert.Description>
-                  Showing dates from {upcoming.data.coverage.resolvedTitles} of{" "}
-                  {upcoming.data.coverage.trackedTitles} tracked titles. The schedule may be incomplete.
-                </Alert.Description>
+                <Alert.Description>{coverageDescription}</Alert.Description>
               </Alert.Content>
             </Alert.Root>
           )}
@@ -192,6 +240,8 @@ const UpcomingPageContent = () => {
               todayDate={todayDate}
               canLoadEarlier={canLoadEarlier}
               canLoadLater={canLoadLater}
+              earlierDaysAvailable={earlierDaysAvailable}
+              laterDaysAvailable={laterDaysAvailable}
               isLoading={upcoming.isFetching}
               loadingDirection={loadingDirection}
               scrollTargetDate={scrollTargetDate}

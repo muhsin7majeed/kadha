@@ -58,13 +58,24 @@ const mergeUpcomingResponses = (responses: UpcomingResponse[]): UpcomingResponse
 const useUpcoming = (range: UpcomingRange, options: UpcomingQueryOptions = {}) =>
   useQuery(upcomingQueryOptions(range, options.enabled ?? true));
 
+export interface UpcomingRangeResult {
+  data?: UpcomingResponse;
+  error: Error | null;
+  isError: boolean;
+  isFetching: boolean;
+  isLoading: boolean;
+  range: UpcomingRange;
+}
+
 export interface UpcomingWindowsResult {
   data?: UpcomingResponse;
   error: Error | null;
+  hasPartialCoverage: boolean;
   hasRangeError: boolean;
   isError: boolean;
   isFetching: boolean;
   isLoading: boolean;
+  rangeResults: UpcomingRangeResult[];
   refetch: () => Promise<unknown[]>;
 }
 
@@ -76,19 +87,30 @@ export const useUpcomingWindows = (
   const results = useQueries({
     queries: ranges.map((range) => upcomingQueryOptions(range, enabled)),
   });
-  const responses = results
+  const rangeResults = results.map((result, index) => ({
+    data: result.data,
+    error: result.error ?? null,
+    isError: result.isError,
+    isFetching: result.isFetching,
+    isLoading: result.isLoading,
+    range: ranges[index],
+  }));
+  const responses = rangeResults
     .map((result) => result.data)
     .filter((data): data is UpcomingResponse => Boolean(data));
-  const hasRangeError = enabled && results.some((result) => result.isError);
+  const hasPartialCoverage = responses.some((response) => response.coverage.failedTitles > 0);
+  const hasRangeError = enabled && rangeResults.some((result) => result.isError);
   const error = results.find((result): result is UseQueryResult<UpcomingResponse, Error> => result.isError)?.error ?? null;
 
   return {
     data: responses.length > 0 ? mergeUpcomingResponses(responses) : undefined,
     error,
+    hasPartialCoverage,
     hasRangeError,
     isError: enabled && responses.length === 0 && hasRangeError,
-    isFetching: enabled && results.some((result) => result.isFetching),
-    isLoading: enabled && responses.length === 0 && results.some((result) => result.isLoading),
+    isFetching: enabled && rangeResults.some((result) => result.isFetching),
+    isLoading: enabled && responses.length === 0 && rangeResults.some((result) => result.isLoading),
+    rangeResults,
     refetch: () => Promise.all(results.map((result) => result.refetch())),
   };
 };

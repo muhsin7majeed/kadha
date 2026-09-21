@@ -5,7 +5,7 @@ import UpcomingPageContent from '@/features/upcoming/components/upcoming-page-co
 
 const Upcoming = () => (
   <Box>
-    <PageHeader subHeader="Upcoming episodes and releases for titles you track. Dates can change as providers update their listings.">
+    <PageHeader subHeader="Upcoming episodes and releases for titles you track, covering the past 90 days through the next 90 days. Dates can change as providers update their listings.">
       Upcoming
     </PageHeader>
     <UpcomingPageContent />

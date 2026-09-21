@@ -5,10 +5,11 @@
 ### Feature Changes
 
 - Added 90-day schedule history for tracked TV episodes and watchlisted movie releases, with past-date navigation and local watched/unwatched status.
-- Made Upcoming List browse backward and forward from today in bounded calendar-month windows with edge-relative Load more controls, a sticky Today action, retained client-side query data, and clear feedback for empty months.
+- Made Upcoming List browse backward and forward from today in bounded calendar-month windows with edge-relative Load more controls that show remaining days, a clear 90-day range description, a sticky Today action, retained client-side query data, and clear feedback for empty months.
 
 ### Behavior Fixes
 
+- Kept Upcoming empty-month feedback separate from failed range loads, disclosed incomplete coverage across loaded months without misleading title counts, and refreshed its rolling date window at UTC midnight.
 - Fixed Continue Watching and In Progress so ongoing TV shows with no aired unwatched episode are excluded, aligned their responsive card widths, and simplified Home actions around marking the next episode.
 - Increased search-result density on wide screens, made narrow layouts adapt card columns without overflow or unnecessary single-card whitespace, and capped the desktop search dialog to the application width.
 - Send authenticated visitors from the public root directly to the app while keeping the landing page available to signed-out visitors.

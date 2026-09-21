@@ -80,8 +80,32 @@ describe('useUpcomingWindows', () => {
       resolvedTitles: 1,
       failedTitles: 1,
     });
+    expect(result.current.hasPartialCoverage).toBe(true);
     expect(mocks.get).toHaveBeenCalledWith('/api/upcoming', { params: ranges[0] });
     expect(mocks.get).toHaveBeenCalledWith('/api/upcoming', { params: ranges[1] });
+  });
+
+  it('exposes failures for the individual range that failed', async () => {
+    mocks.get.mockImplementation((_, config: { params: { from: string } }) =>
+      config.params.from === '2026-09-01'
+        ? Promise.reject(new Error('range failed'))
+        : Promise.resolve({ data: { data: createResponse('2026-08-25', 'Past film', 1) } }),
+    );
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const ranges = [
+      { from: '2026-08-01', to: '2026-08-31' },
+      { from: '2026-09-01', to: '2026-09-30' },
+    ];
+    const { result } = renderHook(() => useUpcomingWindows(ranges), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    await waitFor(() => expect(result.current.rangeResults[1]?.isError).toBe(true));
+
+    expect(result.current.data?.entries).toHaveLength(1);
+    expect(result.current.hasRangeError).toBe(true);
+    expect(result.current.rangeResults[0]?.data?.entries).toHaveLength(1);
+    expect(result.current.rangeResults[1]?.data).toBeUndefined();
   });
 
   it('keeps loaded windows in the Upcoming query cache for navigation', async () => {

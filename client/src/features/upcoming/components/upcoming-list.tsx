@@ -9,9 +9,11 @@ import UpcomingEntry from './upcoming-entry';
 interface UpcomingListProps {
   canLoadEarlier: boolean;
   canLoadLater: boolean;
+  earlierDaysAvailable: number;
   emptyLoad?: { direction: 'earlier' | 'later'; monthKey: string };
   entries: UpcomingEntryModel[];
   isLoading: boolean;
+  laterDaysAvailable: number;
   loadingDirection?: 'earlier' | 'later';
   onLoadEarlier: () => void;
   scrollTargetDate?: string;
@@ -22,9 +24,11 @@ interface UpcomingListProps {
 const UpcomingList = ({
   canLoadEarlier,
   canLoadLater,
+  earlierDaysAvailable,
   emptyLoad,
   entries,
   isLoading,
+  laterDaysAvailable,
   loadingDirection,
   onLoadEarlier,
   scrollTargetDate,
@@ -66,7 +70,7 @@ const UpcomingList = ({
 
     return (
       <Text color="fg.muted" textAlign="center" textStyle="supporting" aria-live="polite">
-        No dates found in {formatUpcomingMonth(emptyLoad.monthKey)}. More dates may still be available in other months.
+        No releases from your tracked titles in {formatUpcomingMonth(emptyLoad.monthKey)}.
       </Text>
     );
   };
@@ -93,6 +97,9 @@ const UpcomingList = ({
   const renderLoadMoreButton = (direction: 'earlier' | 'later') => {
     const isEarlier = direction === 'earlier';
     const canLoad = isEarlier ? canLoadEarlier : canLoadLater;
+    const daysAvailable = isEarlier ? earlierDaysAvailable : laterDaysAvailable;
+
+    if (!canLoad) return null;
 
     return (
       <Button
@@ -100,13 +107,14 @@ const UpcomingList = ({
         size="sm"
         variant="ghost"
         colorPalette="gray"
-        aria-label={isEarlier ? 'Load earlier dates' : 'Load later dates'}
-        disabled={!canLoad || isLoading}
+        aria-label={`${isEarlier ? 'Load earlier dates' : 'Load later dates'}, ${daysAvailable} day${daysAvailable === 1 ? '' : 's'} available`}
+        disabled={isLoading}
         loading={loadingDirection === direction}
         onClick={isEarlier ? onLoadEarlier : onLoadLater}
       >
         {isEarlier ? <LuChevronUp aria-hidden /> : null}
-        Load more
+        {isEarlier ? 'Load earlier dates' : 'Load later dates'} · {daysAvailable} day
+        {daysAvailable === 1 ? '' : 's'} available
         {!isEarlier ? <LuChevronDown aria-hidden /> : null}
       </Button>
     );
