@@ -68,6 +68,7 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
             media={toMediaCardModel(media)}
             onNavigate={onClose}
             width="100%"
+            maxW={{ base: 'none', sm: '220px' }}
           />
         ))}
       </SimpleGrid>

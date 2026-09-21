@@ -16,6 +16,7 @@ interface MediaCardProps {
   showLibraryMetadata?: boolean;
   showPersonalRating?: boolean;
   width?: BoxProps['width'];
+  maxW?: BoxProps['maxW'];
 }
 
 const MediaCard = ({
@@ -26,6 +27,7 @@ const MediaCard = ({
   showLibraryMetadata = false,
   showPersonalRating = false,
   width = { base: '150px', md: '100%' },
+  maxW = '220px',
 }: MediaCardProps) => {
   const genreMap = useGenreAtom();
   const runtime = media.runtime && media.runtime > 0 ? media.runtime : null;
@@ -41,7 +43,7 @@ const MediaCard = ({
       shadow="sm"
       transition="transform 0.2s, box-shadow 0.2s"
       w={width}
-      maxW="220px"
+      maxW={maxW}
       flexShrink={0}
       _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
     >
