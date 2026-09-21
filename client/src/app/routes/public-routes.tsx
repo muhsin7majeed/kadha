@@ -1,6 +1,8 @@
 import { lazy } from 'react';
 import { Route } from 'react-router';
 
+import PublicRoute from '@/components/public-route';
+
 const Landing = lazy(() => import('@/pages/landing'));
 const OtherUserCollectionsTab = lazy(() => import('@/pages/user/profile/other-user-data/collections-tab'));
 const OtherUserMediaTab = lazy(() => import('@/pages/user/profile/other-user-data/media-tab'));
@@ -14,7 +16,9 @@ const UserProfile = lazy(() => import('@/pages/user/profile'));
 
 export const publicRoutes = (
   <>
-    <Route path="/" element={<Landing />} />
+    <Route element={<PublicRoute />}>
+      <Route path="/" element={<Landing />} />
+    </Route>
     <Route path="privacy" element={<Privacy />} />
     <Route path="settings" element={<Settings />} />
     <Route path="terms" element={<Terms />} />

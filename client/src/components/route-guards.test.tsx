@@ -51,12 +51,13 @@ const renderPrivateRoute = () =>
     </MemoryRouter>,
   );
 
-const renderPublicRoute = () =>
+const renderPublicRoute = (initialEntry = '/auth/login') =>
   renderWithProviders(
-    <MemoryRouter initialEntries={['/auth/login']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
-        <Route path="/auth/login" element={<PublicRoute />}>
-          <Route index element={<div>Public auth page</div>} />
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<div>Landing page</div>} />
+          <Route path="/auth/login" element={<div>Public auth page</div>} />
         </Route>
         <Route path="/app" element={<div>App page</div>} />
       </Routes>
@@ -108,6 +109,22 @@ describe('route guards', () => {
     authMock.useAuth.mockReturnValue({ status: 'authenticated', user: makeUser(UserRole.User) });
 
     renderPublicRoute();
+
+    expect(screen.getByText('App page')).toBeInTheDocument();
+  });
+
+  it('renders the landing page for unauthenticated root visits', () => {
+    authMock.useAuth.mockReturnValue({ status: 'unauthenticated', user: null });
+
+    renderPublicRoute('/');
+
+    expect(screen.getByText('Landing page')).toBeInTheDocument();
+  });
+
+  it('redirects authenticated root visits to the app', () => {
+    authMock.useAuth.mockReturnValue({ status: 'authenticated', user: makeUser(UserRole.User) });
+
+    renderPublicRoute('/');
 
     expect(screen.getByText('App page')).toBeInTheDocument();
   });
