@@ -46,8 +46,10 @@ const GlobalSearchDialog = () => {
       closeButton
       contentProps={{
         maxH: { base: "100dvh", md: "85vh" },
+        maxW: { base: "100%", md: "6xl" },
         mx: { base: 0, md: 4 },
         py: 0,
+        w: "100%",
       }}
       triggerWrapper={(trigger) => (
         <Tooltip content="Search">{trigger}</Tooltip>

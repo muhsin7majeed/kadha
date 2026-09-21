@@ -9,7 +9,7 @@
 ### Behavior Fixes
 
 - Fixed Continue Watching and In Progress so ongoing TV shows with no aired unwatched episode are excluded.
-- Increased search-result density on wide screens and made narrow layouts adapt card columns without overflow or unnecessary single-card whitespace.
+- Increased search-result density on wide screens, made narrow layouts adapt card columns without overflow or unnecessary single-card whitespace, and capped the desktop search dialog to the application width.
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.
 - Preserved accessible loading labels and single-dialog transitions after the Chakra UI refresh.
 - Reworked media cards into separate poster and body surfaces, grouped runtime with poster metadata, and aligned Continue Watching detail panels across themes.
