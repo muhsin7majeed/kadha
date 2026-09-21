@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Behavior Fixes
+
+- Make selecting a day in Upcoming Month view reveal its inline day details, including on short mobile and tablet screens.
+
 ## v0.6.0
 
 ### Feature Changes

@@ -1,4 +1,5 @@
 import { Badge, Heading, HStack, Stack, Text } from '@chakra-ui/react';
+import { useEffect, useRef } from 'react';
 
 import CalendarMonthGrid from '@/components/calendar-month-grid';
 import type { UpcomingEntry as UpcomingEntryModel } from '@/features/upcoming/upcoming.types';
@@ -48,6 +49,17 @@ const UpcomingCalendar = ({
   const totalReleases = [...counts.values()].reduce((total, count) => total + count, 0);
   const summary = totalReleases === 0 ? 'Nothing scheduled this month' : `${countLabel(totalReleases)} this month`;
   const selectedEntries = selectedDate ? entriesByDate.get(selectedDate) ?? [] : [];
+  const selectedDayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    selectedDayRef.current?.scrollIntoView?.({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+    });
+  }, [selectedDate]);
 
   return (
     <Stack gap="6">
@@ -107,7 +119,12 @@ const UpcomingCalendar = ({
       />
 
       {selectedDate && (
-        <Stack as="section" gap="3">
+        <Stack
+          ref={selectedDayRef}
+          as="section"
+          gap="3"
+          scrollMarginTop="6rem"
+        >
           <Heading as="h2" textStyle="sectionTitle">
             Selected day
           </Heading>

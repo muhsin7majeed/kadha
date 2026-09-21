@@ -347,6 +347,11 @@ describe('UpcomingPageContent', () => {
   });
 
   it('switches to the month grid, selects a populated date, and requests new months', async () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      value: scrollIntoView,
+    });
     renderContent();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Month' }));
@@ -359,6 +364,7 @@ describe('UpcomingPageContent', () => {
     fireEvent.click(populatedDay);
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Selected day' })).toBeInTheDocument());
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'nearest' });
     expect(screen.getByText('In 5 days')).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Group Drop poster' })).toBeInTheDocument();
     expect(screen.getByText('S2 E1 · Return')).toBeInTheDocument();
