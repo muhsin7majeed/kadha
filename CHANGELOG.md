@@ -8,7 +8,7 @@
 
 ### Behavior Fixes
 
-- Fixed Continue Watching and In Progress so ongoing TV shows with no aired unwatched episode are excluded.
+- Fixed Continue Watching and In Progress so ongoing TV shows with no aired unwatched episode are excluded, aligned their responsive card widths, and simplified Home actions around marking the next episode.
 - Increased search-result density on wide screens, made narrow layouts adapt card columns without overflow or unnecessary single-card whitespace, and capped the desktop search dialog to the application width.
 - Send authenticated visitors from the public root directly to the app while keeping the landing page available to signed-out visitors.
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.

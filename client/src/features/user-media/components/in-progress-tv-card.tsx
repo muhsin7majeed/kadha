@@ -19,7 +19,13 @@ const formatNextEpisodeLabel = (item: TvInProgressItem) => {
   return nextEpisode ? `S${nextEpisode.seasonNumber} E${nextEpisode.episodeNumber}` : null;
 };
 
-const InProgressTvCard = ({ item }: { item: TvInProgressItem }) => {
+const InProgressTvCard = ({
+  item,
+  showDetailsAction = true,
+}: {
+  item: TvInProgressItem;
+  showDetailsAction?: boolean;
+}) => {
   const markNextEpisodeWatched = useMarkNextEpisodeWatched(item.media_id);
   const nextEpisodeLabel = formatNextEpisodeLabel(item);
   const nextEpisode = item.tvProgress.nextEpisode;
@@ -33,7 +39,7 @@ const InProgressTvCard = ({ item }: { item: TvInProgressItem }) => {
       display="grid"
       gridTemplateRows="auto minmax(0, 1fr)"
     >
-      <MediaCard media={toMediaCardModel(item)} />
+      <MediaCard media={toMediaCardModel(item)} width="100%" />
 
       <Card.Root variant="outline" minH="44" display="flex" flexDirection="column">
         <Card.Body gap="3" p="3" display="flex" flexDirection="column" flex="1">
@@ -78,12 +84,14 @@ const InProgressTvCard = ({ item }: { item: TvInProgressItem }) => {
                 Mark next
               </Button>
             ) : null}
-            <Button size="xs" variant="outline" colorPalette="gray" asChild>
-              <Link to={`/app/media/tv/${item.media_id}`} viewTransition>
-                <LuExternalLink />
-                Open
-              </Link>
-            </Button>
+            {showDetailsAction ? (
+              <Button size="xs" variant="outline" colorPalette="gray" asChild>
+                <Link to={`/app/media/tv/${item.media_id}`} viewTransition>
+                  <LuExternalLink />
+                  Details
+                </Link>
+              </Button>
+            ) : null}
           </HStack>
         </Card.Body>
       </Card.Root>

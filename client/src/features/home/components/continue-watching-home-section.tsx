@@ -43,7 +43,11 @@ const ContinueWatchingHomeSection = () => {
         <Box overflowX="auto">
           <Flex gap="4" minW="max-content" align="stretch">
             {query.data?.data.map((item) => (
-              <InProgressTvCard key={`${item.media_type}:${item.media_id}`} item={item} />
+              <InProgressTvCard
+                key={`${item.media_type}:${item.media_id}`}
+                item={item}
+                showDetailsAction={false}
+              />
             ))}
           </Flex>
         </Box>
