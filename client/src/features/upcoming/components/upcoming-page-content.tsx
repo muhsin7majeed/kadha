@@ -12,6 +12,7 @@ import UpcomingCalendar from "./upcoming-calendar";
 
 type UpcomingView = "list" | "month";
 type WindowDirection = "earlier" | "later";
+type PendingLoad = { monthKey: string };
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const utcDateOnly = (date: Date) => date.toISOString().slice(0, 10);
@@ -50,6 +51,8 @@ const UpcomingPageContent = () => {
   const [view, setView] = useState<UpcomingView>("list");
   const [listMonthKeys, setListMonthKeys] = useState([todayMonthKey]);
   const [loadingDirection, setLoadingDirection] = useState<WindowDirection>();
+  const [pendingLoad, setPendingLoad] = useState<PendingLoad>();
+  const [scrollTargetDate, setScrollTargetDate] = useState<string>();
   const [year, setYear] = useState(today.getUTCFullYear());
   const [month, setMonth] = useState(today.getUTCMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string>();
@@ -70,8 +73,17 @@ const UpcomingPageContent = () => {
   const canLoadLater = latestListMonth < maximumMonthKey;
 
   useEffect(() => {
-    if (!listUpcoming.isFetching) setLoadingDirection(undefined);
-  }, [listUpcoming.isFetching]);
+    if (!pendingLoad || listUpcoming.isFetching || !listUpcoming.data) return;
+
+    const range = getMonthRange(pendingLoad.monthKey, minimumDate, maximumDate);
+    const firstLoadedDate = listUpcoming.data.entries
+      .map((entry) => entry.date)
+      .filter((date) => date >= range.from && date <= range.to)
+      .sort((left, right) => left.localeCompare(right))[0];
+
+    if (firstLoadedDate) setScrollTargetDate(firstLoadedDate);
+    setPendingLoad(undefined);
+  }, [listUpcoming.data, listUpcoming.isFetching, maximumDate, minimumDate, pendingLoad]);
 
   const changePeriod = (nextYear: number, nextMonth: number) => {
     const nextMonthKey = `${nextYear}-${pad(nextMonth)}`;
@@ -95,6 +107,7 @@ const UpcomingPageContent = () => {
     }
 
     setLoadingDirection(direction);
+    setPendingLoad({ monthKey: nextMonthKey });
     setListMonthKeys((current) =>
       [...current, nextMonthKey].sort((left, right) => left.localeCompare(right)),
     );
@@ -170,6 +183,7 @@ const UpcomingPageContent = () => {
               canLoadLater={canLoadLater}
               isLoading={upcoming.isFetching}
               loadingDirection={loadingDirection}
+              scrollTargetDate={scrollTargetDate}
               onLoadEarlier={() => loadAdjacentMonth("earlier")}
               onLoadLater={() => loadAdjacentMonth("later")}
             />

@@ -13,6 +13,7 @@ interface UpcomingListProps {
   isLoading: boolean;
   loadingDirection?: 'earlier' | 'later';
   onLoadEarlier: () => void;
+  scrollTargetDate?: string;
   onLoadLater: () => void;
   todayDate: string;
 }
@@ -24,6 +25,7 @@ const UpcomingList = ({
   isLoading,
   loadingDirection,
   onLoadEarlier,
+  scrollTargetDate,
   onLoadLater,
   todayDate,
 }: UpcomingListProps) => {
@@ -42,6 +44,15 @@ const UpcomingList = ({
   useEffect(() => {
     todayAnchorRef.current?.scrollIntoView?.({ block: 'start' });
   }, []);
+
+  useEffect(() => {
+    if (!scrollTargetDate) return;
+
+    document.getElementById(`upcoming-${scrollTargetDate}`)?.scrollIntoView?.({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }, [scrollTargetDate]);
 
   const scrollToToday = () => {
     todayAnchorRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
@@ -119,7 +130,7 @@ const UpcomingList = ({
             {index === todayIndex && renderTodayAnchor()}
             <Stack as="section" gap="3" aria-labelledby={`upcoming-${date}`}>
               <HStack gap="2" flexWrap="wrap">
-                <Heading id={`upcoming-${date}`} as="h2" textStyle="sectionTitle">
+                <Heading id={`upcoming-${date}`} as="h2" textStyle="sectionTitle" scrollMarginTop="20">
                   {formatUpcomingDate(date)}
                 </Heading>
                 <Badge colorPalette="gray" variant="subtle">

@@ -164,6 +164,51 @@ describe('UpcomingPageContent', () => {
     );
   });
 
+  it('scrolls to the first returned date after loading in either direction', async () => {
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      value: scrollIntoView,
+    });
+    const rendered = renderContent();
+
+    await waitFor(() => expect(scrollIntoView).toHaveBeenCalled());
+    scrollIntoView.mockClear();
+    mocks.isFetching = true;
+    fireEvent.click(screen.getByRole('button', { name: 'Load earlier dates' }));
+    mocks.data = {
+      ...structuredClone(response),
+      entries: [...response.entries, { ...response.entries[0], date: '2026-08-12' }],
+    };
+    mocks.isFetching = false;
+    rendered.rerender(
+      <MemoryRouter>
+        <UpcomingPageContent />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() =>
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' }),
+    );
+    scrollIntoView.mockClear();
+    mocks.isFetching = true;
+    fireEvent.click(screen.getByRole('button', { name: 'Load later dates' }));
+    mocks.data = {
+      ...mocks.data,
+      entries: [...(mocks.data?.entries ?? []), { ...response.entries[0], date: '2026-10-03' }],
+    };
+    mocks.isFetching = false;
+    rendered.rerender(
+      <MemoryRouter>
+        <UpcomingPageContent />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() =>
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' }),
+    );
+  });
+
   it('keeps successful entries visible while disclosing partial provider coverage', () => {
     mocks.data = {
       ...structuredClone(response),
