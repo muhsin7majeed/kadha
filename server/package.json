@@ -1,6 +1,6 @@
 {
   "name": "kadha-server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A Node.js server for the Kadha application",
   "license": "MIT",
   "main": "dist/index.js",

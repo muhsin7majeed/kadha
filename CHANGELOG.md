@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.6.0
+
 ### Feature Changes
 
 - Added 90-day schedule history for tracked TV episodes and watchlisted movie releases, with past-date navigation and local watched/unwatched status.
