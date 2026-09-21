@@ -52,12 +52,22 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
         {data.pagination.total} results
       </Text>
 
-      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }} gap={4}>
+      <SimpleGrid
+        gridTemplateColumns={{
+          base: 'repeat(auto-fit, minmax(min(100%, 150px), 1fr))',
+          sm: 'repeat(2, minmax(0, 1fr))',
+          md: 'repeat(3, minmax(0, 1fr))',
+          lg: 'repeat(4, minmax(0, 1fr))',
+          xl: 'repeat(5, minmax(0, 1fr))',
+        }}
+        gap={4}
+      >
         {data.data.map((media) => (
           <MediaCard
             key={`${media.media_type}:${media.media_id}`}
             media={toMediaCardModel(media)}
             onNavigate={onClose}
+            width="100%"
           />
         ))}
       </SimpleGrid>
