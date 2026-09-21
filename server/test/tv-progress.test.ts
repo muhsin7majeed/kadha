@@ -334,4 +334,23 @@ describe('TV progress service', () => {
       ],
     });
   });
+
+  it('excludes ongoing shows with no aired unwatched episode', async () => {
+    const user = await registerTestUser('tv-caught-up-list-user');
+
+    await markSeasonWatched(user.userId, '887101', '1');
+    await markSeasonWatched(user.userId, '887101', '2');
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=recent&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 0,
+      },
+      data: [],
+    });
+  });
 });

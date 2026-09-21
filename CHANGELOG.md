@@ -8,6 +8,7 @@
 
 ### Behavior Fixes
 
+- Fixed Continue Watching and In Progress so ongoing TV shows with no aired unwatched episode are excluded.
 - Made self-hosted instance names carry through runtime notices, account recovery and export filenames, sharing copy, and generated browser metadata instead of falling back to Kadha.
 - Preserved accessible loading labels and single-dialog transitions after the Chakra UI refresh.
 - Reworked media cards into separate poster and body surfaces, grouped runtime with poster metadata, and aligned Continue Watching detail panels across themes.
@@ -15,6 +16,7 @@
 ### Engineering Changes
 
 - Added instance-branding guidance to the working agreement so new runtime copy uses configured names while stable compatibility identifiers remain unchanged.
+- Bounded concurrent TV progress refreshes to avoid unbounded provider fan-out for users with many watched shows.
 - Standardized Docker, CI, package engines, and deployment builds on Node.js 24, including reproducible Alpine native-module compilation and explicit Prisma CLI availability.
 - Migrated the server to Express 5, removed `express-async-errors`, and added async error-handling regression coverage.
 - Refreshed Chakra UI and Ark UI together and migrated the frontend toolchain to Vite 8 with Vite's native tsconfig path resolution.

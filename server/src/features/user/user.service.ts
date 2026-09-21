@@ -19,6 +19,8 @@ type UserMediaFlag = 'watchlist' | 'liked' | 'watched';
 type UserMediaListQuery = Pick<UserMediaQuery, 'page' | 'limit'> & Partial<UserMediaQuery>;
 export type InProgressTvSort = 'recent' | 'next';
 
+const TV_PROGRESS_CONCURRENCY = 5;
+
 const viewableResource = <T>(data: T): ResourceAccessResponse<T> => ({
   data,
   access: {
@@ -651,33 +653,39 @@ export async function getCurrentUserInProgressTv(id: string, page: number, limit
     },
   });
   const mediaById = new Map(mediaRows.map((item) => [item.media_id, item]));
-  const progressItems = (
-    await Promise.all(
-      mediaIds.map(async (mediaId) => {
-        const media = mediaById.get(mediaId);
-        const lastWatchedAt = lastWatchedByMedia.get(mediaId);
+  const resolveProgressItem = async (mediaId: number) => {
+    const media = mediaById.get(mediaId);
+    const lastWatchedAt = lastWatchedByMedia.get(mediaId);
 
-        if (!media || !lastWatchedAt) return null;
+    if (!media || !lastWatchedAt) return null;
 
-        const progress = await getTvProgress(id, String(mediaId));
+    const progress = await getTvProgress(id, String(mediaId));
 
-        if (progress.watchedEpisodeCount === 0 || progress.status === 'completed') {
-          return null;
-        }
+    if (progress.watchedEpisodeCount === 0 || !progress.nextEpisode) return null;
 
-        return {
-          ...formatUserMediaTrackingDetails(flattenMediaSnapshot(media)),
-          tvProgress: {
-            status: progress.status,
-            watchedEpisodeCount: progress.watchedEpisodeCount,
-            totalAiredEpisodeCount: progress.totalAiredEpisodeCount,
-            nextEpisode: progress.nextEpisode,
-            lastWatchedAt: lastWatchedAt.toISOString(),
-          },
-        };
-      }),
-    )
-  ).filter((item) => item !== null);
+    return {
+      ...formatUserMediaTrackingDetails(flattenMediaSnapshot(media)),
+      tvProgress: {
+        status: progress.status,
+        watchedEpisodeCount: progress.watchedEpisodeCount,
+        totalAiredEpisodeCount: progress.totalAiredEpisodeCount,
+        nextEpisode: progress.nextEpisode,
+        lastWatchedAt: lastWatchedAt.toISOString(),
+      },
+    };
+  };
+
+  const progressItems: Array<NonNullable<Awaited<ReturnType<typeof resolveProgressItem>>>> = [];
+
+  for (let index = 0; index < mediaIds.length; index += TV_PROGRESS_CONCURRENCY) {
+    const batch = await Promise.all(
+      mediaIds.slice(index, index + TV_PROGRESS_CONCURRENCY).map((mediaId) => resolveProgressItem(mediaId)),
+    );
+
+    batch.forEach((item) => {
+      if (item) progressItems.push(item);
+    });
+  }
 
   progressItems.sort((first, second) => {
     if (sort === 'next') {
