@@ -9,18 +9,29 @@ const composeFile = join(repositoryRoot, 'deploy/hosted/compose.yaml');
 const temporaryDirectory = mkdtempSync(join(tmpdir(), 'kadha-hosted-compose-'));
 const environmentFile = join(temporaryDirectory, '.env');
 
-const environment = `SERVER_IMAGE=ghcr.io/example/kadha-server:contract-test
-DATABASE_URL=file:/app/db/prod.db
-DATABASE_BACKUP_DIRECTORY=/app/backups
-DATABASE_BACKUP_KEY=
-DATABASE_BACKUP_KEY_FILE=/app/db/.kadha-backup-key
-DATABASE_BACKUP_RETENTION=4
-JWT_ACCESS_SECRET=contract-test-access-secret
-JWT_REFRESH_SECRET=contract-test-refresh-secret
-TMDB_API_KEY=contract-test-tmdb-api-key
-TMDB_BEARER_TOKEN=contract-test-tmdb-bearer-token
-CLIENT_URL=https://kadha.org
-`;
+const contractEnvironment = {
+  SERVER_IMAGE: 'ghcr.io/example/kadha-server:contract-test',
+  DATABASE_URL: 'file:/app/db/prod.db',
+  DATABASE_BACKUP_DIRECTORY: '/app/backups',
+  DATABASE_BACKUP_KEY: '',
+  DATABASE_BACKUP_KEY_FILE: '/app/db/.kadha-backup-key',
+  DATABASE_BACKUP_RETENTION: '4',
+  JWT_ACCESS_SECRET: 'contract-test-access-secret',
+  JWT_REFRESH_SECRET: 'contract-test-refresh-secret',
+  TMDB_API_KEY: 'contract-test-tmdb-api-key',
+  TMDB_BEARER_TOKEN: 'contract-test-tmdb-bearer-token',
+  VAPID_SUBJECT: '',
+  VAPID_PUBLIC_KEY: '',
+  VAPID_PRIVATE_KEY: '',
+  APP_NAME: 'Kadha',
+  CLIENT_URL: 'https://kadha.org',
+  APP_URL: 'https://kadha.org',
+  AUTH_COOKIE_SAME_SITE: 'strict',
+  TRUST_PROXY: '1',
+};
+const environment = `${Object.entries(contractEnvironment)
+  .map(([key, value]) => `${key}=${value}`)
+  .join('\\n')}\\n`;
 
 const fail = (message) => {
   throw new Error(`Hosted Compose contract failed: ${message}`);
@@ -49,7 +60,7 @@ try {
       '--format',
       'json',
     ],
-    { encoding: 'utf8' },
+    { encoding: 'utf8', env: { ...process.env, ...contractEnvironment } },
   );
   const config = JSON.parse(rendered);
   const serviceNames = Object.keys(config.services ?? {});
