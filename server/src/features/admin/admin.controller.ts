@@ -3,8 +3,9 @@ import { Request, Response } from 'express';
 import { badRequest, getRouteParam, sendResponse } from '@/lib/http';
 import { getPaginationParams } from '@/lib/pagination';
 import { requireAuthUser } from '@/middlewares/auth';
+import { getAdminOverview } from './admin.dashboard.service';
 import { adminUsersQuerySchema, updateAdminUserRoleSchema } from './admin.schema';
-import { getAdminOverview, getAdminUser, getAdminUsers, updateAdminUserRole } from './admin.service';
+import { getAdminUser, getAdminUsers, updateAdminUserRole } from './admin.service';
 
 export const getOverview = async (req: Request, res: Response) => {
   const data = await getAdminOverview();

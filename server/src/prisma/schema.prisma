@@ -157,6 +157,7 @@ model User {
   receivedCollectionInvites CollectionInvite[] @relation("CollectionInviteInvitee")
   addedCollectionItems      CollectionItem[]   @relation("CollectionItemAddedByUser")
 
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -531,6 +532,7 @@ model UserActivity {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([createdAt])
   @@index([userId, type])
   @@index([media_id, media_type])
   @@index([collectionId])

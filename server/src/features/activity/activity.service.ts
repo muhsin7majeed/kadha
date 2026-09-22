@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client';
 
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
-import { CreateUserActivityInput } from './activity.types';
+import { CreateUserActivityInput, RecordedActivitySummary } from './activity.types';
 
 type ActivityDelegate = Pick<typeof prisma, 'userActivity'> | Pick<Prisma.TransactionClient, 'userActivity'>;
 
@@ -20,6 +20,36 @@ export async function createUserActivity(input: CreateUserActivityInput, db: Act
       metadata: serializeMetadata(input.metadata),
     },
   });
+}
+
+export async function getRecordedActivitySummary(
+  from: Date,
+  recentFrom: Date,
+  to: Date,
+): Promise<RecordedActivitySummary> {
+  const activities = await prisma.userActivity.findMany({
+    where: { createdAt: { gte: from, lt: to } },
+    select: { userId: true, createdAt: true },
+  });
+  const distinctUsers = new Set<string>();
+  const recentDistinctUsers = new Set<string>();
+  const dailyUsers = new Map<string, Set<string>>();
+
+  activities.forEach((activity) => {
+    distinctUsers.add(activity.userId);
+    if (activity.createdAt >= recentFrom) recentDistinctUsers.add(activity.userId);
+
+    const date = activity.createdAt.toISOString().slice(0, 10);
+    const users = dailyUsers.get(date) ?? new Set<string>();
+    users.add(activity.userId);
+    dailyUsers.set(date, users);
+  });
+
+  return {
+    distinctUserCount: distinctUsers.size,
+    recentDistinctUserCount: recentDistinctUsers.size,
+    daily: [...dailyUsers.entries()].map(([date, users]) => ({ date, userCount: users.size })),
+  };
 }
 
 export async function getUserActivity(ownerId: string, page: number, limit: number) {

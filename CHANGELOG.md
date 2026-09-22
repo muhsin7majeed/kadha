@@ -5,6 +5,7 @@
 ### Feature Changes
 
 - Added a responsive administrator navigation shell for Overview, Feedback, Users, and Provider Usage while preserving existing admin routes and screens.
+- Redesigned the administrator overview around new and recorded-active users, feedback requiring attention, user activity trends, provider health, and privacy-conscious instance totals.
 - Added an administrator Provider Usage dashboard with generic provider metrics, TMDB request and cache tracking, rate-limit visibility, latency summaries, and accessible request charts.
 
 ### Behavior Fixes
@@ -20,6 +21,7 @@
 
 ### Engineering Changes
 
+- Added a composed admin dashboard read model with feature-owned feedback and activity aggregates, bounded 30-day queries, and provider failure isolation.
 - Separate the official hosted backend Compose configuration from the self-hosting configuration, with explicit deployment paths, persistent volume identities, and CI contract validation.
 
 ## v0.6.0

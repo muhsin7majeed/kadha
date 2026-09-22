@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { createNotification } from '@/features/notification/notification.service';
 import { NotificationType } from '@/types/common';
 import type { CreateFeedbackInput, UpdateFeedbackInput } from './feedback.schema';
-import type { AdminFeedbackListParams } from './feedback.types';
+import type { AdminFeedbackAttentionSummary, AdminFeedbackListParams } from './feedback.types';
 
 const userSummarySelect = {
   id: true,
@@ -81,6 +81,36 @@ export async function getUserFeedbackItem(userId: string, id: string) {
   if (!feedback) throw notFound('Feedback not found');
   const { userId: _userId, ...data } = feedback;
   return data;
+}
+
+export async function getAdminFeedbackAttentionSummary(limit = 5): Promise<AdminFeedbackAttentionSummary> {
+  const openStatuses = [FeedbackStatus.NEW, FeedbackStatus.ACKNOWLEDGED];
+  const [newCount, openCount, recentOpen] = await prisma.$transaction([
+    prisma.feedback.count({ where: { status: FeedbackStatus.NEW } }),
+    prisma.feedback.count({ where: { status: { in: openStatuses } } }),
+    prisma.feedback.findMany({
+      where: { status: { in: openStatuses } },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      select: {
+        id: true,
+        category: true,
+        subject: true,
+        status: true,
+        createdAt: true,
+        user: { select: { username: true } },
+      },
+    }),
+  ]);
+
+  return {
+    newCount,
+    openCount,
+    recentOpen: recentOpen.map(({ user, ...feedback }) => ({
+      ...feedback,
+      username: user.username,
+    })),
+  };
 }
 
 export async function getAdminFeedback(params: AdminFeedbackListParams) {

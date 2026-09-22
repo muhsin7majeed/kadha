@@ -12,6 +12,15 @@ export interface ActivityMetadata {
   newRole?: string | null;
 }
 
+export interface RecordedActivitySummary {
+  distinctUserCount: number;
+  recentDistinctUserCount: number;
+  daily: Array<{
+    date: string;
+    userCount: number;
+  }>;
+}
+
 export interface CreateUserActivityInput {
   userId: string;
   type: UserActivityType;
