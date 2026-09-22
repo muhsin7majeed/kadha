@@ -109,7 +109,7 @@ const FeedbackAttention = ({ feedback }: Pick<AdminOverview, 'feedback'>) => (
     <Card.Body pt="0">
       {feedback.recentOpen.length === 0 ? (
         <Stack align="center" justify="center" textAlign="center" minH="44" gap="2">
-          <Text fontWeight="medium">Nothing needs your attention.</Text>
+          <Text fontWeight="medium">No feedback needs attention.</Text>
           <Text color="fg.muted" textStyle="supporting">
             New and acknowledged feedback will appear here.
           </Text>
@@ -157,7 +157,7 @@ const UserActivityChart = ({ users }: Pick<AdminOverview, 'users'>) => {
   const chart = useChart<AdminOverviewTrendPoint>({
     data: users.trend,
     series: [
-      { name: 'recordedActiveUsers', color: 'brand.solid', label: 'Recorded active users' },
+      { name: 'recordedActiveUsers', color: 'brand.solid', label: 'Active users' },
       { name: 'newUsers', color: 'green.solid', label: 'New users' },
     ],
   });
@@ -170,7 +170,7 @@ const UserActivityChart = ({ users }: Pick<AdminOverview, 'users'>) => {
           <Text textStyle="sectionTitle">User activity, last 30 days</Text>
         </HStack>
         <Text color="fg.muted" textStyle="supporting">
-          Recorded activity includes sign-ins and saved account changes.
+          Users who signed in or made a change.
         </Text>
       </Card.Header>
       <Card.Body pt="0">
@@ -210,7 +210,7 @@ const UserActivityChart = ({ users }: Pick<AdminOverview, 'users'>) => {
         <VisuallyHidden>
           {users.trend.map(
             (point) =>
-              `${formatDate(point.date)}, ${point.recordedActiveUsers} recorded active users, ${point.newUsers} new users.`,
+              `${formatDate(point.date)}, ${point.recordedActiveUsers} active users, ${point.newUsers} new users.`,
           )}
         </VisuallyHidden>
       </Card.Body>
@@ -228,7 +228,7 @@ const ProviderHealth = ({ provider }: Pick<AdminOverview, 'provider'>) => (
             <Text textStyle="sectionTitle">Provider health</Text>
           </HStack>
           <Text color="fg.muted" textStyle="supporting" mt="1">
-            Observed outbound activity during the last 24 hours.
+            Provider request metrics from the last 24 hours.
           </Text>
         </Box>
         <Button asChild variant="outline" colorPalette="gray" size="sm">
@@ -272,18 +272,15 @@ const InstanceData = ({ instanceData }: Pick<AdminOverview, 'instanceData'>) => 
     <Card.Header>
       <HStack gap="2">
         <LuServer aria-hidden />
-        <Text textStyle="sectionTitle">Instance data</Text>
+        <Text textStyle="sectionTitle">Instance totals</Text>
       </HStack>
-      <Text color="fg.muted" textStyle="supporting">
-        Aggregate operational counts only. Private libraries are not shown here.
-      </Text>
     </Card.Header>
     <Card.Body pt="0">
       <SimpleGrid columns={{ base: 2, md: 4 }} gap="4">
-        <CompactMetric label="Tracked media" value={instanceData.trackedMediaRows} detail="Aggregate rows" />
-        <CompactMetric label="Collections" value={instanceData.collections} detail="Across the instance" />
-        <CompactMetric label="Friendships" value={instanceData.acceptedFriendships} detail="Accepted only" />
-        <CompactMetric label="Administrators" value={instanceData.admins} detail="Global access" />
+        <CompactMetric label="Tracked media" value={instanceData.trackedMediaRows} detail="Saved entries" />
+        <CompactMetric label="Collections" value={instanceData.collections} detail="Total collections" />
+        <CompactMetric label="Friendships" value={instanceData.acceptedFriendships} detail="Accepted connections" />
+        <CompactMetric label="Administrators" value={instanceData.admins} detail="Admin accounts" />
       </SimpleGrid>
     </Card.Body>
   </Card.Root>
@@ -296,7 +293,7 @@ const AdminOverviewPage = () => {
     <Box>
       <PageHeader
         isFetching={isFetching}
-        subHeader="A privacy-conscious view of instance activity and work that needs attention."
+        subHeader="Key activity and operational metrics."
         action={
           <Button
             colorPalette="gray"
@@ -328,9 +325,6 @@ const AdminOverviewPage = () => {
                     <Badge colorPalette="brand" variant="subtle">{data.appName}</Badge>
                     <Badge colorPalette="gray" variant="subtle">v{data.appVersion}</Badge>
                   </HStack>
-                  <Text color="fg.muted" textStyle="supporting" mt="2">
-                    Instance operations without user-level behavioral tracking.
-                  </Text>
                 </Box>
                 <Text color="fg.muted" textStyle="supporting" alignSelf={{ base: 'start', md: 'center' }}>
                   Updated {formatTimeAgo(data.generatedAt)}
@@ -342,7 +336,7 @@ const AdminOverviewPage = () => {
           <SimpleGrid columns={{ base: 1, sm: 2, xl: 4 }} gap="4">
             <MetricCard label="Total users" value={data.users.total} detail={`${formatNumber(data.instanceData.admins)} administrators`} />
             <MetricCard label="New users, 30 days" value={data.users.newLast30Days} detail={`${formatNumber(data.users.newLast7Days)} in the last 7 days`} />
-            <MetricCard label="Recorded active, 30 days" value={data.users.recordedActiveLast30Days} detail={`${formatNumber(data.users.recordedActiveLast7Days)} in the last 7 days`} />
+            <MetricCard label="Active users, 30 days" value={data.users.recordedActiveLast30Days} detail={`${formatNumber(data.users.recordedActiveLast7Days)} in the last 7 days`} />
             <MetricCard label="Open feedback" value={data.feedback.openCount} detail={`${formatNumber(data.feedback.newCount)} new`} />
           </SimpleGrid>
 

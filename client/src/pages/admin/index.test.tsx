@@ -101,7 +101,9 @@ describe('AdminOverviewPage', () => {
     );
     expect(screen.getByText('25')).toBeInTheDocument();
     expect(screen.getByText('50 ms')).toBeInTheDocument();
-    expect(screen.getByText('Recorded activity includes sign-ins and saved account changes.')).toBeInTheDocument();
+    expect(screen.getByText('Users who signed in or made a change.')).toBeInTheDocument();
+    expect(screen.getByText('Active users, 30 days')).toBeInTheDocument();
+    expect(screen.queryByText('Instance operations without user-level behavioral tracking.')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Refresh dashboard' })).toBeInTheDocument();
   });
 
