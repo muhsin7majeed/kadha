@@ -59,6 +59,47 @@ describe('watch event routes', () => {
     });
   });
 
+  it('preserves TV watchlist state when recording an episode', async () => {
+    const user = await registerTestUser('episode-watchlist-user');
+    const app = await getTestApp();
+    const mediaId = 889102;
+    const watchlistAt = new Date('2026-01-12T12:00:00.000Z');
+    const payload = buildTestMediaPayload({ mediaId, mediaType: 'tv', title: 'Watchlisted Show' });
+
+    await request(app)
+      .post('/api/user-media/watchlist')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, watchlist: true })
+      .expect(200);
+    await prisma.userMedia.update({
+      where: {
+        userId_media_id_media_type: {
+          userId: user.userId,
+          media_id: mediaId,
+          media_type: 'tv',
+        },
+      },
+      data: { watchlistAt },
+    });
+
+    await request(app)
+      .post('/api/user-media/watch-events')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, seasonNumber: 1, episodeNumber: 1 })
+      .expect(201);
+
+    const userMedia = await prisma.userMedia.findUniqueOrThrow({
+      where: {
+        userId_media_id_media_type: {
+          userId: user.userId,
+          media_id: mediaId,
+          media_type: 'tv',
+        },
+      },
+    });
+    expect(userMedia).toMatchObject({ watchlist: true, watchlistAt });
+  });
+
   it('uses a client request ID to make retried creates idempotent', async () => {
     const user = await registerTestUser('rewatch-idempotent-user');
     const app = await getTestApp();
