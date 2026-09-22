@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Flex, HStack, Image, Stack, Text, VStack } from '@chakra-ui/react';
 import {
+  LuArrowLeft,
   LuBookmark,
   LuBookmarkPlus,
   LuCalendar,
@@ -31,6 +32,7 @@ interface HeroSectionProps {
   tvProgress?: TvProgressResponse;
   isTvProgressLoading?: boolean;
   isMarkingNextEpisode?: boolean;
+  onBack?: () => void;
   onMarkNextEpisode?: () => void;
   onOpenTvProgress?: () => void;
   readOnly?: boolean;
@@ -38,6 +40,7 @@ interface HeroSectionProps {
 
 const HeroSection = ({
   data,
+  onBack,
   tvProgress,
   isTvProgressLoading,
   isMarkingNextEpisode,
@@ -133,6 +136,26 @@ const HeroSection = ({
       {isMovie && !readOnly && <WatchEventDialog media={mediaPayload} open={watchEventOpen} onOpenChange={setWatchEventOpen} />}
 
       <Box position="relative" overflow="hidden" bg="bg">
+        {onBack && (
+          <Button
+            position="absolute"
+            top={{ base: '4', md: '6' }}
+            left={{ base: 'max(1rem, env(safe-area-inset-left))', md: '8' }}
+            zIndex="3"
+            variant="outline"
+            colorPalette="gray"
+            bg="blackAlpha.700"
+            color="white"
+            borderColor="whiteAlpha.400"
+            shadow="md"
+            _hover={{ bg: 'blackAlpha.800', borderColor: 'whiteAlpha.600' }}
+            onClick={onBack}
+          >
+            <LuArrowLeft aria-hidden />
+            Back
+          </Button>
+        )}
+
         {/* Backdrop Image */}
         <Box position="absolute" inset={0} width="100%" height="100%">
           <Box
