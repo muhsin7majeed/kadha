@@ -91,25 +91,21 @@ const UpcomingCalendar = ({
               >
                 {firstEntry.media.title}
               </Text>
-              <HStack justify="space-between" gap="1">
-                <Text fontWeight="semibold" textStyle="compactLabel">
-                  {count}
+              {additionalTitles > 0 && (
+                <Text
+                  display={{ base: 'none', sm: 'block' }}
+                  color="fg.muted"
+                  textAlign="right"
+                  textStyle="compactLabel"
+                  minW="0"
+                  whiteSpace="nowrap"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  title={`+${additionalTitles} more`}
+                >
+                  +{additionalTitles} more
                 </Text>
-                {additionalTitles > 0 && (
-                  <Text
-                    display={{ base: 'none', sm: 'block' }}
-                    color="fg.muted"
-                    textStyle="compactLabel"
-                    minW="0"
-                    whiteSpace="nowrap"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    title={`+${additionalTitles} more`}
-                  >
-                    +{additionalTitles} more
-                  </Text>
-                )}
-              </HStack>
+              )}
             </Stack>
           ) : null;
         }}
