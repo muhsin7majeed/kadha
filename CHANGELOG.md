@@ -4,6 +4,7 @@
 
 ### Behavior Fixes
 
+- Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.
 - Keep TV shows on the Watchlist when marking individual episodes, seasons, or all aired episodes as watched.
 - Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.
 - Make selecting a day in Upcoming Month view reveal its inline day details, including on short mobile and tablet screens.

@@ -388,8 +388,43 @@ describe('TV progress service', () => {
     });
   });
 
-  it('excludes ongoing shows with no aired unwatched episode', async () => {
+  it('includes ongoing shows with no aired unwatched episode', async () => {
     const user = await registerTestUser('tv-caught-up-list-user');
+
+    await markSeasonWatched(user.userId, '887101', '1');
+    await markSeasonWatched(user.userId, '887101', '2');
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=recent&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 1,
+      },
+      data: [
+        {
+          media_id: 887101,
+          tvProgress: {
+            status: 'caught_up',
+            watchedEpisodeCount: 4,
+            totalAiredEpisodeCount: 4,
+            nextEpisode: null,
+          },
+        },
+      ],
+    });
+  });
+
+  it('excludes completed shows with no next episode', async () => {
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      in_production: false,
+      next_episode_to_air: null,
+      status: 'Ended',
+    });
+    const user = await registerTestUser('tv-completed-list-user');
 
     await markSeasonWatched(user.userId, '887101', '1');
     await markSeasonWatched(user.userId, '887101', '2');
