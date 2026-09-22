@@ -4,6 +4,7 @@
 
 ### Behavior Fixes
 
+- Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.
 - Make selecting a day in Upcoming Month view reveal its inline day details, including on short mobile and tablet screens.
 
 ## v0.6.0
