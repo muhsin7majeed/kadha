@@ -55,4 +55,11 @@ describe('media card metadata', () => {
     expect(screen.queryByText('TMDB 7.8')).not.toBeInTheDocument();
     expect(screen.queryByText('Your rating 4.5/5')).not.toBeInTheDocument();
   });
+
+  it('presents the full card as a detail navigation target', () => {
+    renderCard(<MediaCard media={movie} showActions={false} />);
+
+    expect(screen.getByRole('article')).toHaveStyle({ cursor: 'pointer' });
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
 });
