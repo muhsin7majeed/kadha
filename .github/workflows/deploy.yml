@@ -147,14 +147,23 @@ jobs:
         with:
           ref: ${{ env.DEPLOY_SHA }}
 
-      - name: Copy docker-compose to VPS
+      - name: Prepare hosted Compose directory
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: mkdir -p ~/apps/kadha/deploy/hosted
+
+      - name: Copy hosted Compose file to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "~/apps/kadha/"
+          source: "deploy/hosted/compose.yaml"
+          target: "~/apps/kadha/deploy/hosted/"
+          strip_components: 2
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
@@ -166,16 +175,45 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           envs: IMAGE
           script: |
-            cd ~/apps/kadha
+            set -eu
+
+            PROJECT_NAME=kadha
+            PROJECT_DIR="$HOME/apps/kadha"
+            ENV_FILE="$PROJECT_DIR/.env"
+            COMPOSE_FILE="$PROJECT_DIR/deploy/hosted/compose.yaml"
+
+            compose() {
+              docker compose \
+                --project-name "$PROJECT_NAME" \
+                --project-directory "$PROJECT_DIR" \
+                --env-file "$ENV_FILE" \
+                --file "$COMPOSE_FILE" \
+                "$@"
+            }
+
+            test -f "$ENV_FILE"
+            test -f "$COMPOSE_FILE"
+
+            # Keep the existing Compose project and persistent volumes explicit.
+            docker volume inspect kadha_sqlite_data >/dev/null
+            docker volume inspect kadha_sqlite_backups >/dev/null
 
             # Pull the exact image built from the CI-tested commit.
-            docker pull $IMAGE
+            docker pull "$IMAGE"
 
-            # Update .env with the image name
-            grep -q "^SERVER_IMAGE=" .env 2>/dev/null && sed -i "s|^SERVER_IMAGE=.*|SERVER_IMAGE=$IMAGE|" .env || echo "SERVER_IMAGE=$IMAGE" >> .env
+            # Update the production environment with that immutable image reference.
+            if grep -q "^SERVER_IMAGE=" "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^SERVER_IMAGE=.*|SERVER_IMAGE=$IMAGE|" "$ENV_FILE"
+            else
+              printf '\nSERVER_IMAGE=%s\n' "$IMAGE" >> "$ENV_FILE"
+            fi
 
-            # Restart with new image
-            docker compose -f docker-compose.prod.yml up -d
+            # Render the exact remote configuration before changing the service.
+            compose config --quiet
 
-            # Clean up old images
+            # Restart with the dedicated hosted configuration.
+            compose up -d server
+            compose ps
+
+            # Clean up old images.
             docker image prune -f

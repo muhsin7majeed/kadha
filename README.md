@@ -496,7 +496,24 @@ docker compose -f docker-compose.prod.yml exec server npx prisma migrate deploy
 
 ### Automated Deployments And Rollback
 
-The hosted deployment workflow runs only after CI succeeds for a push to `master`. It checks out the tested commit, publishes the server image with the full commit SHA, and writes that immutable image reference to the production `.env`. The `latest` tag remains available for self-hosted update workflows, but the hosted deployment does not use it.
+The hosted deployment workflow runs only after CI succeeds for a push to `master`. It checks out the tested commit, builds the server image, publishes it to GHCR with the full commit SHA, and writes that immutable image reference to the production `.env`. The `latest` tag remains available for self-hosted update workflows, but the hosted deployment does not use it.
+
+The official hosted backend uses the repository's dedicated `deploy/hosted/compose.yaml`. The workflow copies it to `~/apps/kadha/deploy/hosted/compose.yaml` and always invokes it with the existing project identity, directory, and environment file:
+
+```bash
+HOSTED_PROJECT_DIR=~/apps/kadha
+HOSTED_ENV_FILE="$HOSTED_PROJECT_DIR/.env"
+HOSTED_COMPOSE_FILE="$HOSTED_PROJECT_DIR/deploy/hosted/compose.yaml"
+
+docker compose \
+  --project-name kadha \
+  --project-directory "$HOSTED_PROJECT_DIR" \
+  --env-file "$HOSTED_ENV_FILE" \
+  --file "$HOSTED_COMPOSE_FILE" \
+  ps
+```
+
+The hosted configuration explicitly reuses `kadha_sqlite_data` for `/app/db` and `kadha_sqlite_backups` for `/app/backups`. Do not run it without the explicit project name, project directory, environment file, and Compose file options: those options protect the existing database, encrypted backups, and production environment from accidental identity changes.
 
 To roll back the hosted server:
 
@@ -505,9 +522,26 @@ To roll back the hosted server:
 3. Pull and restart that exact image:
 
 ```bash
-docker compose -f docker-compose.prod.yml pull server
-docker compose -f docker-compose.prod.yml up -d server
-docker compose -f docker-compose.prod.yml ps
+docker compose \
+  --project-name kadha \
+  --project-directory "$HOSTED_PROJECT_DIR" \
+  --env-file "$HOSTED_ENV_FILE" \
+  --file "$HOSTED_COMPOSE_FILE" \
+  pull server
+
+docker compose \
+  --project-name kadha \
+  --project-directory "$HOSTED_PROJECT_DIR" \
+  --env-file "$HOSTED_ENV_FILE" \
+  --file "$HOSTED_COMPOSE_FILE" \
+  up -d server
+
+docker compose \
+  --project-name kadha \
+  --project-directory "$HOSTED_PROJECT_DIR" \
+  --env-file "$HOSTED_ENV_FILE" \
+  --file "$HOSTED_COMPOSE_FILE" \
+  ps
 ```
 
 Commit-tagged images are retained by the normal deployment cleanup because it removes only dangling images. Rolling back an image does not reverse a database migration, so back up SQLite before migration-bearing releases and review the migration before attempting a code rollback.
