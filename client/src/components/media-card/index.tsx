@@ -38,6 +38,8 @@ const MediaCard = ({
       as="article"
       variant="outline"
       overflow="hidden"
+      position="relative"
+      cursor="pointer"
       bg="bg.panel"
       borderColor="border"
       shadow="sm"
@@ -108,7 +110,7 @@ const MediaCard = ({
           </Box>
 
           {showActions && (
-            <Box flexShrink="0">
+            <Box flexShrink="0" position="relative" zIndex="1">
               <MediaActions media={media} size={{ mdDown: 'xs', md: 'md' }} />
             </Box>
           )}
@@ -121,6 +123,12 @@ const MediaCard = ({
           textStyle="cardTitle"
           lineClamp={2}
           color="fg"
+          _after={{
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+          }}
           onClick={onNavigate}
         >
           {media.title} ({formatDate(media.release_date, 'YYYY')})
