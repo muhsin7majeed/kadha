@@ -87,31 +87,49 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <Box ref={resultsRef}>
-            {results ?? (
-              <SimpleGrid
-                gridTemplateColumns={{
-                  base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
-                  sm: 'repeat(2, minmax(0, 1fr))',
-                  md: 'repeat(3, minmax(0, 1fr))',
-                  lg: 'repeat(4, minmax(0, 1fr))',
-                }}
-                gap={{ base: 2, sm: 4, md: 6 }}
-                justifyItems="center"
+          <Box ref={resultsRef} position="relative" aria-busy={isFetching}>
+            {isFetching && (
+              <Center
+                role="status"
+                position="absolute"
+                inset="0"
+                zIndex="1"
+                bg="bg"
               >
-                {data?.map((media) => (
-                  <MediaCard
-                    key={`${media.media_type}:${media.media_id}`}
-                    detailsPathPrefix={detailsPathPrefix}
-                    media={toMediaCardModel(media)}
-                    showActions={showActions}
-                    showLibraryMetadata={showLibraryMetadata}
-                    showPersonalRating={showPersonalRating}
-                    width="100%"
-                  />
-                ))}
-              </SimpleGrid>
+                <VStack gap="3">
+                  <Spinner size="lg" color={spinnerColor} />
+                  <Text color="fg.muted" textStyle="supporting">
+                    Loading page…
+                  </Text>
+                </VStack>
+              </Center>
             )}
+            <Box opacity={isFetching ? 0.35 : 1} transition="opacity 0.2s">
+              {results ?? (
+                <SimpleGrid
+                  gridTemplateColumns={{
+                    base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
+                    sm: 'repeat(2, minmax(0, 1fr))',
+                    md: 'repeat(3, minmax(0, 1fr))',
+                    lg: 'repeat(4, minmax(0, 1fr))',
+                  }}
+                  gap={{ base: 2, sm: 4, md: 6 }}
+                  justifyItems="center"
+                >
+                  {data?.map((media) => (
+                    <MediaCard
+                      key={`${media.media_type}:${media.media_id}`}
+                      detailsPathPrefix={detailsPathPrefix}
+                      media={toMediaCardModel(media)}
+                      showActions={showActions}
+                      showLibraryMetadata={showLibraryMetadata}
+                      showPersonalRating={showPersonalRating}
+                      width="100%"
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+            </Box>
           </Box>
           {onPageChange && (
             <PaginationControls

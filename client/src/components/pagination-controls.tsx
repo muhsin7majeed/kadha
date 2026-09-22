@@ -23,7 +23,14 @@ const PaginationControls = ({
 
   const { page, totalPages, hasPreviousPage, hasNextPage } = pagination;
   const handlePageChange = (nextPage: number) => {
-    scrollTargetRef?.current?.scrollIntoView?.({ block: 'start', behavior: 'auto' });
+    const target = scrollTargetRef?.current;
+    if (target) {
+      const navigationHeight = document.querySelector<HTMLElement>('nav')?.getBoundingClientRect().height ?? 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - navigationHeight - 8;
+
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+
     onPageChange(nextPage);
   };
 

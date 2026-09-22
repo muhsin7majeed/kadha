@@ -32,23 +32,33 @@ afterEach(() => {
 });
 
 describe('PaginationControls', () => {
-  it('scrolls the results target when changing pages without scrolling on mount', async () => {
+  it('smoothly scrolls the results target below the sticky navigation when changing pages', async () => {
     const user = userEvent.setup();
     const onPageChange = vi.fn();
-    const scrollIntoView = vi.fn();
+    const scrollTo = vi.fn();
+    const navigation = document.createElement('nav');
 
-    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    Object.defineProperty(window, 'scrollTo', { configurable: true, value: scrollTo });
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 100 });
+    Object.defineProperty(navigation, 'getBoundingClientRect', {
       configurable: true,
-      value: scrollIntoView,
+      value: () => ({ height: 64 }),
     });
+    document.body.appendChild(navigation);
 
     renderWithProviders(<PaginationHarness onPageChange={onPageChange} />);
+    Object.defineProperty(screen.getByText('Results'), 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({ top: 600 }),
+    });
 
-    expect(scrollIntoView).not.toHaveBeenCalled();
+    expect(scrollTo).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Next page' }));
 
-    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start', behavior: 'auto' });
+    expect(scrollTo).toHaveBeenCalledWith({ top: 628, behavior: 'smooth' });
     expect(onPageChange).toHaveBeenCalledWith(2);
+
+    navigation.remove();
   });
 });
