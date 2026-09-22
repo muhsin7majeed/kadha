@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Badge, Box, Flex, HStack, Icon, Image, Stack, Text } from '@chakra-ui/react';
 import {
   LuActivity,
@@ -282,6 +282,7 @@ const ActivityItem = ({ activity }: { activity: UserActivity }) => {
 
 const Activity = () => {
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { data, isLoading, isError, isFetching, refetch } = useActivity(page);
   const activities = data?.data ?? [];
 
@@ -305,12 +306,17 @@ const Activity = () => {
           icon={<LuActivity />}
         />
       ) : (
-        <Stack gap="3">
+        <Stack ref={resultsRef} gap="3">
           {activities.map((activity) => (
             <ActivityItem key={activity.id} activity={activity} />
           ))}
 
-          <PaginationControls pagination={data?.pagination} onPageChange={setPage} isDisabled={isFetching} />
+          <PaginationControls
+            pagination={data?.pagination}
+            onPageChange={setPage}
+            isDisabled={isFetching}
+            scrollTargetRef={resultsRef}
+          />
         </Stack>
       )}
     </Box>

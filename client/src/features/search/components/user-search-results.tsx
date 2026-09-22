@@ -1,4 +1,5 @@
 import { Box, Card, HStack, Text, VStack } from '@chakra-ui/react';
+import { useRef } from 'react';
 import { LuSearch } from 'react-icons/lu';
 
 import EmptyState from '@/components/info-states/empty-state';
@@ -22,6 +23,7 @@ interface UserSearchResultsProps {
 
 const UserSearchResults = ({ activeTab, query, page, open, onClose, onPageChange }: UserSearchResultsProps) => {
   const enabled = open && activeTab === 'users' && query.length >= 2;
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { data, isLoading, isFetching, error, refetch } = useSearchUsers(query, page, enabled);
   const users = data?.data;
 
@@ -42,7 +44,7 @@ const UserSearchResults = ({ activeTab, query, page, open, onClose, onPageChange
   }
 
   return (
-    <Box>
+    <Box ref={resultsRef}>
       <Text color="fg.muted" textStyle="supporting" mb={4}>
         {data.pagination.total} results
       </Text>
@@ -77,7 +79,12 @@ const UserSearchResults = ({ activeTab, query, page, open, onClose, onPageChange
         ))}
       </VStack>
 
-      <PaginationControls pagination={data.pagination} isDisabled={isFetching} onPageChange={onPageChange} />
+      <PaginationControls
+        pagination={data.pagination}
+        isDisabled={isFetching}
+        onPageChange={onPageChange}
+        scrollTargetRef={resultsRef}
+      />
     </Box>
   );
 };
