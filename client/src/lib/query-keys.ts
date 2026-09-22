@@ -33,6 +33,7 @@ export const adminQueryKeys = {
   adminUsers: ['admin', 'users'] as const,
   adminUsersList: (params: AdminUsersListParams) => ['admin', 'users', params] as const,
   adminUser: (id?: string) => ['admin', 'users', id] as const,
+  adminProviderUsage: (range: string) => ['admin', 'provider-usage', range] as const,
 };
 
 export const collectionQueryKeys = {

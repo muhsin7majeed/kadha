@@ -35,6 +35,7 @@ beforeEach(async () => {
   resetAuthRateLimitsForTests();
 
   await prisma.$transaction([
+    prisma.providerUsageBucket.deleteMany(),
     prisma.feedback.deleteMany(),
     prisma.collectionInvite.deleteMany(),
     prisma.collectionMember.deleteMany(),

@@ -3,4 +3,4 @@
 - Safari on iphone overflowing
 - Merge search results of movie and tv together
 - Admin panel useful metrics
-- TMDB metrics in Admin Panel
+- Unify the loaders on different sections, each have different types. Use skeleton everywhere.
