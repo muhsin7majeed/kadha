@@ -1,6 +1,7 @@
 import request from 'supertest';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { getAdminProviderHealth } from '@/features/admin/admin.dashboard.service';
 import { prisma } from '@/lib/prisma';
 import { getTestApp } from './helpers/app';
 import { promoteTestUserToAdmin } from './helpers/admin';
@@ -82,13 +83,34 @@ describe('admin routes', () => {
     });
   });
 
-  it('allows admin users to read overview metrics', async () => {
+  it('allows admin users to read a privacy-conscious dashboard', async () => {
     const admin = await registerTestUser('overview-admin');
     const trackedUser = await registerTestUser('overview-user');
 
     await promoteTestUserToAdmin(admin);
     await updateUserMediaFlag(trackedUser, 'liked', true, 883101);
     await createTestCollection(trackedUser, 'Admin overview collection');
+    await prisma.feedback.create({
+      data: {
+        userId: trackedUser.userId,
+        category: 'BUG',
+        subject: 'Calendar problem',
+        message: 'Private feedback detail that must not appear in the dashboard.',
+      },
+    });
+    await prisma.providerUsageBucket.create({
+      data: {
+        provider: 'tmdb',
+        operation: 'movie-details',
+        bucketStart: new Date(),
+        requestCount: 4,
+        successCount: 3,
+        errorCount: 1,
+        rateLimitedCount: 1,
+        cacheHitCount: 2,
+        totalDurationMs: 120,
+      },
+    });
 
     const response = await request(await getTestApp())
       .get('/api/admin/overview')
@@ -102,7 +124,58 @@ describe('admin routes', () => {
       totalCollections: 1,
       appName: 'Kadha',
       appVersion: expect.any(String),
+      generatedAt: expect.any(String),
+      users: {
+        total: 2,
+        newLast7Days: 2,
+        newLast30Days: 2,
+        recordedActiveLast7Days: 2,
+        recordedActiveLast30Days: 2,
+      },
+      feedback: {
+        newCount: 1,
+        openCount: 1,
+        recentOpen: [
+          expect.objectContaining({
+            subject: 'Calendar problem',
+            category: 'BUG',
+            status: 'NEW',
+            username: trackedUser.username,
+          }),
+        ],
+      },
+      provider: {
+        status: 'available',
+        range: '24h',
+        summary: {
+          requestCount: 4,
+          errorCount: 1,
+          rateLimitedCount: 1,
+          cacheHitCount: 2,
+          averageDurationMs: 30,
+        },
+      },
+      instanceData: {
+        trackedMediaRows: 1,
+        collections: 1,
+        acceptedFriendships: 0,
+        admins: 1,
+      },
     });
+    expect(response.body.data.users.trend).toHaveLength(30);
+    expect(JSON.stringify(response.body.data)).not.toContain('Private feedback detail');
+  });
+
+  it('keeps the dashboard available when provider metrics fail', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    await expect(
+      getAdminProviderHealth(new Date('2026-09-23T00:00:00.000Z'), async () => {
+        throw new Error('Provider metrics unavailable');
+      }),
+    ).resolves.toEqual({ status: 'unavailable', range: '24h' });
+
+    consoleError.mockRestore();
   });
 
   it('allows admins to read provider usage metrics', async () => {

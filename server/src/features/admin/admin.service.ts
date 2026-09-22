@@ -1,21 +1,16 @@
 import { Prisma, UserActivityType, UserRole } from '@prisma/client';
 
 import { createUserActivity } from '@/features/activity/activity.service';
-import { envConfig } from '@/config/env';
 import { createPaginationMeta } from '@/lib/pagination';
 import { prisma } from '@/lib/prisma';
 import { conflict, forbidden, notFound } from '@/lib/http';
-import { AdminOverview, AdminUserDetail, AdminUserListParams, AdminUserSummary } from './admin.types';
+import { AdminUserDetail, AdminUserListParams, AdminUserSummary } from './admin.types';
 
 type CountByUserId = Map<string, number>;
 type UserCountRow = {
   userId: string;
   _count?: true | { _all?: number };
 };
-
-const trackedMediaWhere = {
-  OR: [{ watched: true }, { liked: true }, { watchlist: true }],
-} satisfies Prisma.UserMediaWhereInput;
 
 const countByUserId = (rows: UserCountRow[]): CountByUserId =>
   new Map(
@@ -146,48 +141,6 @@ export async function updateAdminUserRole(actorId: string, targetId: string, rol
 
     return updatedUser;
   });
-}
-
-export async function getAdminOverview(): Promise<AdminOverview> {
-  const now = new Date();
-  const sevenDaysAgo = new Date(now);
-  sevenDaysAgo.setDate(now.getDate() - 7);
-
-  const thirtyDaysAgo = new Date(now);
-  thirtyDaysAgo.setDate(now.getDate() - 30);
-
-  const [
-    totalUsers,
-    newUsersLast7Days,
-    newUsersLast30Days,
-    totalTrackedMediaRows,
-    totalCollections,
-    totalFriendships,
-    totalNotifications,
-    totalAdmins,
-  ] = await prisma.$transaction([
-    prisma.user.count(),
-    prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
-    prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.userMedia.count({ where: trackedMediaWhere }),
-    prisma.collection.count(),
-    prisma.friendship.count({ where: { status: 'ACCEPTED' } }),
-    prisma.notification.count(),
-    prisma.user.count({ where: { role: UserRole.ADMIN } }),
-  ]);
-
-  return {
-    totalUsers,
-    newUsersLast7Days,
-    newUsersLast30Days,
-    totalTrackedMediaRows,
-    totalCollections,
-    totalFriendships,
-    totalNotifications,
-    totalAdmins,
-    appName: envConfig.appName,
-    appVersion: envConfig.version,
-  };
 }
 
 export async function getAdminUsers(params: AdminUserListParams) {

@@ -85,7 +85,8 @@ packages/contracts/
 - New server process wiring belongs in `server/src/index.ts`.
 - New Express app middleware and route mounting belongs in `server/src/app.ts`.
 - New server feature code belongs in `server/src/features/<feature-name>`.
-- Feedback persistence, validation, owner/admin query boundaries, and status transitions belong in `server/src/features/feedback`; notification creation and browser-push delivery remain in `server/src/features/notification`, while account portability remains in the user feature.
+- Feedback persistence, validation, owner/admin query boundaries, open-status filtering, inbox counts, status transitions, and dashboard attention summaries belong in `server/src/features/feedback`; notification creation and browser-push delivery remain in `server/src/features/notification`, while account portability remains in the user feature.
+- The admin dashboard read model is composed in `server/src/features/admin/admin.dashboard.service.ts`; source aggregates remain owned by activity, feedback, and provider-usage features.
 - Account-synced Home layout validation, normalization, and persistence belong in `server/src/features/home-preferences`; export and import orchestration remain in the user feature.
 - New server business logic should live in feature services, not controllers.
 - Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated

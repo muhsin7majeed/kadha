@@ -6,7 +6,13 @@ import { prisma } from '@/lib/prisma';
 import { createNotification } from '@/features/notification/notification.service';
 import { NotificationType } from '@/types/common';
 import type { CreateFeedbackInput, UpdateFeedbackInput } from './feedback.schema';
-import type { AdminFeedbackListParams } from './feedback.types';
+import type {
+  AdminFeedbackAttentionSummary,
+  AdminFeedbackListParams,
+  AdminFeedbackStatusSummary,
+} from './feedback.types';
+
+const openStatuses = [FeedbackStatus.NEW, FeedbackStatus.ACKNOWLEDGED];
 
 const userSummarySelect = {
   id: true,
@@ -83,10 +89,41 @@ export async function getUserFeedbackItem(userId: string, id: string) {
   return data;
 }
 
+export async function getAdminFeedbackAttentionSummary(limit = 5): Promise<AdminFeedbackAttentionSummary> {
+  const [newCount, openCount, recentOpen] = await prisma.$transaction([
+    prisma.feedback.count({ where: { status: FeedbackStatus.NEW } }),
+    prisma.feedback.count({ where: { status: { in: openStatuses } } }),
+    prisma.feedback.findMany({
+      where: { status: { in: openStatuses } },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      select: {
+        id: true,
+        category: true,
+        subject: true,
+        status: true,
+        createdAt: true,
+        user: { select: { username: true } },
+      },
+    }),
+  ]);
+
+  return {
+    newCount,
+    openCount,
+    recentOpen: recentOpen.map(({ user, ...feedback }) => ({
+      ...feedback,
+      username: user.username,
+    })),
+  };
+}
+
 export async function getAdminFeedback(params: AdminFeedbackListParams) {
   const where: Prisma.FeedbackWhereInput = {
     ...(params.category ? { category: params.category } : {}),
-    ...(params.status ? { status: params.status } : {}),
+    ...(params.status
+      ? { status: params.status === 'OPEN' ? { in: openStatuses } : params.status }
+      : {}),
     ...(params.query
       ? {
           OR: [
@@ -98,7 +135,7 @@ export async function getAdminFeedback(params: AdminFeedbackListParams) {
       : {}),
   };
   const skip = (params.page - 1) * params.limit;
-  const [items, total] = await prisma.$transaction([
+  const [items, total, newCount, acknowledgedCount, completedCount, notPlannedCount] = await prisma.$transaction([
     prisma.feedback.findMany({
       where,
       select: adminSummarySelect,
@@ -107,8 +144,22 @@ export async function getAdminFeedback(params: AdminFeedbackListParams) {
       orderBy: { [params.sort]: params.order },
     }),
     prisma.feedback.count({ where }),
+    prisma.feedback.count({ where: { status: FeedbackStatus.NEW } }),
+    prisma.feedback.count({ where: { status: FeedbackStatus.ACKNOWLEDGED } }),
+    prisma.feedback.count({ where: { status: FeedbackStatus.COMPLETED } }),
+    prisma.feedback.count({ where: { status: FeedbackStatus.NOT_PLANNED } }),
   ]);
-  return { data: items.map(toAdminSummary), pagination: createPaginationMeta(params.page, params.limit, total) };
+  return {
+    data: items.map(toAdminSummary),
+    pagination: createPaginationMeta(params.page, params.limit, total),
+    summary: {
+      newCount,
+      openCount: newCount + acknowledgedCount,
+      acknowledgedCount,
+      completedCount,
+      notPlannedCount,
+    } satisfies AdminFeedbackStatusSummary,
+  };
 }
 
 export async function getAdminFeedbackItem(id: string) {
