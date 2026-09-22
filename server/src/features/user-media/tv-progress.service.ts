@@ -136,13 +136,7 @@ const getTvMediaSnapshotPayload = (mediaId: number, details: TMDBTvDetails) => (
   status: details.status,
 });
 
-const ensureTvUserMedia = async (
-  userId: string,
-  mediaId: number,
-  details: TMDBTvDetails,
-  tx: ProgressDb,
-  clearWatchlist = true,
-) => {
+const ensureTvUserMedia = async (userId: string, mediaId: number, details: TMDBTvDetails, tx: ProgressDb) => {
   await upsertMediaSnapshot(getTvMediaSnapshotPayload(mediaId, details), tx);
 
   return tx.userMedia.upsert({
@@ -153,12 +147,7 @@ const ensureTvUserMedia = async (
         media_type: TV_MEDIA_TYPE,
       },
     },
-    update: clearWatchlist
-      ? {
-          watchlist: false,
-          watchlistAt: null,
-        }
-      : {},
+    update: {},
     create: {
       userId,
       media_id: mediaId,
