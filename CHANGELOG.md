@@ -10,6 +10,7 @@
 - Add a labelled Back control over the hero backdrop on successfully loaded private media details reached through in-app navigation, preserving URL-backed library state in standalone PWAs.
 - Reset document scroll when navigating to a new route while leaving query-state changes and browser Back/Forward restoration to their owning behaviors.
 - Make the full media card navigate to details while keeping its library actions independently interactive.
+- Scroll paginated result lists to their first item when users change pages, without overriding initial-load or browser-history restoration.
 
 ## v0.6.0
 

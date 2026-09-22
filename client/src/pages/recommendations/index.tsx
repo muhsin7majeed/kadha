@@ -1,5 +1,5 @@
 import { Box, Button, Center, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { LuSparkles } from 'react-icons/lu';
 
@@ -13,6 +13,7 @@ import RecommendationListItem from '@/features/recommendations/components/recomm
 
 const Recommendations = () => {
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { data: recommendations, isLoading, isFetching, error, refetch } = useRecommendations(page);
   const response = recommendations?.data;
 
@@ -60,13 +61,18 @@ const Recommendations = () => {
         </Box>
       ) : (
         <Stack gap="5">
-          <Stack gap="4">
+          <Stack ref={resultsRef} gap="4">
             {response?.items.map((item) => (
               <RecommendationListItem key={`${item.media.media_type}:${item.media.media_id}`} item={item} />
             ))}
           </Stack>
 
-          <PaginationControls pagination={recommendations?.pagination} isDisabled={isFetching} onPageChange={setPage} />
+          <PaginationControls
+            pagination={recommendations?.pagination}
+            isDisabled={isFetching}
+            onPageChange={setPage}
+            scrollTargetRef={resultsRef}
+          />
         </Stack>
       )}
     </Box>

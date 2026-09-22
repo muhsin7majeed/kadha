@@ -230,6 +230,7 @@ const OwnerMediaLibrary = ({
       data={response?.data}
       isLoading={isLoading || isCorrectingPage || (isPlaceholderData && response?.data.length === 0)}
       isFetching={isFetching}
+      isPlaceholderData={isPlaceholderData}
       error={error}
       refetch={refetch}
       emptyState={
