@@ -27,6 +27,7 @@ const MediaDetails = () => {
   const [tvProgressDialogOpen, setTvProgressDialogOpen] = useState(false);
   const [tvProgressDialogSeason, setTvProgressDialogSeason] = useState<number | undefined>();
   const isPublicRead = location.pathname.startsWith('/media/');
+  const canNavigateBack = !isPublicRead && location.key !== 'default';
   const isValidMediaType = mediaType === 'movie' || mediaType === 'tv';
   const hasValidParams = isValidMediaType && Boolean(id);
   const { data, isError, isLoading, isFetching, refetch } = useMediaDetails(
@@ -120,6 +121,7 @@ const MediaDetails = () => {
       {/* Hero Section with Backdrop and Poster */}
       <HeroSection
         data={data}
+        onBack={canNavigateBack ? () => navigate(-1) : undefined}
         tvProgress={tvProgress.data}
         isTvProgressLoading={tvProgress.isLoading}
         isMarkingNextEpisode={markNextEpisodeWatched.isPending}

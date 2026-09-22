@@ -133,6 +133,17 @@ describe('HeroSection watched action', () => {
     vi.clearAllMocks();
   });
 
+  it('renders the contextual Back control over the hero when provided', async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+
+    renderWithProviders(<HeroSection data={movie} onBack={onBack} />);
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
   it('opens the rewatch form for an already watched movie', async () => {
     const user = userEvent.setup();
 
