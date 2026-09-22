@@ -661,7 +661,7 @@ export async function getCurrentUserInProgressTv(id: string, page: number, limit
 
     const progress = await getTvProgress(id, String(mediaId));
 
-    if (progress.watchedEpisodeCount === 0 || !progress.nextEpisode) return null;
+    if (progress.watchedEpisodeCount === 0 || progress.status === 'completed') return null;
 
     return {
       ...formatUserMediaTrackingDetails(flattenMediaSnapshot(media)),

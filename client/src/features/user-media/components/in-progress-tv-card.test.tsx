@@ -45,10 +45,10 @@ const item: TvInProgressItem = {
   },
 };
 
-const renderCard = (showDetailsAction?: boolean) =>
+const renderCard = (showDetailsAction?: boolean, cardItem = item) =>
   renderWithProviders(
     <MemoryRouter>
-      <InProgressTvCard item={item} showDetailsAction={showDetailsAction} />
+      <InProgressTvCard item={cardItem} showDetailsAction={showDetailsAction} />
     </MemoryRouter>,
   );
 
@@ -69,5 +69,22 @@ describe('InProgressTvCard', () => {
     renderCard();
 
     expect(screen.getByRole('link', { name: 'Details' })).toBeInTheDocument();
+  });
+
+  it('renders caught-up shows without a mark-next action', () => {
+    renderCard(true, {
+      ...item,
+      tvProgress: {
+        ...item.tvProgress,
+        status: 'caught_up',
+        watchedEpisodeCount: 2,
+        totalAiredEpisodeCount: 2,
+        nextEpisode: null,
+      },
+    });
+
+    expect(screen.getByText('Caught up')).toBeInTheDocument();
+    expect(screen.getByText('No aired episodes left')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Mark next/ })).not.toBeInTheDocument();
   });
 });

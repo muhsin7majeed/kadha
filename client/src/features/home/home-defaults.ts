@@ -3,7 +3,7 @@ import type { HomePreferences, HomeSectionId } from './home.types';
 export const HOME_SECTION_DETAILS: Record<HomeSectionId, { description: string; label: string }> = {
   'continue-watching': {
     label: 'Continue Watching',
-    description: 'TV shows with an aired episode ready to continue.',
+    description: "TV shows you've started and haven't finished.",
   },
   watchlist: {
     label: 'From Your Watchlist',
