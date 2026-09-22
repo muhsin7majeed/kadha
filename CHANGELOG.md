@@ -7,6 +7,7 @@
 - Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.
 - Make selecting a day in Upcoming Month view reveal its inline day details, including on short mobile and tablet screens.
 - Add a labelled Back control over the hero backdrop on successfully loaded private media details reached through in-app navigation, preserving URL-backed library state in standalone PWAs.
+- Reset document scroll when navigating to a new route while leaving query-state changes and browser Back/Forward restoration to their owning behaviors.
 
 ## v0.6.0
 
