@@ -7,15 +7,19 @@ import {
   SimpleGrid,
   Stack,
   Table,
+  Tabs,
   Text,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import { useState } from "react";
 import {
+  Bar,
+  BarChart,
   CartesianGrid,
   Legend,
   Line,
   LineChart,
+  ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
@@ -23,6 +27,7 @@ import {
 
 import EmptyState from "@/components/info-states/empty-state";
 import ErrorState from "@/components/info-states/error-state";
+import SimpleTabs from "@/components/simple-tabs";
 import PageHeader from "@/components/page-header";
 import CommonSpinner from "@/components/spinners/common-spinner";
 import useProviderUsage from "@/features/provider-usage/api/use-provider-usage";
@@ -74,6 +79,22 @@ const ProviderUsagePage = () => {
     series: [
       { name: "requestCount", color: "brand.solid", label: "Requests" },
       { name: "rateLimitedCount", color: "red.solid", label: "Rate limited" },
+    ],
+  });
+  const operationChartData = (report?.operations ?? []).map((operation) => ({
+    ...operation,
+    label: `${operation.provider} / ${operation.operation}`,
+  }));
+  const operationChart = useChart({
+    data: operationChartData,
+    series: [
+      { name: "requestCount", color: "brand.solid", label: "Requests" },
+      { name: "cacheHitCount", color: "gray.solid", label: "Cache hits" },
+      {
+        name: "rateLimitedCount",
+        color: "red.solid",
+        label: "Rate limited",
+      },
     ],
   });
 
@@ -163,48 +184,49 @@ const ProviderUsagePage = () => {
                 <Card.Body>
                   <Chart.Root
                     width="full"
-                    maxH="sm"
-                    minH="xs"
+                    height={{ base: "xs", md: "sm" }}
                     chart={chart}
                     aria-label="Provider requests over time"
                   >
-                    <LineChart data={chart.data}>
-                      <CartesianGrid
-                        stroke={chart.color("border.muted")}
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey={chart.key("bucketStart")}
-                        tickFormatter={(value) =>
-                          dayjs(value).format(
-                            range === "24h"
-                              ? "HH:mm"
-                              : range === "7d"
-                                ? "DD MMM HH:mm"
-                                : "DD MMM",
-                          )
-                        }
-                      />
-                      <YAxis
-                        tickFormatter={(value) => formatNumber(Number(value))}
-                      />
-                      <Tooltip cursor={false} content={<Chart.Tooltip />} />
-                      <Legend content={<Chart.Legend />} />
-                      <Line
-                        type="monotone"
-                        dataKey={chart.key("requestCount")}
-                        stroke={chart.color("brand.solid")}
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey={chart.key("rateLimitedCount")}
-                        stroke={chart.color("red.solid")}
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chart.data}>
+                        <CartesianGrid
+                          stroke={chart.color("border.muted")}
+                          vertical={false}
+                        />
+                        <XAxis
+                          dataKey={chart.key("bucketStart")}
+                          tickFormatter={(value) =>
+                            dayjs(value).format(
+                              range === "24h"
+                                ? "HH:mm"
+                                : range === "7d"
+                                  ? "DD MMM HH:mm"
+                                  : "DD MMM",
+                            )
+                          }
+                        />
+                        <YAxis
+                          tickFormatter={(value) => formatNumber(Number(value))}
+                        />
+                        <Tooltip cursor={false} content={<Chart.Tooltip />} />
+                        <Legend content={<Chart.Legend />} />
+                        <Line
+                          type="monotone"
+                          dataKey={chart.key("requestCount")}
+                          stroke={chart.color("brand.solid")}
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey={chart.key("rateLimitedCount")}
+                          stroke={chart.color("red.solid")}
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
                   </Chart.Root>
                   <Text color="fg.muted" textStyle="supporting" mt="4">
                     The chart shows recorded five-minute buckets. A zero
@@ -225,50 +247,112 @@ const ProviderUsagePage = () => {
                     No provider operations recorded in this range.
                   </Text>
                 ) : (
-                  <Box overflowX="auto">
-                    <Table.Root size="sm" minW="680px">
-                      <Table.Header>
-                        <Table.Row>
-                          <Table.ColumnHeader>Provider</Table.ColumnHeader>
-                          <Table.ColumnHeader>Operation</Table.ColumnHeader>
-                          <Table.ColumnHeader textAlign="right">
-                            Requests
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader textAlign="right">
-                            Cache hits
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader textAlign="right">
-                            Rate limited
-                          </Table.ColumnHeader>
-                          <Table.ColumnHeader textAlign="right">
-                            Avg. latency
-                          </Table.ColumnHeader>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {report.operations.map((operation) => (
-                          <Table.Row
-                            key={`${operation.provider}-${operation.operation}`}
+                  <SimpleTabs
+                    defaultValue="chart"
+                    tabs={[
+                      { value: "chart", label: "Chart" },
+                      { value: "table", label: "Table" },
+                    ]}
+                  >
+                    <Tabs.Content value="chart" pt="4">
+                      <Chart.Root
+                        width="full"
+                        height={{ base: "sm", md: "md" }}
+                        chart={operationChart}
+                        aria-label="Requests by provider operation"
+                      >
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart
+                            data={operationChart.data}
+                            layout="vertical"
+                            margin={{ left: 8, right: 16 }}
                           >
-                            <Table.Cell>{operation.provider}</Table.Cell>
-                            <Table.Cell>{operation.operation}</Table.Cell>
-                            <Table.Cell textAlign="right">
-                              {formatNumber(operation.requestCount)}
-                            </Table.Cell>
-                            <Table.Cell textAlign="right">
-                              {formatNumber(operation.cacheHitCount)}
-                            </Table.Cell>
-                            <Table.Cell textAlign="right">
-                              {formatNumber(operation.rateLimitedCount)}
-                            </Table.Cell>
-                            <Table.Cell textAlign="right">
-                              {formatNumber(operation.averageDurationMs)} ms
-                            </Table.Cell>
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table.Root>
-                  </Box>
+                            <CartesianGrid horizontal={false} />
+                            <XAxis
+                              type="number"
+                              tickFormatter={(value) =>
+                                formatNumber(Number(value))
+                              }
+                            />
+                            <YAxis
+                              type="category"
+                              dataKey={operationChart.key("label")}
+                              width={150}
+                            />
+                            <Tooltip
+                              cursor={false}
+                              content={<Chart.Tooltip />}
+                            />
+                            <Legend content={<Chart.Legend />} />
+                            <Bar
+                              dataKey={operationChart.key("requestCount")}
+                              fill={operationChart.color("brand.solid")}
+                              name="Requests"
+                              radius={[0, 4, 4, 0]}
+                            />
+                            <Bar
+                              dataKey={operationChart.key("cacheHitCount")}
+                              fill={operationChart.color("gray.solid")}
+                              name="Cache hits"
+                              radius={[0, 4, 4, 0]}
+                            />
+                            <Bar
+                              dataKey={operationChart.key("rateLimitedCount")}
+                              fill={operationChart.color("red.solid")}
+                              name="Rate limited"
+                              radius={[0, 4, 4, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </Chart.Root>
+                    </Tabs.Content>
+                    <Tabs.Content value="table" pt="4">
+                      <Box overflowX="auto">
+                        <Table.Root size="sm" minW="680px">
+                          <Table.Header>
+                            <Table.Row>
+                              <Table.ColumnHeader>Provider</Table.ColumnHeader>
+                              <Table.ColumnHeader>Operation</Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">
+                                Requests
+                              </Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">
+                                Cache hits
+                              </Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">
+                                Rate limited
+                              </Table.ColumnHeader>
+                              <Table.ColumnHeader textAlign="right">
+                                Avg. latency
+                              </Table.ColumnHeader>
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {report.operations.map((operation) => (
+                              <Table.Row
+                                key={`${operation.provider}-${operation.operation}`}
+                              >
+                                <Table.Cell>{operation.provider}</Table.Cell>
+                                <Table.Cell>{operation.operation}</Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  {formatNumber(operation.requestCount)}
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  {formatNumber(operation.cacheHitCount)}
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  {formatNumber(operation.rateLimitedCount)}
+                                </Table.Cell>
+                                <Table.Cell textAlign="right">
+                                  {formatNumber(operation.averageDurationMs)} ms
+                                </Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table.Root>
+                      </Box>
+                    </Tabs.Content>
+                  </SimpleTabs>
                 )}
               </Card.Body>
             </Card.Root>

@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -28,10 +29,13 @@ vi.mock("recharts", () => {
   );
 
   return {
+    Bar: ChartElement,
+    BarChart: ChartElement,
     CartesianGrid: ChartElement,
     Legend: ChartElement,
     Line: ChartElement,
     LineChart: ChartElement,
+    ResponsiveContainer: ChartElement,
     Tooltip: ChartElement,
     XAxis: ChartElement,
     YAxis: ChartElement,
@@ -89,7 +93,9 @@ vi.mock("@/features/provider-usage/api/use-provider-usage", () => ({
 }));
 
 describe("ProviderUsagePage", () => {
-  it("renders provider usage summaries and operation details", () => {
+  it("renders provider usage summaries and operation details", async () => {
+    const user = userEvent.setup();
+
     renderWithProviders(
       <MemoryRouter initialEntries={["/app/admin/provider-usage"]}>
         <ProviderUsagePage />
@@ -101,7 +107,13 @@ describe("ProviderUsagePage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("1,234")).toBeInTheDocument();
     expect(screen.getByText("27.0%")).toBeInTheDocument();
-    expect(screen.getByText("movie-details")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Chart" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     expect(screen.getByText(/TMDB 429 response/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("tab", { name: "Table" }));
+    expect(screen.getByText("movie-details")).toBeInTheDocument();
   });
 });
