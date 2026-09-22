@@ -109,6 +109,45 @@ describe('feedback routes', () => {
     expect(await prisma.notification.count({ where: { userId: owner.userId, type: 'FEEDBACK_STATUS_CHANGED' } })).toBe(2);
   });
 
+  it('returns status counts and treats new and acknowledged feedback as open', async () => {
+    const owner = await registerTestUser('feedback-inbox-owner');
+    const admin = await registerTestUser('feedback-inbox-admin');
+    await promote(admin.userId);
+
+    const newFeedback = await createFeedback(owner, { subject: 'New inbox item' });
+    const acknowledgedFeedback = await createFeedback(owner, { subject: 'Acknowledged inbox item' });
+    const completedFeedback = await createFeedback(owner, { subject: 'Completed inbox item' });
+    const notPlannedFeedback = await createFeedback(owner, { subject: 'Not planned inbox item' });
+
+    const update = async (id: string, status: string) =>
+      request(await getTestApp())
+        .patch(`/api/admin/feedback/${id}`)
+        .set('Authorization', authorization(admin))
+        .send({ status })
+        .expect(200);
+
+    await update(acknowledgedFeedback.body.data.id, 'ACKNOWLEDGED');
+    await update(completedFeedback.body.data.id, 'COMPLETED');
+    await update(notPlannedFeedback.body.data.id, 'NOT_PLANNED');
+
+    const response = await request(await getTestApp())
+      .get('/api/admin/feedback?status=OPEN&page=1&limit=20')
+      .set('Authorization', authorization(admin))
+      .expect(200);
+
+    expect(response.body.summary).toEqual({
+      newCount: 1,
+      openCount: 2,
+      acknowledgedCount: 1,
+      completedCount: 1,
+      notPlannedCount: 1,
+    });
+    expect(response.body.data.map((item: { id: string }) => item.id)).toEqual(
+      expect.arrayContaining([newFeedback.body.data.id, acknowledgedFeedback.body.data.id]),
+    );
+    expect(response.body.data).toHaveLength(2);
+  });
+
   it('keeps transition timestamps and status notifications idempotent across terminal changes', async () => {
     const owner = await registerTestUser('feedback-transition-owner');
     const admin = await registerTestUser('feedback-transition-admin');

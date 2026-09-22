@@ -23,7 +23,7 @@ export const updateFeedbackSchema = z
 export const adminFeedbackQuerySchema = z.object({
   query: z.string().trim().max(120).optional().default(''),
   category: z.nativeEnum(FeedbackCategory).optional(),
-  status: z.nativeEnum(FeedbackStatus).optional(),
+  status: z.union([z.nativeEnum(FeedbackStatus), z.literal('OPEN')]).optional(),
   sort: z.enum(['createdAt', 'updatedAt']).optional().default('createdAt'),
   order: z.enum(['asc', 'desc']).optional().default('desc'),
 });

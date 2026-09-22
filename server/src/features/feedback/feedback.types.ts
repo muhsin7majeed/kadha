@@ -13,12 +13,20 @@ export interface AdminFeedbackAttentionSummary {
   }>;
 }
 
+export interface AdminFeedbackStatusSummary {
+  newCount: number;
+  openCount: number;
+  acknowledgedCount: number;
+  completedCount: number;
+  notPlannedCount: number;
+}
+
 export interface AdminFeedbackListParams {
   page: number;
   limit: number;
   query: string;
   category?: FeedbackCategory;
-  status?: FeedbackStatus;
+  status?: FeedbackStatus | 'OPEN';
   sort: 'createdAt' | 'updatedAt';
   order: 'asc' | 'desc';
 }
