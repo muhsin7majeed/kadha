@@ -50,6 +50,17 @@ jobs:
       - name: Audit client production dependencies
         run: node scripts/audit-production.mjs client
 
+  hosted-compose:
+    name: Hosted Compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate hosted Compose contract
+        run: node scripts/validate-hosted-compose.mjs
+
   server:
     name: Server
     runs-on: ubuntu-latest

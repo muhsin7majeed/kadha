@@ -13,6 +13,10 @@
 - Make the full media card navigate to details while keeping its library actions independently interactive.
 - Scroll paginated result lists to their first item when users change pages, without overriding initial-load or browser-history restoration.
 
+### Engineering Changes
+
+- Separate the official hosted backend Compose configuration from the self-hosting configuration, with explicit deployment paths, persistent volume identities, and CI contract validation.
+
 ## v0.6.0
 
 ### Feature Changes
