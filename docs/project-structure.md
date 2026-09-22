@@ -95,6 +95,7 @@ packages/contracts/
 - Route-level screens should be lazy-loaded from `client/src/app/routes.tsx` when practical to keep production chunks small.
 - New client API hooks should prefer feature folders over generic component folders.
 - New client API hooks belong in `client/src/features/<feature-name>/api`, not `client/src/pages/**/apis`.
+- Shared admin framing and navigation belong in `client/src/features/admin/components`; admin route screens remain in `client/src/pages/admin`.
 - Feature-owned client types belong near the feature, using `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned client utilities and hooks belong near the feature, not in generic `client/src/utils` or `client/src/hooks`.
 - Home section preferences, the typed Home registry, and personal Home previews belong in `client/src/features/home`; reusable global catalog rows belong in `client/src/features/discovery`.

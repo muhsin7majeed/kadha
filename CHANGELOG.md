@@ -4,6 +4,7 @@
 
 ### Feature Changes
 
+- Added a responsive administrator navigation shell for Overview, Feedback, Users, and Provider Usage while preserving existing admin routes and screens.
 - Added an administrator Provider Usage dashboard with generic provider metrics, TMDB request and cache tracking, rate-limit visibility, latency summaries, and accessible request charts.
 
 ### Behavior Fixes
