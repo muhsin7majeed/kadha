@@ -10,6 +10,7 @@ import type {
 const BUCKET_MINUTES = 5;
 const RETENTION_DAYS = 90;
 const FLUSH_INTERVAL_MS = 30_000;
+const RETENTION_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 interface PendingUsage {
   provider: string;
@@ -109,13 +110,22 @@ const mergeUsage = (target: PendingUsage, source: PendingUsage) => {
   target.totalDurationMs += source.totalDurationMs;
 };
 
-export const flushProviderUsageMetrics = async (now = new Date()) => {
+export const pruneProviderUsageMetrics = async (now = new Date()) => {
+  const retentionDate = new Date(now);
+  retentionDate.setUTCDate(retentionDate.getUTCDate() - RETENTION_DAYS);
+
+  try {
+    await prisma.providerUsageBucket.deleteMany({ where: { bucketStart: { lt: retentionDate } } });
+  } catch (error) {
+    console.error('Failed to prune provider usage metrics', error);
+  }
+};
+
+export const flushProviderUsageMetrics = async () => {
   if (pendingUsage.size === 0) return;
 
   const entries = [...pendingUsage.values()];
   pendingUsage.clear();
-  const retentionDate = new Date(now);
-  retentionDate.setUTCDate(retentionDate.getUTCDate() - RETENTION_DAYS);
 
   try {
     await prisma.$transaction([
@@ -139,7 +149,6 @@ export const flushProviderUsageMetrics = async (now = new Date()) => {
           },
         }),
       ),
-      prisma.providerUsageBucket.deleteMany({ where: { bucketStart: { lt: retentionDate } } }),
     ]);
   } catch (error) {
     entries.forEach((entry) => {
@@ -163,6 +172,12 @@ export const startProviderUsageMetrics = () => {
     void flushProviderUsageMetrics();
   }, FLUSH_INTERVAL_MS);
   flushTimer.unref();
+
+  void pruneProviderUsageMetrics();
+  const retentionTimer = setInterval(() => {
+    void pruneProviderUsageMetrics();
+  }, RETENTION_INTERVAL_MS);
+  retentionTimer.unref();
 };
 
 const emptySummary = (): ProviderUsageSummary => ({
@@ -201,11 +216,13 @@ export const getProviderUsageReport = async ({
   from,
   to,
   provider,
+  operation,
 }: ProviderUsageQuery): Promise<ProviderUsageReport> => {
   const buckets = await prisma.providerUsageBucket.findMany({
     where: {
       bucketStart: { gte: from, lt: to },
       ...(provider ? { provider } : {}),
+      ...(operation ? { operation } : {}),
     },
     orderBy: [{ bucketStart: 'asc' }, { provider: 'asc' }, { operation: 'asc' }],
   });

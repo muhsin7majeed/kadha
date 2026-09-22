@@ -6,6 +6,7 @@ import { requestWithProviderMetrics } from '@/features/provider-usage/provider-u
 import {
   flushProviderUsageMetrics,
   getProviderUsageReport,
+  pruneProviderUsageMetrics,
   recordProviderCacheHit,
   recordProviderRequest,
   resetProviderUsageBufferForTests,
@@ -19,7 +20,7 @@ describe('provider usage metrics', () => {
     recordProviderRequest({ provider: 'tmdb', operation: 'movie-details', status: 429, durationMs: 12, now });
     recordProviderCacheHit({ provider: 'tmdb', operation: 'movie-details', now });
 
-    await flushProviderUsageMetrics(now);
+    await flushProviderUsageMetrics();
 
     const bucket = await prisma.providerUsageBucket.findUnique({
       where: {
@@ -58,6 +59,53 @@ describe('provider usage metrics', () => {
     });
 
     expect(bucket).toMatchObject({ requestCount: 1, errorCount: 1, rateLimitedCount: 1 });
+  });
+
+  it('prunes buckets older than the retention window even without pending metrics', async () => {
+    const now = new Date('2026-12-21T12:00:00.000Z');
+    const retentionBoundary = new Date('2026-09-22T12:00:00.000Z');
+
+    await prisma.providerUsageBucket.createMany({
+      data: [
+        {
+          provider: 'tmdb',
+          operation: 'old',
+          bucketStart: new Date('2026-09-22T11:55:00.000Z'),
+          requestCount: 1,
+        },
+        {
+          provider: 'tmdb',
+          operation: 'boundary',
+          bucketStart: retentionBoundary,
+          requestCount: 1,
+        },
+      ],
+    });
+
+    await pruneProviderUsageMetrics(now);
+
+    await expect(
+      prisma.providerUsageBucket.findUnique({
+        where: {
+          provider_operation_bucketStart: {
+            provider: 'tmdb',
+            operation: 'old',
+            bucketStart: new Date('2026-09-22T11:55:00.000Z'),
+          },
+        },
+      }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.providerUsageBucket.findUnique({
+        where: {
+          provider_operation_bucketStart: {
+            provider: 'tmdb',
+            operation: 'boundary',
+            bucketStart: retentionBoundary,
+          },
+        },
+      }),
+    ).resolves.toBeTruthy();
   });
 
   it('returns an aggregated report by time bucket and operation', async () => {

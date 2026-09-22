@@ -109,23 +109,40 @@ describe('admin routes', () => {
     const admin = await registerTestUser('provider-usage-admin');
 
     await promoteTestUserToAdmin(admin);
-    await prisma.providerUsageBucket.create({
-      data: {
-        provider: 'tmdb',
-        operation: 'movie-details',
-        bucketStart: new Date('2026-09-22T12:00:00.000Z'),
-        requestCount: 3,
-        successCount: 2,
-        errorCount: 1,
-        rateLimitedCount: 1,
-        cacheHitCount: 4,
-        totalDurationMs: 150,
-      },
+    await prisma.providerUsageBucket.createMany({
+      data: [
+        {
+          provider: 'tmdb',
+          operation: 'movie-details',
+          bucketStart: new Date('2026-09-22T12:00:00.000Z'),
+          requestCount: 3,
+          successCount: 2,
+          errorCount: 1,
+          rateLimitedCount: 1,
+          cacheHitCount: 4,
+          totalDurationMs: 150,
+        },
+        {
+          provider: 'tmdb',
+          operation: 'movie-search',
+          bucketStart: new Date('2026-09-22T12:00:00.000Z'),
+          requestCount: 5,
+          successCount: 5,
+          errorCount: 0,
+          rateLimitedCount: 0,
+          cacheHitCount: 0,
+          totalDurationMs: 200,
+        },
+      ],
     });
 
     const response = await request(await getTestApp())
       .get('/api/admin/provider-usage')
-      .query({ from: '2026-09-22T11:00:00.000Z', to: '2026-09-22T13:00:00.000Z' })
+      .query({
+        from: '2026-09-22T11:00:00.000Z',
+        to: '2026-09-22T13:00:00.000Z',
+        operation: 'movie-details',
+      })
       .set('Authorization', authorization(admin))
       .expect(200);
 

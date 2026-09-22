@@ -2,6 +2,7 @@ export interface ProviderUsageQuery {
   from: Date;
   to: Date;
   provider?: string;
+  operation?: string;
 }
 
 export interface ProviderUsageSummary {
