@@ -11,7 +11,7 @@ import UserLink from '@/components/user-link';
 import useMarkNotificationRead from '@/features/notifications/api/use-mark-notification-read';
 import useMarkAllNotificationsRead from '@/features/notifications/api/use-mark-all-notifications-read';
 import PaginationControls from '@/components/pagination-controls';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import useRespondToCollectionInvite from '@/features/collections/api/use-respond-to-collection-invite';
 import {
@@ -51,6 +51,7 @@ const getNotificationMessage = (notification: Notification) => {
 
 const Notifications = () => {
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const { data, isLoading, isError, isFetching, refetch } = useNotifications(page);
   const markNotificationRead = useMarkNotificationRead();
@@ -134,7 +135,7 @@ const Notifications = () => {
       ) : notifications.length === 0 ? (
         <EmptyState title="No notifications" description="No notifications found" />
       ) : (
-        <Stack gap="2">
+        <Stack ref={resultsRef} gap="2">
           {notifications.map((notification) => (
             <Box as="article" key={notification.id}>
               <Flex
@@ -231,7 +232,12 @@ const Notifications = () => {
             </Box>
           ))}
 
-          <PaginationControls pagination={data?.pagination} onPageChange={setPage} isDisabled={isFetching} />
+          <PaginationControls
+            pagination={data?.pagination}
+            onPageChange={setPage}
+            isDisabled={isFetching}
+            scrollTargetRef={resultsRef}
+          />
         </Stack>
       )}
 

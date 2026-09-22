@@ -1,4 +1,5 @@
 import { Box, SimpleGrid, Text } from '@chakra-ui/react';
+import { useRef } from 'react';
 import { LuSearch } from 'react-icons/lu';
 
 import EmptyState from '@/components/info-states/empty-state';
@@ -22,6 +23,7 @@ interface MediaSearchResultsProps {
 const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChange }: MediaSearchResultsProps) => {
   const mediaType = activeTab === 'tv' ? 'tv' : 'movie';
   const enabled = open && (activeTab === 'movie' || activeTab === 'tv') && query.length >= 2;
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { data, isLoading, isFetching, error, refetch } = useSearchMedia(mediaType, query, page, enabled);
 
   if (!enabled) {
@@ -47,7 +49,7 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
   }
 
   return (
-    <Box>
+    <Box ref={resultsRef}>
       <Text color="fg.muted" textStyle="supporting" mb={4}>
         {data.pagination.total} results
       </Text>
@@ -73,7 +75,12 @@ const MediaSearchResults = ({ activeTab, query, page, open, onClose, onPageChang
         ))}
       </SimpleGrid>
 
-      <PaginationControls pagination={data.pagination} isDisabled={isFetching} onPageChange={onPageChange} />
+      <PaginationControls
+        pagination={data.pagination}
+        isDisabled={isFetching}
+        onPageChange={onPageChange}
+        scrollTargetRef={resultsRef}
+      />
     </Box>
   );
 };

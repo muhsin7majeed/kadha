@@ -1,5 +1,5 @@
 import { Badge, Box, Button, Card, Field, Input, NativeSelect, Stack, Text, Textarea } from '@chakra-ui/react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
 import EmptyState from '@/components/info-states/empty-state';
@@ -22,6 +22,7 @@ const FeedbackPage = () => {
   const [category, setCategory] = useState<FeedbackCategory>('GENERAL');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const resultsRef = useRef<HTMLDivElement>(null);
   const createFeedback = useCreateFeedback();
   const feedback = useFeedback(page);
   const items = feedback.data?.data ?? [];
@@ -85,7 +86,7 @@ const FeedbackPage = () => {
           ) : items.length === 0 ? (
             <EmptyState title="No feedback yet" description="Your submissions and their responses will appear here." />
           ) : (
-            <Stack gap="3">
+            <Stack ref={resultsRef} gap="3">
               {items.map((item) => (
                 <Card.Root key={item.id} variant="outline">
                   <Card.Body>
@@ -102,7 +103,12 @@ const FeedbackPage = () => {
                   </Card.Body>
                 </Card.Root>
               ))}
-              <PaginationControls pagination={feedback.data?.pagination} onPageChange={setPage} isDisabled={feedback.isFetching} />
+              <PaginationControls
+                pagination={feedback.data?.pagination}
+                onPageChange={setPage}
+                isDisabled={feedback.isFetching}
+                scrollTargetRef={resultsRef}
+              />
             </Stack>
           )}
         </Box>

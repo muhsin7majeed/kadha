@@ -1,5 +1,5 @@
 import { Box, Button, Card, HStack, NativeSelect, Stack, Table, Text } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { LuEye, LuUsers } from 'react-icons/lu';
 import { Link } from 'react-router';
 
@@ -29,6 +29,7 @@ const AdminUsers = () => {
   const [role, setRole] = useState<AdminRoleFilter>('ALL');
   const [sort, setSort] = useState<AdminUserSort>('createdAt');
   const [order, setOrder] = useState<AdminSortOrder>('desc');
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, isError, isFetching, refetch } = useAdminUsers({
     page,
@@ -117,7 +118,7 @@ const AdminUsers = () => {
           <EmptyState title="No users found" description="Try a different search or role filter." icon={<LuUsers />} />
         ) : (
           <>
-            <Card.Root>
+            <Card.Root ref={resultsRef}>
               <Box overflowX="auto">
                 <Table.Root size="sm" minW="1100px">
                   <Table.Header>
@@ -173,7 +174,12 @@ const AdminUsers = () => {
               <Text color="fg.muted" textStyle="supporting">
                 {data?.pagination.total ?? 0} total users
               </Text>
-              <PaginationControls pagination={data?.pagination} onPageChange={setPage} isDisabled={isFetching} />
+              <PaginationControls
+                pagination={data?.pagination}
+                onPageChange={setPage}
+                isDisabled={isFetching}
+                scrollTargetRef={resultsRef}
+              />
             </HStack>
           </>
         )}

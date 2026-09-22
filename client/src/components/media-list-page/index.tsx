@@ -1,4 +1,5 @@
 import { Box, Center, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
+import { useRef } from 'react';
 import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
@@ -19,6 +20,7 @@ interface MediaListPageProps {
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
+  isPlaceholderData?: boolean;
   error: Error | null;
   refetch: () => void;
   emptyState: {
@@ -46,6 +48,7 @@ const MediaListPage = ({
   data,
   isLoading,
   isFetching,
+  isPlaceholderData = false,
   error,
   refetch,
   emptyState,
@@ -59,6 +62,9 @@ const MediaListPage = ({
   showPersonalRating,
   onPageChange,
 }: MediaListPageProps) => {
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const isRefreshingPlaceholder = isFetching && isPlaceholderData;
+
   return (
     <Box>
       <PageHeader action={headerAction} isFetching={isFetching} subHeader={description}>
@@ -84,32 +90,57 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          {results ?? (
-            <SimpleGrid
-              gridTemplateColumns={{
-                base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
-                sm: 'repeat(2, minmax(0, 1fr))',
-                md: 'repeat(3, minmax(0, 1fr))',
-                lg: 'repeat(4, minmax(0, 1fr))',
-              }}
-              gap={{ base: 2, sm: 4, md: 6 }}
-              justifyItems="center"
-            >
-              {data?.map((media) => (
-                <MediaCard
-                  key={`${media.media_type}:${media.media_id}`}
-                  detailsPathPrefix={detailsPathPrefix}
-                  media={toMediaCardModel(media)}
-                  showActions={showActions}
-                  showLibraryMetadata={showLibraryMetadata}
-                  showPersonalRating={showPersonalRating}
-                  width="100%"
-                />
-              ))}
-            </SimpleGrid>
-          )}
+          <Box ref={resultsRef} position="relative" aria-busy={isRefreshingPlaceholder}>
+            {isRefreshingPlaceholder && (
+              <Center
+                role="status"
+                position="absolute"
+                inset="0"
+                zIndex="1"
+                bg="bg"
+              >
+                <VStack gap="3">
+                  <Spinner size="lg" color={spinnerColor} />
+                  <Text color="fg.muted" textStyle="supporting">
+                    Loading page…
+                  </Text>
+                </VStack>
+              </Center>
+            )}
+            <Box opacity={isRefreshingPlaceholder ? 0.35 : 1} transition="opacity 0.2s">
+              {results ?? (
+                <SimpleGrid
+                  gridTemplateColumns={{
+                    base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
+                    sm: 'repeat(2, minmax(0, 1fr))',
+                    md: 'repeat(3, minmax(0, 1fr))',
+                    lg: 'repeat(4, minmax(0, 1fr))',
+                  }}
+                  gap={{ base: 2, sm: 4, md: 6 }}
+                  justifyItems="center"
+                >
+                  {data?.map((media) => (
+                    <MediaCard
+                      key={`${media.media_type}:${media.media_id}`}
+                      detailsPathPrefix={detailsPathPrefix}
+                      media={toMediaCardModel(media)}
+                      showActions={showActions}
+                      showLibraryMetadata={showLibraryMetadata}
+                      showPersonalRating={showPersonalRating}
+                      width="100%"
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+            </Box>
+          </Box>
           {onPageChange && (
-            <PaginationControls pagination={pagination} isDisabled={isFetching} onPageChange={onPageChange} />
+            <PaginationControls
+              pagination={pagination}
+              isDisabled={isFetching}
+              onPageChange={onPageChange}
+              scrollTargetRef={resultsRef}
+            />
           )}
         </>
       )}

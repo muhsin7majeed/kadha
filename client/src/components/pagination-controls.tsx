@@ -1,4 +1,5 @@
 import { HStack, IconButton, Text } from "@chakra-ui/react";
+import type { RefObject } from "react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 import { PaginationMeta } from "@/types/common";
@@ -7,18 +8,31 @@ interface PaginationControlsProps {
   pagination?: PaginationMeta;
   onPageChange: (page: number) => void;
   isDisabled?: boolean;
+  scrollTargetRef?: RefObject<HTMLElement | null>;
 }
 
 const PaginationControls = ({
   pagination,
   onPageChange,
   isDisabled,
+  scrollTargetRef,
 }: PaginationControlsProps) => {
   if (!pagination || pagination.totalPages <= 1) {
     return null;
   }
 
   const { page, totalPages, hasPreviousPage, hasNextPage } = pagination;
+  const handlePageChange = (nextPage: number) => {
+    const target = scrollTargetRef?.current;
+    if (target) {
+      const navigationHeight = document.querySelector<HTMLElement>('nav')?.getBoundingClientRect().height ?? 0;
+      const top = target.getBoundingClientRect().top + window.scrollY - navigationHeight - 8;
+
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+
+    onPageChange(nextPage);
+  };
 
   return (
     <HStack justifyContent="center" gap="3" pt="6">
@@ -28,7 +42,7 @@ const PaginationControls = ({
         variant="outline"
         size="sm"
         disabled={!hasPreviousPage || isDisabled}
-        onClick={() => onPageChange(page - 1)}
+        onClick={() => handlePageChange(page - 1)}
       >
         <LuChevronLeft />
       </IconButton>
@@ -46,7 +60,7 @@ const PaginationControls = ({
         variant="outline"
         size="sm"
         disabled={!hasNextPage || isDisabled}
-        onClick={() => onPageChange(page + 1)}
+        onClick={() => handlePageChange(page + 1)}
       >
         <LuChevronRight />
       </IconButton>

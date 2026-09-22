@@ -9,7 +9,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LuListChecks } from "react-icons/lu";
 
 import EmptyState from "@/components/info-states/empty-state";
@@ -23,6 +23,7 @@ import type { InProgressTvSort } from "@/features/user-media/user-media.types";
 const InProgress = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<InProgressTvSort>("recent");
+  const resultsRef = useRef<HTMLDivElement>(null);
   const {
     data: inProgressTv,
     isLoading,
@@ -85,6 +86,7 @@ const InProgress = () => {
       ) : (
         <>
           <SimpleGrid
+            ref={resultsRef}
             columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
             gap={6}
             justifyItems="center"
@@ -100,6 +102,7 @@ const InProgress = () => {
             pagination={inProgressTv?.pagination}
             isDisabled={isFetching}
             onPageChange={setPage}
+            scrollTargetRef={resultsRef}
           />
         </>
       )}
