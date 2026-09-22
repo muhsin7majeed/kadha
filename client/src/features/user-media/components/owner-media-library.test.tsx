@@ -335,6 +335,27 @@ describe("owner media library", () => {
     expect(screen.getByRole("img", { name: "Arrival poster" })).toBeInTheDocument();
   });
 
+  it("keeps cached results visible during a background refresh", () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <OwnerMediaLibrary
+          {...baseProps}
+          isFetching
+          response={{
+            ...response,
+            data: [media],
+            pagination: { ...response.pagination, total: 100, totalPages: 5 },
+            facets: { ...response.facets, total: 100 },
+          }}
+          updateQuery={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("img", { name: "Arrival poster" })).toBeInTheDocument();
+    expect(screen.queryByText("Loading page…")).not.toBeInTheDocument();
+  });
+
   it("repairs an out-of-range restored page without showing a false empty state", async () => {
     const updateQuery = vi.fn();
     renderWithProviders(

@@ -20,6 +20,7 @@ interface MediaListPageProps {
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
+  isPlaceholderData?: boolean;
   error: Error | null;
   refetch: () => void;
   emptyState: {
@@ -47,6 +48,7 @@ const MediaListPage = ({
   data,
   isLoading,
   isFetching,
+  isPlaceholderData = false,
   error,
   refetch,
   emptyState,
@@ -61,6 +63,7 @@ const MediaListPage = ({
   onPageChange,
 }: MediaListPageProps) => {
   const resultsRef = useRef<HTMLDivElement>(null);
+  const isRefreshingPlaceholder = isFetching && isPlaceholderData;
 
   return (
     <Box>
@@ -87,8 +90,8 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <Box ref={resultsRef} position="relative" aria-busy={isFetching}>
-            {isFetching && (
+          <Box ref={resultsRef} position="relative" aria-busy={isRefreshingPlaceholder}>
+            {isRefreshingPlaceholder && (
               <Center
                 role="status"
                 position="absolute"
@@ -104,7 +107,7 @@ const MediaListPage = ({
                 </VStack>
               </Center>
             )}
-            <Box opacity={isFetching ? 0.35 : 1} transition="opacity 0.2s">
+            <Box opacity={isRefreshingPlaceholder ? 0.35 : 1} transition="opacity 0.2s">
               {results ?? (
                 <SimpleGrid
                   gridTemplateColumns={{
