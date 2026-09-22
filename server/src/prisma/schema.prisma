@@ -614,3 +614,22 @@ model CollectionInvite {
   @@index([collectionId, status])
   @@map("collection_invites")
 }
+
+model ProviderUsageBucket {
+  id               String   @id @default(uuid())
+  provider         String
+  operation        String
+  bucketStart      DateTime
+  requestCount     Int      @default(0)
+  successCount     Int      @default(0)
+  errorCount       Int      @default(0)
+  rateLimitedCount Int      @default(0)
+  cacheHitCount    Int      @default(0)
+  totalDurationMs  Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([provider, operation, bucketStart])
+  @@index([provider, bucketStart])
+  @@map("provider_usage_buckets")
+}

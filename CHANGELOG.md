@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Feature Changes
+
+- Added an administrator Provider Usage dashboard with generic provider metrics, TMDB request and cache tracking, rate-limit visibility, latency summaries, and accessible request charts.
+
 ### Behavior Fixes
 
 - Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.

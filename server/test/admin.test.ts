@@ -10,7 +10,9 @@ import { updateUserMediaFlag } from './helpers/user-media';
 
 describe('admin routes', () => {
   it('rejects unauthenticated admin requests', async () => {
-    const response = await request(await getTestApp()).get('/api/admin/overview').expect(401);
+    const response = await request(await getTestApp())
+      .get('/api/admin/overview')
+      .expect(401);
 
     expect(response.body).toEqual({
       code: 'UNAUTHORIZED',
@@ -101,6 +103,57 @@ describe('admin routes', () => {
       appName: 'Kadha',
       appVersion: expect.any(String),
     });
+  });
+
+  it('allows admins to read provider usage metrics', async () => {
+    const admin = await registerTestUser('provider-usage-admin');
+
+    await promoteTestUserToAdmin(admin);
+    await prisma.providerUsageBucket.create({
+      data: {
+        provider: 'tmdb',
+        operation: 'movie-details',
+        bucketStart: new Date('2026-09-22T12:00:00.000Z'),
+        requestCount: 3,
+        successCount: 2,
+        errorCount: 1,
+        rateLimitedCount: 1,
+        cacheHitCount: 4,
+        totalDurationMs: 150,
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/admin/provider-usage')
+      .query({ from: '2026-09-22T11:00:00.000Z', to: '2026-09-22T13:00:00.000Z' })
+      .set('Authorization', authorization(admin))
+      .expect(200);
+
+    expect(response.body.data.summary).toMatchObject({
+      requestCount: 3,
+      successCount: 2,
+      errorCount: 1,
+      rateLimitedCount: 1,
+      cacheHitCount: 4,
+      averageDurationMs: 50,
+    });
+    expect(response.body.data.operations).toEqual([
+      expect.objectContaining({ provider: 'tmdb', operation: 'movie-details', requestCount: 3 }),
+    ]);
+  });
+
+  it('rejects provider usage ranges longer than 90 days', async () => {
+    const admin = await registerTestUser('provider-usage-range-admin');
+
+    await promoteTestUserToAdmin(admin);
+
+    const response = await request(await getTestApp())
+      .get('/api/admin/provider-usage')
+      .query({ from: '2026-01-01T00:00:00.000Z', to: '2026-04-02T00:00:00.000Z' })
+      .set('Authorization', authorization(admin))
+      .expect(400);
+
+    expect(response.body).toMatchObject({ code: 'BAD_REQUEST' });
   });
 
   it('allows admin users to list and inspect users', async () => {

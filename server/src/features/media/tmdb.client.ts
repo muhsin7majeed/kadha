@@ -1,3 +1,7 @@
+import type { AxiosResponse } from 'axios';
+
+import { recordProviderCacheHit } from '@/features/provider-usage/provider-usage.service';
+import { requestWithProviderMetrics } from '@/features/provider-usage/provider-usage.client';
 import api from '@/lib/axiosInstance';
 
 import {
@@ -34,17 +38,22 @@ interface CacheEntry<T> {
 const responseCache = new Map<string, CacheEntry<unknown>>();
 const inFlightRequests = new Map<string, Promise<unknown>>();
 
-const getCached = async <T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> => {
+const requestWithMetrics = <T>(operation: string, request: () => Promise<AxiosResponse<T>>) =>
+  requestWithProviderMetrics('tmdb', operation, request);
+
+const getCached = async <T>(key: string, ttlMs: number, operation: string, fetcher: () => Promise<T>): Promise<T> => {
   const now = Date.now();
   const cached = responseCache.get(key);
 
   if (cached && cached.expiresAt > now) {
+    recordProviderCacheHit({ provider: 'tmdb', operation });
     return cached.data as T;
   }
 
   const inFlight = inFlightRequests.get(key);
 
   if (inFlight) {
+    recordProviderCacheHit({ provider: 'tmdb', operation });
     return inFlight as Promise<T>;
   }
 
@@ -67,128 +76,154 @@ const getCached = async <T>(key: string, ttlMs: number, fetcher: () => Promise<T
 };
 
 export async function fetchTrendingMovies() {
-  return getCached('trending:movie:day', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/trending/movie/day');
+  return getCached('trending:movie:day', CACHE_TTL.lists, 'trending-movies', async () => {
+    const response = await requestWithMetrics('trending-movies', () =>
+      api.get<MovieDBMovieResponse>('/trending/movie/day'),
+    );
     return response.data;
   });
 }
 
 export async function fetchTrendingTvs() {
-  return getCached('trending:tv:day', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBTvResponse>('/trending/tv/day');
+  return getCached('trending:tv:day', CACHE_TTL.lists, 'trending-tv', async () => {
+    const response = await requestWithMetrics('trending-tv', () => api.get<MovieDBTvResponse>('/trending/tv/day'));
     return response.data;
   });
 }
 
 export async function fetchPopularMovies() {
-  return getCached('popular:movie', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/movie/popular');
+  return getCached('popular:movie', CACHE_TTL.lists, 'popular-movies', async () => {
+    const response = await requestWithMetrics('popular-movies', () => api.get<MovieDBMovieResponse>('/movie/popular'));
     return response.data;
   });
 }
 
 export async function fetchPopularTvs() {
-  return getCached('popular:tv', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBTvResponse>('/tv/popular');
+  return getCached('popular:tv', CACHE_TTL.lists, 'popular-tv', async () => {
+    const response = await requestWithMetrics('popular-tv', () => api.get<MovieDBTvResponse>('/tv/popular'));
     return response.data;
   });
 }
 
 export async function fetchNowPlayingMovies() {
-  return getCached('now-playing:movie', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/movie/now_playing');
+  return getCached('now-playing:movie', CACHE_TTL.lists, 'now-playing-movies', async () => {
+    const response = await requestWithMetrics('now-playing-movies', () =>
+      api.get<MovieDBMovieResponse>('/movie/now_playing'),
+    );
     return response.data;
   });
 }
 
 export async function fetchUpcomingMovies() {
-  return getCached('upcoming:movie', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/movie/upcoming');
+  return getCached('upcoming:movie', CACHE_TTL.lists, 'upcoming-movies', async () => {
+    const response = await requestWithMetrics('upcoming-movies', () =>
+      api.get<MovieDBMovieResponse>('/movie/upcoming'),
+    );
     return response.data;
   });
 }
 
 export async function fetchOnTheAirTvs() {
-  return getCached('on-the-air:tv', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBTvResponse>('/tv/on_the_air');
+  return getCached('on-the-air:tv', CACHE_TTL.lists, 'on-the-air-tv', async () => {
+    const response = await requestWithMetrics('on-the-air-tv', () => api.get<MovieDBTvResponse>('/tv/on_the_air'));
     return response.data;
   });
 }
 
 export async function fetchTopRatedMovies() {
-  return getCached('top-rated:movie', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/movie/top_rated');
+  return getCached('top-rated:movie', CACHE_TTL.lists, 'top-rated-movies', async () => {
+    const response = await requestWithMetrics('top-rated-movies', () =>
+      api.get<MovieDBMovieResponse>('/movie/top_rated'),
+    );
     return response.data;
   });
 }
 
 export async function fetchTopRatedTvs() {
-  return getCached('top-rated:tv', CACHE_TTL.lists, async () => {
-    const response = await api.get<MovieDBTvResponse>('/tv/top_rated');
+  return getCached('top-rated:tv', CACHE_TTL.lists, 'top-rated-tv', async () => {
+    const response = await requestWithMetrics('top-rated-tv', () => api.get<MovieDBTvResponse>('/tv/top_rated'));
     return response.data;
   });
 }
 
 export async function fetchMediaDetails(mediaType: 'movie' | 'tv', id: number) {
-  return getCached(`details:${mediaType}:${id}`, CACHE_TTL.details, async () => {
-    const response = await api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`);
+  return getCached(`details:${mediaType}:${id}`, CACHE_TTL.details, `${mediaType}-details`, async () => {
+    const response = await requestWithMetrics(`${mediaType}-details`, () =>
+      api.get<TMDBMovieDetails | TMDBTvDetails>(`/${mediaType}/${id}`),
+    );
     return response.data;
   });
 }
 
-export function fetchMediaRecommendations(
-  mediaType: 'movie',
-  id: number,
-  page: number,
-): Promise<MovieDBMovieResponse>;
+export function fetchMediaRecommendations(mediaType: 'movie', id: number, page: number): Promise<MovieDBMovieResponse>;
 export function fetchMediaRecommendations(mediaType: 'tv', id: number, page: number): Promise<MovieDBTvResponse>;
 export function fetchMediaRecommendations(mediaType: 'movie' | 'tv', id: number, page: number) {
-  return getCached(`recommendations:${mediaType}:${id}:${page}`, CACHE_TTL.recommendations, async () => {
-    const response = await api.get<MovieDBMovieResponse | MovieDBTvResponse>(`/${mediaType}/${id}/recommendations`, {
-      params: { page },
-    });
-    return response.data;
-  });
+  return getCached(
+    `recommendations:${mediaType}:${id}:${page}`,
+    CACHE_TTL.recommendations,
+    `${mediaType}-recommendations`,
+    async () => {
+      const response = await requestWithMetrics(`${mediaType}-recommendations`, () =>
+        api.get<MovieDBMovieResponse | MovieDBTvResponse>(`/${mediaType}/${id}/recommendations`, {
+          params: { page },
+        }),
+      );
+      return response.data;
+    },
+  );
 }
 
 export async function fetchMovieCredits(movieId: number) {
-  return getCached(`credits:movie:${movieId}`, CACHE_TTL.credits, async () => {
-    const response = await api.get<TMDBMovieCredits>(`/movie/${movieId}/credits`);
+  return getCached(`credits:movie:${movieId}`, CACHE_TTL.credits, 'movie-credits', async () => {
+    const response = await requestWithMetrics('movie-credits', () =>
+      api.get<TMDBMovieCredits>(`/movie/${movieId}/credits`),
+    );
     return response.data;
   });
 }
 
 export async function fetchTvAggregateCredits(tvId: number) {
-  return getCached(`credits:tv:${tvId}`, CACHE_TTL.credits, async () => {
-    const response = await api.get<TMDBTvAggregateCredits>(`/tv/${tvId}/aggregate_credits`);
+  return getCached(`credits:tv:${tvId}`, CACHE_TTL.credits, 'tv-credits', async () => {
+    const response = await requestWithMetrics('tv-credits', () =>
+      api.get<TMDBTvAggregateCredits>(`/tv/${tvId}/aggregate_credits`),
+    );
     return response.data;
   });
 }
 
 export async function fetchWatchProviders(mediaType: 'movie' | 'tv', id: number) {
-  return getCached(`watch-providers:${mediaType}:${id}`, CACHE_TTL.watchProviders, async () => {
-    const response = await api.get<TMDBWatchProvidersResponse>(`/${mediaType}/${id}/watch/providers`);
-    return response.data;
-  });
+  return getCached(
+    `watch-providers:${mediaType}:${id}`,
+    CACHE_TTL.watchProviders,
+    `${mediaType}-watch-providers`,
+    async () => {
+      const response = await requestWithMetrics(`${mediaType}-watch-providers`, () =>
+        api.get<TMDBWatchProvidersResponse>(`/${mediaType}/${id}/watch/providers`),
+      );
+      return response.data;
+    },
+  );
 }
 
 export async function fetchTvSeasonDetails(tvId: number, seasonNumber: number) {
-  return getCached(`tv-season:${tvId}:${seasonNumber}`, CACHE_TTL.seasonDetails, async () => {
-    const response = await api.get<TMDBTvSeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`);
+  return getCached(`tv-season:${tvId}:${seasonNumber}`, CACHE_TTL.seasonDetails, 'tv-season-details', async () => {
+    const response = await requestWithMetrics('tv-season-details', () =>
+      api.get<TMDBTvSeasonDetails>(`/tv/${tvId}/season/${seasonNumber}`),
+    );
     return response.data;
   });
 }
 
 export async function fetchMovieGenres() {
-  return getCached('genres:movie', CACHE_TTL.genres, async () => {
-    const response = await api.get<MovieDBGenreResponse>('/genre/movie/list');
+  return getCached('genres:movie', CACHE_TTL.genres, 'movie-genres', async () => {
+    const response = await requestWithMetrics('movie-genres', () => api.get<MovieDBGenreResponse>('/genre/movie/list'));
     return response.data;
   });
 }
 
 export async function fetchTvGenres() {
-  return getCached('genres:tv', CACHE_TTL.genres, async () => {
-    const response = await api.get<MovieDBGenreResponse>('/genre/tv/list');
+  return getCached('genres:tv', CACHE_TTL.genres, 'tv-genres', async () => {
+    const response = await requestWithMetrics('tv-genres', () => api.get<MovieDBGenreResponse>('/genre/tv/list'));
     return response.data;
   });
 }
@@ -196,30 +231,39 @@ export async function fetchTvGenres() {
 export async function searchMoviesByQuery(query: string, page: number) {
   const normalizedQuery = query.trim();
 
-  return getCached(`search:movie:${normalizedQuery.toLowerCase()}:${page}`, CACHE_TTL.search, async () => {
-    const response = await api.get<MovieDBMovieResponse>('/search/movie', {
-      params: {
-        query: normalizedQuery,
-        page,
-        include_adult: true,
-      },
-    });
+  return getCached(
+    `search:movie:${normalizedQuery.toLowerCase()}:${page}`,
+    CACHE_TTL.search,
+    'movie-search',
+    async () => {
+      const response = await requestWithMetrics('movie-search', () =>
+        api.get<MovieDBMovieResponse>('/search/movie', {
+          params: {
+            query: normalizedQuery,
+            page,
+            include_adult: true,
+          },
+        }),
+      );
 
-    return response.data;
-  });
+      return response.data;
+    },
+  );
 }
 
 export async function searchTvsByQuery(query: string, page: number) {
   const normalizedQuery = query.trim();
 
-  return getCached(`search:tv:${normalizedQuery.toLowerCase()}:${page}`, CACHE_TTL.search, async () => {
-    const response = await api.get<MovieDBTvResponse>('/search/tv', {
-      params: {
-        query: normalizedQuery,
-        page,
-        include_adult: true,
-      },
-    });
+  return getCached(`search:tv:${normalizedQuery.toLowerCase()}:${page}`, CACHE_TTL.search, 'tv-search', async () => {
+    const response = await requestWithMetrics('tv-search', () =>
+      api.get<MovieDBTvResponse>('/search/tv', {
+        params: {
+          query: normalizedQuery,
+          page,
+          include_adult: true,
+        },
+      }),
+    );
 
     return response.data;
   });

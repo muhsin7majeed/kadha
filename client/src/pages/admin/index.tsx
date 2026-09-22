@@ -1,11 +1,12 @@
 import { Badge, Box, Button, Card, HStack, SimpleGrid, Stack, Text } from '@chakra-ui/react';
-import { LuMessageSquare, LuUsers } from 'react-icons/lu';
+import { LuActivity, LuMessageSquare, LuUsers } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import useAdminOverview from '@/features/admin/api/use-admin-overview';
+import useProviderUsage from '@/features/provider-usage/api/use-provider-usage';
 
 interface MetricCardProps {
   label: string;
@@ -27,6 +28,7 @@ const MetricCard = ({ label, value }: MetricCardProps) => (
 
 const AdminOverview = () => {
   const { data, isLoading, isError, isFetching, refetch } = useAdminOverview();
+  const providerUsage = useProviderUsage('24h');
 
   return (
     <Box>
@@ -77,6 +79,28 @@ const AdminOverview = () => {
             <MetricCard label="Friendships" value={data.totalFriendships} />
             <MetricCard label="Notifications" value={data.totalNotifications} />
           </SimpleGrid>
+
+          {providerUsage.data ? (
+            <Card.Root>
+              <Card.Body>
+                <Stack direction={{ base: 'column', md: 'row' }} justifyContent="space-between" gap="4">
+                  <HStack gap="3" alignItems="start">
+                    <LuActivity />
+                    <Box>
+                      <Text textStyle="sectionTitle">Provider usage, last 24 hours</Text>
+                      <Text color="fg.muted" textStyle="supporting">
+                        {providerUsage.data.summary.requestCount.toLocaleString()} requests,{' '}
+                        {providerUsage.data.summary.rateLimitedCount.toLocaleString()} rate limited.
+                      </Text>
+                    </Box>
+                  </HStack>
+                  <Button asChild variant="outline" colorPalette="gray" alignSelf={{ base: 'stretch', md: 'center' }}>
+                    <Link to="/app/admin/provider-usage">View provider usage</Link>
+                  </Button>
+                </Stack>
+              </Card.Body>
+            </Card.Root>
+          ) : null}
         </Stack>
       )}
     </Box>
