@@ -5,11 +5,13 @@
 ### Behavior Fixes
 
 - Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.
+- Keep TV shows on the Watchlist when marking individual episodes, seasons, or all aired episodes as watched.
 - Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.
 - Make selecting a day in Upcoming Month view reveal its inline day details, including on short mobile and tablet screens.
 - Add a labelled Back control over the hero backdrop on successfully loaded private media details reached through in-app navigation, preserving URL-backed library state in standalone PWAs.
 - Reset document scroll when navigating to a new route while leaving query-state changes and browser Back/Forward restoration to their owning behaviors.
 - Make the full media card navigate to details while keeping its library actions independently interactive.
+- Scroll paginated result lists to their first item when users change pages, without overriding initial-load or browser-history restoration.
 
 ## v0.6.0
 

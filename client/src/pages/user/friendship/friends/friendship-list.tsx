@@ -11,7 +11,7 @@ import useRejectFriendRequest from '@/features/friendship/api/use-reject-friend-
 import UserLink from '@/components/user-link';
 import { FriendshipType } from '@/features/friendship/friendship.types';
 import PaginationControls from '@/components/pagination-controls';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface FriendshipListProps {
   type: FriendshipType;
@@ -21,6 +21,7 @@ interface FriendshipListProps {
 
 const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, emptyDescription }) => {
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { data: usersResponse, isLoading, isFetching, error, refetch } = useFriendships(type, page);
   const users = usersResponse?.data;
 
@@ -62,7 +63,7 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
   }
 
   return (
-    <Box display="flex" flexDirection="column" gap={3}>
+    <Box ref={resultsRef} display="flex" flexDirection="column" gap={3}>
       {users.map((user) => (
         <Card.Root key={user.id} p={4}>
           <Box display="flex" alignItems="center" justifyContent="space-between" gap={3}>
@@ -121,7 +122,12 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
           </Box>
         </Card.Root>
       ))}
-      <PaginationControls pagination={usersResponse?.pagination} isDisabled={isFetching} onPageChange={setPage} />
+      <PaginationControls
+        pagination={usersResponse?.pagination}
+        isDisabled={isFetching}
+        onPageChange={setPage}
+        scrollTargetRef={resultsRef}
+      />
     </Box>
   );
 };

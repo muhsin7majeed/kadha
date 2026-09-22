@@ -133,10 +133,10 @@ export async function createWatchEvent(userId: string, payload: WatchEventCreate
         },
       },
       update: {
-        watchlist: false,
-        watchlistAt: null,
         ...(isTitleEvent
           ? {
+              watchlist: false,
+              watchlistAt: null,
               watched: true,
               watchedAt: now,
               watchedOn,

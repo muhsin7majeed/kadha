@@ -1,4 +1,5 @@
 import { Box, Heading, Stack, Text } from '@chakra-ui/react';
+import { useRef } from 'react';
 
 import PaginationControls from '@/components/pagination-controls';
 import type { DiaryEntry, DiaryResponse } from '@/features/user-media/user-media.types';
@@ -30,41 +31,50 @@ interface DiaryTimelineProps {
   response: DiaryResponse;
 }
 
-const DiaryTimeline = ({ isFetching, onPageChange, response }: DiaryTimelineProps) => (
-  <Stack gap="6">
-    <Box borderLeftWidth="2px" borderColor="border.subtle" pl={{ base: '4', md: '6' }}>
-      <Stack gap="7">
-        {groupEntries(response.data).map((group) => (
-          <Box as="section" key={group.key} position="relative">
-            <Box
-              aria-hidden
-              position="absolute"
-              boxSize="2.5"
-              borderRadius="full"
-              bg={group.key === 'undated' ? 'fg.muted' : 'brand.solid'}
-              left={{ base: '-1.28rem', md: '-1.78rem' }}
-              top="2"
-            />
-            <Heading as="h2" textStyle="sectionTitle" mb="3">
-              {group.label}
-            </Heading>
-            {group.key === 'undated' && (
-              <Text color="fg.muted" textStyle="supporting" mb="3">
-                These entries remain part of your diary but cannot appear in calendar views or date trends.
-              </Text>
-            )}
-            <Stack as="ol" listStyleType="none" gap="3">
-              {group.entries.map((entry) => (
-                <DiaryEntryItem key={entry.id} entry={entry} />
-              ))}
-            </Stack>
-          </Box>
-        ))}
-      </Stack>
-    </Box>
+const DiaryTimeline = ({ isFetching, onPageChange, response }: DiaryTimelineProps) => {
+  const resultsRef = useRef<HTMLDivElement>(null);
 
-    <PaginationControls pagination={response.pagination} onPageChange={onPageChange} isDisabled={isFetching} />
-  </Stack>
-);
+  return (
+    <Stack ref={resultsRef} gap="6">
+      <Box borderLeftWidth="2px" borderColor="border.subtle" pl={{ base: '4', md: '6' }}>
+        <Stack gap="7">
+          {groupEntries(response.data).map((group) => (
+            <Box as="section" key={group.key} position="relative">
+              <Box
+                aria-hidden
+                position="absolute"
+                boxSize="2.5"
+                borderRadius="full"
+                bg={group.key === 'undated' ? 'fg.muted' : 'brand.solid'}
+                left={{ base: '-1.28rem', md: '-1.78rem' }}
+                top="2"
+              />
+              <Heading as="h2" textStyle="sectionTitle" mb="3">
+                {group.label}
+              </Heading>
+              {group.key === 'undated' && (
+                <Text color="fg.muted" textStyle="supporting" mb="3">
+                  These entries remain part of your diary but cannot appear in calendar views or date trends.
+                </Text>
+              )}
+              <Stack as="ol" listStyleType="none" gap="3">
+                {group.entries.map((entry) => (
+                  <DiaryEntryItem key={entry.id} entry={entry} />
+                ))}
+              </Stack>
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+
+      <PaginationControls
+        pagination={response.pagination}
+        onPageChange={onPageChange}
+        isDisabled={isFetching}
+        scrollTargetRef={resultsRef}
+      />
+    </Stack>
+  );
+};
 
 export default DiaryTimeline;

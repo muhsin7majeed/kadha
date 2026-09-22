@@ -8,7 +8,7 @@ import useSearchUsers from '@/features/user/api/use-search-users';
 import FriendshipActions from '@/features/friendship/components/friendship-actions';
 import UserLink from '@/components/user-link';
 import PaginationControls from '@/components/pagination-controls';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface UsersSearchResultProps {
   searchQuery: string;
@@ -16,6 +16,7 @@ interface UsersSearchResultProps {
 
 const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) => {
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const {
     data: usersResponse,
     isLoading: isLoadingUsers,
@@ -45,7 +46,7 @@ const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) =>
       ) : !users || users?.length === 0 ? (
         <EmptyState title="No users found" description="Try searching for a different user." />
       ) : (
-        <Box>
+        <Box ref={resultsRef}>
           {users?.map((user) => {
             return (
               <Card.Root key={user.id}>
@@ -71,6 +72,7 @@ const UsersSearchResult: React.FC<UsersSearchResultProps> = ({ searchQuery }) =>
             pagination={usersResponse?.pagination}
             isDisabled={isFetchingUsers}
             onPageChange={setPage}
+            scrollTargetRef={resultsRef}
           />
         </Box>
       )}

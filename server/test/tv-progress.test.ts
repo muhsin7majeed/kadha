@@ -12,6 +12,7 @@ import { prisma } from '@/lib/prisma';
 import {
   clearEpisodeWatched,
   getTvProgress,
+  markAllAiredWatched,
   markEpisodeWatched,
   markNextEpisodeWatched,
   markSeasonWatched,
@@ -26,6 +27,29 @@ const createProgressUser = (username: string) =>
       password: 'test-password',
     },
   });
+
+const createWatchlistedProgressUser = async (username: string, watchlistAt: Date) => {
+  const user = await createProgressUser(username);
+
+  await prisma.mediaSnapshot.create({
+    data: {
+      media_id: 887101,
+      media_type: 'tv',
+      title: 'Progress Show',
+    },
+  });
+  await prisma.userMedia.create({
+    data: {
+      userId: user.id,
+      media_id: 887101,
+      media_type: 'tv',
+      watchlist: true,
+      watchlistAt,
+    },
+  });
+
+  return user;
+};
 
 const unairedEpisodeDate = '2999-08-01';
 
@@ -203,8 +227,9 @@ describe('TV progress service', () => {
     });
   });
 
-  it('marks the next episode watched and removes watchlist state', async () => {
-    const user = await createProgressUser('tv-next-user');
+  it('marks the next episode watched without changing watchlist state', async () => {
+    const watchlistAt = new Date('2026-01-10T12:00:00.000Z');
+    const user = await createWatchlistedProgressUser('tv-next-user', watchlistAt);
 
     const progress = await markNextEpisodeWatched(user.id, '887101');
     const userMedia = await prisma.userMedia.findUnique({
@@ -228,7 +253,35 @@ describe('TV progress service', () => {
       episodeNumber: 1,
       watched: true,
     });
-    expect(userMedia?.watchlist).toBe(false);
+    expect(userMedia).toMatchObject({
+      watchlist: true,
+      watchlistAt,
+    });
+  });
+
+  it.each([
+    ['season', (userId: string) => markSeasonWatched(userId, '887101', '1')],
+    ['all aired episodes', (userId: string) => markAllAiredWatched(userId, '887101')],
+  ])('marks %s watched without changing watchlist state', async (_label, markWatched) => {
+    const watchlistAt = new Date('2026-01-11T12:00:00.000Z');
+    const user = await createWatchlistedProgressUser(`tv-bulk-${_label.replaceAll(' ', '-')}-user`, watchlistAt);
+
+    await markWatched(user.id);
+
+    const userMedia = await prisma.userMedia.findUniqueOrThrow({
+      where: {
+        userId_media_id_media_type: {
+          userId: user.id,
+          media_id: 887101,
+          media_type: 'tv',
+        },
+      },
+    });
+
+    expect(userMedia).toMatchObject({
+      watchlist: true,
+      watchlistAt,
+    });
   });
 
   it('marks only aired episodes for a season', async () => {
