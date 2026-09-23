@@ -50,7 +50,7 @@ const QuickInfo = ({ media, genres, showPersonalRating }: {
   const runtime = media.runtime && media.runtime > 0 ? minutesToHours(media.runtime) : null;
   const year = /^\d{4}/.exec(media.release_date)?.[0];
   return (
-    <Popover.Root positioning={{ placement: 'bottom-end', strategy: 'fixed' }}>
+    <Popover.Root lazyMount unmountOnExit positioning={{ placement: 'bottom-end', strategy: 'fixed' }}>
       <Popover.Trigger asChild>
         <IconButton aria-label={`Quick info about ${media.title}`} title={`Quick info about ${media.title}`} size="xs" variant="solid" colorPalette="gray" borderRadius="full">
           <LuInfo />
@@ -102,6 +102,7 @@ const MediaCard = ({
   const minimal = preferences?.style === 'minimal';
   const runtime = media.runtime && media.runtime > 0 ? minutesToHours(media.runtime) : null;
   const year = /^\d{4}/.exec(media.release_date)?.[0];
+  const detailsPath = `${detailsPathPrefix}/${media.media_type}/${media.media_id}`;
 
   return (
     <Card.Root
@@ -118,8 +119,10 @@ const MediaCard = ({
           width="100%" height="100%" objectFit="cover"
         />
         <NavLink
-          to={`${detailsPathPrefix}/${media.media_type}/${media.media_id}`}
+          to={detailsPath}
           aria-label={media.title}
+          aria-hidden={minimal ? undefined : true}
+          tabIndex={minimal ? undefined : -1}
           position="absolute" inset="0" zIndex="0"
           onClick={onNavigate}
         >
@@ -145,7 +148,9 @@ const MediaCard = ({
           <Stack position="absolute" bottom="0" insetX="0" p="3" pt="12" gap="2" minW="0" color="white" bgGradient="to-t" gradientFrom="blackAlpha.950" gradientVia="blackAlpha.700" gradientTo="transparent" pointerEvents="none">
             <Box pointerEvents="none"><StatusIcons media={media} /></Box>
             <Box role="group" aria-label={`${media.title} title`} overflowX="auto" maxW="full" tabIndex={0} pointerEvents="auto" position="relative" zIndex="1" css={scrollStyle}>
-              <Text as="h3" textStyle="cardTitle" whiteSpace="nowrap" width="max-content">{media.title}</Text>
+              <NavLink to={detailsPath} onClick={onNavigate} display="block" width="max-content" color="white">
+                <Text as="h3" textStyle="cardTitle" whiteSpace="nowrap">{media.title}</Text>
+              </NavLink>
             </Box>
             {genres.length > 0 && (
               <HStack role="group" aria-label={`${media.title} genres`} overflowX="auto" maxW="full" tabIndex={0} pointerEvents="auto" position="relative" zIndex="1" gap="1" css={scrollStyle}>

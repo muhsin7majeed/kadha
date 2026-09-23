@@ -37,6 +37,14 @@ describe('shared media card style', () => {
     expect(screen.getByRole('link', { name: 'Long Movie Name' })).toHaveAttribute('href', '/app/media/movie/1');
   });
 
+  it('keeps the detailed title an actual navigation link', async () => {
+    const user = userEvent.setup();
+    const onNavigate = vi.fn();
+    renderWithProviders(<MemoryRouter><MediaCard media={media} showActions={false} onNavigate={onNavigate} /></MemoryRouter>);
+    await user.click(screen.getByRole('link', { name: 'Long Movie Name' }));
+    expect(onNavigate).toHaveBeenCalledOnce();
+  });
+
   it('limits minimal to poster, controls and stacked active statuses', async () => {
     mock.style = 'minimal';
     const user = userEvent.setup();
