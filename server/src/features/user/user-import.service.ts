@@ -5,6 +5,7 @@ import { isSupportedWatchRegion, normalizeWatchRegion } from '@/constants/watch-
 import { prisma } from '@/lib/prisma';
 import { homePreferencesSchema } from '@/features/home-preferences/home-preferences.schema';
 import { normalizeHomePreferences } from '@/features/home-preferences/home-preferences.service';
+import { mediaCardPreferencesSchema } from '@/features/media-card-preferences/media-card-preferences.schema';
 import { navigationPreferencesSchema } from '@/features/navigation-preferences/navigation-preferences.schema';
 import { normalizeNavigationPreferences } from '@/features/navigation-preferences/navigation-preferences.service';
 import { ImportPayload } from './user-import.schema';
@@ -162,6 +163,11 @@ const getImportableNavigationPreferences = (exportData: Record<string, unknown>)
   return parsed.success ? normalizeNavigationPreferences(parsed.data, false) : null;
 };
 
+const getImportableMediaCardPreferences = (exportData: Record<string, unknown>) => {
+  const parsed = mediaCardPreferencesSchema.safeParse(getAccount(exportData).mediaCard);
+  return parsed.success ? parsed.data : null;
+};
+
 const hasImportableAccountPreferences = (exportData: Record<string, unknown>) => {
   const account = getAccount(exportData);
   const watchRegion = asString(account.watchRegion);
@@ -173,7 +179,8 @@ const hasImportableAccountPreferences = (exportData: Record<string, unknown>) =>
     isPrivacy(account.watchlistPrivacy) ||
     Boolean(watchRegion && isSupportedWatchRegion(normalizeWatchRegion(watchRegion))) ||
     Boolean(getImportableHomePreferences(exportData)) ||
-    Boolean(getImportableNavigationPreferences(exportData))
+    Boolean(getImportableNavigationPreferences(exportData)) ||
+    Boolean(getImportableMediaCardPreferences(exportData))
   );
 };
 
@@ -468,6 +475,7 @@ const importAccountPreferences = async (
 
   const homePreferences = getImportableHomePreferences(exportData);
   const navigationPreferences = getImportableNavigationPreferences(exportData);
+  const mediaCardPreferences = getImportableMediaCardPreferences(exportData);
 
   await tx.user.update({
     where: { id: userId },
@@ -494,6 +502,15 @@ const importAccountPreferences = async (
   if (navigationPreferences) {
     const config = JSON.stringify(navigationPreferences);
     await tx.navigationPreferences.upsert({
+      where: { userId },
+      update: { config },
+      create: { userId, config },
+    });
+  }
+
+  if (mediaCardPreferences) {
+    const config = JSON.stringify(mediaCardPreferences);
+    await tx.mediaCardPreferences.upsert({
       where: { userId },
       update: { config },
       create: { userId, config },
