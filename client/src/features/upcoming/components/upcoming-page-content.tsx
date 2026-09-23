@@ -1,11 +1,12 @@
-import { Alert, Button, Stack } from "@chakra-ui/react";
+import { Alert, Button, Flex, Stack } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LuCalendarDays, LuList, LuPartyPopper } from "react-icons/lu";
 
 import EmptyState from "@/components/info-states/empty-state";
 import SimpleTabs from "@/components/simple-tabs";
 import ErrorState from "@/components/info-states/error-state";
-import CommonSpinner from "@/components/spinners/common-spinner";
+import ListSkeleton from "@/components/loading/list-skeleton";
+import LoadingStatus from "@/components/loading/loading-status";
 import useUpcoming, { useUpcomingWindows } from "@/features/upcoming/api/use-upcoming";
 import UpcomingList from "./upcoming-list";
 import UpcomingCalendar from "./upcoming-calendar";
@@ -196,7 +197,7 @@ const UpcomingPageContent = () => {
       }}
     >
       {upcoming.isLoading ? (
-        <CommonSpinner />
+        <ListSkeleton label="Loading upcoming releases" />
       ) : upcoming.isError || !upcoming.data ? (
         <ErrorState
           title="Upcoming dates unavailable"
@@ -205,6 +206,11 @@ const UpcomingPageContent = () => {
         />
       ) : (
         <Stack gap="5" aria-busy={upcoming.isFetching}>
+          {upcoming.isFetching && loadingDirection === undefined && (
+            <Flex justify="flex-end">
+              <LoadingStatus />
+            </Flex>
+          )}
           {hasCoverageWarning && (
             <Alert.Root role="status" status="warning" variant="subtle">
               <Alert.Indicator />

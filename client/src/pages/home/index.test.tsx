@@ -93,7 +93,7 @@ describe('Home', () => {
 
     renderHome();
 
-    expect(screen.getByText('Loading your Home...')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading your Home');
     expect(mocks.continueSection).not.toHaveBeenCalled();
     expect(mocks.watchlistSection).not.toHaveBeenCalled();
   });

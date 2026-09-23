@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { LuRotateCcw } from "react-icons/lu";
 
 import SimpleCheckbox from "@/components/simple-checkbox";
+import ListSkeleton from "@/components/loading/list-skeleton";
+import LoadingStatus from "@/components/loading/loading-status";
 
 import useNavigationPreferences from "@/features/navigation/api/use-navigation-preferences";
 import useUpdateNavigationPreferences from "@/features/navigation/api/use-update-navigation-preferences";
@@ -39,7 +41,7 @@ const fitCompactCapacity = (items: NavigationPreferenceItem[]) => {
 };
 
 const NavigationSettingsSection = () => {
-  const { data, isLoading } = useNavigationPreferences();
+  const { data, isLoading, isFetching } = useNavigationPreferences();
   const { mutateAsync: updatePreferences, isPending } =
     useUpdateNavigationPreferences();
   const [preferences, setPreferences] = useState<NavigationPreferences>(() =>
@@ -87,8 +89,11 @@ const NavigationSettingsSection = () => {
     setPreferences(structuredClone(saved));
   };
 
+  if (isLoading) return <ListSkeleton label="Loading navigation settings" rows={5} />;
+
   return (
     <Stack gap="5">
+      {isFetching && <LoadingStatus />}
       <Card.Root variant="outline">
         <Card.Header>
           <Heading as="h3" textStyle="subsectionTitle">

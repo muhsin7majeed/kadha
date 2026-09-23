@@ -28,7 +28,6 @@ const Watchlist = () => {
       errorDescription="Failed to fetch watchlist"
       loadingText="Loading your watchlist..."
       libraryKey="watchlist"
-      spinnerColor="brand.solid"
       supportsPersonalRating={false}
       query={query}
       updateQuery={updateQuery}

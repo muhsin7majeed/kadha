@@ -1,10 +1,11 @@
-import { Box, Button, Flex, Spinner, Stack } from '@chakra-ui/react';
+import { Box, Button, Flex, Stack } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
 import PageHeader from '@/components/page-header';
 import useInProgressTv from '@/features/user-media/api/use-in-progress-tv';
 import InProgressTvCard from '@/features/user-media/components/in-progress-tv-card';
 import HomeSectionError from './home-section-error';
+import MediaCarouselSkeleton from '@/components/media-carousel/media-carousel-skeleton';
 
 const ContinueWatchingHomeSection = () => {
   const query = useInProgressTv({ enabled: true, limit: 10, page: 1, sort: 'recent' });
@@ -24,7 +25,7 @@ const ContinueWatchingHomeSection = () => {
   return (
     <Stack gap="3">
       <PageHeader
-        isFetching={query.isFetching}
+        isRefreshing={query.isFetching && !query.isLoading && query.data !== undefined}
         mb="0"
         action={
           <Button asChild size="sm" variant="ghost" colorPalette="brand">
@@ -36,9 +37,7 @@ const ContinueWatchingHomeSection = () => {
       </PageHeader>
 
       {query.isLoading ? (
-        <Flex minH="72" align="center" justify="center">
-          <Spinner color="brand.solid" />
-        </Flex>
+        <MediaCarouselSkeleton label="Loading Continue Watching" />
       ) : (
         <Box overflowX="auto">
           <Flex gap="4" minW="max-content" align="stretch">
@@ -46,7 +45,7 @@ const ContinueWatchingHomeSection = () => {
               <InProgressTvCard
                 key={`${item.media_type}:${item.media_id}`}
                 item={item}
-                showDetailsAction={false}
+                variant="carousel"
               />
             ))}
           </Flex>

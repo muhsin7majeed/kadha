@@ -1,4 +1,4 @@
-import { Box, Center, SimpleGrid, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Box, SimpleGrid } from '@chakra-ui/react';
 import { useRef } from 'react';
 import MediaCard from '@/components/media-card';
 import EmptyState from '@/components/info-states/empty-state';
@@ -10,6 +10,7 @@ import { PaginationMeta } from '@/types/common';
 import PageHeader from '../page-header';
 import PaginationControls from '../pagination-controls';
 import { toMediaCardModel } from '@/features/media/media-card-model';
+import MediaListSkeleton from '../loading/media-list-skeleton';
 
 interface MediaListPageProps {
   title: string;
@@ -20,7 +21,6 @@ interface MediaListPageProps {
   data: (UserMedia | MovieWithMeta | TvWithMeta)[] | undefined;
   isLoading: boolean;
   isFetching: boolean;
-  isPlaceholderData?: boolean;
   error: Error | null;
   refetch: () => void;
   emptyState: {
@@ -30,7 +30,6 @@ interface MediaListPageProps {
   };
   errorDescription: string;
   loadingText: string;
-  spinnerColor?: string;
   detailsPathPrefix?: string;
   pagination?: PaginationMeta;
   showActions?: boolean;
@@ -48,14 +47,12 @@ const MediaListPage = ({
   data,
   isLoading,
   isFetching,
-  isPlaceholderData = false,
   error,
   refetch,
   emptyState,
   errorDescription,
   loadingText,
   detailsPathPrefix,
-  spinnerColor = 'brand.solid',
   pagination,
   showActions,
   showLibraryMetadata,
@@ -63,23 +60,18 @@ const MediaListPage = ({
   onPageChange,
 }: MediaListPageProps) => {
   const resultsRef = useRef<HTMLDivElement>(null);
-  const isRefreshingPlaceholder = isFetching && isPlaceholderData;
+  const isRefreshing = isFetching && !isLoading && data !== undefined;
 
   return (
     <Box>
-      <PageHeader action={headerAction} isFetching={isFetching} subHeader={description}>
+      <PageHeader action={headerAction} isRefreshing={isRefreshing} subHeader={description}>
         {title}
       </PageHeader>
 
       {controls}
 
       {isLoading ? (
-        <Center py={20}>
-          <VStack gap={4}>
-            <Spinner size="xl" color={spinnerColor} />
-            <Text color="fg.muted">{loadingText}</Text>
-          </VStack>
-        </Center>
+        <MediaListSkeleton label={loadingText} />
       ) : error ? (
         <Box py={10}>
           <ErrorState title="Error" description={errorDescription} onRetry={refetch} />
@@ -90,24 +82,8 @@ const MediaListPage = ({
         </Box>
       ) : (
         <>
-          <Box ref={resultsRef} position="relative" aria-busy={isRefreshingPlaceholder}>
-            {isRefreshingPlaceholder && (
-              <Center
-                role="status"
-                position="absolute"
-                inset="0"
-                zIndex="1"
-                bg="bg"
-              >
-                <VStack gap="3">
-                  <Spinner size="lg" color={spinnerColor} />
-                  <Text color="fg.muted" textStyle="supporting">
-                    Loading page…
-                  </Text>
-                </VStack>
-              </Center>
-            )}
-            <Box opacity={isRefreshingPlaceholder ? 0.35 : 1} transition="opacity 0.2s">
+          <Box ref={resultsRef} aria-busy={isRefreshing}>
+            <Box>
               {results ?? (
                 <SimpleGrid
                   gridTemplateColumns={{

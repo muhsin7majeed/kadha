@@ -33,8 +33,10 @@ describe("NotificationsSettings", () => {
     await waitFor(() =>
       expect(mocks.get).toHaveBeenCalledWith("/api/notifications/push/config"),
     );
-    expect(
-      screen.getByText("This browser does not support web push notifications."),
-    ).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByText("This browser does not support web push notifications."),
+      ).toBeInTheDocument(),
+    );
   });
 });

@@ -105,6 +105,7 @@ packages/contracts/
 - Public profile collection lists return privacy-safe summaries and item counts rather than embedded media or collaborator details; full collection data is loaded only on an authorized details route.
 - Owner-scoped tracked schedule resolution belongs in `server/src/features/upcoming`; Upcoming query state, list entries, and calendar rendering belong in `client/src/features/upcoming`.
 - Shared UI-only components can remain in `client/src/components`.
+- Shared initial-load skeletons and accessible background-refresh indicators belong in `client/src/components/loading`; pages should keep usable content visible while it refreshes.
 - Repeated compound controls with Kadha-specific behavior or palette defaults belong in `client/src/components` using the `SimpleX` naming convention. The current canonical wrappers are `SimpleTabs`, `SimpleCheckbox`, `SimpleRadioGroup`, and `SimpleCheckboxCard`.
 - Ordinary Chakra `Button`, `IconButton`, `Input`, and `NativeSelect` usage does not require a wrapper; use the global theme default and explicit semantic `colorPalette` values at the call site.
 - Shared generic utilities can remain in `client/src/utils`.

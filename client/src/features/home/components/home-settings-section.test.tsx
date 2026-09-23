@@ -82,6 +82,14 @@ describe('HomeSettingsSection', () => {
     expect(screen.getByRole('button', { name: 'Save Home settings' })).toBeEnabled();
   });
 
+  it('shows a structural loading state before preferences are available', () => {
+    mocks.isLoading = true;
+    renderWithProviders(<HomeSettingsSection />);
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading Home settings');
+    expect(screen.queryByRole('button', { name: 'Save Home settings' })).not.toBeInTheDocument();
+  });
+
   it('locks controls while an update is pending', () => {
     mocks.isPending = true;
     renderWithProviders(<HomeSettingsSection />);

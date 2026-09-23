@@ -11,7 +11,7 @@ import EmptyState from "@/components/info-states/empty-state";
 import SimpleTabs from "@/components/simple-tabs";
 import ErrorState from "@/components/info-states/error-state";
 import PageHeader from "@/components/page-header";
-import CommonSpinner from "@/components/spinners/common-spinner";
+import ListSkeleton from "@/components/loading/list-skeleton";
 import useDiary from "@/features/user-media/api/use-diary";
 import useDiaryInsights from "@/features/user-media/api/use-diary-insights";
 import DiaryCalendar from "@/features/user-media/components/diary-calendar";
@@ -62,7 +62,7 @@ const Diary = () => {
   return (
     <Box>
       <PageHeader
-        isFetching={diary.isFetching}
+        isRefreshing={diary.isFetching && !diary.isLoading && diary.data !== undefined}
         subHeader="A private record of each movie watch, rewatch, and TV episode you log."
       >
         Diary
@@ -117,7 +117,7 @@ const Diary = () => {
           />
 
           {diary.isLoading ? (
-            <CommonSpinner />
+            <ListSkeleton label="Loading your diary" />
           ) : diary.isError || !diary.data ? (
             <ErrorState
               title="Diary unavailable"
@@ -154,7 +154,7 @@ const Diary = () => {
 
               <Tabs.Content value="calendar" mt="6">
                 {insights.isLoading ? (
-                  <CommonSpinner />
+                  <ListSkeleton label="Loading diary calendar" rows={3} />
                 ) : insights.isError || !insights.data ? (
                   <ErrorState
                     title="Calendar unavailable"
@@ -189,7 +189,7 @@ const Diary = () => {
 
               <Tabs.Content value="insights" mt="6">
                 {insights.isLoading ? (
-                  <CommonSpinner />
+                  <ListSkeleton label="Loading diary insights" rows={3} />
                 ) : insights.isError || !insights.data ? (
                   <ErrorState
                     title="Diary insights unavailable"
