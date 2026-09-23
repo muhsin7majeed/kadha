@@ -23,7 +23,7 @@ import ErrorState from '@/components/info-states/error-state';
 import NavLink from '@/components/nav-link';
 import PageHeader from '@/components/page-header';
 import PaginationControls from '@/components/pagination-controls';
-import CommonSpinner from '@/components/spinners/common-spinner';
+import ListSkeleton from '@/components/loading/list-skeleton';
 import useActivity from '@/features/activity/api/use-activity';
 import { ActivityMetadata, UserActivity, UserActivityType } from '@/features/activity/activity.types';
 import { parseActivityMetadata } from '@/features/activity/utils/activity-metadata';
@@ -289,14 +289,14 @@ const Activity = () => {
   return (
     <Box>
       <PageHeader
-        isFetching={isFetching}
+        isRefreshing={isFetching && !isLoading && data !== undefined}
         subHeader="A private timeline of media, collection, and profile actions on your account."
       >
         Activity
       </PageHeader>
 
       {isLoading ? (
-        <CommonSpinner />
+        <ListSkeleton label="Loading activity" />
       ) : isError ? (
         <ErrorState title="Error" description="Failed to fetch activity" onRetry={refetch} />
       ) : activities.length === 0 ? (

@@ -135,6 +135,26 @@ describe('UpcomingPageContent', () => {
     mocks.useUpcoming.mockReset();
   });
 
+  it('shows a structural loading state without a duplicate refresh indicator', () => {
+    mocks.data = undefined;
+    mocks.isLoading = true;
+    mocks.isFetching = true;
+
+    renderContent();
+
+    expect(screen.getByRole('status')).toHaveTextContent('Loading upcoming releases');
+    expect(screen.queryByText('Refreshing content')).not.toBeInTheDocument();
+  });
+
+  it('shows non-blocking refresh feedback while keeping upcoming content visible', () => {
+    mocks.isFetching = true;
+
+    renderContent();
+
+    expect(screen.getByRole('status')).toHaveTextContent('Refreshing content');
+    expect(screen.getByRole('link', { name: 'Group Drop' })).toBeInTheDocument();
+  });
+
   it('defaults to a chronological list with grouped episodes, date context, and media links', () => {
     renderContent();
 

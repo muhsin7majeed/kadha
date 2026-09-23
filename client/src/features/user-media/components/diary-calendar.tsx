@@ -2,7 +2,7 @@ import { Box, Heading, HStack, Stack, Text } from '@chakra-ui/react';
 
 import CalendarMonthGrid from '@/components/calendar-month-grid';
 import ErrorState from '@/components/info-states/error-state';
-import CommonSpinner from '@/components/spinners/common-spinner';
+import ListSkeleton from '@/components/loading/list-skeleton';
 import type { DiaryDayBucket, DiaryResponse } from '@/features/user-media/user-media.types';
 import DiaryTimeline from './diary-timeline';
 
@@ -130,7 +130,7 @@ const DiaryCalendar = ({
             Selected day
           </Heading>
           {isDayLoading ? (
-            <CommonSpinner spinnerProps={{ 'aria-label': 'Loading selected day' }} />
+            <ListSkeleton label="Loading selected day" rows={2} />
           ) : isDayError ? (
             <ErrorState
               title="Selected day unavailable"

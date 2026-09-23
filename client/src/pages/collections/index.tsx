@@ -5,7 +5,7 @@ import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import PageHeader from '@/components/page-header';
 import SimpleTabs from '@/components/simple-tabs';
-import CommonSpinner from '@/components/spinners/common-spinner';
+import ListSkeleton from '@/components/loading/list-skeleton';
 import useCollections from '@/features/collections/api/use-collections';
 import CollectionList from '@/features/collections/components/collection-list';
 import CollectionMenu from '@/features/collections/components/collection-menu';
@@ -26,7 +26,7 @@ const Collections = () => {
     <>
       <Flex justifyContent="space-between" alignItems="flex-start" direction={{ base: 'column', sm: 'row' }} gap="3" mb="4">
         <PageHeader
-          isFetching={isFetching}
+          isRefreshing={isFetching && !isLoading && collections !== undefined}
           mb="0"
           subHeader="Create custom groups for movies and shows you want to organize together."
         >
@@ -47,7 +47,7 @@ const Collections = () => {
       />
 
       {isLoading ? (
-        <CommonSpinner />
+        <ListSkeleton label="Loading collections" />
       ) : error ? (
         <ErrorState title="Error" description="Error fetching collections" onRetry={refetch} />
       ) : collections?.length === 0 ? (

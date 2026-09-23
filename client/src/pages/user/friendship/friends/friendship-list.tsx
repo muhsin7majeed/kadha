@@ -1,8 +1,9 @@
-import CommonSpinner from '@/components/spinners/common-spinner';
+import ListSkeleton from '@/components/loading/list-skeleton';
+import LoadingStatus from '@/components/loading/loading-status';
 import useFriendships from '@/features/friendship/api/use-friends';
 import ErrorState from '@/components/info-states/error-state';
 import EmptyState from '@/components/info-states/empty-state';
-import { Box, Button, Card, HStack } from '@chakra-ui/react';
+import { Box, Button, Card, Flex, HStack } from '@chakra-ui/react';
 import useUnfriend from '@/features/friendship/api/use-unfriend';
 import useUnblock from '@/features/friendship/api/use-unblock';
 import { LuUserMinus, LuShieldOff, LuCheck, LuX } from 'react-icons/lu';
@@ -51,7 +52,7 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
   }, [type]);
 
   if (isLoading) {
-    return <CommonSpinner />;
+    return <ListSkeleton label="Loading friends" />;
   }
 
   if (error) {
@@ -63,7 +64,12 @@ const FriendshipList: React.FC<FriendshipListProps> = ({ type, emptyTitle, empty
   }
 
   return (
-    <Box ref={resultsRef} display="flex" flexDirection="column" gap={3}>
+    <Box ref={resultsRef} display="flex" flexDirection="column" gap={3} aria-busy={isFetching}>
+      {isFetching && (
+        <Flex justify="flex-end">
+          <LoadingStatus />
+        </Flex>
+      )}
       {users.map((user) => (
         <Card.Root key={user.id} p={4}>
           <Box display="flex" alignItems="center" justifyContent="space-between" gap={3}>
