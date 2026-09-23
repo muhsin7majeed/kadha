@@ -173,6 +173,7 @@ describe("owner media library", () => {
   });
 
   it("debounces title search and commits type and sort controls", async () => {
+    const user = userEvent.setup();
     const updateQuery = vi.fn();
     renderWithProviders(
       <OwnerMediaLibrary {...baseProps} updateQuery={updateQuery} />,
@@ -188,7 +189,7 @@ describe("owner media library", () => {
       ),
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Movies" }));
+    await user.click(screen.getByText("Movies"));
     expect(updateQuery).toHaveBeenCalledWith({ mediaType: "movie" });
 
     fireEvent.change(screen.getByLabelText("Sort library"), {
@@ -215,10 +216,7 @@ describe("owner media library", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "Movies" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(screen.getByRole("radio", { name: "Movies" })).toBeChecked();
     expect(
       screen.queryByRole("button", { name: "Remove media type filter" }),
     ).not.toBeInTheDocument();

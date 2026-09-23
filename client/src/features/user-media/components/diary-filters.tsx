@@ -1,5 +1,6 @@
-import { Field, Flex, NativeSelect, SegmentGroup } from '@chakra-ui/react';
+import { Field, Flex, NativeSelect } from '@chakra-ui/react';
 
+import MediaTypeSegmentedControl from '@/components/media-type-segmented-control';
 import type { MediaType } from '@/types/common';
 
 export type DiaryMediaType = 'all' | MediaType;
@@ -15,12 +16,6 @@ interface DiaryFiltersProps {
   showMonth?: boolean;
   year?: number;
 }
-
-const mediaItems = [
-  { label: 'All', value: 'all' },
-  { label: 'Movies', value: 'movie' },
-  { label: 'TV', value: 'tv' },
-];
 
 const months = Array.from({ length: 12 }, (_, index) => ({
   value: index + 1,
@@ -43,17 +38,12 @@ const DiaryFilters = ({
   <Flex gap="3" align={{ base: 'stretch', md: 'end' }} direction={{ base: 'column', md: 'row' }} flexWrap="wrap">
     <Field.Root maxW={{ md: 'xs' }}>
       <Field.Label>Media type</Field.Label>
-      <SegmentGroup.Root
+      <MediaTypeSegmentedControl
         aria-label="Filter diary by media type"
-        colorPalette="brand"
         value={mediaType}
-        onValueChange={(details) => onMediaTypeChange(details.value as DiaryMediaType)}
+        onValueChange={onMediaTypeChange}
         disabled={disabled}
-        size="sm"
-      >
-        <SegmentGroup.Indicator />
-        <SegmentGroup.Items items={mediaItems} />
-      </SegmentGroup.Root>
+      />
     </Field.Root>
 
     <Field.Root maxW={{ md: '44' }}>
