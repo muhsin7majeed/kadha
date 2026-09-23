@@ -26,6 +26,7 @@
 
 ### Engineering Changes
 
+- Skipped client and server test suites in pull request CI while retaining builds, lint, audits, and validation; tests continue on `master`, scheduled, and manual runs.
 - Narrowed the internal administrator user-list response to identity fields; privacy settings and aggregate support totals now require the user-detail endpoint.
 - Expanded the working agreement to identify real repeated UI and domain patterns and propose reuse before adding another copy.
 - Added a composed admin dashboard read model with feature-owned feedback and activity aggregates, bounded 30-day queries, and provider failure isolation.

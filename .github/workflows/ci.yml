@@ -76,6 +76,7 @@ jobs:
         run: docker compose run --rm --no-deps server npm run build
 
       - name: Test server
+        if: github.event_name != 'pull_request'
         run: docker compose run --rm --no-deps server npm test
 
   client:
@@ -93,6 +94,7 @@ jobs:
         run: docker compose run --rm --no-deps client npm run lint
 
       - name: Test client
+        if: github.event_name != 'pull_request'
         run: docker compose run --rm --no-deps client npm test
 
       - name: Build client

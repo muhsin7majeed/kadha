@@ -43,11 +43,12 @@
 - Client install: `docker compose run --rm client npm ci`
 - Client build: `docker compose run --rm client npm run build`
 - Client lint: `docker compose run --rm client npm run lint`
+- Client tests: `docker compose run --rm client npm test`
 - Server install: `docker compose run --rm server npm ci`
 - Server build: `docker compose run --rm server npm run build`
 - Server tests: `docker compose run --rm server npm test`
 
-Run the most relevant build, lint, or test command for the area changed. If verification cannot be run, explain why.
+Run the most relevant build, lint, or test command for the area changed. Pull request CI intentionally skips the client and server test suites, so run relevant tests locally before pushing. If verification cannot be run, explain why.
 
 ## Server Structure
 
