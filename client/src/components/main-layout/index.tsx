@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import TabBar from '../tabbar';
 import Navbar from '../navbar';
 import { useGenreMap } from '@/features/media/api/use-genre-map';
-import ListSkeleton from '@/components/loading/list-skeleton';
+import LoadingStatus from '@/components/loading/loading-status';
 
 const MainLayout = () => {
   useGenreMap();
@@ -28,7 +28,13 @@ const MainLayout = () => {
           pt={hasPagePadding ? 2 : 0}
           pb={hasPagePadding ? { base: 24, md: 24 } : 20}
         >
-          <Suspense fallback={<ListSkeleton label="Loading page" />}>
+          <Suspense
+            fallback={
+              <Box display="flex" justifyContent="center" py="12">
+                <LoadingStatus label="Loading page" />
+              </Box>
+            }
+          >
             <Outlet />
           </Suspense>
         </Box>
