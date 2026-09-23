@@ -117,6 +117,11 @@ describe('viewing diary page', () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Diary' })).toBeInTheDocument();
+    expect(
+      getComputedStyle(screen.getByRole('radiogroup', { name: 'Filter diary by media type' })).getPropertyValue(
+        '--chakra-colors-color-palette-solid',
+      ),
+    ).toBe('var(--chakra-colors-brand-solid)');
     expect(screen.getByText('A Test Film')).toBeInTheDocument();
     expect(screen.getByText('Still excellent.')).toBeInTheDocument();
     expect(screen.getByText('2 hours')).toBeInTheDocument();
