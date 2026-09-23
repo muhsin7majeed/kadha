@@ -1,17 +1,22 @@
-import { Box, Flex, Skeleton } from '@chakra-ui/react';
+import { Box, Flex, Skeleton, Stack, VisuallyHidden } from '@chakra-ui/react';
 
-const MediaCarouselSkeleton = () => {
+interface MediaCarouselSkeletonProps {
+  label: string;
+}
+
+const MediaCarouselSkeleton = ({ label }: MediaCarouselSkeletonProps) => {
   return (
-    <Box>
-      <Skeleton height="40px" width="300px" mb="4" />
+    <Box role="status" aria-live="polite" aria-busy="true">
+      <VisuallyHidden>{label}</VisuallyHidden>
+      <Skeleton height="8" width={{ base: '48', md: '72' }} mb="4" />
 
-      <Flex gap={4} overflowX="auto">
-        <Skeleton height="300px" flex="0 0 200px" />
-        <Skeleton height="300px" flex="0 0 200px" />
-        <Skeleton height="300px" flex="0 0 200px" />
-        <Skeleton height="300px" flex="0 0 200px" />
-        <Skeleton height="300px" flex="0 0 200px" />
-        <Skeleton height="300px" flex="0 0 200px" />
+      <Flex gap="4" overflow="hidden">
+        {Array.from({ length: 6 }, (_, index) => (
+          <Stack key={index} flex={{ base: '0 0 10rem', md: '0 0 12rem' }} gap="3">
+            <Skeleton aspectRatio="2 / 3" borderRadius="lg" />
+            <Skeleton height="5" width="80%" />
+          </Stack>
+        ))}
       </Flex>
     </Box>
   );
