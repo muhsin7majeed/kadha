@@ -112,7 +112,7 @@ describe('DiaryCalendar', () => {
       onDayRetry,
     });
 
-    expect(screen.getByLabelText('Loading selected day')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading selected day');
     expect(screen.queryByText('No watches were logged for this day.')).not.toBeInTheDocument();
 
     cleanup();
