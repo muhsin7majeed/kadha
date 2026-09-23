@@ -52,7 +52,7 @@ const QuickInfo = ({ media, genres, showPersonalRating }: {
   return (
     <Popover.Root lazyMount unmountOnExit positioning={{ placement: 'bottom-end', strategy: 'fixed' }}>
       <Popover.Trigger asChild>
-        <IconButton aria-label={`Quick info about ${media.title}`} title={`Quick info about ${media.title}`} size="xs" variant="solid" colorPalette="gray" borderRadius="full">
+        <IconButton aria-label={`Quick info about ${media.title}`} title={`Quick info about ${media.title}`} size="xs" variant="subtle" colorPalette="brand" borderRadius="full">
           <LuInfo />
         </IconButton>
       </Popover.Trigger>

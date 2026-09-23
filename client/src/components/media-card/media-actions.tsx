@@ -166,8 +166,9 @@ const MediaActions: React.FC<MediaActionsProps> = ({
             aria-label={`Manage ${media.title}`}
             title={`Manage ${media.title}`}
             size={size}
-            variant="ghost"
-            colorPalette="gray"
+            variant="surface"
+            colorPalette="brand"
+            borderRadius="full"
           >
             <LuEllipsis />
           </IconButton>
