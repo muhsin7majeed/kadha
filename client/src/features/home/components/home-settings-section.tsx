@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { LuRotateCcw } from "react-icons/lu";
 
 import SimpleCheckbox from "@/components/simple-checkbox";
+import ListSkeleton from "@/components/loading/list-skeleton";
+import LoadingStatus from "@/components/loading/loading-status";
 
 import useHomePreferences from "@/features/home/api/use-home-preferences";
 import useUpdateHomePreferences from "@/features/home/api/use-update-home-preferences";
@@ -18,7 +20,7 @@ import type {
 import ReorderablePreferenceList from "@/features/settings/components/reorderable-preference-list";
 
 const HomeSettingsSection = () => {
-  const { data, isLoading } = useHomePreferences();
+  const { data, isLoading, isFetching } = useHomePreferences();
   const { mutateAsync: updatePreferences, isPending } =
     useUpdateHomePreferences();
   const [preferences, setPreferences] = useState<HomePreferences>(() =>
@@ -54,9 +56,12 @@ const HomeSettingsSection = () => {
     setPreferences(structuredClone(saved));
   };
 
+  if (isLoading) return <ListSkeleton label="Loading Home settings" rows={4} />;
+
   return (
     <Card.Root variant="outline">
       <Card.Header>
+        {isFetching && <LoadingStatus />}
         <Heading as="h3" textStyle="subsectionTitle">
           Home sections
         </Heading>
