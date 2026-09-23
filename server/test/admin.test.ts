@@ -324,17 +324,25 @@ describe('admin routes', () => {
     const alphaUser = await registerTestUser('alpha-users-list');
 
     await promoteTestUserToAdmin(admin);
+    const sharedTimestamp = new Date('2026-09-01T12:00:00.000Z');
+    await prisma.user.updateMany({
+      where: { id: { in: [zetaUser.userId, alphaUser.userId] } },
+      data: { createdAt: sharedTimestamp, updatedAt: sharedTimestamp },
+    });
+    const expectedOrder = [alphaUser, zetaUser].sort((left, right) =>
+      left.userId < right.userId ? -1 : 1,
+    );
 
     const firstPage = await request(await getTestApp())
       .get('/api/admin/users')
-      .query({ role: 'USER', sort: 'username', order: 'asc', page: 1, limit: 1 })
+      .query({ role: 'USER', sort: 'createdAt', order: 'asc', page: 1, limit: 1 })
       .set('Authorization', authorization(admin))
       .expect(200);
 
     expect(firstPage.body.data).toEqual([
       {
-        id: alphaUser.userId,
-        username: alphaUser.username,
+        id: expectedOrder[0].userId,
+        username: expectedOrder[0].username,
         role: 'USER',
         createdAt: expect.any(String),
       },
@@ -350,10 +358,23 @@ describe('admin routes', () => {
 
     const secondPage = await request(await getTestApp())
       .get('/api/admin/users')
-      .query({ role: 'USER', sort: 'username', order: 'asc', page: 2, limit: 1 })
+      .query({ role: 'USER', sort: 'createdAt', order: 'asc', page: 2, limit: 1 })
       .set('Authorization', authorization(admin))
       .expect(200);
 
-    expect(secondPage.body.data[0]).toMatchObject({ id: zetaUser.userId, username: zetaUser.username });
+    expect(secondPage.body.data[0]).toMatchObject({
+      id: expectedOrder[1].userId,
+      username: expectedOrder[1].username,
+    });
+
+    const updatedAtOrder = await request(await getTestApp())
+      .get('/api/admin/users')
+      .query({ role: 'USER', sort: 'updatedAt', order: 'asc', page: 1, limit: 2 })
+      .set('Authorization', authorization(admin))
+      .expect(200);
+
+    expect(updatedAtOrder.body.data.map((user: { id: string }) => user.id)).toEqual(
+      expectedOrder.map((user) => user.userId),
+    );
   });
 });

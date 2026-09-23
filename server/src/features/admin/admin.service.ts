@@ -150,9 +150,10 @@ export async function getAdminUsers(params: AdminUserListParams) {
     ...(params.role ? { role: params.role } : {}),
   };
   const skip = (params.page - 1) * params.limit;
-  const orderBy: Prisma.UserOrderByWithRelationInput = {
-    [params.sort]: params.order,
-  };
+  const orderBy: Prisma.UserOrderByWithRelationInput[] = [
+    { [params.sort]: params.order },
+    { id: 'asc' },
+  ];
 
   const [users, total] = await prisma.$transaction([
     prisma.user.findMany({
