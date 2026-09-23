@@ -13,6 +13,8 @@ import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { LuRefreshCcw } from "react-icons/lu";
 
 import SimpleCheckbox from "@/components/simple-checkbox";
+import ListSkeleton from "@/components/loading/list-skeleton";
+import LoadingStatus from "@/components/loading/loading-status";
 import { APP_CONFIG } from "@/config/app-config";
 import useRecommendationSettings from "@/features/recommendations/api/use-recommendation-settings";
 import useUpdateRecommendationSettings from "@/features/recommendations/api/use-update-recommendation-settings";
@@ -99,7 +101,7 @@ const SettingsCheckbox = ({
 );
 
 const RecommendationSettingsSection = () => {
-  const { data: settings, isLoading } = useRecommendationSettings();
+  const { data: settings, isLoading, isFetching } = useRecommendationSettings();
   const { mutateAsync: updateSettings, isPending: isUpdating } =
     useUpdateRecommendationSettings();
   const { mutate: resetFeedback, isPending: isResettingFeedback } =
@@ -137,8 +139,11 @@ const RecommendationSettingsSection = () => {
   const controlsDisabled =
     isLoading || isUpdating || isResettingFeedback || isResettingSettings;
 
+  if (isLoading) return <ListSkeleton label="Loading recommendation settings" rows={4} />;
+
   return (
     <Stack gap="5">
+      {isFetching && <LoadingStatus />}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card.Root variant="outline">
           <Card.Header>

@@ -3,6 +3,7 @@ import { Alert, Button, Card, Stack, Text } from "@chakra-ui/react";
 import { APP_CONFIG } from "@/config/app-config";
 import usePushNotifications from "@/features/notifications/api/use-push-notifications";
 import SettingsSectionHeader from "./settings-section-header";
+import ListSkeleton from "@/components/loading/list-skeleton";
 
 const NotificationsSettings = () => {
   const {
@@ -28,6 +29,9 @@ const NotificationsSettings = () => {
         description={`Choose whether ${APP_CONFIG.appName} can alert this device when something needs your attention.`}
       />
 
+      {isLoading ? (
+        <ListSkeleton label="Loading notification settings" rows={2} />
+      ) : (
       <Card.Root variant="outline">
         <Card.Body gap="4">
           <Stack gap="1">
@@ -88,6 +92,7 @@ const NotificationsSettings = () => {
           )}
         </Card.Body>
       </Card.Root>
+      )}
     </Stack>
   );
 };
