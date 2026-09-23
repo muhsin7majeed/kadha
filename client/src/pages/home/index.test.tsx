@@ -98,9 +98,4 @@ describe('Home', () => {
     expect(mocks.watchlistSection).not.toHaveBeenCalled();
   });
 
-  it('loads the temporary media card lab in development', async () => {
-    renderHome();
-
-    expect(await screen.findByRole('button', { name: 'Compare media cards' })).toBeInTheDocument();
-  });
 });

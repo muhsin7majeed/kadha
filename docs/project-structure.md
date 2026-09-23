@@ -89,6 +89,7 @@ packages/contracts/
 - The admin dashboard read model is composed in `server/src/features/admin/admin.dashboard.service.ts`; source aggregates remain owned by activity, feedback, and provider-usage features.
 - Admin user lists use an explicit identity-only projection; privacy settings and aggregate support totals are loaded only by the administrator user-detail service path.
 - Account-synced Home layout validation, normalization, and persistence belong in `server/src/features/home-preferences`; export and import orchestration remain in the user feature.
+- Media-card style validation and owner-scoped persistence belong in `server/src/features/media-card-preferences`; the client preference query and Settings control belong in `client/src/features/media-card-preferences`, while shared poster presentation stays in `client/src/components/media-card`. Account export/import remains owned by the user feature.
 - New server business logic should live in feature services, not controllers.
 - Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated
   `account-deletion.service.ts`; reusable collection ownership invariants live in the collection feature.

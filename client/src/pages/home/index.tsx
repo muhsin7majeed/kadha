@@ -1,5 +1,4 @@
-import { Button, HStack, Stack, Text } from '@chakra-ui/react';
-import { lazy, Suspense } from 'react';
+import { Button, Stack, Text } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
 import PageHeader from '@/components/page-header';
@@ -7,11 +6,6 @@ import useHomePreferences from '@/features/home/api/use-home-preferences';
 import HomeSectionError from '@/features/home/components/home-section-error';
 import { HOME_SECTION_REGISTRY } from '@/features/home/home-registry';
 import ListSkeleton from '@/components/loading/list-skeleton';
-
-const mediaCardLabModulePath = '/src/features/media-card-lab/media-card-lab-dialog.tsx';
-const MediaCardLabDialog = import.meta.env.DEV
-  ? lazy(() => import(/* @vite-ignore */ mediaCardLabModulePath))
-  : null;
 
 const Home = () => {
   const preferences = useHomePreferences();
@@ -45,16 +39,9 @@ const Home = () => {
         isRefreshing={preferences.isFetching && preferences.data !== undefined}
         subHeader="Pick up where you left off or find the next thing worth watching."
         action={
-          <HStack gap="2" flexWrap="wrap" justify="end">
-            {MediaCardLabDialog && (
-              <Suspense fallback={null}>
-                <MediaCardLabDialog />
-              </Suspense>
-            )}
-            <Button asChild size="sm" variant="outline" colorPalette="gray">
-              <Link to="/app/settings/home">Customize</Link>
-            </Button>
-          </HStack>
+          <Button asChild size="sm" variant="outline" colorPalette="gray">
+            <Link to="/app/settings/home">Customize</Link>
+          </Button>
         }
       >
         Home

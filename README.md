@@ -11,6 +11,7 @@ Use the hosted beta at [kadha.org](https://kadha.org), or deploy your own instan
 - Track watched, liked, and watchlisted movies and TV shows with ratings, dates, and private notes.
 - Record movie rewatches and individual TV episodes in a private viewing diary.
 - Follow TV progress and find the next episode of an in-progress series.
+- Choose Minimal or Detailed media cards in **Settings → Appearance**; the choice syncs with your account across devices. In Progress and Continue Watching keep their own cards.
 - Build private collections, collaborate with invited members, or share selected collections through read-only links.
 - Explore personal recommendations and viewing insights derived from your own tracking activity.
 - Control the visibility of each profile section, export or import Kadha data, and permanently delete your account.
@@ -228,7 +229,7 @@ Signed-in users can change their password from **Settings → Security** after c
 successful change revokes every access and refresh session, including the current device.
 
 Users can export their account data and import Kadha JSON exports from **Settings → Data**. Export categories are
-selectable and include account preferences, personal media tracking, watch history, owned collections, recommendation
+selectable and include account preferences (including media card style), personal media tracking, watch history, owned collections, recommendation
 preferences, friendships, collection relationships, notifications, and activity. Passwords, recovery-code material,
 sessions, roles, and account IDs are never exported. Account-deletion downloads include every export category by
 default.
