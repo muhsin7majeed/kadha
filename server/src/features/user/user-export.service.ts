@@ -8,6 +8,10 @@ import {
   parseStoredHomePreferences,
 } from '@/features/home-preferences/home-preferences.service';
 import {
+  DEFAULT_MEDIA_CARD_PREFERENCES,
+  parseStoredMediaCardPreferences,
+} from '@/features/media-card-preferences/media-card-preferences.service';
+import {
   DEFAULT_NAVIGATION_PREFERENCES,
   normalizeNavigationPreferences,
   parseStoredNavigationPreferences,
@@ -40,6 +44,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     recommendationFeedback,
     homePreferences,
     navigationPreferences,
+    mediaCardPreferences,
     feedback,
   ] = await prisma.$transaction([
     prisma.user.findUnique({
@@ -211,6 +216,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     prisma.navigationPreferences.findUnique({
       where: { userId: id },
     }),
+    prisma.mediaCardPreferences.findUnique({ where: { userId: id } }),
     prisma.feedback.findMany({
       where: { userId: id },
       orderBy: { createdAt: 'desc' },
@@ -255,6 +261,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       navigation: navigationPreferences
         ? normalizeNavigationPreferences(parseStoredNavigationPreferences(navigationPreferences.config))
         : DEFAULT_NAVIGATION_PREFERENCES,
+      mediaCard: mediaCardPreferences
+        ? parseStoredMediaCardPreferences(mediaCardPreferences.config)
+        : DEFAULT_MEDIA_CARD_PREFERENCES,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     };

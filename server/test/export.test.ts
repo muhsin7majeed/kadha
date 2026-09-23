@@ -40,6 +40,7 @@ describe('user data export', () => {
         }),
       },
     });
+    await prisma.mediaCardPreferences.create({ data: { userId: user.userId, config: JSON.stringify({ version: 1, style: 'minimal' }) } });
     await prisma.navigationPreferences.create({
       data: {
         userId: user.userId,
@@ -121,6 +122,7 @@ describe('user data export', () => {
               { id: 'trending-tv', visible: true },
             ],
           },
+          mediaCard: { version: 1, style: 'minimal' },
           navigation: {
             version: 1,
             layout: 'grid',

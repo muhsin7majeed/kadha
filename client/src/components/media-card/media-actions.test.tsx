@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { MediaCardModel } from '@/features/media/media-card-model';
@@ -62,6 +63,26 @@ describe('MediaActions menu presentation', () => {
     expect(screen.queryByRole('menuitem', { name: 'Manage watched tracking' })).not.toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Add to watchlist' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Add to collection' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Edit card view' })).not.toBeInTheDocument();
+  });
+
+  it('links to Appearance only when used on a shared poster card', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/app/media/tv/1']}>
+        <MediaActions media={media} presentation="menu" showCardStyleLink />
+        <Routes>
+          <Route path="/app/media/tv/1" element={null} />
+          <Route path="/app/settings/appearance" element={<div>Appearance destination</div>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage Example Show' }));
+    const link = screen.getByRole('menuitem', { name: 'Edit card view' });
+    expect(link).toHaveAttribute('href', '/app/settings/appearance');
+    await user.click(link);
+    expect(screen.getByText('Appearance destination')).toBeInTheDocument();
   });
 
   it('keeps dynamic labels and dispatches the selected action', async () => {

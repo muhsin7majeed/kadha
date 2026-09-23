@@ -63,6 +63,7 @@ export const friendshipQueryKeys = {
 
 export const mediaQueryKeys = {
   genreMap: ['genreMap'] as const,
+  mediaCardPreferences: ['media-card', 'preferences'] as const,
   mediaDetails: ['media-details'] as const,
   mediaDetailsById: (mediaType: MediaType, id: string) => ['media-details', mediaType, id] as const,
   mediaWatchProviders: ['media-watch-providers'] as const,

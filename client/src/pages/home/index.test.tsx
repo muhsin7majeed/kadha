@@ -97,4 +97,5 @@ describe('Home', () => {
     expect(mocks.continueSection).not.toHaveBeenCalled();
     expect(mocks.watchlistSection).not.toHaveBeenCalled();
   });
+
 });

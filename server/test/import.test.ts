@@ -454,6 +454,7 @@ describe('user data import', () => {
         }),
       },
     });
+    await prisma.mediaCardPreferences.create({ data: { userId: source.userId, config: JSON.stringify({ version: 1, style: 'minimal' }) } });
     await updateUserMediaFlag(source, 'liked', true, 886401);
 
     const exportResponse = await request(await getTestApp())
@@ -485,6 +486,8 @@ describe('user data import', () => {
       watchRegion: 'GB',
     });
     expect(await prisma.userMedia.count({ where: { userId: target.userId } })).toBe(0);
+    expect(JSON.parse((await prisma.mediaCardPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).config))
+      .toEqual({ version: 1, style: 'minimal' });
     const importedNavigation = await prisma.navigationPreferences.findUniqueOrThrow({ where: { userId: target.userId } });
     const importedNavigationConfig = JSON.parse(importedNavigation.config);
     expect(importedNavigationConfig).toMatchObject({ version: 1, layout: 'scrollable' });
@@ -525,6 +528,8 @@ describe('user data import', () => {
       ],
     });
     await prisma.homePreferences.create({ data: { userId: target.userId, config: currentHomeConfig } });
+    const currentCardConfig = JSON.stringify({ version: 1, style: 'minimal' });
+    await prisma.mediaCardPreferences.create({ data: { userId: target.userId, config: currentCardConfig } });
 
     await request(await getTestApp())
       .post('/api/user/import')
@@ -536,6 +541,7 @@ describe('user data import', () => {
           data: {
             accountPreferences: {
               profilePrivacy: 'PUBLIC',
+              mediaCard: { version: 1, style: 'unknown' },
               navigation: {
                 version: 1,
                 layout: 'compact',
@@ -557,6 +563,9 @@ describe('user data import', () => {
     });
     expect(await prisma.homePreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
       config: currentHomeConfig,
+    });
+    expect(await prisma.mediaCardPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
+      config: currentCardConfig,
     });
   });
 
