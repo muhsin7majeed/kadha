@@ -5,7 +5,7 @@ import PageHeader from '@/components/page-header';
 import useHomePreferences from '@/features/home/api/use-home-preferences';
 import HomeSectionError from '@/features/home/components/home-section-error';
 import { HOME_SECTION_REGISTRY } from '@/features/home/home-registry';
-import MediaCarouselSkeleton from '@/components/media-carousel/media-carousel-skeleton';
+import ListSkeleton from '@/components/loading/list-skeleton';
 
 const Home = () => {
   const preferences = useHomePreferences();
@@ -16,8 +16,7 @@ const Home = () => {
         <PageHeader subHeader="Pick up where you left off or find the next thing worth watching.">
           Home
         </PageHeader>
-        <MediaCarouselSkeleton label="Loading your Home" />
-        <MediaCarouselSkeleton label="Loading your Home" />
+        <ListSkeleton label="Loading your Home" rows={4} />
       </Stack>
     );
   }
