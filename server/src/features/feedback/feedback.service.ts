@@ -45,7 +45,7 @@ export async function createFeedback(userId: string, input: CreateFeedbackInput)
         userId,
         category: input.category,
         subject: input.subject,
-        message: input.message,
+        message: input.message ?? '',
         sourcePath: input.sourcePath || null,
         appVersion: input.appVersion || null,
       },

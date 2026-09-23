@@ -4,6 +4,7 @@
 
 ### Feature Changes
 
+- Added device-local Grid, List, and Table views to private, shared, and public collections, with denser responsive poster grids on mobile.
 - Added an account-synced Minimal or Detailed media card style in Appearance settings, with visual previews and an Edit card view shortcut in shared poster menus. The choice travels with account exports and imports; In Progress and Continue Watching cards keep their current design.
 - Added a responsive administrator navigation shell for Overview, Feedback, Users, and Provider Usage while preserving existing admin routes and screens.
 - Redesigned the administrator overview around new and recorded-active users, feedback requiring attention, user activity trends, provider health, and privacy-conscious instance totals.
@@ -13,6 +14,7 @@
 
 ### Behavior Fixes
 
+- Made the message optional when submitting feedback while keeping category and subject required.
 - Redesigned In Progress cards around the next episode with full-width mobile rows, integrated desktop and Home cards, visible aired-episode progress, and a compact menu for secondary media actions.
 - Standardized main navigation loading with content-shaped skeletons for initial requests, non-blocking refresh indicators when content remains available, and persistent navigation during lazy page loading.
 - Kept personal tracking dialogs closed after successfully marking a title unwatched while still returning to tracking details after cancellation.

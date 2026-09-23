@@ -1,5 +1,5 @@
 import type { OwnerMediaLibraryKey, UserMedia } from '@/features/user-media/user-media.types';
-import { formatDate, minutesToHours } from '@/utils/date';
+import { formatDate } from '@/utils/date';
 
 const libraryMeta = {
   liked: { dateKey: 'likedAt', dateLabel: 'Liked', tableLabel: 'Liked' },
@@ -13,14 +13,3 @@ export const getOwnerMediaDate = (media: UserMedia, libraryKey: OwnerMediaLibrar
   const value = media[libraryMeta[libraryKey].dateKey];
   return value ? formatDate(value, 'DD MMM YYYY') : '—';
 };
-
-export const getOwnerMediaRuntime = (media: UserMedia) =>
-  media.runtime != null && media.runtime > 0
-    ? `${minutesToHours(media.runtime)}${media.media_type === 'tv' ? '/episode' : ''}`
-    : '—';
-
-export const getOwnerMediaScore = (media: UserMedia) =>
-  media.vote_average > 0 ? media.vote_average.toFixed(1) : '—';
-
-export const getOwnerMediaYear = (media: UserMedia) =>
-  media.release_date ? formatDate(media.release_date, 'YYYY') : '—';

@@ -6,7 +6,7 @@ const optionalTrimmed = (max: number) => z.string().trim().max(max).optional().n
 export const createFeedbackSchema = z.object({
   category: z.nativeEnum(FeedbackCategory),
   subject: z.string().trim().min(3).max(120),
-  message: z.string().trim().min(10).max(5000),
+  message: z.string().trim().max(5000).optional(),
   sourcePath: optionalTrimmed(500),
   appVersion: optionalTrimmed(50),
 });

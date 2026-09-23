@@ -35,13 +35,12 @@ describe('FeedbackPage', () => {
     expect(screen.getByText('Existing report')).toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText('Category'), 'BUG');
     await user.type(screen.getByLabelText('Subject'), 'Calendar problem');
-    await user.type(screen.getByLabelText('Message'), 'The selected date changes after navigation.');
     await user.click(screen.getByRole('button', { name: 'Send feedback' }));
 
     expect(mocks.mutateAsync).toHaveBeenCalledWith(expect.objectContaining({
       category: 'BUG',
       subject: 'Calendar problem',
-      message: 'The selected date changes after navigation.',
+      message: '',
       sourcePath: '/app/diary',
       appVersion: expect.any(String),
     }));

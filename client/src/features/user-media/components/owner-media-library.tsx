@@ -3,13 +3,13 @@ import { useEffect } from 'react';
 import { LuX } from 'react-icons/lu';
 
 import MediaListPage from '@/components/media-list-page';
+import MediaViewSwitcher from '@/components/media-view-switcher';
 import useOwnerLibraryView from '@/features/user-media/api/use-owner-library-view';
 import { defaultOwnerMediaQuery } from '@/features/user-media/api/use-owner-media-query';
 import type { UserMediaAccessResponse } from '@/features/user-media/api/use-watched';
 import type { OwnerMediaLibraryKey, OwnerMediaQuery } from '@/features/user-media/user-media.types';
 import MediaLibraryFilters from './media-library-filters';
 import MediaLibraryToolbar from './media-library-toolbar';
-import MediaLibraryViewSwitcher from './media-library-view-switcher';
 import OwnerMediaListView from './owner-media-list-view';
 import OwnerMediaTableView from './owner-media-table-view';
 
@@ -123,7 +123,7 @@ const OwnerMediaLibrary = ({
       />
 
       <Flex justify="flex-end" mt="4">
-        <MediaLibraryViewSwitcher value={view} onChange={setView} />
+        <MediaViewSwitcher value={view} onChange={setView} />
       </Flex>
 
       {criteriaApplied && (

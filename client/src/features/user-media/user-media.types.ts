@@ -2,7 +2,6 @@ import { MediaMeta, MediaType } from '@/types/common';
 
 export type MediaAction = 'liked' | 'watched' | 'watchlist';
 export type OwnerMediaLibraryKey = 'liked' | 'watched' | 'watchlist';
-export type OwnerMediaView = 'grid' | 'list' | 'table';
 
 export interface UserMedia extends MediaMeta {
   /**

@@ -26,8 +26,22 @@ describe('feedback routes', () => {
   it('requires authentication and validates submissions', async () => {
     await request(await getTestApp()).post('/api/feedback').send(payload).expect(401);
     const user = await registerTestUser('feedback-validation');
-    const response = await request(await getTestApp()).post('/api/feedback').set('Authorization', authorization(user)).send({ ...payload, subject: '', message: '' }).expect(400);
-    expect(response.body.fieldErrors).toMatchObject({ subject: expect.any(String), message: expect.any(String) });
+    const response = await request(await getTestApp()).post('/api/feedback').set('Authorization', authorization(user)).send({ ...payload, subject: '' }).expect(400);
+    expect(response.body.fieldErrors).toMatchObject({ subject: expect.any(String) });
+  });
+
+  it('accepts feedback without a message and normalizes blank messages', async () => {
+    const user = await registerTestUser('feedback-optional-message');
+    const omitted = await createFeedback(user, { subject: 'Subject only', message: undefined });
+    const blank = await createFeedback(user, { subject: 'Blank message', message: '   ' });
+
+    for (const created of [omitted, blank]) {
+      const detail = await request(await getTestApp())
+        .get(`/api/feedback/${created.body.data.id}`)
+        .set('Authorization', authorization(user))
+        .expect(200);
+      expect(detail.body.data.message).toBe('');
+    }
   });
 
   it('creates, lists, and reads only the current user feedback', async () => {
