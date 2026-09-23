@@ -49,7 +49,7 @@ Kadha is an open-source, self-hostable movie and TV tracker powered by TMDB and 
 - [x] Authenticated self-service account deletion with session cleanup and documented backup handling.
 - [x] Authenticated password changes that revoke existing sessions.
 - [x] Contact-free password recovery using user-held, single-use recovery codes.
-- [x] Admin dashboard with responsive administration navigation, feedback attention summaries, user growth and recorded-activity trends, privacy-conscious instance metrics, user search, global role management, and provider usage monitoring.
+- [x] Admin dashboard with responsive administration navigation, feedback attention summaries, user growth and recorded-activity trends, privacy-conscious instance metrics, focused account lookup and role management, and provider usage monitoring.
 - [x] Private signed-in feedback with personal status history, an open-by-default administrator triage inbox, status counts and responses, in-app acknowledgments, and reference-only export coverage.
 - [x] Theme presets with independent light and dark modes.
 - [x] Responsive grouped navigation for account, privacy, recommendations, navigation, appearance, security, and data settings.

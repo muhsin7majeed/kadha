@@ -84,8 +84,8 @@ const AdminUserDetail = () => {
                   <Text textStyle="pageTitle" overflowWrap="anywhere">
                     {user.username}
                   </Text>
-                  <Text color="fg.muted" textStyle="supporting" overflowWrap="anywhere">
-                    {user.id}
+                  <Text color="fg.muted" textStyle="supporting">
+                    Account details
                   </Text>
                 </Box>
                 <Badge alignSelf={{ base: 'flex-start', md: 'center' }} colorPalette="brand" variant="subtle">
@@ -98,7 +98,7 @@ const AdminUserDetail = () => {
 
           <Card.Root>
             <Card.Header>
-              <Text fontWeight="semibold">Role management</Text>
+              <Text textStyle="subsectionTitle">Role management</Text>
             </Card.Header>
             <Card.Body gap="3">
               <Text color="fg.muted" textStyle="supporting">
@@ -123,41 +123,47 @@ const AdminUserDetail = () => {
 
           <Card.Root>
             <Card.Header>
-              <Text fontWeight="semibold">Account</Text>
+              <Text textStyle="subsectionTitle">Administrator-visible account details</Text>
             </Card.Header>
-            <Card.Body>
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-                <DetailItem label="Created" value={formatDate(user.createdAt, 'DD MMM YYYY, HH:mm')} />
-                <DetailItem label="Updated" value={formatDate(user.updatedAt, 'DD MMM YYYY, HH:mm')} />
-                <DetailItem label="Profile privacy" value={formatEnumLabel(user.profilePrivacy)} />
-                <DetailItem label="Watched privacy" value={formatEnumLabel(user.watchedPrivacy)} />
-                <DetailItem label="Liked privacy" value={formatEnumLabel(user.likedPrivacy)} />
-                <DetailItem label="Watchlist privacy" value={formatEnumLabel(user.watchlistPrivacy)} />
+            <Card.Body pt="0">
+              <Stack gap="4">
+                <Text color="fg.muted" textStyle="supporting">
+                  Account identifiers and timestamps available for support and role management.
+                </Text>
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+                  <DetailItem label="Account ID" value={user.id} />
+                  <DetailItem label="Joined" value={formatDate(user.createdAt, 'DD MMM YYYY, HH:mm')} />
+                  <DetailItem label="Last updated" value={formatDate(user.updatedAt, 'DD MMM YYYY, HH:mm')} />
+                </SimpleGrid>
+              </Stack>
+            </Card.Body>
+          </Card.Root>
+
+          <Card.Root>
+            <Card.Header>
+              <Text textStyle="subsectionTitle">Privacy settings</Text>
+            </Card.Header>
+            <Card.Body pt="0">
+              <SimpleGrid columns={{ base: 1, sm: 2 }} gap="4">
+                <DetailItem label="Profile" value={formatEnumLabel(user.profilePrivacy)} />
+                <DetailItem label="Watched" value={formatEnumLabel(user.watchedPrivacy)} />
+                <DetailItem label="Liked" value={formatEnumLabel(user.likedPrivacy)} />
+                <DetailItem label="Watchlist" value={formatEnumLabel(user.watchlistPrivacy)} />
               </SimpleGrid>
             </Card.Body>
           </Card.Root>
 
           <Card.Root>
             <Card.Header>
-              <Text fontWeight="semibold">Usage Counts</Text>
+              <Text textStyle="subsectionTitle">Aggregate support totals</Text>
             </Card.Header>
-            <Card.Body>
-              <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} gap="4">
+            <Card.Body pt="0">
+              <SimpleGrid columns={{ base: 2, md: 3 }} gap="4">
                 <DetailItem label="Watched" value={user.watchedCount} />
                 <DetailItem label="Liked" value={user.likedCount} />
                 <DetailItem label="Watchlist" value={user.watchlistCount} />
                 <DetailItem label="Collections" value={user.collectionCount} />
                 <DetailItem label="Friends" value={user.friendCount} />
-              </SimpleGrid>
-            </Card.Body>
-          </Card.Root>
-
-          <Card.Root>
-            <Card.Header>
-              <Text fontWeight="semibold">Friend Requests</Text>
-            </Card.Header>
-            <Card.Body>
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
                 <DetailItem label="Pending sent" value={user.pendingSentFriendRequestCount} />
                 <DetailItem label="Pending received" value={user.pendingReceivedFriendRequestCount} />
               </SimpleGrid>

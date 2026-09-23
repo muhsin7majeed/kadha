@@ -87,6 +87,7 @@ packages/contracts/
 - New server feature code belongs in `server/src/features/<feature-name>`.
 - Feedback persistence, validation, owner/admin query boundaries, open-status filtering, inbox counts, status transitions, and dashboard attention summaries belong in `server/src/features/feedback`; notification creation and browser-push delivery remain in `server/src/features/notification`, while account portability remains in the user feature.
 - The admin dashboard read model is composed in `server/src/features/admin/admin.dashboard.service.ts`; source aggregates remain owned by activity, feedback, and provider-usage features.
+- Admin user lists use an explicit identity-only projection; privacy settings and aggregate support totals are loaded only by the administrator user-detail service path.
 - Account-synced Home layout validation, normalization, and persistence belong in `server/src/features/home-preferences`; export and import orchestration remain in the user feature.
 - New server business logic should live in feature services, not controllers.
 - Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated
