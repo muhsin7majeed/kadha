@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
 import { UserRole } from '@/types/common';
@@ -9,6 +9,7 @@ import AdminUserDetail from './user-detail';
 
 const mocks = vi.hoisted(() => ({
   mutate: vi.fn(),
+  authUserId: 'admin-user-id',
 }));
 
 vi.mock('@/features/admin/api/use-admin-user', () => ({
@@ -43,10 +44,31 @@ vi.mock('@/features/admin/api/use-update-admin-user-role', () => ({
 }));
 
 vi.mock('@/features/auth/use-auth', () => ({
-  useAuth: () => ({ status: 'authenticated', user: { id: 'admin-user-id' } }),
+  useAuth: () => ({ status: 'authenticated', user: { id: mocks.authUserId } }),
 }));
 
 describe('AdminUserDetail', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.authUserId = 'admin-user-id';
+  });
+
+  it('labels administrator-visible support metadata without exposing private records', () => {
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/app/admin/users/target-user-id']}>
+        <AdminUserDetail />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('Administrator-visible account details')).toBeInTheDocument();
+    expect(screen.getByText('Privacy settings')).toBeInTheDocument();
+    expect(screen.getByText('Aggregate support totals')).toBeInTheDocument();
+    expect(screen.getByText('target-user-id')).toBeInTheDocument();
+    expect(screen.getAllByText('Only Me')).not.toHaveLength(0);
+    expect(screen.queryByText('Password')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recovery code')).not.toBeInTheDocument();
+  });
+
   it('confirms and submits a user promotion', async () => {
     const user = userEvent.setup();
 
@@ -62,5 +84,18 @@ describe('AdminUserDetail', () => {
     await user.click(screen.getByRole('button', { name: 'Make admin', exact: true }));
 
     expect(mocks.mutate).toHaveBeenCalledWith({ id: 'target-user-id', role: UserRole.Admin }, expect.anything());
+  });
+
+  it('does not offer role changes for the signed-in administrator', () => {
+    mocks.authUserId = 'target-user-id';
+
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/app/admin/users/target-user-id']}>
+        <AdminUserDetail />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText('You cannot change your own role.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Make admin' })).not.toBeInTheDocument();
   });
 });

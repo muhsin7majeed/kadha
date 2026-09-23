@@ -11,11 +11,19 @@ import { updateUserMediaFlag } from './helpers/user-media';
 
 describe('admin routes', () => {
   it('rejects unauthenticated admin requests', async () => {
-    const response = await request(await getTestApp())
+    const app = await getTestApp();
+    const overviewResponse = await request(app)
       .get('/api/admin/overview')
       .expect(401);
+    const usersResponse = await request(app)
+      .get('/api/admin/users')
+      .expect(401);
 
-    expect(response.body).toEqual({
+    expect(overviewResponse.body).toEqual({
+      code: 'UNAUTHORIZED',
+      message: 'Unauthorized',
+    });
+    expect(usersResponse.body).toEqual({
       code: 'UNAUTHORIZED',
       message: 'Unauthorized',
     });
@@ -23,13 +31,21 @@ describe('admin routes', () => {
 
   it('rejects non-admin users', async () => {
     const user = await registerTestUser('normal-admin-viewer');
-
-    const response = await request(await getTestApp())
+    const app = await getTestApp();
+    const overviewResponse = await request(app)
       .get('/api/admin/overview')
       .set('Authorization', authorization(user))
       .expect(403);
+    const usersResponse = await request(app)
+      .get('/api/admin/users')
+      .set('Authorization', authorization(user))
+      .expect(403);
 
-    expect(response.body).toEqual({
+    expect(overviewResponse.body).toEqual({
+      code: 'FORBIDDEN',
+      message: 'Forbidden',
+    });
+    expect(usersResponse.body).toEqual({
       code: 'FORBIDDEN',
       message: 'Forbidden',
     });
@@ -80,6 +96,9 @@ describe('admin routes', () => {
     expect(selfDemotion.body).toEqual({
       code: 'FORBIDDEN',
       message: 'You cannot change your own role',
+    });
+    await expect(prisma.user.findUniqueOrThrow({ where: { id: admin.userId } })).resolves.toMatchObject({
+      role: 'ADMIN',
     });
   });
 
@@ -263,14 +282,11 @@ describe('admin routes', () => {
       .expect(200);
 
     expect(listResponse.body.pagination.total).toBe(1);
-    expect(listResponse.body.data[0]).toMatchObject({
+    expect(listResponse.body.data[0]).toEqual({
       id: trackedUser.userId,
       username: trackedUser.username,
       role: 'USER',
-      likedCount: 1,
-      watchedCount: 1,
-      watchlistCount: 1,
-      collectionCount: 1,
+      createdAt: expect.any(String),
     });
 
     const detailResponse = await request(await getTestApp())
@@ -278,16 +294,66 @@ describe('admin routes', () => {
       .set('Authorization', authorization(admin))
       .expect(200);
 
-    expect(detailResponse.body.data).toMatchObject({
+    expect(detailResponse.body.data).toEqual({
       id: trackedUser.userId,
       username: trackedUser.username,
       role: 'USER',
+      createdAt: expect.any(String),
+      updatedAt: expect.any(String),
+      profilePrivacy: 'ONLY_ME',
+      watchedPrivacy: 'ONLY_ME',
+      likedPrivacy: 'ONLY_ME',
+      watchlistPrivacy: 'ONLY_ME',
       likedCount: 1,
       watchedCount: 1,
       watchlistCount: 1,
       collectionCount: 1,
+      friendCount: 0,
       pendingSentFriendRequestCount: 0,
       pendingReceivedFriendRequestCount: 0,
     });
+    expect(JSON.stringify(detailResponse.body.data)).not.toContain('password');
+    expect(JSON.stringify(detailResponse.body.data)).not.toContain('recovery');
+    expect(JSON.stringify(detailResponse.body.data)).not.toContain('session');
+    expect(JSON.stringify(detailResponse.body.data)).not.toContain('watchRegion');
+  });
+
+  it('filters, sorts, and paginates the compact user list', async () => {
+    const admin = await registerTestUser('users-list-admin');
+    const zetaUser = await registerTestUser('zeta-users-list');
+    const alphaUser = await registerTestUser('alpha-users-list');
+
+    await promoteTestUserToAdmin(admin);
+
+    const firstPage = await request(await getTestApp())
+      .get('/api/admin/users')
+      .query({ role: 'USER', sort: 'username', order: 'asc', page: 1, limit: 1 })
+      .set('Authorization', authorization(admin))
+      .expect(200);
+
+    expect(firstPage.body.data).toEqual([
+      {
+        id: alphaUser.userId,
+        username: alphaUser.username,
+        role: 'USER',
+        createdAt: expect.any(String),
+      },
+    ]);
+    expect(firstPage.body.pagination).toMatchObject({
+      page: 1,
+      limit: 1,
+      total: 2,
+      totalPages: 2,
+      hasNextPage: true,
+      hasPreviousPage: false,
+    });
+
+    const secondPage = await request(await getTestApp())
+      .get('/api/admin/users')
+      .query({ role: 'USER', sort: 'username', order: 'asc', page: 2, limit: 1 })
+      .set('Authorization', authorization(admin))
+      .expect(200);
+
+    expect(secondPage.body.data[0]).toMatchObject({ id: zetaUser.userId, username: zetaUser.username });
   });
 });
