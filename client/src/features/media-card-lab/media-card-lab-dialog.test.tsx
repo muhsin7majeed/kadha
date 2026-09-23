@@ -13,7 +13,7 @@ const openLab = async () => {
 };
 
 describe('MediaCardLabDialog', () => {
-  it('compares all five named concepts with visible personal states', async () => {
+  it('keeps the original five concepts with visible personal states', async () => {
     await openLab();
 
     const dialog = screen.getByRole('dialog', { name: 'Media card design lab' });
@@ -25,6 +25,31 @@ describe('MediaCardLabDialog', () => {
     expect(within(dialog).getAllByText('Liked').length).toBeGreaterThan(0);
     expect(within(dialog).getAllByText('Watchlist').length).toBeGreaterThan(0);
     expect(within(dialog).getAllByText('Watched ×2').length).toBeGreaterThan(0);
+  });
+
+  it('compares three poster-overlay concepts with scrollable titles, genres, chips and active-only status', async () => {
+    await openLab();
+
+    const dialog = screen.getByRole('dialog', { name: 'Media card design lab' });
+    for (const name of ['6. Cinematic Gradient', '7. Status Rail', '8. Glass Caption']) {
+      const concept = within(dialog).getByRole('region', { name });
+      expect(within(concept).getAllByRole('group', { name: 'Dune: Part Two title' })).toHaveLength(1);
+      expect(within(concept).getAllByRole('group', { name: 'Dune: Part Two genres' })).toHaveLength(1);
+      expect(within(concept).getByRole('group', { name: 'Dune: Part Two title' })).toHaveAttribute('tabindex', '0');
+      expect(within(concept).getByRole('group', { name: 'Dune: Part Two genres' })).toHaveAttribute('tabindex', '0');
+      expect(getComputedStyle(within(concept).getByRole('group', { name: 'Dune: Part Two title' })).overflowX).toBe('auto');
+      expect(getComputedStyle(within(concept).getByRole('group', { name: 'Dune: Part Two genres' })).overflowX).toBe('auto');
+      const facts = within(concept).getByRole('group', { name: 'Dune: Part Two facts' });
+      for (const value of ['8.1', 'Movie', '2024', '2h 46m']) {
+        expect(within(facts).getByText(value)).toBeInTheDocument();
+      }
+      expect(within(concept).getByLabelText('Liked Dune: Part Two')).toBeInTheDocument();
+      expect(within(concept).getByLabelText('Watchlisted Dune: Part Two')).toBeInTheDocument();
+      expect(within(concept).getByLabelText('Watched Spider-Man: Across the Spider-Verse')).toBeInTheDocument();
+      expect(within(concept).queryByLabelText('Liked Shōgun')).not.toBeInTheDocument();
+      expect(within(concept).getByRole('button', { name: 'Quick info about Dune: Part Two' })).toBeInTheDocument();
+      expect(within(concept).getByRole('button', { name: 'Manage Dune: Part Two' })).toBeInTheDocument();
+    }
   });
 
   it('provides labelled quick information and overflow actions', async () => {

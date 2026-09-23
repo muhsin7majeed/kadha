@@ -320,6 +320,152 @@ export const CompactQuickViewCard = ({ media }: { media: MediaCardLabItem }) => 
   </Card.Root>
 );
 
+const OverlayControls = ({ media }: { media: MediaCardLabItem }) => (
+  <HStack position="absolute" top="2" right="2" gap="1" zIndex="1">
+    <QuickInfo media={media} />
+    <ActionMenu media={media} />
+  </HStack>
+);
+
+const OverlayStatus = ({ media, direction = 'row' }: { media: MediaCardLabItem; direction?: 'row' | 'column' }) => {
+  const states = [
+    media.liked ? { label: `Liked ${media.title}`, icon: <LuHeart aria-hidden="true" /> } : null,
+    media.watchlist ? { label: `Watchlisted ${media.title}`, icon: <LuBookmark aria-hidden="true" /> } : null,
+    media.watched || media.watchCount ? { label: `Watched ${media.title}`, icon: <LuCheck aria-hidden="true" /> } : null,
+  ].filter((state) => state !== null);
+
+  if (states.length === 0) return null;
+
+  return (
+    <Flex gap="1" direction={direction} align="start">
+      {states.map((state) => (
+        <Badge
+          key={state.label}
+          aria-label={state.label}
+          title={state.label}
+          bg="blackAlpha.800"
+          color="white"
+          p="1.5"
+          borderRadius="full"
+        >
+          {state.icon}
+        </Badge>
+      ))}
+    </Flex>
+  );
+};
+
+const OverlayFacts = ({ media }: { media: MediaCardLabItem }) => (
+  <HStack
+    role="group"
+    aria-label={`${media.title} facts`}
+    gap="1"
+    overflowX="auto"
+    maxW="full"
+    tabIndex={0}
+    scrollbarWidth="thin"
+  >
+    <Badge flexShrink="0" bg="blackAlpha.800" color="white">
+      <LuStar aria-hidden="true" />
+      {media.vote_average.toFixed(1)}
+    </Badge>
+    <Badge flexShrink="0" bg="blackAlpha.800" color="white">{media.media_type === 'movie' ? 'Movie' : 'TV'}</Badge>
+    <Badge flexShrink="0" bg="blackAlpha.800" color="white">{releaseYear(media)}</Badge>
+    {media.runtime ? (
+      <Badge flexShrink="0" bg="blackAlpha.800" color="white">
+        {minutesToHours(media.runtime)}{media.media_type === 'tv' ? '/episode' : ''}
+      </Badge>
+    ) : null}
+  </HStack>
+);
+
+const OverlayIdentity = ({ media }: { media: MediaCardLabItem }) => (
+  <Stack gap="1" minW="0" color="white">
+    <Box role="group" aria-label={`${media.title} title`} overflowX="auto" maxW="full" tabIndex={0} scrollbarWidth="thin">
+      <Text as="h3" textStyle="cardTitle" whiteSpace="nowrap" width="max-content">{media.title}</Text>
+    </Box>
+    <HStack
+      role="group"
+      aria-label={`${media.title} genres`}
+      overflowX="auto"
+      maxW="full"
+      gap="1.5"
+      tabIndex={0}
+      scrollbarWidth="thin"
+    >
+      {media.genres.map((genre) => (
+        <Text key={genre} textStyle="supporting" whiteSpace="nowrap" flexShrink="0">{genre}</Text>
+      ))}
+    </HStack>
+  </Stack>
+);
+
+const OverlayPoster = ({ media, children }: { media: MediaCardLabItem; children: React.ReactNode }) => (
+  <Card.Root as="article" variant="outline" overflow="hidden" bg="bg.subtle" maxW="220px" width="full">
+    <Box position="relative" aspectRatio="2 / 3" minW="0">
+      <Poster media={media} />
+      {children}
+      <OverlayControls media={media} />
+    </Box>
+  </Card.Root>
+);
+
+export const CinematicGradientCard = ({ media }: { media: MediaCardLabItem }) => (
+  <OverlayPoster media={media}>
+    <Box
+      position="absolute"
+      inset="0"
+      bgGradient="to-t"
+      gradientFrom="blackAlpha.950"
+      gradientVia="blackAlpha.500"
+      gradientTo="transparent"
+      pointerEvents="none"
+    />
+    <Stack position="absolute" left="3" right="3" bottom="3" gap="2.5">
+      <OverlayStatus media={media} />
+      <OverlayFacts media={media} />
+      <OverlayIdentity media={media} />
+    </Stack>
+  </OverlayPoster>
+);
+
+export const StatusRailCard = ({ media }: { media: MediaCardLabItem }) => (
+  <OverlayPoster media={media}>
+    <Box position="absolute" top="2" left="2">
+      <OverlayStatus media={media} direction="column" />
+    </Box>
+    <Stack position="absolute" insetX="0" bottom="0" p="3" pt="10" gap="2" bgGradient="to-t" gradientFrom="blackAlpha.950" gradientTo="transparent">
+      <OverlayFacts media={media} />
+      <OverlayIdentity media={media} />
+    </Stack>
+  </OverlayPoster>
+);
+
+export const GlassCaptionCard = ({ media }: { media: MediaCardLabItem }) => (
+  <OverlayPoster media={media}>
+    <Box position="absolute" top="2" left="2">
+      <OverlayStatus media={media} />
+    </Box>
+    <Stack
+      position="absolute"
+      bottom="2"
+      left="2"
+      right="2"
+      p="2.5"
+      gap="2"
+      bg="blackAlpha.800"
+      backdropFilter="blur(14px)"
+      borderWidth="1px"
+      borderColor="whiteAlpha.400"
+      borderRadius="lg"
+      minW="0"
+    >
+      <OverlayIdentity media={media} />
+      <OverlayFacts media={media} />
+    </Stack>
+  </OverlayPoster>
+);
+
 interface ConceptSectionProps {
   description: string;
   items: MediaCardLabItem[];
