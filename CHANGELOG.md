@@ -7,6 +7,7 @@
 - Added a responsive administrator navigation shell for Overview, Feedback, Users, and Provider Usage while preserving existing admin routes and screens.
 - Redesigned the administrator overview around new and recorded-active users, feedback requiring attention, user activity trends, provider health, and privacy-conscious instance totals.
 - Redesigned administrator feedback as an open-by-default triage inbox with status counts, responsive submission details, and clearer message, metadata, and response sections.
+- Simplified administrator account lookup with a responsive user list and detail-only privacy settings and aggregate support totals.
 - Added an administrator Provider Usage dashboard with generic provider metrics, TMDB request and cache tracking, rate-limit visibility, latency summaries, and accessible request charts.
 
 ### Behavior Fixes
