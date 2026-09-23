@@ -44,7 +44,7 @@ const MediaTypeSegmentedControl = ({
       color="fg"
       flex={stretch ? '1' : undefined}
       items={mediaTypeItems}
-      _checked={{ color: 'colorPalette.contrast' }}
+      _checked={{ bg: 'colorPalette.solid', color: 'colorPalette.contrast' }}
     />
   </SegmentGroup.Root>
 );

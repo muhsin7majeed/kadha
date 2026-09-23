@@ -14,15 +14,28 @@ import TopRatedTvs from '@/features/discovery/components/top-rated-tvs';
 import TrendingMovies from '@/features/discovery/components/trending-movies';
 import TrendingTvs from '@/features/discovery/components/trending-tvs';
 import UpcomingMovies from '@/features/discovery/components/upcoming-movies';
+import type { MediaTypeFilter } from '@/types/common';
+
+const storedToSegmentValue: Record<MediaTypeFilter, MediaTypeSegmentValue> = {
+  All: 'all',
+  Movie: 'movie',
+  TV: 'tv',
+};
+
+const segmentToStoredValue: Record<MediaTypeSegmentValue, MediaTypeFilter> = {
+  all: 'All',
+  movie: 'Movie',
+  tv: 'TV',
+};
 
 const Discover = () => {
   const [mediaType, setMediaType] = useMediaType();
   const showMovies = mediaType === 'Movie' || mediaType === 'All';
   const showTv = mediaType === 'TV' || mediaType === 'All';
-  const segmentValue = mediaType.toLowerCase() as MediaTypeSegmentValue;
+  const segmentValue = storedToSegmentValue[mediaType];
 
   const handleMediaTypeChange = (value: MediaTypeSegmentValue) => {
-    setMediaType(value === 'all' ? 'All' : value === 'movie' ? 'Movie' : 'TV');
+    setMediaType(segmentToStoredValue[value]);
   };
 
   return (

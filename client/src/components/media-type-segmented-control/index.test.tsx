@@ -65,6 +65,9 @@ describe('MediaTypeSegmentedControl', () => {
     expect(getComputedStyle(root).getPropertyValue('--segment-indicator-bg')).toBe(
       'var(--chakra-colors-color-palette-solid)',
     );
+    expect(getComputedStyle(selectedItem!).getPropertyValue('--bg-currentcolor')).toBe(
+      'var(--chakra-colors-color-palette-solid)',
+    );
     expect(getComputedStyle(selectedItem!).color).toBe(
       'var(--chakra-colors-color-palette-contrast)',
     );
