@@ -12,6 +12,7 @@
 
 ### Behavior Fixes
 
+- Standardized main navigation loading with content-shaped skeletons for initial requests, non-blocking refresh indicators when content remains available, and persistent navigation during lazy page loading.
 - Kept personal tracking dialogs closed after successfully marking a title unwatched while still returning to tracking details after cancellation.
 - Standardized media type filters across Discover, Diary, owner libraries, and the private profile overview with one accessible control that visibly follows the selected theme.
 - Improved Diary heatmap keyboard access, chart semantics, selected-day request states, and filtered pagination behavior.
