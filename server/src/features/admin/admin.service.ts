@@ -165,25 +165,12 @@ export async function getAdminUsers(params: AdminUserListParams) {
         username: true,
         role: true,
         createdAt: true,
-        updatedAt: true,
-        profilePrivacy: true,
-        watchedPrivacy: true,
-        likedPrivacy: true,
-        watchlistPrivacy: true,
       },
     }),
     prisma.user.count({ where }),
   ]);
 
-  const counts = await getUserSummaryCounts(users.map((user) => user.id));
-  const data: AdminUserSummary[] = users.map((user) => ({
-    ...user,
-    watchedCount: getCount(counts.watchedCounts, user.id),
-    likedCount: getCount(counts.likedCounts, user.id),
-    watchlistCount: getCount(counts.watchlistCounts, user.id),
-    collectionCount: getCount(counts.collectionCounts, user.id),
-    friendCount: getCount(counts.friendCounts, user.id),
-  }));
+  const data: AdminUserSummary[] = users;
 
   return {
     data,
