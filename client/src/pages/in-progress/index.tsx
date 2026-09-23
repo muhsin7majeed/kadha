@@ -1,13 +1,9 @@
 import {
   Box,
-  Center,
   Field,
   HStack,
   NativeSelect,
   SimpleGrid,
-  Spinner,
-  Text,
-  VStack,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { LuListChecks } from "react-icons/lu";
@@ -19,6 +15,7 @@ import PaginationControls from "@/components/pagination-controls";
 import useInProgressTv from "@/features/user-media/api/use-in-progress-tv";
 import InProgressTvCard from "@/features/user-media/components/in-progress-tv-card";
 import type { InProgressTvSort } from "@/features/user-media/user-media.types";
+import MediaListSkeleton from "@/components/loading/media-list-skeleton";
 
 const InProgress = () => {
   const [page, setPage] = useState(1);
@@ -35,7 +32,7 @@ const InProgress = () => {
   return (
     <Box>
       <PageHeader
-        isFetching={isFetching}
+        isRefreshing={isFetching && !isLoading && inProgressTv !== undefined}
         subHeader="TV shows with episode progress, including the next aired episode when one is available."
       >
         In Progress
@@ -61,12 +58,7 @@ const InProgress = () => {
       </HStack>
 
       {isLoading ? (
-        <Center py={20}>
-          <VStack gap={4}>
-            <Spinner size="xl" color="brand.solid" />
-            <Text color="fg.muted">Loading your TV progress...</Text>
-          </VStack>
-        </Center>
+        <MediaListSkeleton label="Loading your TV progress" />
       ) : error ? (
         <Box py={10}>
           <ErrorState

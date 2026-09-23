@@ -93,7 +93,7 @@ describe('Home', () => {
 
     renderHome();
 
-    expect(screen.getByText('Loading your Home...')).toBeInTheDocument();
+    expect(screen.getAllByText('Loading your Home')).toHaveLength(2);
     expect(mocks.continueSection).not.toHaveBeenCalled();
     expect(mocks.watchlistSection).not.toHaveBeenCalled();
   });

@@ -3,17 +3,20 @@ import LoadingStatus from './loading/loading-status';
 
 interface PageHeaderProps extends FlexProps {
   action?: React.ReactNode;
+  isFetching?: boolean;
   isRefreshing?: boolean;
   subHeader?: string;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ action, isRefreshing, children, subHeader, ...props }) => {
+const PageHeader: React.FC<PageHeaderProps> = ({ action, isFetching, isRefreshing, children, subHeader, ...props }) => {
+  const showRefreshing = isRefreshing ?? isFetching;
+
   return (
     <Flex justifyContent="space-between" direction="column" gap={2} mb="4" {...props}>
       <Flex justify="space-between" align="start" gap="3">
         <Flex align="center" gap="2">
           <Heading textStyle="pageTitle">{children}</Heading>
-          {isRefreshing && <LoadingStatus />}
+          {showRefreshing && <LoadingStatus />}
         </Flex>
         {action}
       </Flex>

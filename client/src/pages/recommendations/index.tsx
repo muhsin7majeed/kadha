@@ -1,4 +1,4 @@
-import { Box, Button, Center, Spinner, Stack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Center, Stack } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { LuSparkles } from 'react-icons/lu';
@@ -10,6 +10,7 @@ import PageHeader from '@/components/page-header';
 import PaginationControls from '@/components/pagination-controls';
 import useRecommendations from '@/features/recommendations/api/use-recommendations';
 import RecommendationListItem from '@/features/recommendations/components/recommendation-list-item';
+import ListSkeleton from '@/components/loading/list-skeleton';
 
 const Recommendations = () => {
   const [page, setPage] = useState(1);
@@ -19,17 +20,15 @@ const Recommendations = () => {
 
   return (
     <Box>
-      <PageHeader isFetching={isFetching} subHeader="Private suggestions based only on the tracking signals you allow.">
+      <PageHeader
+        isRefreshing={isFetching && !isLoading && recommendations !== undefined}
+        subHeader="Private suggestions based only on the tracking signals you allow."
+      >
         Recommendations
       </PageHeader>
 
       {isLoading ? (
-        <Center py={20}>
-          <VStack gap={4}>
-            <Spinner size="xl" color="brand.solid" />
-            <Text color="fg.muted">Finding private recommendations...</Text>
-          </VStack>
-        </Center>
+        <ListSkeleton label="Finding private recommendations" />
       ) : error ? (
         <Box py={10}>
           <ErrorState

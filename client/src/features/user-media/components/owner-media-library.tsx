@@ -33,7 +33,6 @@ interface OwnerMediaLibraryProps {
   query: OwnerMediaQuery;
   refetch: () => void;
   response?: UserMediaAccessResponse;
-  spinnerColor?: string;
   supportsPersonalRating?: boolean;
   title: string;
   updateQuery: (patch: Partial<OwnerMediaQuery>, options?: { replace?: boolean }) => void;
@@ -71,7 +70,6 @@ const OwnerMediaLibrary = ({
   query,
   refetch,
   response,
-  spinnerColor,
   supportsPersonalRating = true,
   title,
   updateQuery,
@@ -230,7 +228,6 @@ const OwnerMediaLibrary = ({
       data={response?.data}
       isLoading={isLoading || isCorrectingPage || (isPlaceholderData && response?.data.length === 0)}
       isFetching={isFetching}
-      isPlaceholderData={isPlaceholderData}
       error={error}
       refetch={refetch}
       emptyState={
@@ -244,7 +241,6 @@ const OwnerMediaLibrary = ({
       }
       errorDescription={errorDescription}
       loadingText={loadingText}
-      spinnerColor={spinnerColor}
       showLibraryMetadata
       showPersonalRating={supportsPersonalRating}
       pagination={response?.pagination}
