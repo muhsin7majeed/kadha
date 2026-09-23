@@ -1,7 +1,9 @@
 import { Stack } from '@chakra-ui/react';
 
-import { useMediaTypeValue } from '@/atoms/media-type';
-import MediaTypeFilter from '@/components/media-type-filter';
+import { useMediaType } from '@/atoms/media-type';
+import MediaTypeSegmentedControl, {
+  type MediaTypeSegmentValue,
+} from '@/components/media-type-segmented-control';
 import PageHeader from '@/components/page-header';
 import NowPlayingMovies from '@/features/discovery/components/now-playing-movies';
 import OnTheAirTvs from '@/features/discovery/components/on-the-air-tvs';
@@ -12,11 +14,29 @@ import TopRatedTvs from '@/features/discovery/components/top-rated-tvs';
 import TrendingMovies from '@/features/discovery/components/trending-movies';
 import TrendingTvs from '@/features/discovery/components/trending-tvs';
 import UpcomingMovies from '@/features/discovery/components/upcoming-movies';
+import type { MediaTypeFilter } from '@/types/common';
+
+const storedToSegmentValue: Record<MediaTypeFilter, MediaTypeSegmentValue> = {
+  All: 'all',
+  Movie: 'movie',
+  TV: 'tv',
+};
+
+const segmentToStoredValue: Record<MediaTypeSegmentValue, MediaTypeFilter> = {
+  all: 'All',
+  movie: 'Movie',
+  tv: 'TV',
+};
 
 const Discover = () => {
-  const mediaType = useMediaTypeValue();
+  const [mediaType, setMediaType] = useMediaType();
   const showMovies = mediaType === 'Movie' || mediaType === 'All';
   const showTv = mediaType === 'TV' || mediaType === 'All';
+  const segmentValue = storedToSegmentValue[mediaType];
+
+  const handleMediaTypeChange = (value: MediaTypeSegmentValue) => {
+    setMediaType(segmentToStoredValue[value]);
+  };
 
   return (
     <Stack gap="6">
@@ -24,7 +44,11 @@ const Discover = () => {
         <PageHeader subHeader="Browse what is trending, popular, airing, upcoming, and highly rated.">
           Discover
         </PageHeader>
-        <MediaTypeFilter />
+        <MediaTypeSegmentedControl
+          aria-label="Filter discovery by media type"
+          value={segmentValue}
+          onValueChange={handleMediaTypeChange}
+        />
       </Stack>
 
       <Stack gap="4">

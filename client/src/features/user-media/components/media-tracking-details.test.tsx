@@ -190,12 +190,13 @@ describe('MediaTrackingDetails', () => {
     await user.click(screen.getByRole('button', { name: 'Mark unwatched' }));
 
     expect(mutationMocks.watched).toHaveBeenCalledWith(expect.objectContaining({ watched: false }));
-    expect(
-      screen.getByRole('alertdialog', {
-        name: 'Mark this title unwatched?',
-        hidden: true,
-      }),
-    ).toHaveAttribute('data-state', 'closed');
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('alertdialog', { name: 'Mark this title unwatched?' }),
+      ).not.toBeInTheDocument();
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByRole('dialog', { name: 'Your tracking' })).not.toBeInTheDocument();
   });
 
   it('repopulates saved liked details when the editor is reopened', async () => {

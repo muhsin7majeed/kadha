@@ -117,6 +117,11 @@ describe('viewing diary page', () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Diary' })).toBeInTheDocument();
+    expect(
+      getComputedStyle(screen.getByRole('radiogroup', { name: 'Filter diary by media type' })).getPropertyValue(
+        '--segment-indicator-bg',
+      ),
+    ).toBe('var(--chakra-colors-color-palette-solid)');
     expect(screen.getByText('A Test Film')).toBeInTheDocument();
     expect(screen.getByText('Still excellent.')).toBeInTheDocument();
     expect(screen.getByText('2 hours')).toBeInTheDocument();
@@ -145,5 +150,75 @@ describe('viewing diary page', () => {
     );
 
     expect(screen.getByRole('tab', { name: /Insights/ })).toBeInTheDocument();
+  });
+
+  it('resets selected-day pagination when the media type changes', async () => {
+    mocks.useDiaryInsights.mockReturnValue({
+      data: {
+        ...insightsResponse,
+        daily: [
+          {
+            date: '2026-09-13',
+            movieWatches: 1,
+            episodeWatches: 0,
+            totalEntries: 1,
+            estimatedMinutes: 120,
+            runtimeCoverage: { coveredEntries: 1, totalEntries: 1, ratio: 1 },
+          },
+        ],
+      },
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+    mocks.useDiary.mockImplementation((query: { page: number; date?: string }) => ({
+      data: query.date
+        ? {
+            ...response,
+            pagination: {
+              page: query.page,
+              limit: 20,
+              total: 21,
+              totalPages: 2,
+              hasNextPage: query.page === 1,
+              hasPreviousPage: query.page === 2,
+            },
+          }
+        : response,
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+      refetch: vi.fn(),
+    }));
+
+    renderPage();
+
+    const calendarTab = screen.getByRole('tab', { name: /Calendar/ });
+    fireEvent.click(calendarTab);
+    await waitFor(() => expect(calendarTab).toHaveAttribute('aria-selected', 'true'));
+    fireEvent.change(screen.getByLabelText('Calendar month'), { target: { value: '9' } });
+    fireEvent.click(
+      await screen.findByRole('button', {
+        name: /September 13, 2026, 1 watch, 1 movie, 0 episodes/,
+      }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Next page' }));
+
+    await waitFor(() =>
+      expect(mocks.useDiary).toHaveBeenCalledWith(
+        { page: 2, mediaType: 'all', date: '2026-09-13' },
+        true,
+      ),
+    );
+
+    fireEvent.click(screen.getByText('TV'));
+
+    await waitFor(() =>
+      expect(mocks.useDiary).toHaveBeenCalledWith(
+        { page: 1, mediaType: 'tv', date: '2026-09-13' },
+        true,
+      ),
+    );
   });
 });

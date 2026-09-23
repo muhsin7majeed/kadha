@@ -49,7 +49,7 @@ const DiaryHeatmap = ({ daily, onSelectDate, year }: DiaryHeatmapProps) => {
             ))}
           </Flex>
           <Grid
-            role="grid"
+            role="group"
             aria-label={`${year} viewing activity`}
             templateRows="repeat(7, 0.75rem)"
             gridAutoFlow="column"
@@ -65,23 +65,35 @@ const DiaryHeatmap = ({ daily, onSelectDate, year }: DiaryHeatmapProps) => {
               const level = count === 0 || maxEntries === 0 ? 0 : Math.max(1, Math.ceil((count / maxEntries) * 4));
               const label = new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' }).format(date);
 
+              if (count === 0) {
+                return (
+                  <Box
+                    key={key}
+                    aria-hidden
+                    title={`${label}: 0`}
+                    boxSize="3"
+                    borderRadius="xs"
+                    bg={heatColors[0]}
+                    borderWidth="1px"
+                    borderColor="border.subtle"
+                  />
+                );
+              }
+
               return (
                 <chakra.button
                   type="button"
-                  role="gridcell"
                   key={key}
                   aria-label={`${label}: ${count} ${count === 1 ? 'watch' : 'watches'}`}
                   title={`${label}: ${count}`}
                   boxSize="3"
                   borderRadius="xs"
                   bg={heatColors[level]}
-                  borderWidth={count === 0 ? '1px' : '0'}
+                  borderWidth="0"
                   borderColor="border.subtle"
-                  cursor={count > 0 ? 'pointer' : 'default'}
+                  cursor="pointer"
                   _focusVisible={{ outline: '2px solid', outlineColor: 'brand.focusRing', outlineOffset: '2px' }}
-                  onClick={() => {
-                    if (count > 0) onSelectDate(key);
-                  }}
+                  onClick={() => onSelectDate(key)}
                 />
               );
             })}

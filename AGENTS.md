@@ -16,6 +16,7 @@
 - Treat readability and maintainability as correctness requirements. Passing tests do not make unnecessarily tangled, duplicated, or poorly structured code acceptable.
 - Prefer clear domain boundaries, cohesive modules, small named functions, and explicit control flow over oversized multi-purpose services, deeply nested conditionals or ternaries, and dense inline query construction.
 - Reuse existing domain logic and established framework or library capabilities before writing custom equivalents. Introduce a new dependency only when it materially simplifies the solution, and ask first as required above.
+- When touching an area, actively check for the same UI or domain pattern elsewhere. Surface real duplication and propose a shared primitive before copying it again; ask before broadening the change unless the abstraction is already approved.
 - Avoid premature abstractions: extract shared code when duplication is real or a domain concept has a clear independent responsibility, not merely because two snippets look similar.
 - When feature work touches problematic code, refactor the relevant area enough to leave it clearer, cohesive, and maintainable. Keep that cleanup bounded to the behavior being changed rather than turning it into an unrelated whole-file rewrite.
 - Do not duplicate filters, sorting rules, validation, or business decisions across multiple query paths without a strong reason. When duplication is unavoidable, centralize the contract where practical and add tests that keep the implementations aligned.
@@ -42,11 +43,12 @@
 - Client install: `docker compose run --rm client npm ci`
 - Client build: `docker compose run --rm client npm run build`
 - Client lint: `docker compose run --rm client npm run lint`
+- Client tests: `docker compose run --rm client npm test`
 - Server install: `docker compose run --rm server npm ci`
 - Server build: `docker compose run --rm server npm run build`
 - Server tests: `docker compose run --rm server npm test`
 
-Run the most relevant build, lint, or test command for the area changed. If verification cannot be run, explain why.
+Run the most relevant build, lint, or test command for the area changed. Pull request CI intentionally skips the client and server test suites, so run relevant tests locally before pushing. If verification cannot be run, explain why.
 
 ## Server Structure
 

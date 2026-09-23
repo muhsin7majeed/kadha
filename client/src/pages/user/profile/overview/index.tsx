@@ -5,7 +5,6 @@ import {
   Card,
   Heading,
   HStack,
-  SegmentGroup,
   SimpleGrid,
   Skeleton,
   Stack,
@@ -17,6 +16,7 @@ import { Link } from 'react-router';
 import { useParams } from 'react-router';
 
 import ErrorState from '@/components/info-states/error-state';
+import MediaTypeSegmentedControl from '@/components/media-type-segmented-control';
 import { APP_CONFIG } from '@/config/app-config';
 import InsightSection from '@/features/insights/components/insight-section';
 import DistributionInsightList from '@/features/insights/components/distribution-insight-list';
@@ -25,32 +25,6 @@ import RankedInsightList from '@/features/insights/components/ranked-insight-lis
 import useViewingInsights from '@/features/insights/api/use-viewing-insights';
 import { InsightMediaType, ViewingInsights } from '@/features/insights/insights.types';
 import { useAuth } from '@/features/auth/use-auth';
-
-const mediaTypeItems = [
-  { label: 'All', value: 'all' },
-  { label: 'Movies', value: 'movie' },
-  { label: 'TV', value: 'tv' },
-] satisfies Array<{ label: string; value: InsightMediaType }>;
-
-interface InsightMediaFilterProps {
-  disabled: boolean;
-  mediaType: InsightMediaType;
-  onChange: (mediaType: InsightMediaType) => void;
-}
-
-const InsightMediaFilter = ({ disabled, mediaType, onChange }: InsightMediaFilterProps) => (
-  <SegmentGroup.Root
-    aria-label="Filter overview by media type"
-    orientation="horizontal"
-    value={mediaType}
-    onValueChange={(details) => onChange(details.value as InsightMediaType)}
-    disabled={disabled}
-    size="sm"
-  >
-    <SegmentGroup.Indicator />
-    <SegmentGroup.Items items={mediaTypeItems} />
-  </SegmentGroup.Root>
-);
 
 interface SummaryCardProps {
   label: string;
@@ -134,7 +108,12 @@ const ViewingOverview = () => {
     return (
       <Stack gap="5">
         <HStack justify="flex-end">
-          <InsightMediaFilter disabled={isFetching} mediaType={mediaType} onChange={setMediaType} />
+          <MediaTypeSegmentedControl
+            aria-label="Filter overview by media type"
+            disabled={isFetching}
+            value={mediaType}
+            onValueChange={setMediaType}
+          />
         </HStack>
         <Card.Root variant="outline">
           <Card.Body alignItems="center" py="12" textAlign="center" gap="4">
@@ -173,7 +152,12 @@ const ViewingOverview = () => {
             All-time insights from your current tracked state.
           </Text>
         </Box>
-        <InsightMediaFilter disabled={isFetching} mediaType={mediaType} onChange={setMediaType} />
+        <MediaTypeSegmentedControl
+          aria-label="Filter overview by media type"
+          disabled={isFetching}
+          value={mediaType}
+          onValueChange={setMediaType}
+        />
       </HStack>
 
       <Card.Root variant="subtle" bg="brand.subtle">

@@ -1,12 +1,12 @@
-import { Button, Field, Flex, Group, Input, InputGroup, NativeSelect } from '@chakra-ui/react';
+import { Field, Flex, Input, InputGroup, NativeSelect } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { LuSearch } from 'react-icons/lu';
 
+import MediaTypeSegmentedControl from '@/components/media-type-segmented-control';
 import type {
   OwnerMediaQuery,
   OwnerMediaSort,
   OwnerMediaSortOrder,
-  OwnerMediaTypeFilter,
 } from '@/features/user-media/user-media.types';
 
 interface MediaLibraryToolbarProps {
@@ -18,12 +18,6 @@ interface MediaLibraryToolbarProps {
   supportsPersonalRating?: boolean;
   updateQuery: (patch: Partial<OwnerMediaQuery>, options?: { replace?: boolean }) => void;
 }
-
-const mediaTypeItems: Array<{ label: string; value: OwnerMediaTypeFilter }> = [
-  { label: 'All', value: 'all' },
-  { label: 'Movies', value: 'movie' },
-  { label: 'TV', value: 'tv' },
-];
 
 const MediaLibraryToolbar = ({
   addedLabel,
@@ -76,22 +70,13 @@ const MediaLibraryToolbar = ({
 
       <Field.Root w={{ lg: '64' }}>
         <Field.Label>Media type</Field.Label>
-        <Group attached aria-label="Filter library by media type" role="group">
-          {mediaTypeItems.map((item) => (
-            <Button
-              key={item.value}
-              aria-pressed={query.mediaType === item.value}
-              colorPalette={query.mediaType === item.value ? 'brand' : 'gray'}
-              disabled={disabled}
-              flex="1"
-              size="sm"
-              variant={query.mediaType === item.value ? 'solid' : 'outline'}
-              onClick={() => updateQuery({ mediaType: item.value })}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </Group>
+        <MediaTypeSegmentedControl
+          aria-label="Filter library by media type"
+          disabled={disabled}
+          stretch
+          value={query.mediaType}
+          onValueChange={(mediaType) => updateQuery({ mediaType })}
+        />
       </Field.Root>
 
       <Field.Root w={{ lg: '64' }}>

@@ -1,6 +1,6 @@
 import { IconButton } from '@chakra-ui/react';
 import type { IconButtonProps } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LuNotebookPen } from 'react-icons/lu';
 
 import SimpleDialog from '@/components/dialogs/simple-dialog';
@@ -43,6 +43,7 @@ const MediaTrackingDetailsDialog = ({
   const [editRequest, setEditRequest] = useState<EditRequest | null>(null);
   const [removeWatchedOpen, setRemoveWatchedOpen] = useState(false);
   const [savedDetails, setSavedDetails] = useState<MediaTrackingDetailsUpdate>({});
+  const reopenTrackingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const open = controlledOpen ?? internalOpen;
   const currentMedia: UserMediaPayload = { ...media, ...savedDetails };
   const currentTrackingState: MediaMeta = { ...trackingState, ...savedDetails };
@@ -57,6 +58,30 @@ const MediaTrackingDetailsDialog = ({
   useEffect(() => {
     setSavedDetails({});
   }, [media.media_id, media.media_type]);
+
+  useEffect(
+    () => () => {
+      if (reopenTrackingTimeout.current) {
+        clearTimeout(reopenTrackingTimeout.current);
+      }
+    },
+    [],
+  );
+
+  const cancelTrackingReopen = () => {
+    if (reopenTrackingTimeout.current) {
+      clearTimeout(reopenTrackingTimeout.current);
+      reopenTrackingTimeout.current = null;
+    }
+  };
+
+  const scheduleTrackingReopen = () => {
+    cancelTrackingReopen();
+    reopenTrackingTimeout.current = setTimeout(() => {
+      reopenTrackingTimeout.current = null;
+      setOpen(true);
+    }, 0);
+  };
 
   const hasVisibleTracking =
     Boolean(
@@ -128,10 +153,13 @@ const MediaTrackingDetailsDialog = ({
         onOpenChange={(nextOpen) => {
           setRemoveWatchedOpen(nextOpen);
           if (!nextOpen) {
-            setTimeout(() => setOpen(true), 0);
+            scheduleTrackingReopen();
           }
         }}
-        onRemoved={() => setOpen(false)}
+        onRemoved={() => {
+          cancelTrackingReopen();
+          setOpen(false);
+        }}
       />
 
       {editRequest && (
