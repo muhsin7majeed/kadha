@@ -40,6 +40,7 @@ const DiaryTrends = ({ monthly }: { monthly: DiaryMonthBucket[] }) => {
                 <Flex as="li" key={bucket.month} gap="3" align="center">
                   <Text width="8" textStyle="compactLabel" color="fg.muted">{monthNames[bucket.month - 1]}</Text>
                   <Flex
+                    role="img"
                     flex="1"
                     h="5"
                     bg="bg.subtle"
@@ -47,7 +48,7 @@ const DiaryTrends = ({ monthly }: { monthly: DiaryMonthBucket[] }) => {
                     overflow="hidden"
                     aria-label={`${monthNames[bucket.month - 1]}: ${bucket.movieWatches} movies and ${bucket.episodeWatches} episodes`}
                   >
-                    <Flex width={`${width}%`} minW={bucket.totalEntries > 0 ? '2px' : '0'}>
+                    <Flex aria-hidden width={`${width}%`} minW={bucket.totalEntries > 0 ? '2px' : '0'}>
                       <Box width={`${movieShare}%`} bg="blue.solid" />
                       <Box flex="1" bg="purple.solid" />
                     </Flex>
@@ -74,13 +75,21 @@ const DiaryTrends = ({ monthly }: { monthly: DiaryMonthBucket[] }) => {
             {monthly.map((bucket) => (
               <Flex as="li" key={bucket.month} gap="3" align="center">
                 <Text width="8" textStyle="compactLabel" color="fg.muted">{monthNames[bucket.month - 1]}</Text>
-                <Box flex="1" h="5" bg="bg.subtle" borderRadius="sm" overflow="hidden">
+                <Box
+                  role="img"
+                  aria-label={`${monthNames[bucket.month - 1]}: ${formatHours(bucket.estimatedMinutes)} estimated`}
+                  flex="1"
+                  h="5"
+                  bg="bg.subtle"
+                  borderRadius="sm"
+                  overflow="hidden"
+                >
                   <Box
+                    aria-hidden
                     h="full"
                     width={`${(bucket.estimatedMinutes / maxMinutes) * 100}%`}
                     minW={bucket.estimatedMinutes > 0 ? '2px' : '0'}
                     bg="teal.solid"
-                    aria-label={`${monthNames[bucket.month - 1]}: ${formatHours(bucket.estimatedMinutes)} estimated`}
                   />
                 </Box>
                 <Text width="12" textAlign="end" textStyle="supporting">{formatHours(bucket.estimatedMinutes)}</Text>

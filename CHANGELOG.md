@@ -12,6 +12,7 @@
 
 ### Behavior Fixes
 
+- Made Diary media filters follow the selected theme and improved keyboard access, chart semantics, selected-day request states, and filtered pagination behavior.
 - Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.
 - Keep TV shows on the Watchlist when marking individual episodes, seasons, or all aired episodes as watched.
 - Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.

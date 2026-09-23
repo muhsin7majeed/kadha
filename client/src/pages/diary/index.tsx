@@ -101,6 +101,7 @@ const Diary = () => {
             showMonth={tab === "timeline"}
             onMediaTypeChange={(value) => {
               setMediaType(value);
+              setDayPage(1);
               resetPage();
             }}
             onYearChange={(value) => {
@@ -167,8 +168,11 @@ const Diary = () => {
                     daily={insights.data.daily}
                     selectedDate={selectedDate}
                     dayResponse={dayDiary.data}
+                    isDayError={dayDiary.isError}
                     isDayFetching={dayDiary.isFetching}
+                    isDayLoading={dayDiary.isLoading}
                     onDayPageChange={setDayPage}
+                    onDayRetry={() => void dayDiary.refetch()}
                     onSelectDate={(date) => {
                       setSelectedDate(date);
                       setDayPage(1);

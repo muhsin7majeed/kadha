@@ -1,6 +1,8 @@
 import { Box, Heading, HStack, Stack, Text } from '@chakra-ui/react';
 
 import CalendarMonthGrid from '@/components/calendar-month-grid';
+import ErrorState from '@/components/info-states/error-state';
+import CommonSpinner from '@/components/spinners/common-spinner';
 import type { DiaryDayBucket, DiaryResponse } from '@/features/user-media/user-media.types';
 import DiaryTimeline from './diary-timeline';
 
@@ -27,9 +29,12 @@ const dayLabel = (date: string, bucket?: DiaryDayBucket) => {
 interface DiaryCalendarProps {
   daily: DiaryDayBucket[];
   dayResponse?: DiaryResponse;
+  isDayError?: boolean;
   isDayFetching: boolean;
+  isDayLoading?: boolean;
   month: number;
   onDayPageChange: (page: number) => void;
+  onDayRetry?: () => void;
   onPeriodChange: (year: number, month: number) => void;
   onSelectDate: (date: string) => void;
   selectedDate?: string;
@@ -39,9 +44,12 @@ interface DiaryCalendarProps {
 const DiaryCalendar = ({
   daily,
   dayResponse,
+  isDayError = false,
   isDayFetching,
+  isDayLoading = false,
   month,
   onDayPageChange,
+  onDayRetry,
   onPeriodChange,
   onSelectDate,
   selectedDate,
@@ -121,7 +129,15 @@ const DiaryCalendar = ({
           <Heading as="h2" textStyle="sectionTitle" mb="4">
             Selected day
           </Heading>
-          {dayResponse && dayResponse.data.length > 0 ? (
+          {isDayLoading ? (
+            <CommonSpinner spinnerProps={{ 'aria-label': 'Loading selected day' }} />
+          ) : isDayError ? (
+            <ErrorState
+              title="Selected day unavailable"
+              description="Could not load watches for this day."
+              onRetry={onDayRetry}
+            />
+          ) : dayResponse && dayResponse.data.length > 0 ? (
             <DiaryTimeline response={dayResponse} isFetching={isDayFetching} onPageChange={onDayPageChange} />
           ) : (
             <Text color="fg.muted">No watches were logged for this day.</Text>

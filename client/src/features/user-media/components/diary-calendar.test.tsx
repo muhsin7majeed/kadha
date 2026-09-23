@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
@@ -102,5 +102,29 @@ describe('DiaryCalendar', () => {
     expect(
       screen.getByText(/Entries without a recorded date/),
     ).toBeInTheDocument();
+  });
+
+  it('distinguishes selected-day loading and failure from an empty day', async () => {
+    const onDayRetry = vi.fn();
+    renderCalendar({
+      selectedDate: '2024-02-29',
+      isDayLoading: true,
+      onDayRetry,
+    });
+
+    expect(screen.getByLabelText('Loading selected day')).toBeInTheDocument();
+    expect(screen.queryByText('No watches were logged for this day.')).not.toBeInTheDocument();
+
+    cleanup();
+    renderCalendar({
+      selectedDate: '2024-02-29',
+      isDayError: true,
+      onDayRetry,
+    });
+
+    expect(screen.getByText('Selected day unavailable')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(onDayRetry).toHaveBeenCalledOnce();
+    expect(screen.queryByText('No watches were logged for this day.')).not.toBeInTheDocument();
   });
 });

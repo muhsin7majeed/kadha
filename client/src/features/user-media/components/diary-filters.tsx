@@ -45,6 +45,7 @@ const DiaryFilters = ({
       <Field.Label>Media type</Field.Label>
       <SegmentGroup.Root
         aria-label="Filter diary by media type"
+        colorPalette="brand"
         value={mediaType}
         onValueChange={(details) => onMediaTypeChange(details.value as DiaryMediaType)}
         disabled={disabled}

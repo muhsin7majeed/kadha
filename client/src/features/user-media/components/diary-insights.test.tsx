@@ -35,7 +35,10 @@ describe('diary insight visualizations', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('gridcell', { name: /September 13, 2026: 3 watches/ }));
+    const populatedDay = screen.getByRole('button', { name: /September 13, 2026: 3 watches/ });
+    expect(screen.getAllByRole('button')).toEqual([populatedDay]);
+
+    fireEvent.click(populatedDay);
     expect(onSelectDate).toHaveBeenCalledWith('2026-09-13');
     expect(screen.getByText(/Darker squares contain more diary entries—not a score to beat/)).toBeInTheDocument();
   });
@@ -43,8 +46,8 @@ describe('diary insight visualizations', () => {
   it('shows exact monthly volume and estimated-time values without chart interaction', () => {
     renderWithProviders(<DiaryTrends monthly={monthly} />);
 
-    expect(screen.getByLabelText('Jan: 2 movies and 3 episodes')).toBeInTheDocument();
-    expect(screen.getByLabelText('Jan: 5h estimated')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Jan: 2 movies and 3 episodes' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Jan: 5h estimated' })).toBeInTheDocument();
     expect(screen.getByText(/Missing runtimes are excluded/)).toBeInTheDocument();
   });
 });
