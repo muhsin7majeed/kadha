@@ -1,7 +1,8 @@
 import { IconButton, Menu, Portal, Stack } from '@chakra-ui/react';
 import type { IconButtonProps, StackProps } from '@chakra-ui/react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { LuBookmark, LuBookmarkPlus, LuCheck, LuEllipsis, LuEye, LuHeart, LuNotebookPen, LuPlus } from 'react-icons/lu';
+import { Link } from 'react-router';
+import { LuBookmark, LuBookmarkPlus, LuCheck, LuEllipsis, LuEye, LuHeart, LuNotebookPen, LuPlus, LuSlidersHorizontal } from 'react-icons/lu';
 
 import { Tooltip } from '@/components/ui/tooltip';
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
@@ -23,6 +24,7 @@ interface MediaActionsProps {
   orientation?: StackProps['direction'];
   presentation?: 'buttons' | 'menu';
   size?: IconButtonProps['size'];
+  showCardStyleLink?: boolean;
 }
 
 interface MediaActionIconButtonProps {
@@ -63,6 +65,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
   orientation = 'column',
   presentation = 'buttons',
   size = 'md',
+  showCardStyleLink = false,
 }) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
@@ -205,6 +208,12 @@ const MediaActions: React.FC<MediaActionsProps> = ({
                 <LuPlus />
                 {collectionLabel}
               </Menu.Item>
+
+              {showCardStyleLink && (
+                <Menu.Item value="card-style" asChild>
+                  <Link to="/app/settings/appearance"><LuSlidersHorizontal />Edit card view</Link>
+                </Menu.Item>
+              )}
             </Menu.Content>
           </Menu.Positioner>
         </Portal>

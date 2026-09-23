@@ -1,9 +1,10 @@
 import { Badge, Box, Card, CloseButton, Flex, HStack, IconButton, Image, Popover, Portal, Stack, Text } from '@chakra-ui/react';
 import type { BoxProps } from '@chakra-ui/react';
-import { LuBookmark, LuCheck, LuHeart, LuInfo, LuStar } from 'react-icons/lu';
+import { LuBookmark, LuCheck, LuEllipsis, LuHeart, LuInfo, LuStar } from 'react-icons/lu';
 
 import { useGenreAtom } from '@/atoms/genre-atom';
 import useMediaCardPreferences from '@/features/media-card-preferences/api/use-media-card-preferences';
+import type { MediaCardStyle } from '@/features/media-card-preferences/media-card-preferences.types';
 import type { MediaCardModel } from '@/features/media/media-card-model';
 import { minutesToHours } from '@/utils/date';
 import NavLink from '@/components/nav-link';
@@ -18,6 +19,7 @@ interface MediaCardProps {
   showPersonalRating?: boolean;
   width?: BoxProps['width'];
   maxW?: BoxProps['maxW'];
+  previewStyle?: MediaCardStyle;
 }
 
 const scrollStyle = {
@@ -95,39 +97,46 @@ const MediaCard = ({
   showPersonalRating = false,
   width = { base: '150px', md: '100%' },
   maxW = '220px',
+  previewStyle,
 }: MediaCardProps) => {
   const genreMap = useGenreAtom();
-  const genres = media.genre_ids.map((genre) => genreMap[genre]).filter(Boolean);
+  const genres = previewStyle ? ['Adventure', 'Drama'] : media.genre_ids.map((genre) => genreMap[genre]).filter(Boolean);
   const { data: preferences } = useMediaCardPreferences();
-  const minimal = preferences?.style === 'minimal';
+  const minimal = (previewStyle ?? preferences?.style) === 'minimal';
   const runtime = media.runtime && media.runtime > 0 ? minutesToHours(media.runtime) : null;
   const year = /^\d{4}/.exec(media.release_date)?.[0];
   const detailsPath = `${detailsPathPrefix}/${media.media_type}/${media.media_id}`;
+  const posterSrc = previewStyle
+    ? '/assets/images/card-style-preview.svg'
+    : media.poster_path ? `https://image.tmdb.org/t/p/w500${media.poster_path}` : '/assets/images/image-placeholder.svg';
 
   return (
     <Card.Root
-      as="article" variant="outline" overflow="hidden" position="relative" cursor="pointer"
+      as={previewStyle ? 'div' : 'article'} aria-hidden={previewStyle ? true : undefined}
+      variant="outline" overflow="hidden" position="relative" cursor={previewStyle ? 'default' : 'pointer'}
       bg="bg.subtle" borderColor="border" shadow="sm" w={width} maxW={maxW} flexShrink={0}
       transition="transform 0.2s, box-shadow 0.2s"
-      _hover={{ transform: 'translateY(-1px)', shadow: 'md' }}
+      _hover={previewStyle ? undefined : { transform: 'translateY(-1px)', shadow: 'md' }}
     >
       <Box position="relative" aspectRatio="2 / 3" bg="bg.subtle" minW="0">
         <Image
-          src={media.poster_path ? `https://image.tmdb.org/t/p/w500${media.poster_path}` : '/assets/images/image-placeholder.svg'}
+          src={posterSrc}
           alt={`${media.title} poster`}
           onError={(event) => { event.currentTarget.src = '/assets/images/image-placeholder.svg'; }}
           width="100%" height="100%" objectFit="cover"
         />
-        <NavLink
-          to={detailsPath}
-          aria-label={media.title}
-          aria-hidden={minimal ? undefined : true}
-          tabIndex={minimal ? undefined : -1}
-          position="absolute" inset="0" zIndex="0"
-          onClick={onNavigate}
-        >
-          <Box as="span" srOnly>{media.title}</Box>
-        </NavLink>
+        {!previewStyle && (
+          <NavLink
+            to={detailsPath}
+            aria-label={media.title}
+            aria-hidden={minimal ? undefined : true}
+            tabIndex={minimal ? undefined : -1}
+            position="absolute" inset="0" zIndex="0"
+            onClick={onNavigate}
+          >
+            <Box as="span" srOnly>{media.title}</Box>
+          </NavLink>
+        )}
 
         {!minimal && (
           <Stack role="group" aria-label={`${media.title} facts`} position="absolute" top="2" left="2" align="start" gap="1" pointerEvents="none" maxW="calc(100% - 5rem)">
@@ -140,20 +149,33 @@ const MediaCard = ({
         {minimal && <Box position="absolute" top="2" left="2" pointerEvents="none"><StatusIcons media={media} vertical /></Box>}
 
         <HStack position="absolute" top="2" right="2" gap="1" zIndex="2">
-          <QuickInfo media={media} genres={genres} showPersonalRating={showLibraryMetadata && showPersonalRating} />
-          {showActions && <MediaActions media={media} presentation="menu" size="xs" />}
+          {previewStyle ? (
+            <>
+              <Box as="span" bg="brand.subtle" color="brand.fg" borderRadius="full" p="1.5"><LuInfo /></Box>
+              <Box as="span" bg="brand.subtle" color="brand.fg" borderRadius="full" p="1.5"><LuEllipsis /></Box>
+            </>
+          ) : (
+            <>
+              <QuickInfo media={media} genres={genres} showPersonalRating={showLibraryMetadata && showPersonalRating} />
+              {showActions && <MediaActions media={media} presentation="menu" size="xs" showCardStyleLink />}
+            </>
+          )}
         </HStack>
 
         {!minimal && (
           <Stack position="absolute" bottom="0" insetX="0" p="3" pt="12" gap="2" minW="0" color="white" bgGradient="to-t" gradientFrom="blackAlpha.950" gradientVia="blackAlpha.700" gradientTo="transparent" pointerEvents="none">
             <Box pointerEvents="none"><StatusIcons media={media} /></Box>
-            <Box role="group" aria-label={`${media.title} title`} overflowX="auto" maxW="full" tabIndex={0} pointerEvents="auto" position="relative" zIndex="1" css={scrollStyle}>
-              <NavLink to={detailsPath} onClick={onNavigate} display="block" width="max-content" color="white">
-                <Text as="h3" textStyle="cardTitle" whiteSpace="nowrap">{media.title}</Text>
-              </NavLink>
+            <Box role="group" aria-label={`${media.title} title`} overflowX="auto" maxW="full" tabIndex={previewStyle ? undefined : 0} pointerEvents={previewStyle ? 'none' : 'auto'} position="relative" zIndex="1" css={scrollStyle}>
+              {previewStyle ? (
+                <Text textStyle="cardTitle" whiteSpace="nowrap" width="max-content">{media.title}</Text>
+              ) : (
+                <NavLink to={detailsPath} onClick={onNavigate} display="block" width="max-content" color="white">
+                  <Text as="h3" textStyle="cardTitle" whiteSpace="nowrap">{media.title}</Text>
+                </NavLink>
+              )}
             </Box>
             {genres.length > 0 && (
-              <HStack role="group" aria-label={`${media.title} genres`} overflowX="auto" maxW="full" tabIndex={0} pointerEvents="auto" position="relative" zIndex="1" gap="1" css={scrollStyle}>
+              <HStack role="group" aria-label={`${media.title} genres`} overflowX="auto" maxW="full" tabIndex={previewStyle ? undefined : 0} pointerEvents={previewStyle ? 'none' : 'auto'} position="relative" zIndex="1" gap="1" css={scrollStyle}>
                 {genres.map((genre) => <Badge key={genre} flexShrink="0" bg="whiteAlpha.300" color="white" whiteSpace="nowrap">{genre}</Badge>)}
               </HStack>
             )}

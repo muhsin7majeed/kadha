@@ -33,6 +33,12 @@ describe('MediaCardSettingsSection', () => {
     const user = userEvent.setup();
     renderWithProviders(<MediaCardSettingsSection />);
     expect(screen.getByRole('radio', { name: /Detailed/ })).toBeChecked();
+    expect(screen.getAllByText('Sample preview')).toHaveLength(2);
+    expect(screen.getByTestId('preview-detailed')).toHaveTextContent('Adventure');
+    expect(screen.getByTestId('preview-detailed')).toHaveTextContent('2025');
+    expect(screen.getByTestId('preview-minimal')).not.toHaveTextContent('Adventure');
+    expect(screen.getByTestId('preview-detailed').querySelector('a, button')).toBeNull();
+    expect(screen.getByTestId('preview-minimal').querySelector('a, button')).toBeNull();
     await user.click(screen.getByRole('radio', { name: /Minimal/ }));
     expect(mocks.update).toHaveBeenCalledWith({ version: 1, style: 'minimal' });
   });
@@ -41,11 +47,13 @@ describe('MediaCardSettingsSection', () => {
     mocks.isLoading = true;
     const view = renderWithProviders(<MediaCardSettingsSection />);
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sample preview')).not.toBeInTheDocument();
     view.unmount();
     mocks.isLoading = false;
     mocks.isError = true;
     renderWithProviders(<MediaCardSettingsSection />);
     expect(screen.getByText(/Could not load card style/)).toBeInTheDocument();
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sample preview')).not.toBeInTheDocument();
   });
 });

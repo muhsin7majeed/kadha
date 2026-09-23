@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="Abstract sample poster">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#142741"/><stop offset=".55" stop-color="#636172"/><stop offset="1" stop-color="#d18c64"/></linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#263c4b"/><stop offset="1" stop-color="#0c1726"/></linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h400v600H0z"/>
+  <circle cx="279" cy="193" r="75" fill="#f6d2a5" opacity=".92"/>
+  <path fill="#304658" d="m0 356 107-167 89 131 102-107 102 153v234H0z"/>
+  <path fill="url(#ground)" d="m0 427 116-88 74 59 110-101 100 115v188H0z"/>
+  <path d="M169 600 220 439l52 161" fill="#9a765c" opacity=".62"/>
+</svg>

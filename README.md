@@ -11,7 +11,7 @@ Use the hosted beta at [kadha.org](https://kadha.org), or deploy your own instan
 - Track watched, liked, and watchlisted movies and TV shows with ratings, dates, and private notes.
 - Record movie rewatches and individual TV episodes in a private viewing diary.
 - Follow TV progress and find the next episode of an in-progress series.
-- Choose Minimal or Detailed media cards in **Settings → Appearance**; the choice syncs with your account across devices. In Progress and Continue Watching keep their own cards.
+- Choose Minimal or Detailed media cards in **Settings → Appearance**, with previews of both styles or an **Edit card view** shortcut in the poster menu. The choice syncs with your account across devices. In Progress and Continue Watching keep their own cards.
 - Build private collections, collaborate with invited members, or share selected collections through read-only links.
 - Explore personal recommendations and viewing insights derived from your own tracking activity.
 - Control the visibility of each profile section, export or import Kadha data, and permanently delete your account.

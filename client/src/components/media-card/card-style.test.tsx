@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -19,7 +20,9 @@ const media: MediaCardModel = {
   vote_average: 7.5, vote_count: 30, liked: true, watched: true, watchlist: false,
 };
 const renderCard = (item = media, showActions = false) => renderWithProviders(
-  <MemoryRouter><MediaCard media={item} showActions={showActions} /></MemoryRouter>,
+  <QueryClientProvider client={new QueryClient()}>
+    <MemoryRouter><MediaCard media={item} showActions={showActions} /></MemoryRouter>
+  </QueryClientProvider>,
 );
 
 describe('shared media card style', () => {
@@ -55,6 +58,13 @@ describe('shared media card style', () => {
     await user.click(screen.getByRole('button', { name: 'Quick info about Long Movie Name' }));
     expect(await screen.findByText('A short synopsis')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Long Movie Name' })).toHaveAttribute('href', '/app/media/movie/1');
+  });
+
+  it('offers the card-view setting from a shared card menu', async () => {
+    const user = userEvent.setup();
+    renderCard(media, true);
+    await user.click(screen.getByRole('button', { name: 'Manage Long Movie Name' }));
+    expect(screen.getByRole('menuitem', { name: 'Edit card view' })).toHaveAttribute('href', '/app/settings/appearance');
   });
 
   it('omits personal state and menu on public read-only cards', () => {

@@ -4,7 +4,7 @@
 
 ### Feature Changes
 
-- Added an account-synced Minimal or Detailed media card style in Appearance settings for shared grids and carousels; the choice travels with account exports and imports. In Progress and Continue Watching cards keep their current design.
+- Added an account-synced Minimal or Detailed media card style in Appearance settings, with visual previews and an Edit card view shortcut in shared poster menus. The choice travels with account exports and imports; In Progress and Continue Watching cards keep their current design.
 - Added a responsive administrator navigation shell for Overview, Feedback, Users, and Provider Usage while preserving existing admin routes and screens.
 - Redesigned the administrator overview around new and recorded-active users, feedback requiring attention, user activity trends, provider health, and privacy-conscious instance totals.
 - Redesigned administrator feedback as an open-by-default triage inbox with status counts, responsive submission details, and clearer message, metadata, and response sections.
