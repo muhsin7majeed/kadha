@@ -28,7 +28,7 @@ export interface Feedback extends FeedbackSummary {
 export interface CreateFeedbackInput {
   category: FeedbackCategory;
   subject: string;
-  message: string;
+  message?: string;
   sourcePath?: string;
   appVersion?: string;
 }

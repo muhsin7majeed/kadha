@@ -26,7 +26,7 @@ const FeedbackDetail = () => {
             <Box><Text color="fg.muted" textStyle="supporting">Submitted</Text><Text>{formatDate(data.createdAt, 'DD MMM YYYY, HH:mm')}</Text></Box>
           </SimpleGrid>
         </Stack></Card.Body></Card.Root>
-        <Card.Root><Card.Header><Text textStyle="subsectionTitle">Message</Text></Card.Header><Card.Body><Text whiteSpace="pre-wrap" overflowWrap="anywhere">{data.message}</Text></Card.Body></Card.Root>
+        <Card.Root><Card.Header><Text textStyle="subsectionTitle">Message</Text></Card.Header><Card.Body><Text whiteSpace="pre-wrap" overflowWrap="anywhere" color={data.message ? undefined : 'fg.muted'}>{data.message || 'No message provided.'}</Text></Card.Body></Card.Root>
         <Card.Root><Card.Header><Text textStyle="subsectionTitle">Response</Text></Card.Header><Card.Body><Text whiteSpace="pre-wrap" overflowWrap="anywhere" color={data.adminResponse ? undefined : 'fg.muted'}>{data.adminResponse || 'No response yet.'}</Text></Card.Body></Card.Root>
       </Stack>
     )}

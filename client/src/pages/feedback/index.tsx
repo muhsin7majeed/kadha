@@ -68,9 +68,9 @@ const FeedbackPage = () => {
                 <Field.Label>Subject</Field.Label>
                 <Input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={3} maxLength={120} disabled={createFeedback.isPending} />
               </Field.Root>
-              <Field.Root required>
-                <Field.Label>Message</Field.Label>
-                <Textarea value={message} onChange={(event) => setMessage(event.target.value)} minLength={10} maxLength={5000} minH="32" disabled={createFeedback.isPending} />
+              <Field.Root>
+                <Field.Label>Message (optional)</Field.Label>
+                <Textarea value={message} onChange={(event) => setMessage(event.target.value)} maxLength={5000} minH="32" disabled={createFeedback.isPending} />
               </Field.Root>
               <Button type="submit" colorPalette="brand" alignSelf={{ base: 'stretch', md: 'flex-start' }} loading={createFeedback.isPending} disabled={createFeedback.isPending}>
                 Send feedback

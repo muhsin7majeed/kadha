@@ -102,8 +102,8 @@ const AdminFeedbackDetail = () => {
                   <Text textStyle="subsectionTitle">Submitted message</Text>
                 </Card.Header>
                 <Card.Body pt="0">
-                  <Text whiteSpace="pre-wrap" overflowWrap="anywhere">
-                    {feedback.data.message}
+                  <Text whiteSpace="pre-wrap" overflowWrap="anywhere" color={feedback.data.message ? undefined : 'fg.muted'}>
+                    {feedback.data.message || 'No message provided.'}
                   </Text>
                 </Card.Body>
               </Card.Root>

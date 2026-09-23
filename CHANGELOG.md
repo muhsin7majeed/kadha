@@ -13,6 +13,7 @@
 
 ### Behavior Fixes
 
+- Made the message optional when submitting feedback while keeping category and subject required.
 - Redesigned In Progress cards around the next episode with full-width mobile rows, integrated desktop and Home cards, visible aired-episode progress, and a compact menu for secondary media actions.
 - Standardized main navigation loading with content-shaped skeletons for initial requests, non-blocking refresh indicators when content remains available, and persistent navigation during lazy page loading.
 - Kept personal tracking dialogs closed after successfully marking a title unwatched while still returning to tracking details after cancellation.

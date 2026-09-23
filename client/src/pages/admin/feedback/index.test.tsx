@@ -11,7 +11,7 @@ const updateFeedback = vi.fn();
 const adminFeedbackQuery = vi.fn();
 
 vi.mock('@/features/feedback/api/use-admin-feedback-item', () => ({
-  default: () => ({ data: { id: 'feedback-1', category: 'BUG', subject: 'Calendar problem', message: 'A detailed problem report.', status: 'NEW', username: 'ashe', sourcePath: '/app/diary', appVersion: '0.2.0', adminResponse: null, acknowledgedAt: null, resolvedAt: null, createdAt: '2026-09-14T12:00:00.000Z', updatedAt: '2026-09-14T12:00:00.000Z' }, isLoading: false, isError: false, isFetching: false, refetch: vi.fn() }),
+  default: () => ({ data: { id: 'feedback-1', category: 'BUG', subject: 'Calendar problem', message: '', status: 'NEW', username: 'ashe', sourcePath: '/app/diary', appVersion: '0.2.0', adminResponse: null, acknowledgedAt: null, resolvedAt: null, createdAt: '2026-09-14T12:00:00.000Z', updatedAt: '2026-09-14T12:00:00.000Z' }, isLoading: false, isError: false, isFetching: false, refetch: vi.fn() }),
 }));
 vi.mock('@/features/feedback/api/use-update-feedback', () => ({ default: () => ({ mutateAsync: updateFeedback, isPending: false }) }));
 
@@ -74,6 +74,7 @@ describe('AdminFeedback', () => {
     });
     renderWithProviders(<MemoryRouter initialEntries={['/app/admin/feedback/feedback-1']}><Routes><Route path="/app/admin/feedback/:id" element={<AdminFeedbackDetail />} /></Routes></MemoryRouter>);
     expect(screen.getByText('Submitted message')).toBeInTheDocument();
+    expect(screen.getByText('No message provided.')).toBeInTheDocument();
     expect(screen.getByText('Submission details')).toBeInTheDocument();
     expect(screen.getByText('/app/diary')).toBeInTheDocument();
     expect(screen.getByText('0.2.0')).toBeInTheDocument();
