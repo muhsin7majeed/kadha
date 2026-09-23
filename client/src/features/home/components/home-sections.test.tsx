@@ -13,7 +13,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/features/user-media/api/use-in-progress-tv', () => ({ default: mocks.inProgress }));
 vi.mock('@/features/recommendations/api/use-recommendations', () => ({ default: mocks.recommendations }));
 vi.mock('@/features/user-media/api/use-watch-list', () => ({ default: mocks.watchlist }));
-vi.mock('@/features/user-media/components/in-progress-tv-card', () => ({ default: () => <div>Progress card</div> }));
+vi.mock('@/features/user-media/components/in-progress-tv-card', () => ({
+  default: ({ variant }: { variant?: string }) => <div>Progress card: {variant}</div>,
+}));
 vi.mock('@/components/media-carousel', () => ({
   default: ({ title, viewAllTo }: { title: string; viewAllTo?: string }) => <a href={viewAllTo}>{title}</a>,
 }));
@@ -50,6 +52,17 @@ describe('personal Home sections', () => {
 
     rerender(<RecommendationsHomeSection />);
     expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  });
+
+  it('uses the compact card presentation for Continue Watching', () => {
+    mocks.inProgress.mockReturnValue({
+      ...emptyQuery,
+      data: { data: [{ media_id: 1, media_type: 'tv' }] },
+    });
+
+    renderSection(<ContinueWatchingHomeSection />);
+
+    expect(screen.getByText('Progress card: carousel')).toBeInTheDocument();
   });
 
   it('links previews to their full destinations', () => {
