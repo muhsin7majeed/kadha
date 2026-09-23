@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.7.0
+
 ### Feature Changes
 
 - Added device-local Grid, List, and Table views to private, shared, and public collections, with denser responsive poster grids on mobile.
