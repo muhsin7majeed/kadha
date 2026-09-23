@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { LuHeart } from "react-icons/lu";
 import { MemoryRouter } from "react-router";
@@ -14,6 +14,10 @@ vi.mock("@chakra-ui/react", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@chakra-ui/react")>();
   return { ...actual, useBreakpointValue: () => responsive.desktop };
 });
+
+vi.mock("@/features/media-card-preferences/api/use-media-card-preferences", () => ({
+  default: () => ({ data: { version: 1, style: 'detailed' } }),
+}));
 
 vi.mock("@/components/media-card/media-actions", () => ({
   default: () => <div data-testid="media-actions">Actions</div>,
@@ -141,7 +145,7 @@ describe("owner media library", () => {
     expect(
       screen.getByRole("img", { name: "Arrival poster" }),
     ).toBeInTheDocument();
-    expect(screen.queryByText(media.overview)).not.toBeInTheDocument();
+    expect(within(screen.getByRole('article')).queryByText(media.overview)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "List view" }));
     expect(screen.getByText(media.overview)).toBeInTheDocument();

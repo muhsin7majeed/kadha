@@ -12,12 +12,13 @@ const fetchMediaCardPreferences = async () => {
 
 const useMediaCardPreferences = () => {
   const { status } = useAuth();
-  return useQuery({
+  const query = useQuery({
     queryKey: queryKeys.mediaCardPreferences,
     queryFn: fetchMediaCardPreferences,
     enabled: status === 'authenticated',
     staleTime: 1000 * 60 * 5,
   });
+  return { ...query, data: status === 'authenticated' ? query.data : undefined };
 };
 
 export default useMediaCardPreferences;
