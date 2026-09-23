@@ -12,7 +12,8 @@
 
 ### Behavior Fixes
 
-- Made Diary media filters follow the selected theme and improved keyboard access, chart semantics, selected-day request states, and filtered pagination behavior.
+- Standardized media type filters across Discover, Diary, owner libraries, and the private profile overview with one accessible control that visibly follows the selected theme.
+- Improved Diary heatmap keyboard access, chart semantics, selected-day request states, and filtered pagination behavior.
 - Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.
 - Keep TV shows on the Watchlist when marking individual episodes, seasons, or all aired episodes as watched.
 - Removed the redundant visible release total from populated Upcoming Month day cells while keeping the count available to assistive technology.
@@ -25,6 +26,7 @@
 ### Engineering Changes
 
 - Narrowed the internal administrator user-list response to identity fields; privacy settings and aggregate support totals now require the user-detail endpoint.
+- Expanded the working agreement to identify real repeated UI and domain patterns and propose reuse before adding another copy.
 - Added a composed admin dashboard read model with feature-owned feedback and activity aggregates, bounded 30-day queries, and provider failure isolation.
 - Separate the official hosted backend Compose configuration from the self-hosting configuration, with explicit deployment paths, persistent volume identities, and CI contract validation.
 
