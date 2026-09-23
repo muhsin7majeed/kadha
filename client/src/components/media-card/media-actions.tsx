@@ -1,7 +1,7 @@
-import { IconButton, Stack } from '@chakra-ui/react';
+import { IconButton, Menu, Portal, Stack } from '@chakra-ui/react';
 import type { IconButtonProps, StackProps } from '@chakra-ui/react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { LuBookmark, LuBookmarkPlus, LuCheck, LuEye, LuHeart, LuPlus } from 'react-icons/lu';
+import { LuBookmark, LuBookmarkPlus, LuCheck, LuEllipsis, LuEye, LuHeart, LuNotebookPen, LuPlus } from 'react-icons/lu';
 
 import { Tooltip } from '@/components/ui/tooltip';
 import AddToCollectionDialog from '@/features/collections/components/add-to-collection-dialog';
@@ -16,11 +16,12 @@ import WatchEventDialog from '@/features/user-media/components/watch-event-dialo
 import type { MediaAction, UserMediaPayload } from '@/features/user-media/user-media.types';
 import buildUserMediaPayload from '@/features/user-media/utils/build-user-media-payload';
 import { getMediaActionLabel } from '@/features/user-media/utils/media-action-copy';
-import type { MediaTrackingDetailsUpdate } from '@/features/user-media/utils/media-tracking-details';
+import { hasActiveMediaTracking, type MediaTrackingDetailsUpdate } from '@/features/user-media/utils/media-tracking-details';
 
 interface MediaActionsProps {
   media: MediaCardModel;
   orientation?: StackProps['direction'];
+  presentation?: 'buttons' | 'menu';
   size?: IconButtonProps['size'];
 }
 
@@ -57,7 +58,12 @@ const MediaActionIconButton = ({
   </Tooltip>
 );
 
-const MediaActions: React.FC<MediaActionsProps> = ({ media, orientation = 'column', size = 'md' }) => {
+const MediaActions: React.FC<MediaActionsProps> = ({
+  media,
+  orientation = 'column',
+  presentation = 'buttons',
+  size = 'md',
+}) => {
   const [showAddToCollectionDialog, setShowAddToCollectionDialog] = useState(false);
   const [trackingDetailsOpen, setTrackingDetailsOpen] = useState(false);
   const [watchHistoryOpen, setWatchHistoryOpen] = useState(false);
@@ -97,6 +103,14 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, orientation = 'colum
   const collectionLabel = 'Add to collection';
   const currentMedia = useMemo(() => ({ ...media, ...savedDetails }), [media, savedDetails]);
   const mediaPayload = useMemo(() => buildUserMediaPayload(currentMedia), [currentMedia]);
+  const hasManageableTracking =
+    hasActiveMediaTracking(currentMedia) &&
+    Boolean(
+      currentMedia.liked ||
+        currentMedia.watchlist ||
+        (currentMedia.watched && media.media_type !== 'movie') ||
+        currentMedia.rating != null,
+    );
 
   useEffect(() => {
     setSavedDetails({});
@@ -144,6 +158,110 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, orientation = 'colum
     setShowAddToCollectionDialog(true);
   };
 
+  const actionControls =
+    presentation === 'menu' ? (
+      <Menu.Root>
+        <Menu.Trigger asChild>
+          <IconButton
+            aria-label={`Manage ${media.title}`}
+            title={`Manage ${media.title}`}
+            size={size}
+            variant="ghost"
+            colorPalette="gray"
+          >
+            <LuEllipsis />
+          </IconButton>
+        </Menu.Trigger>
+
+        <Portal>
+          <Menu.Positioner>
+            <Menu.Content>
+              <Menu.Item value="liked" disabled={isAddingToLiked} onClick={() => void handleLike()}>
+                <LuHeart />
+                {likeLabel}
+              </Menu.Item>
+
+              {!(media.media_type === 'tv' && media.watched) && (
+                <Menu.Item value="watched" disabled={isAddingToWatched} onClick={() => void handleWatched()}>
+                  <LuEye />
+                  {watchedLabel}
+                </Menu.Item>
+              )}
+
+              <Menu.Item value="watchlist" disabled={isAddingToWatchList} onClick={() => void handleWatchlist()}>
+                <LuBookmark />
+                {watchlistLabel}
+              </Menu.Item>
+
+              {hasManageableTracking && (
+                <Menu.Item value="tracking" onClick={() => setTrackingDetailsOpen(true)}>
+                  <LuNotebookPen />
+                  Manage personal tracking
+                </Menu.Item>
+              )}
+
+              <Menu.Item value="collection" onClick={handleCollection}>
+                <LuPlus />
+                {collectionLabel}
+              </Menu.Item>
+            </Menu.Content>
+          </Menu.Positioner>
+        </Portal>
+      </Menu.Root>
+    ) : (
+      <Stack
+        direction={orientation}
+        gap={{ base: 0.5, md: 1 }}
+        backdropFilter="blur(10px)"
+        p={{ base: 0.5, md: 1 }}
+        borderRadius="full"
+      >
+        <MediaActionIconButton
+          label={likeLabel}
+          colorPalette="red"
+          size={size}
+          onClick={handleLike}
+          loading={isAddingToLiked}
+        >
+          <LuHeart fill={media.liked ? 'red' : 'none'} />
+        </MediaActionIconButton>
+
+        <MediaActionIconButton
+          label={watchedLabel}
+          colorPalette="blue"
+          size={size}
+          onClick={handleWatched}
+          loading={media.media_type === 'tv' && isAddingToWatched}
+        >
+          {media.watched || Boolean(media.watchCount) ? <LuCheck fill="blue" /> : <LuEye />}
+        </MediaActionIconButton>
+
+        <MediaActionIconButton
+          label={watchlistLabel}
+          colorPalette="green"
+          size={size}
+          onClick={handleWatchlist}
+          loading={isAddingToWatchList}
+        >
+          {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
+        </MediaActionIconButton>
+
+        <MediaTrackingDetailsDialog
+          excludedActions={media.media_type === 'movie' ? ['watched'] : []}
+          media={mediaPayload}
+          trackingState={media}
+          size={size}
+          open={trackingDetailsOpen}
+          onOpenChange={setTrackingDetailsOpen}
+          onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
+        />
+
+        <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
+          <LuPlus />
+        </MediaActionIconButton>
+      </Stack>
+    );
+
   return (
     <>
       <AddToCollectionDialog
@@ -173,61 +291,19 @@ const MediaActions: React.FC<MediaActionsProps> = ({ media, orientation = 'colum
         </>
       )}
 
-      <Stack
-        direction={orientation}
-        gap={{ base: 0.5, md: 1 }}
-        backdropFilter="blur(10px)"
-        p={{ base: 0.5, md: 1 }}
-        borderRadius="full"
-      >
-        <MediaActionIconButton
-          label={likeLabel}
-          colorPalette="red"
-          size={size}
-          onClick={handleLike}
-          loading={isAddingToLiked}
-        >
-          <LuHeart fill={media.liked ? 'red' : 'none'} />
-        </MediaActionIconButton>
-
-        <MediaActionIconButton
-          label={watchedLabel}
-          colorPalette="blue"
-          size={size}
-          onClick={handleWatched}
-          loading={media.media_type === 'tv' && isAddingToWatched}
-        >
-          {media.watched || Boolean(media.watchCount) ? (
-            <LuCheck fill="blue" />
-          ) : (
-            <LuEye />
-          )}
-        </MediaActionIconButton>
-
-        <MediaActionIconButton
-          label={watchlistLabel}
-          colorPalette="green"
-          size={size}
-          onClick={handleWatchlist}
-          loading={isAddingToWatchList}
-        >
-          {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
-        </MediaActionIconButton>
-
+      {presentation === 'menu' && (
         <MediaTrackingDetailsDialog
           excludedActions={media.media_type === 'movie' ? ['watched'] : []}
           media={mediaPayload}
           trackingState={media}
-          size={size}
+          showTrigger={false}
           open={trackingDetailsOpen}
           onOpenChange={setTrackingDetailsOpen}
           onSaved={(details) => setSavedDetails((current) => ({ ...current, ...details }))}
         />
+      )}
 
-        <MediaActionIconButton label={collectionLabel} colorPalette="brand" size={size} onClick={handleCollection}>
-          <LuPlus />
-        </MediaActionIconButton>
-      </Stack>
+      {actionControls}
     </>
   );
 };

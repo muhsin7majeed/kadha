@@ -81,12 +81,13 @@ const InProgress = () => {
             ref={resultsRef}
             columns={{ base: 1, sm: 2, md: 3, lg: 4 }}
             gap={6}
-            justifyItems="center"
+            justifyItems={{ base: "stretch", sm: "center" }}
           >
             {inProgressTv?.data.map((item) => (
               <InProgressTvCard
                 key={`${item.media_type}:${item.media_id}`}
                 item={item}
+                variant="page"
               />
             ))}
           </SimpleGrid>

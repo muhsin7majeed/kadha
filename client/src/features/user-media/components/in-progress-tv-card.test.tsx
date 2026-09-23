@@ -1,7 +1,9 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { MediaCardModel } from '@/features/media/media-card-model';
 import type { TvInProgressItem } from '@/features/user-media/user-media.types';
 import { renderWithProviders } from '@/test/render';
 
@@ -9,8 +11,10 @@ const mocks = vi.hoisted(() => ({
   markNext: vi.fn(),
 }));
 
-vi.mock('@/components/media-card', () => ({
-  default: ({ width }: { width?: string }) => <div data-testid="media-card" data-width={width} />,
+vi.mock('@/components/media-card/media-actions', () => ({
+  default: ({ media, presentation }: { media: MediaCardModel; presentation?: string }) => (
+    <button type="button">{presentation} actions for {media.title}</button>
+  ),
 }));
 
 vi.mock('@/features/user-media/api/use-mark-next-episode-watched', () => ({
@@ -45,34 +49,35 @@ const item: TvInProgressItem = {
   },
 };
 
-const renderCard = (showDetailsAction?: boolean, cardItem = item) =>
+const renderCard = (cardItem = item, variant: 'page' | 'carousel' = 'page') =>
   renderWithProviders(
     <MemoryRouter>
-      <InProgressTvCard item={cardItem} showDetailsAction={showDetailsAction} />
+      <InProgressTvCard item={cardItem} variant={variant} />
     </MemoryRouter>,
   );
 
 describe('InProgressTvCard', () => {
-  it('uses the full card width for the media card', () => {
-    renderCard(false);
-
-    expect(screen.getByTestId('media-card')).toHaveAttribute('data-width', '100%');
-  });
-
-  it('hides the details action for the Home preview', () => {
-    renderCard(false);
-
-    expect(screen.queryByRole('link', { name: 'Details' })).not.toBeInTheDocument();
-  });
-
-  it('shows the details action by default', () => {
+  it('prioritizes details navigation, next episode, progress, and the primary action', async () => {
+    const user = userEvent.setup();
     renderCard();
 
-    expect(screen.getByRole('link', { name: 'Details' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Example Show (2020)' })).toHaveAttribute(
+      'href',
+      '/app/media/tv/1',
+    );
+    expect(screen.getByText('S1 E2 · Next episode')).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: '1 of 2 aired episodes watched' }),
+    ).toHaveAttribute('aria-valuetext', '1 of 2 aired episodes watched');
+    expect(screen.getByText('1 of 2 aired episodes watched')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'menu actions for Example Show' })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Mark S1 E2 watched' }));
+    expect(mocks.markNext).toHaveBeenCalledTimes(1);
   });
 
   it('renders caught-up shows without a mark-next action', () => {
-    renderCard(true, {
+    renderCard({
       ...item,
       tvProgress: {
         ...item.tvProgress,
@@ -85,6 +90,13 @@ describe('InProgressTvCard', () => {
 
     expect(screen.getByText('Caught up')).toBeInTheDocument();
     expect(screen.getByText('No aired episodes left')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Mark next/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Mark .* watched/ })).not.toBeInTheDocument();
+  });
+
+  it('supports the compact Home carousel presentation', () => {
+    renderCard(item, 'carousel');
+
+    expect(screen.getByRole('article')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'menu actions for Example Show' })).toBeInTheDocument();
   });
 });

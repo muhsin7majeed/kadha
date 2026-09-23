@@ -45,7 +45,7 @@ const ContinueWatchingHomeSection = () => {
               <InProgressTvCard
                 key={`${item.media_type}:${item.media_id}`}
                 item={item}
-                showDetailsAction={false}
+                variant="carousel"
               />
             ))}
           </Flex>
