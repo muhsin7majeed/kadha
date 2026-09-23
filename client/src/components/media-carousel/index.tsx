@@ -55,7 +55,7 @@ const MediaCarousel = ({ title, data, isLoading, isFetching, viewAllTo }: MediaC
   return (
     <Box mb="4">
       <Flex justifyContent="space-between" alignItems="center" gap="3" mb="4">
-        <PageHeader isRefreshing={isFetching} mb="0">
+        <PageHeader isRefreshing={Boolean(isFetching && !isLoading)} mb="0">
           {title}
         </PageHeader>
 

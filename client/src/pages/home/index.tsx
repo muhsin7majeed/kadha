@@ -1,24 +1,24 @@
-import { Button, Center, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, Stack, Text } from '@chakra-ui/react';
 import { Link } from 'react-router';
 
 import PageHeader from '@/components/page-header';
 import useHomePreferences from '@/features/home/api/use-home-preferences';
 import HomeSectionError from '@/features/home/components/home-section-error';
 import { HOME_SECTION_REGISTRY } from '@/features/home/home-registry';
+import MediaCarouselSkeleton from '@/components/media-carousel/media-carousel-skeleton';
 
 const Home = () => {
   const preferences = useHomePreferences();
 
   if (preferences.isLoading) {
     return (
-      <Center minH="60vh">
-        <Stack align="center" gap="3">
-          <Spinner color="brand.solid" />
-          <Text color="fg.muted" textStyle="supporting">
-            Loading your Home...
-          </Text>
-        </Stack>
-      </Center>
+      <Stack gap="6">
+        <PageHeader subHeader="Pick up where you left off or find the next thing worth watching.">
+          Home
+        </PageHeader>
+        <MediaCarouselSkeleton label="Loading your Home" />
+        <MediaCarouselSkeleton label="Loading your Home" />
+      </Stack>
     );
   }
 
@@ -37,6 +37,7 @@ const Home = () => {
   return (
     <Stack gap="6">
       <PageHeader
+        isRefreshing={preferences.isFetching && preferences.data !== undefined}
         subHeader="Pick up where you left off or find the next thing worth watching."
         action={
           <Button asChild size="sm" variant="outline" colorPalette="gray">

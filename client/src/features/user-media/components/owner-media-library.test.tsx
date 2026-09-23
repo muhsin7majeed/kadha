@@ -311,7 +311,7 @@ describe("owner media library", () => {
     expect(screen.getByRole("button", { name: /Clear all/ })).toBeDisabled();
   });
 
-  it("shows a loading state while retained results refresh for a new page", () => {
+  it("keeps retained results visible while a new page refreshes", () => {
     renderWithProviders(
       <MemoryRouter>
         <OwnerMediaLibrary
@@ -329,7 +329,8 @@ describe("owner media library", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("Loading page…")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Refreshing content");
+    expect(screen.queryByText("Loading page…")).not.toBeInTheDocument();
     expect(screen.getByRole("img", { name: "Arrival poster" })).toBeInTheDocument();
   });
 
