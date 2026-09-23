@@ -12,6 +12,7 @@
 
 ### Behavior Fixes
 
+- Kept personal tracking dialogs closed after successfully marking a title unwatched while still returning to tracking details after cancellation.
 - Standardized media type filters across Discover, Diary, owner libraries, and the private profile overview with one accessible control that visibly follows the selected theme.
 - Improved Diary heatmap keyboard access, chart semantics, selected-day request states, and filtered pagination behavior.
 - Keep ongoing TV shows in Continue Watching after the user catches up with all currently aired episodes, while excluding completed shows.
