@@ -50,7 +50,7 @@ describe('AdminUsers', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
+    expect(screen.getAllByRole('columnheader', { hidden: true }).map((header) => header.textContent)).toEqual([
       'Username',
       'Role',
       'Joined',

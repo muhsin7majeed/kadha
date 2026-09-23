@@ -1,4 +1,4 @@
-import { Box, Button, Card, HStack, NativeSelect, Stack, Table, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, Card, HStack, NativeSelect, Stack, Table, Text } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 import { LuEye, LuUsers } from 'react-icons/lu';
 import { Link } from 'react-router';
@@ -47,7 +47,7 @@ const AdminUsers = () => {
 
   return (
     <Box>
-      <PageHeader isFetching={isFetching} subHeader="Search, filter, and inspect account summaries.">
+      <PageHeader isFetching={isFetching} subHeader="Find accounts and manage administrator access.">
         Admin Users
       </PageHeader>
 
@@ -88,7 +88,6 @@ const AdminUsers = () => {
               }}
             >
               <option value="createdAt">Joined date</option>
-              <option value="updatedAt">Updated date</option>
               <option value="username">Username</option>
             </NativeSelect.Field>
             <NativeSelect.Indicator />
@@ -103,8 +102,8 @@ const AdminUsers = () => {
                 resetToFirstPage();
               }}
             >
-              <option value="desc">Desc</option>
-              <option value="asc">Asc</option>
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
             </NativeSelect.Field>
             <NativeSelect.Indicator />
           </NativeSelect.Root>
@@ -113,61 +112,62 @@ const AdminUsers = () => {
         {isLoading ? (
           <CommonSpinner />
         ) : isError ? (
-          <ErrorState title="Error" description="Failed to fetch admin users" onRetry={refetch} />
+          <ErrorState title="Users unavailable" description="Failed to fetch admin users." onRetry={refetch} />
         ) : users.length === 0 ? (
           <EmptyState title="No users found" description="Try a different search or role filter." icon={<LuUsers />} />
         ) : (
           <>
             <Card.Root ref={resultsRef}>
-              <Box overflowX="auto">
-                <Table.Root size="sm" minW="1100px">
-                  <Table.Header>
-                    <Table.Row>
-                      <Table.ColumnHeader>Username</Table.ColumnHeader>
-                      <Table.ColumnHeader>Role</Table.ColumnHeader>
-                      <Table.ColumnHeader>Joined</Table.ColumnHeader>
-                      <Table.ColumnHeader>Updated</Table.ColumnHeader>
-                      <Table.ColumnHeader>Profile</Table.ColumnHeader>
-                      <Table.ColumnHeader>Watched</Table.ColumnHeader>
-                      <Table.ColumnHeader>Liked</Table.ColumnHeader>
-                      <Table.ColumnHeader>Watchlist</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Watched</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Liked</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Watchlist</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Collections</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Friends</Table.ColumnHeader>
-                      <Table.ColumnHeader textAlign="right">Action</Table.ColumnHeader>
-                    </Table.Row>
-                  </Table.Header>
-                  <Table.Body>
-                    {users.map((user) => (
-                      <Table.Row key={user.id}>
-                        <Table.Cell fontWeight="medium">{user.username}</Table.Cell>
-                        <Table.Cell>{formatEnumLabel(user.role)}</Table.Cell>
-                        <Table.Cell>{formatDate(user.createdAt, 'DD MMM YYYY')}</Table.Cell>
-                        <Table.Cell>{formatDate(user.updatedAt, 'DD MMM YYYY')}</Table.Cell>
-                        <Table.Cell>{formatEnumLabel(user.profilePrivacy)}</Table.Cell>
-                        <Table.Cell>{formatEnumLabel(user.watchedPrivacy)}</Table.Cell>
-                        <Table.Cell>{formatEnumLabel(user.likedPrivacy)}</Table.Cell>
-                        <Table.Cell>{formatEnumLabel(user.watchlistPrivacy)}</Table.Cell>
-                        <Table.Cell textAlign="right">{user.watchedCount}</Table.Cell>
-                        <Table.Cell textAlign="right">{user.likedCount}</Table.Cell>
-                        <Table.Cell textAlign="right">{user.watchlistCount}</Table.Cell>
-                        <Table.Cell textAlign="right">{user.collectionCount}</Table.Cell>
-                        <Table.Cell textAlign="right">{user.friendCount}</Table.Cell>
-                        <Table.Cell textAlign="right">
-                          <Button asChild size="xs" variant="outline" colorPalette="gray">
-                            <Link to={`/app/admin/users/${user.id}`}>
-                              <LuEye />
+              <Table.Root size="sm" tableLayout="fixed">
+                <Table.Header>
+                  <Table.Row>
+                    <Table.ColumnHeader width={{ base: 'auto', md: '45%' }}>Username</Table.ColumnHeader>
+                    <Table.ColumnHeader width={{ base: '28', md: 'auto' }}>Role</Table.ColumnHeader>
+                    <Table.ColumnHeader display={{ base: 'none', md: 'table-cell' }}>Joined</Table.ColumnHeader>
+                    <Table.ColumnHeader width={{ base: '14', md: '24' }} textAlign="right">
+                      Action
+                    </Table.ColumnHeader>
+                  </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                  {users.map((user) => (
+                    <Table.Row key={user.id}>
+                      <Table.Cell minW="0">
+                        <Text fontWeight="medium" overflowWrap="anywhere">
+                          {user.username}
+                        </Text>
+                        <Text display={{ base: 'block', md: 'none' }} color="fg.muted" textStyle="supporting">
+                          Joined {formatDate(user.createdAt, 'DD MMM YYYY')}
+                        </Text>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Badge colorPalette={user.role === UserRole.Admin ? 'brand' : 'gray'}>
+                          {formatEnumLabel(user.role)}
+                        </Badge>
+                      </Table.Cell>
+                      <Table.Cell display={{ base: 'none', md: 'table-cell' }}>
+                        {formatDate(user.createdAt, 'DD MMM YYYY')}
+                      </Table.Cell>
+                      <Table.Cell textAlign="right">
+                        <Button
+                          asChild
+                          size="xs"
+                          variant="outline"
+                          colorPalette="gray"
+                          aria-label={`View ${user.username}`}
+                        >
+                          <Link to={`/app/admin/users/${user.id}`}>
+                            <LuEye aria-hidden />
+                            <Text as="span" display={{ base: 'none', md: 'inline' }}>
                               View
-                            </Link>
-                          </Button>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Root>
-              </Box>
+                            </Text>
+                          </Link>
+                        </Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table.Root>
             </Card.Root>
 
             <HStack justifyContent="space-between" flexWrap="wrap" gap="3">

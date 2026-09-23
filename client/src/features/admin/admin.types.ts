@@ -80,6 +80,13 @@ export interface AdminUserSummary {
   username: string;
   role: UserRole;
   createdAt: string;
+}
+
+export interface AdminUserDetail {
+  id: string;
+  username: string;
+  role: UserRole;
+  createdAt: string;
   updatedAt: string;
   profilePrivacy: DataPrivacy;
   watchedPrivacy: DataPrivacy;
@@ -90,9 +97,6 @@ export interface AdminUserSummary {
   watchlistCount: number;
   collectionCount: number;
   friendCount: number;
-}
-
-export interface AdminUserDetail extends AdminUserSummary {
   pendingSentFriendRequestCount: number;
   pendingReceivedFriendRequestCount: number;
 }
