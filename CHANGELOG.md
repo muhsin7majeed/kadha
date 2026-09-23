@@ -23,6 +23,7 @@
 
 ### Engineering Changes
 
+- Narrowed the internal administrator user-list response to identity fields; privacy settings and aggregate support totals now require the user-detail endpoint.
 - Added a composed admin dashboard read model with feature-owned feedback and activity aggregates, bounded 30-day queries, and provider failure isolation.
 - Separate the official hosted backend Compose configuration from the self-hosting configuration, with explicit deployment paths, persistent volume identities, and CI contract validation.
 
