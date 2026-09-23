@@ -1,12 +1,11 @@
 import EmptyState from '@/components/info-states/empty-state';
 import { APP_CONFIG } from '@/config/app-config';
 import ErrorState from '@/components/info-states/error-state';
-import MediaCard from '@/components/media-card';
 import PageHeader from '@/components/page-header';
 import CommonSpinner from '@/components/spinners/common-spinner';
 import usePublicCollection from '@/features/collections/api/use-public-collection';
-import { collectionMediaToMediaCardModel } from '@/features/collections/utils/collection-media';
-import { Badge, Box, HStack, Separator, SimpleGrid, Stack, Text } from '@chakra-ui/react';
+import CollectionMediaViews from '@/features/collections/components/collection-media-views';
+import { Badge, Box, HStack, Separator, Stack, Text } from '@chakra-ui/react';
 import { useParams } from 'react-router';
 
 const getLockedCopy = (reason?: string) => {
@@ -79,16 +78,7 @@ const PublicCollection = () => {
       </HStack>
 
       {collection.media.length > 0 ? (
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={6}>
-          {collection.media.map((media) => (
-            <MediaCard
-              key={`${media.media_type}-${media.media_id}`}
-              detailsPathPrefix="/media"
-              media={collectionMediaToMediaCardModel(media)}
-              showActions={false}
-            />
-          ))}
-        </SimpleGrid>
+        <CollectionMediaViews media={collection.media} detailsPathPrefix="/media" showActions={false} />
       ) : (
         <EmptyState title="No media" description="This collection is empty." />
       )}

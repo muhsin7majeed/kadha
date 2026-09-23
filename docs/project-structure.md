@@ -102,7 +102,8 @@ packages/contracts/
 - Feature-owned client types belong near the feature, using `client/src/features/<feature-name>/<feature-name>.types.ts`.
 - Feature-owned client utilities and hooks belong near the feature, not in generic `client/src/utils` or `client/src/hooks`.
 - Home section preferences, the typed Home registry, and personal Home previews belong in `client/src/features/home`; reusable global catalog rows belong in `client/src/features/discovery`.
-- Collection list presentation and collection-owned UI belong in `client/src/features/collections`; authenticated list and details screens belong in `client/src/pages/collections`, while public collection details remain in `client/src/pages/public-collection`.
+- Collection list presentation, collection display preferences, and collection-owned UI belong in `client/src/features/collections`; authenticated list and details screens belong in `client/src/pages/collections`, while public collection details remain in `client/src/pages/public-collection`.
+- Reusable media Grid, List, and Table presentation belongs in `client/src/components`; feature wrappers provide route prefixes, personal actions, ratings, saved-date metadata, and device-local preference keys.
 - Public profile collection lists return privacy-safe summaries and item counts rather than embedded media or collaborator details; full collection data is loaded only on an authorized details route.
 - Owner-scoped tracked schedule resolution belongs in `server/src/features/upcoming`; Upcoming query state, list entries, and calendar rendering belong in `client/src/features/upcoming`.
 - Shared UI-only components can remain in `client/src/components`.

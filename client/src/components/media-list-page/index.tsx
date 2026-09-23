@@ -1,6 +1,6 @@
-import { Box, SimpleGrid } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { useRef } from 'react';
-import MediaCard from '@/components/media-card';
+import MediaCardGrid from '@/components/media-card-grid';
 import EmptyState from '@/components/info-states/empty-state';
 import ErrorState from '@/components/info-states/error-state';
 import { UserMedia } from '@/features/user-media/user-media.types';
@@ -85,28 +85,13 @@ const MediaListPage = ({
           <Box ref={resultsRef} aria-busy={isRefreshing}>
             <Box>
               {results ?? (
-                <SimpleGrid
-                  gridTemplateColumns={{
-                    base: 'repeat(auto-fit, minmax(min(10rem, 100%), 1fr))',
-                    sm: 'repeat(2, minmax(0, 1fr))',
-                    md: 'repeat(3, minmax(0, 1fr))',
-                    lg: 'repeat(4, minmax(0, 1fr))',
-                  }}
-                  gap={{ base: 2, sm: 4, md: 6 }}
-                  justifyItems="center"
-                >
-                  {data?.map((media) => (
-                    <MediaCard
-                      key={`${media.media_type}:${media.media_id}`}
-                      detailsPathPrefix={detailsPathPrefix}
-                      media={toMediaCardModel(media)}
-                      showActions={showActions}
-                      showLibraryMetadata={showLibraryMetadata}
-                      showPersonalRating={showPersonalRating}
-                      width="100%"
-                    />
-                  ))}
-                </SimpleGrid>
+                <MediaCardGrid
+                  detailsPathPrefix={detailsPathPrefix}
+                  media={data?.map(toMediaCardModel) ?? []}
+                  showActions={showActions}
+                  showLibraryMetadata={showLibraryMetadata}
+                  showPersonalRating={showPersonalRating}
+                />
               )}
             </Box>
           </Box>
