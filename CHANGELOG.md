@@ -6,6 +6,10 @@
 
 - Added direct Letterboxd ZIP imports for watched movies, watchlists, likes, ratings, and dated diary watches, with a full-screen movie-match review, per-entry inclusion, searchable TMDB choices, progress, import/skip counts, and re-import protection.
 
+### Behavior Fixes
+
+- Prevented duplicate Letterboxd movie rows when diary entry links differ from film links, while retaining viewing dates, rewatches, and safe re-imports. Ambiguous diary viewings now require a film assignment or an explicit skip.
+
 ### Engineering Changes
 
 - Added owner-scoped Letterboxd match identities to prevent conflicting rematches, with bounded matching and import workloads.

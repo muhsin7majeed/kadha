@@ -1,13 +1,14 @@
-import { Button, Card, Field, Heading, HStack, Input, Progress, Stack, Text } from '@chakra-ui/react';
+import { Button, Card, Field, Heading, HStack, Input, Link, NativeSelect, Progress, Stack, Text } from '@chakra-ui/react';
 import { useState, type ChangeEvent } from 'react';
 import { LuFileUp } from 'react-icons/lu';
 
 import SimpleCheckbox from '@/components/simple-checkbox';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
 import { queryClient } from '@/lib/query-client';
+import { getApiErrorMessage } from '@/hooks/use-error-handler';
 import { importLetterboxdFilms, previewLetterboxdFilms, type LetterboxdCandidate, type LetterboxdMatch } from '@/features/user/api/letterboxd-import';
 import LetterboxdMatchRow from './letterboxd-match-row';
-import { parseLetterboxdExport, type LetterboxdFilm } from './parse-letterboxd-export';
+import { parseLetterboxdExport, type AmbiguousDiaryEntry, type LetterboxdFilm } from './parse-letterboxd-export';
 
 const BATCH_SIZE = 100;
 const PREVIEW_SIZE = 20;
@@ -39,6 +40,9 @@ const batches = <T extends LetterboxdFilm>(items: T[], size = BATCH_SIZE): T[][]
 
 const LetterboxdImportSection = () => {
   const [films, setFilms] = useState<LetterboxdFilm[]>([]);
+  const [ambiguousDiary, setAmbiguousDiary] = useState<AmbiguousDiaryEntry[]>([]);
+  const [diaryAssignments, setDiaryAssignments] = useState<Record<string, string>>({});
+  const [skippedDiary, setSkippedDiary] = useState(0);
   const [matches, setMatches] = useState<LetterboxdMatch[]>([]);
   const [choices, setChoices] = useState<Record<string, number | null>>({});
   const [manualCandidates, setManualCandidates] = useState<Record<string, LetterboxdCandidate>>({});
@@ -53,6 +57,27 @@ const LetterboxdImportSection = () => {
   const [completedCount, setCompletedCount] = useState(0);
   const [visible, setVisible] = useState(50);
 
+  const previewFilms = async (items: LetterboxdFilm[], onBatch?: () => void) => {
+    setStage('matching');
+    setProcessed(0);
+    const found: LetterboxdMatch[] = [];
+    let count = 0;
+    try {
+      for (const group of batches(items, PREVIEW_SIZE)) {
+        const next = await previewLetterboxdFilms(group);
+        found.push(...next);
+        count += group.length;
+        setMatches([...found]);
+        setChoices((current) => ({ ...current, ...Object.fromEntries(next.map((match) => [match.uri, match.suggestedId])) }));
+        setChecked((current) => ({ ...current, ...Object.fromEntries(next.map((match) => [match.uri, match.suggestedId != null])) }));
+        setProcessed(count);
+        onBatch?.();
+      }
+    } catch (caught) {
+      throw new Error(`Movie matching stopped after ${count} of ${items.length}. ${getApiErrorMessage(caught) ?? (caught instanceof Error ? caught.message : 'Try again.')} You can search unmatched rows manually or upload the ZIP again to retry.`);
+    }
+  };
+
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -61,6 +86,9 @@ const LetterboxdImportSection = () => {
     setError('');
     setComplete(false);
     setFilms([]);
+    setAmbiguousDiary([]);
+    setDiaryAssignments({});
+    setSkippedDiary(0);
     setMatches([]);
     setChoices({});
     setManualCandidates({});
@@ -68,22 +96,66 @@ const LetterboxdImportSection = () => {
     setVisible(50);
     try {
       const parsed = await parseLetterboxdExport(file);
-      setFilms(parsed);
-      setStage('matching');
-      setProcessed(0);
+      setFilms(parsed.films);
+      setAmbiguousDiary(parsed.ambiguousDiary);
       setOpen(true);
-      const found: LetterboxdMatch[] = [];
-      let count = 0;
-      for (const group of batches(parsed, PREVIEW_SIZE)) {
-        found.push(...await previewLetterboxdFilms(group));
-        count += group.length;
-        setProcessed(count);
-      }
-      setMatches(found);
-      setChoices(Object.fromEntries(found.map((match) => [match.uri, match.suggestedId])));
-      setChecked(Object.fromEntries(found.map((match) => [match.uri, match.suggestedId != null])));
+      if (!parsed.ambiguousDiary.length) await previewFilms(parsed.films);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not read this Letterboxd export.');
+    } finally {
+      setBusy(false);
+      setStage(null);
+    }
+  };
+
+  const assignmentOptions = (entry: AmbiguousDiaryEntry, index: number) => [
+    ...entry.filmUris,
+    ...ambiguousDiary.slice(0, index).filter((previous) => previous.diaryOnly && diaryAssignments[previous.sourceUri] === 'separate' &&
+      previous.year === entry.year && previous.title.normalize('NFKC').trim().toLocaleLowerCase() === entry.title.normalize('NFKC').trim().toLocaleLowerCase(),
+    ).map((previous) => previous.sourceUri),
+  ];
+  const assignmentsReady = ambiguousDiary.every((entry, index) => {
+    const uri = diaryAssignments[entry.sourceUri];
+    return uri === 'skip' || (uri === 'separate' && entry.diaryOnly) || assignmentOptions(entry, index).includes(uri);
+  });
+
+  const continueMatching = async () => {
+    if (!assignmentsReady) return;
+    const resolved = films.map((film) => ({ ...film, watches: [...film.watches] }));
+    let skipped = 0;
+    for (const [index, entry] of ambiguousDiary.entries()) {
+      const uri = diaryAssignments[entry.sourceUri];
+      if (uri === 'skip') { skipped += 1; continue; }
+      if (uri === 'separate' && entry.diaryOnly) {
+        resolved.push({ uri: entry.sourceUri, title: entry.title, year: entry.year, watched: true, watchlist: false,
+          liked: false, rating: entry.rating, watches: [{ sourceUri: entry.sourceUri, sourceId: entry.sourceId, watchedOn: entry.watchedOn }] });
+        continue;
+      }
+      const film = resolved.find((item) => item.uri === uri);
+      if (!film || !assignmentOptions(entry, index).includes(uri)) return;
+      if (film.watches.length >= 200) {
+        setError(`Too many diary entries for ${film.title} (200 maximum per movie).`);
+        return;
+      }
+      film.watched = true;
+      film.watches.push({ sourceUri: entry.sourceUri, sourceId: entry.sourceId, watchedOn: entry.watchedOn });
+      if (film.rating == null) film.rating = entry.rating;
+    }
+    setBusy(true);
+    setError('');
+    let completedBatches = 0;
+    try {
+      await previewFilms(resolved, () => { completedBatches += 1; });
+      setFilms(resolved);
+      setSkippedDiary(skipped);
+      setAmbiguousDiary([]);
+    } catch (caught) {
+      if (completedBatches > 0) {
+        setFilms(resolved);
+        setSkippedDiary(skipped);
+        setAmbiguousDiary([]);
+      }
+      setError(caught instanceof Error ? caught.message : 'Could not match these movies.');
     } finally {
       setBusy(false);
       setStage(null);
@@ -194,9 +266,34 @@ const LetterboxdImportSection = () => {
             </Stack>
           ) : null}
           {error ? <Text role="alert" color="fg.error" textStyle="supporting">{error}</Text> : null}
-          {!stage && matches.length ? (
+          {!stage && ambiguousDiary.length && !matches.length ? (
+            <Stack gap="4">
+              <Heading as="h3" textStyle="sectionTitle">Assign diary viewings</Heading>
+              <Text textStyle="supporting">These diary entries share a title and year with more than one Letterboxd film. Choose the film for each viewing or explicitly skip it. Check the film links if you are unsure.</Text>
+              {ambiguousDiary.map((entry, index) => (
+                <Field.Root key={`${entry.sourceUri}:${entry.sourceId}`}>
+                  <Field.Label>Diary entry {index + 1}: film for {entry.title} ({entry.year}) viewing on {entry.watchedOn ?? 'an unknown date'}</Field.Label>
+                  <HStack gap="3" flexWrap="wrap">
+                    <Link href={entry.sourceUri} target="_blank" rel="noopener noreferrer" textStyle="supporting">View diary entry {index + 1}</Link>
+                    {assignmentOptions(entry, index).map((uri) => <Link key={uri} href={uri} target="_blank" rel="noopener noreferrer" textStyle="supporting">View candidate {uri}</Link>)}
+                  </HStack>
+                  <NativeSelect.Root colorPalette="brand">
+                    <NativeSelect.Field value={diaryAssignments[entry.sourceUri] ?? ''} onChange={(change) => setDiaryAssignments((current) => ({ ...current, [entry.sourceUri]: change.target.value }))}>
+                      <option value="">Choose a film or skip this viewing</option>
+                      {assignmentOptions(entry, index).map((uri) => <option key={uri} value={uri}>{uri}</option>)}
+                      {entry.diaryOnly ? <option value="separate">Keep as a separate movie</option> : null}
+                      <option value="skip">Skip this viewing</option>
+                    </NativeSelect.Field>
+                  </NativeSelect.Root>
+                </Field.Root>
+              ))}
+              <Button colorPalette="brand" disabled={busy || !assignmentsReady} onClick={continueMatching}>Continue to movie matching</Button>
+            </Stack>
+          ) : null}
+          {!stage && films.length && !ambiguousDiary.length ? (
             <>
               <Text textStyle="supporting" color="fg.muted">Check each entry you want to import, then choose its TMDB movie. Unchecked entries are skipped.</Text>
+              {matches.some((match) => match.mappingConflict) ? <Text role="alert" textStyle="supporting" color="fg.error">Previously imported films with conflicting TMDB matches cannot be re-imported. They are left unchecked; the other films remain available.</Text> : null}
               <Stack gap="2">
                 <Heading as="h3" textStyle="cardTitle">What to import</Heading>
                 <HStack gap="4" flexWrap="wrap">
@@ -222,6 +319,7 @@ const LetterboxdImportSection = () => {
               </Stack>
               <Stack gap="2" position="sticky" bottom="0" bg="bg.panel" p="4" borderWidth="1px" borderColor="border.subtle" borderRadius="lg">
                 <Text textStyle="body">{included.length} to import · {films.length - included.length} skipped</Text>
+                {skippedDiary ? <Text textStyle="supporting" color="fg.muted">{skippedDiary} diary {skippedDiary === 1 ? 'viewing' : 'viewings'} skipped by choice.</Text> : null}
                 {withoutSelectedData.length ? <Text textStyle="supporting" color="fg.muted">{withoutSelectedData.length} checked {withoutSelectedData.length === 1 ? 'entry has' : 'entries have'} no data in the chosen categories and will be skipped.</Text> : null}
                 {pending.length ? <Text role="alert" textStyle="supporting" color="fg.error">{pending.length} checked {pending.length === 1 ? 'entry needs' : 'entries need'} a TMDB movie. Choose a match or uncheck them.</Text> : null}
                 {conflicting.length ? <Text role="alert" textStyle="supporting" color="fg.error">{conflicting.length} previously imported {conflicting.length === 1 ? 'match differs' : 'matches differ'}. Choose the original movie or uncheck the entry.</Text> : null}

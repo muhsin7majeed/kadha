@@ -15,6 +15,7 @@ export interface LetterboxdMatch {
   candidates: LetterboxdCandidate[];
   suggestedId: number | null;
   mappedId: number | null;
+  mappingConflict: boolean;
   importedWatches: number;
   error: boolean;
 }

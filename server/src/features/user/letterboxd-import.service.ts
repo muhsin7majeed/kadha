@@ -27,6 +27,9 @@ const findCandidates = async (film: LetterboxdFilm) => {
 };
 
 const sourceEventId = (uri: string, sourceId: string) => createHash('sha256').update(`${uri}:${sourceId}`).digest('hex');
+const watchEventId = (film: LetterboxdFilm, watch: LetterboxdFilm['watches'][number]) =>
+  sourceEventId(watch.sourceUri ?? film.uri, watch.sourceId);
+const filmSourceUris = (film: LetterboxdFilm) => [film.uri, ...film.watches.flatMap((watch) => watch.sourceUri ? [watch.sourceUri] : [])];
 
 export const previewLetterboxdImport = async (userId: string, films: LetterboxdFilm[]) => {
   const results = [];
@@ -35,7 +38,7 @@ export const previewLetterboxdImport = async (userId: string, films: LetterboxdF
   }
   const ids = [...new Set(results.flatMap((result) => result.candidates.map((candidate) => candidate.id)))];
   const eventIds = films.flatMap((film) => film.watches.map((watch) =>
-    importedWatchEventRequestId('letterboxd', sourceEventId(film.uri, watch.sourceId)),
+    importedWatchEventRequestId('letterboxd', watchEventId(film, watch)),
   ));
   const [tracked, events, mappings] = await Promise.all([
     prisma.userMedia.findMany({
@@ -47,15 +50,17 @@ export const previewLetterboxdImport = async (userId: string, films: LetterboxdF
       select: { clientRequestId: true },
     }),
     prisma.letterboxdFilmMatch.findMany({
-      where: { userId, uri: { in: films.map((film) => film.uri) } },
+      where: { userId, uri: { in: [...new Set(films.flatMap(filmSourceUris))] } },
     }),
   ]);
   const byId = new Map(tracked.map((item) => [item.media_id, item]));
   const importedIds = new Set(events.map((event) => event.clientRequestId));
   const mappedIds = new Map(mappings.map((mapping) => [mapping.uri, mapping.tmdbId]));
   return results.map((result, index) => {
-    const mappedId = mappedIds.get(result.uri) ?? null;
-    let suggestedId = result.suggestedId;
+    const savedIds = [...new Set(filmSourceUris(films[index]).flatMap((uri) => mappedIds.has(uri) ? [mappedIds.get(uri)!] : []))];
+    const mappingConflict = savedIds.length > 1;
+    const mappedId = mappingConflict ? null : savedIds[0] ?? null;
+    let suggestedId = mappingConflict ? null : result.suggestedId;
     if (mappedId !== null) {
       suggestedId = result.candidates.some((candidate) => candidate.id === mappedId) ? mappedId : null;
     }
@@ -63,8 +68,9 @@ export const previewLetterboxdImport = async (userId: string, films: LetterboxdF
       ...result,
       suggestedId,
       mappedId,
+      mappingConflict,
       importedWatches: films[index].watches.filter((watch) =>
-        importedIds.has(importedWatchEventRequestId('letterboxd', sourceEventId(result.uri, watch.sourceId))),
+        importedIds.has(importedWatchEventRequestId('letterboxd', watchEventId(films[index], watch))),
       ).length,
       candidates: result.candidates.map((candidate) => ({
         ...candidate,
@@ -93,17 +99,16 @@ export const importLetterboxdFilms = async (userId: string, films: LetterboxdImp
     const watchEvents = [];
     const mediaSnapshots = [];
     const mappings = await tx.letterboxdFilmMatch.findMany({
-      where: { userId, uri: { in: films.map((film) => film.uri) } },
+      where: { userId, uri: { in: [...new Set(films.flatMap(filmSourceUris))] } },
     });
     const mappedIds = new Map(mappings.map((mapping) => [mapping.uri, mapping.tmdbId]));
     for (const film of films) {
-      const mappedId = mappedIds.get(film.uri);
-      if (mappedId !== undefined && mappedId !== film.tmdbId) {
+      if (filmSourceUris(film).some((uri) => mappedIds.has(uri) && mappedIds.get(uri) !== film.tmdbId)) {
         throw badRequest('This film was previously imported with another TMDB match.');
       }
     }
     const requestIds = films.flatMap((film) => film.watches.map((watch) =>
-      importedWatchEventRequestId('letterboxd', sourceEventId(film.uri, watch.sourceId)),
+      importedWatchEventRequestId('letterboxd', watchEventId(film, watch)),
     ));
     const existingEvents = await tx.watchEvent.findMany({
       where: { userId, clientRequestId: { in: requestIds } },
@@ -153,7 +158,7 @@ export const importLetterboxdFilms = async (userId: string, films: LetterboxdImp
         watchedOn: dated.at(-1) ?? null,
       });
       for (const watch of film.watches) {
-        const eventId = sourceEventId(film.uri, watch.sourceId);
+        const eventId = watchEventId(film, watch);
         const previousMovie = existingById.get(importedWatchEventRequestId('letterboxd', eventId));
         if (previousMovie !== undefined && previousMovie !== movie.id) {
           throw badRequest('This film was previously imported with another TMDB match.');

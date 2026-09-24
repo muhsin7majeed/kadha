@@ -1,5 +1,5 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,7 +8,10 @@ import { renderWithProviders } from '@/test/render';
 import LetterboxdImportSection from './letterboxd-import-section';
 
 const mocks = vi.hoisted(() => ({ parse: vi.fn(), post: vi.fn(), get: vi.fn() }));
-vi.mock('./parse-letterboxd-export', () => ({ parseLetterboxdExport: mocks.parse }));
+vi.mock('./parse-letterboxd-export', () => ({ parseLetterboxdExport: async (file: File) => {
+  const result = await mocks.parse(file);
+  return Array.isArray(result) ? { films: result, ambiguousDiary: [] } : result;
+} }));
 vi.mock('@/lib/axios-instance', () => ({ default: { post: mocks.post, get: mocks.get } }));
 
 const film = (id: number) => ({
@@ -25,6 +28,161 @@ const upload = () => fireEvent.change(screen.getByLabelText('Letterboxd export Z
 beforeEach(() => { vi.clearAllMocks(); queryClient.clear(); });
 
 describe('LetterboxdImportSection', () => {
+  it('lets a diary-only rewatch join the first event after explicit confirmation', async () => {
+    const first = { ...film(1), uri: 'https://boxd.it/event-one', watches: [{ sourceUri: 'https://boxd.it/event-one', sourceId: 'one', watchedOn: '2026-01-02' }] };
+    const second = { title: first.title, year: first.year, sourceUri: 'https://boxd.it/event-two', sourceId: 'two', watchedOn: '2026-02-02', rating: null, filmUris: [first.uri], diaryOnly: true };
+    mocks.parse.mockResolvedValue({ films: [first], ambiguousDiary: [second] });
+    mocks.post.mockImplementation((path: string, payload: { films: typeof first[] }) => Promise.resolve({ data: { data: path.endsWith('/preview') ? payload.films.map((item) => ({ ...match(1), uri: item.uri })) : {} } }));
+    renderImport();
+    upload();
+    expect(await screen.findByRole('combobox', { name: /Diary entry 1: film for Film 1 \(2001\) viewing on 2026-02-02/ })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox', { name: /Diary entry 1: film for Film 1 \(2001\) viewing on 2026-02-02/ }), { target: { value: first.uri } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Import 1 movie' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', { films: [expect.objectContaining({ watches: [expect.objectContaining({ sourceUri: first.uri }), expect.objectContaining({ sourceUri: second.sourceUri })] })] }));
+  });
+
+  it('can assign a later rewatch to a second diary-only movie created earlier in the review', async () => {
+    const first = { ...film(1), uri: 'https://boxd.it/a-one', watches: [{ sourceUri: 'https://boxd.it/a-one', sourceId: 'a-one', watchedOn: '2026-01-01' }] };
+    const entry = { title: first.title, year: first.year, rating: null, diaryOnly: true, filmUris: [first.uri] };
+    mocks.parse.mockResolvedValue({ films: [first], ambiguousDiary: [
+      { ...entry, sourceUri: 'https://boxd.it/b-one', sourceId: 'b-one', watchedOn: '2026-02-01' },
+      { ...entry, sourceUri: 'https://boxd.it/b-two', sourceId: 'b-two', watchedOn: '2026-03-01' },
+    ] });
+    mocks.post.mockImplementation((path: string, payload: { films: typeof first[] }) => Promise.resolve({ data: { data: path.endsWith('/preview') ? payload.films.map((item, index) => ({ ...match(index + 1), uri: item.uri })) : {} } }));
+    renderImport();
+    upload();
+    fireEvent.change(await screen.findByRole('combobox', { name: /Diary entry 1: film for Film 1/ }), { target: { value: 'separate' } });
+    const second = screen.getByRole('combobox', { name: /Diary entry 2: film for Film 1/ });
+    expect(within(second).getByRole('option', { name: 'https://boxd.it/b-one' })).toBeInTheDocument();
+    fireEvent.change(second, { target: { value: 'https://boxd.it/b-one' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Import 2 movies' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', { films: expect.arrayContaining([
+      expect.objectContaining({ uri: first.uri, watches: [expect.objectContaining({ sourceId: 'a-one' })] }),
+      expect.objectContaining({ uri: 'https://boxd.it/b-one', watches: [expect.objectContaining({ sourceId: 'b-one' }), expect.objectContaining({ sourceId: 'b-two' })] }),
+    ]) }));
+  });
+
+  it('can keep a diary-only entry separate rather than silently merging distinct movies', async () => {
+    const first = { ...film(1), uri: 'https://boxd.it/event-one', watches: [{ sourceUri: 'https://boxd.it/event-one', sourceId: 'one', watchedOn: '2026-01-02' }] };
+    mocks.parse.mockResolvedValue({ films: [first], ambiguousDiary: [{ title: first.title, year: first.year, sourceUri: 'https://boxd.it/event-two', sourceId: 'two', watchedOn: '2026-02-02', rating: null, filmUris: [first.uri], diaryOnly: true }] });
+    mocks.post.mockImplementation((path: string, payload: { films: typeof first[] }) => Promise.resolve({ data: { data: path.endsWith('/preview') ? payload.films.map((item) => ({ ...match(1, null), uri: item.uri })) : {} } }));
+    renderImport();
+    upload();
+    fireEvent.change(await screen.findByRole('combobox', { name: /Diary entry 1: film for Film 1/ }), { target: { value: 'separate' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    expect(await screen.findByText('Movie matches (2)')).toBeInTheDocument();
+    expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/preview', { films: expect.arrayContaining([
+      expect.objectContaining({ uri: first.uri, watches: [expect.objectContaining({ sourceId: 'one' })] }),
+      expect.objectContaining({ uri: 'https://boxd.it/event-two', watches: [expect.objectContaining({ sourceId: 'two' })] }),
+    ]) });
+  });
+
+  it('requires assigning ambiguous diary viewings before matching and imports the selected film once', async () => {
+    const first = { ...film(1), title: 'Obsession' };
+    const second = { ...film(2), title: 'Obsession' };
+    const event = { title: 'Obsession', year: 2001, sourceUri: 'https://boxd.it/log', sourceId: '2026-01-03:2026-01-03:1', watchedOn: '2026-01-03', rating: 7, filmUris: [first.uri, second.uri] };
+    mocks.parse.mockResolvedValue({ films: [first, second], ambiguousDiary: [event] });
+    mocks.post.mockImplementation((path: string) => Promise.resolve({ data: { data: path.endsWith('/preview') ? [match(1), match(2)] : {} } }));
+    renderImport();
+    upload();
+    expect(await screen.findByText(/Assign diary viewings/)).toBeInTheDocument();
+    expect(mocks.post).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Continue to movie matching' })).toBeDisabled();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Diary entry 1: film for Obsession (2001) viewing on 2026-01-03' }), { target: { value: first.uri } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Import 2 movies' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', { films: expect.arrayContaining([
+      expect.objectContaining({ uri: first.uri, watches: [expect.objectContaining({ sourceUri: event.sourceUri })] }),
+      expect.objectContaining({ uri: second.uri, watches: [] }),
+    ]) }));
+  });
+
+  it('does not attach a diary viewing twice when matching is retried', async () => {
+    const source = film(1);
+    mocks.parse.mockResolvedValue({ films: [source, { ...film(2), title: source.title }], ambiguousDiary: [{ title: source.title, year: source.year, sourceUri: 'https://boxd.it/log', sourceId: 'date:1', watchedOn: '2026-01-03', rating: null, filmUris: [source.uri, film(2).uri] }] });
+    mocks.post.mockRejectedValueOnce(new Error('TMDB unavailable')).mockImplementation((path: string) => Promise.resolve({ data: { data: path.endsWith('/preview') ? [match(1), match(2)] : {} } }));
+    renderImport();
+    upload();
+    fireEvent.change(await screen.findByRole('combobox', { name: 'Diary entry 1: film for Film 1 (2001) viewing on 2026-01-03' }), { target: { value: source.uri } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('TMDB unavailable');
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Import 2 movies' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', { films: expect.arrayContaining([
+      expect.objectContaining({ uri: source.uri, watches: [expect.objectContaining({ sourceUri: 'https://boxd.it/log' })] }),
+    ]) }));
+  });
+
+  it('identifies same-day ambiguous diary entries individually for keyboard users', async () => {
+    const first = film(1);
+    const second = { ...first, uri: film(2).uri };
+    const entry = { title: first.title, year: first.year, sourceId: 'one', watchedOn: '2026-01-02', rating: null, filmUris: [first.uri, second.uri], diaryOnly: false };
+    mocks.parse.mockResolvedValue({ films: [first, second], ambiguousDiary: [{ ...entry, sourceUri: 'https://boxd.it/log-one' }, { ...entry, sourceUri: 'https://boxd.it/log-two', sourceId: 'two' }] });
+    renderImport();
+    upload();
+    expect(await screen.findByRole('combobox', { name: 'Diary entry 1: film for Film 1 (2001) viewing on 2026-01-02' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Diary entry 2: film for Film 1 (2001) viewing on 2026-01-02' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'View diary entry 2' })).toHaveAttribute('href', 'https://boxd.it/log-two');
+  });
+
+  it('allows explicitly skipping an ambiguous diary viewing without assigning it to either movie', async () => {
+    const first = { ...film(1), title: 'Obsession' };
+    const second = { ...film(2), title: 'Obsession' };
+    mocks.parse.mockResolvedValue({ films: [first, second], ambiguousDiary: [{ title: 'Obsession', year: 2001, sourceUri: 'https://boxd.it/log', sourceId: 'date:1', watchedOn: '2026-01-03', rating: null, filmUris: [first.uri, second.uri] }] });
+    mocks.post.mockImplementation((path: string) => Promise.resolve({ data: { data: path.endsWith('/preview') ? [match(1), match(2)] : {} } }));
+    renderImport();
+    upload();
+    fireEvent.change(await screen.findByRole('combobox', { name: 'Diary entry 1: film for Obsession (2001) viewing on 2026-01-03' }), { target: { value: 'skip' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    expect(await screen.findByText('1 diary viewing skipped by choice.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Import 2 movies' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', { films: expect.arrayContaining([
+      expect.objectContaining({ uri: first.uri, watches: [] }),
+      expect.objectContaining({ uri: second.uri, watches: [] }),
+    ]) }));
+  });
+
+  it('skips a conflicting legacy match without blocking unrelated films', async () => {
+    mocks.parse.mockResolvedValue([film(1), film(2)]);
+    mocks.post.mockResolvedValue({ data: { data: [{ ...match(1, null), mappingConflict: true }, match(2)] } });
+    renderImport();
+    upload();
+    expect(await screen.findByRole('alert')).toHaveTextContent(/conflicting TMDB matches/);
+    expect(screen.getByRole('checkbox', { name: 'Include Film 1 (2001)' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Import 1 movie' })).toBeEnabled();
+  });
+
+  it('leaves assigned diary viewings and successful matches reviewable after a later preview failure', async () => {
+    const films = Array.from({ length: 21 }, (_, index) => film(index + 1));
+    mocks.parse.mockResolvedValue({ films, ambiguousDiary: [{ title: films[0].title, year: films[0].year, sourceUri: 'https://boxd.it/log', sourceId: 'one', watchedOn: '2026-01-01', rating: null, filmUris: [films[0].uri, films[1].uri], diaryOnly: false }] });
+    mocks.post.mockImplementation((path: string, payload: { films: typeof films }) => path.endsWith('/preview') && payload.films.length === 1
+      ? Promise.reject(new Error('Matching unavailable'))
+      : Promise.resolve({ data: { data: path.endsWith('/preview') ? payload.films.map((item) => ({ ...match(Number(item.uri.split('/').at(-1))), uri: item.uri })) : {} } }));
+    renderImport();
+    upload();
+    fireEvent.change(await screen.findByRole('combobox', { name: /Diary entry 1: film for Film 1/ }), { target: { value: films[0].uri } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continue to movie matching' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Matching unavailable');
+    expect(screen.getByRole('button', { name: 'Import 20 movies' })).toBeEnabled();
+    expect(screen.getByRole('combobox', { name: 'TMDB movie for Film 21 (2001)' })).toBeInTheDocument();
+    expect(screen.queryByText(/Assign diary viewings/)).not.toBeInTheDocument();
+  });
+
+  it('leaves later films reviewable when a preview batch fails', async () => {
+    const films = Array.from({ length: 21 }, (_, index) => film(index + 1));
+    mocks.parse.mockResolvedValue(films);
+    mocks.post.mockImplementation((path: string, payload: { films: typeof films }) => path.endsWith('/preview') && payload.films.length === 1
+      ? Promise.reject(new Error('Matching unavailable'))
+      : Promise.resolve({ data: { data: path.endsWith('/preview') ? payload.films.map((item) => match(Number(item.uri.split('/').at(-1)))) : {} } }));
+    renderImport();
+    upload();
+    expect(await screen.findByRole('alert')).toHaveTextContent('Matching unavailable');
+    expect(screen.getByRole('button', { name: 'Import 20 movies' })).toBeEnabled();
+    expect(screen.getByRole('checkbox', { name: 'Include Film 21 (2001)' })).not.toBeChecked();
+  });
+
   it('rejects an invalid ZIP without opening review', async () => {
     mocks.parse.mockRejectedValue(new Error('Letterboxd ZIP has no supported film files.'));
     renderImport();

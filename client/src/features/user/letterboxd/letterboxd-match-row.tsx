@@ -49,10 +49,11 @@ const LetterboxdMatchRow = ({ film, match, manualCandidate, choice, checked, dis
     <Grid as="article" templateColumns={{ base: '56px minmax(0, 1fr)', md: '64px minmax(0, 1fr) minmax(220px, 1fr)' }} gap="3" p="3" borderWidth="1px" borderColor="border.subtle" borderRadius="lg" alignItems="start">
       <Image src={poster ? `https://image.tmdb.org/t/p/w185${poster}` : '/assets/images/image-placeholder.svg'} alt={poster ? `${chosen?.title ?? film.title} poster` : ''} w="full" aspectRatio="2 / 3" objectFit="cover" borderRadius="md" />
       <Stack gap="1" minW="0">
-        <SimpleCheckbox label={`Include ${film.title} (${film.year})`} checked={checked} disabled={disabled} onCheckedChange={(details) => onChecked(details.checked === true)} />
+        <SimpleCheckbox label={`Include ${film.title} (${film.year})`} checked={checked} disabled={disabled || match?.mappingConflict} onCheckedChange={(details) => onChecked(details.checked === true)} />
         <Text textStyle="supporting" color="fg.muted">Letterboxd · {film.title} ({film.year})</Text>
         {checked && choice == null ? <Text textStyle="supporting" color="fg.warning">Choose a TMDB movie to include this entry.</Text> : null}
         {match?.error ? <Text textStyle="supporting" color="fg.error">Initial match failed. Search for a movie below or leave this unchecked.</Text> : null}
+        {match?.mappingConflict ? <Text textStyle="supporting" color="fg.error">This film was previously imported with different TMDB matches. It cannot be re-imported; leave it skipped.</Text> : null}
         {blocked ? <Text textStyle="supporting" color="fg.error">Previously imported as TMDB movie #{match.mappedId}. Choose that movie or uncheck this entry.</Text> : null}
       </Stack>
       <Box gridColumn={{ base: '1 / -1', md: 'auto' }} minW="0">
@@ -68,7 +69,7 @@ const LetterboxdMatchRow = ({ film, match, manualCandidate, choice, checked, dis
               setSelectedCandidate(null);
               onChoice(null);
             }
-          }} disabled={disabled} openOnClick>
+          }} disabled={disabled || match?.mappingConflict} openOnClick>
             <Combobox.Control>
               <Combobox.Input placeholder="Search TMDB movies" />
               <Combobox.IndicatorGroup><Combobox.ClearTrigger /><Combobox.Trigger /></Combobox.IndicatorGroup>

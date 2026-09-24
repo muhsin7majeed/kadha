@@ -248,8 +248,13 @@ unique exact movie matches. Check only the entries you want to import; uncertain
 TMDB movie. Search within an entry's dropdown to select another TMDB movie. Only checked entries with a movie match are
 imported; the confirmation area shows import and skip counts, existing ratings, and new or already imported diary watches.
 Letterboxd exports do not reliably identify TV entries, so this importer only supports TMDB movies; leave series unchecked.
-You can also choose which tracking categories to import; films with no selected data are not added. Ratings convert
-from five stars to Kadha's ten-point scale; existing ratings are left alone. Diary logs keep their recorded viewing dates and same-day rewatches. Watched movies without diary logs are
+Film-level CSVs are combined by film URI; diary entry links are treated as viewing identities, not extra movies. When a
+diary entry could belong to more than one film with the same name and year, choose the right Letterboxd film or explicitly
+skip that viewing before matching movies. If repeated diary entries have no film-level record, confirm whether they belong
+to one movie or should remain separate. Previously imported films with conflicting TMDB matches are left out of this
+import; other films remain available. You can also choose which tracking categories to import; films with no selected
+data are not added. Ratings convert from five stars to Kadha's ten-point scale; existing ratings are left alone. Diary
+logs keep their recorded viewing dates and same-day rewatches. Watched movies without diary logs are
 marked watched without inventing a viewing date. Large imports run in batches, so a failed batch may leave earlier
 batches imported. Re-importing the same export avoids duplicate diary entries, and previously imported films cannot
 be rematched to a different TMDB movie by accident. A full Kadha JSON export currently does not include the internal

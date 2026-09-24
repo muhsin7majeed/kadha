@@ -46,6 +46,8 @@ describe('Letterboxd import', () => {
     expect(preview.body.data[0].suggestedId).toBeNull();
     await request(app).post('/api/user/letterboxd/preview')
       .set('Authorization', authorization(user)).send({ films: [{ ...film, year: 0 }] }).expect(400);
+    await request(app).post('/api/user/letterboxd/preview')
+      .set('Authorization', authorization(user)).send({ films: [{ ...film, watches: [{ sourceUri: 'https://example.com/view', sourceId: 'one', watchedOn: null }] }] }).expect(400);
   });
 
   it('does not call a match unique when another exact result is beyond the first ten or on an unchecked page', async () => {
@@ -101,6 +103,40 @@ describe('Letterboxd import', () => {
     expect(await prisma.watchEvent.count({ where: { userId: user.userId, media_id: 800001 } })).toBe(2);
     expect(await prisma.userMedia.findUnique({ where: { userId_media_id_media_type: { userId: user.userId, media_id: 800001, media_type: 'movie' } } })).toMatchObject({ watched: true, liked: true, rating: 7 });
     expect(await prisma.watchEvent.count({ where: { userId: other.userId } })).toBe(0);
+  });
+
+  it('reuses old diary event identities when the same film is re-imported with its film URI', async () => {
+    const user = await registerTestUser('letterboxd-diary-alias');
+    const app = await getTestApp();
+    const diaryUri = 'https://boxd.it/diary-entry';
+    const legacy = { ...film, uri: diaryUri, watches: [{ sourceId: '2026-01-03:2026-01-03:1', watchedOn: '2026-01-03' }] };
+    await request(app).post('/api/user/letterboxd/import').set('Authorization', authorization(user))
+      .send({ films: [{ ...legacy, tmdbId: 800001 }] }).expect(200);
+    const corrected = { ...film, uri: 'https://boxd.it/film', watches: [{ ...legacy.watches[0], sourceUri: diaryUri }] };
+    const preview = await request(app).post('/api/user/letterboxd/preview').set('Authorization', authorization(user))
+      .send({ films: [corrected] }).expect(200);
+    expect(preview.body.data[0]).toMatchObject({ mappedId: 800001, importedWatches: 1 });
+    await request(app).post('/api/user/letterboxd/import').set('Authorization', authorization(user))
+      .send({ films: [{ ...corrected, tmdbId: 800001 }] }).expect(200);
+    expect(await prisma.watchEvent.count({ where: { userId: user.userId } })).toBe(1);
+    provider.fetchMediaDetails.mockResolvedValue(movie(800002));
+    await request(app).post('/api/user/letterboxd/import').set('Authorization', authorization(user))
+      .send({ films: [{ ...corrected, tmdbId: 800002 }] }).expect(400);
+    expect(await prisma.watchEvent.count({ where: { userId: user.userId } })).toBe(1);
+  });
+
+  it('previews a conflicting legacy diary mapping per film without hiding unrelated movies', async () => {
+    const user = await registerTestUser('letterboxd-legacy-conflict');
+    const app = await getTestApp();
+    const diaryUri = 'https://boxd.it/legacy-entry';
+    await prisma.letterboxdFilmMatch.createMany({ data: [
+      { userId: user.userId, uri: film.uri, tmdbId: 800001 },
+      { userId: user.userId, uri: diaryUri, tmdbId: 800002 },
+    ] });
+    provider.searchMoviesByQuery.mockImplementation((title: string) => Promise.resolve({ results: [movie(800001, title)], total_pages: 1 }));
+    const result = await request(app).post('/api/user/letterboxd/preview').set('Authorization', authorization(user))
+      .send({ films: [{ ...film, watches: [{ sourceUri: diaryUri, sourceId: 'one', watchedOn: null }] }, { ...film, uri: 'https://boxd.it/other', title: 'Other Film', watches: [] }] }).expect(200);
+    expect(result.body.data).toMatchObject([{ mappingConflict: true, suggestedId: null }, { mappingConflict: false, suggestedId: 800001 }]);
   });
 
   it('refuses to remap previously imported diary events to another movie', async () => {

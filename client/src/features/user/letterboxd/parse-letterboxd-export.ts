@@ -9,6 +9,20 @@ const MAX_ENTRY_BYTES = 3 * 1024 * 1024;
 const MAX_ENTRIES = 2048;
 const MAX_FILMS = 5000;
 
+export interface LetterboxdWatch {
+  sourceUri: string;
+  sourceId: string;
+  watchedOn: string | null;
+}
+
+export interface AmbiguousDiaryEntry extends LetterboxdWatch {
+  title: string;
+  year: number;
+  rating: number | null;
+  filmUris: string[];
+  diaryOnly: boolean;
+}
+
 export interface LetterboxdFilm {
   uri: string;
   title: string;
@@ -17,7 +31,12 @@ export interface LetterboxdFilm {
   watchlist: boolean;
   liked: boolean;
   rating: number | null;
-  watches: { sourceId: string; watchedOn: string | null }[];
+  watches: LetterboxdWatch[];
+}
+
+export interface LetterboxdExport {
+  films: LetterboxdFilm[];
+  ambiguousDiary: AmbiguousDiaryEntry[];
 }
 
 const readEntry = async (entry: FileEntry, limit: number) => {
@@ -93,13 +112,32 @@ const filmKey = (uri: string) => {
   return null;
 };
 
-export const parseLetterboxdExport = async (file: File): Promise<LetterboxdFilm[]> => {
+export const parseLetterboxdExport = async (file: File): Promise<LetterboxdExport> => {
   const files = await readFilmFiles(file);
   if (!Object.keys(files).length) throw new Error('Letterboxd ZIP has no supported film files.');
   const films = new Map<string, LetterboxdFilm>();
   const watchOccurrences = new Map<string, number>();
 
-  for (const name of ENTRY_NAMES) {
+  const ambiguousDiary: AmbiguousDiaryEntry[] = [];
+  const filmUrisByTitle = new Map<string, string[]>();
+  const diaryOnlyUrisByTitle = new Map<string, string>();
+  const titleKey = (title: string, year: number) => `${title.normalize('NFKC').trim().toLocaleLowerCase()}\u0000${year}`;
+  const addFilm = (uri: string, title: string, year: number) => {
+    const existing = films.get(uri);
+    if (existing && existing.year !== year) throw new Error('Conflicting years for a film in the Letterboxd export.');
+    if (!existing && films.size >= MAX_FILMS) throw new Error('Letterboxd export has too many films.');
+    const film = existing ?? { uri, title, year, watched: false, watchlist: false, liked: false, rating: null, watches: [] };
+    films.set(uri, film);
+    return film;
+  };
+  const parseRating = (value: string | undefined, name: EntryName) => {
+    if (!value?.trim()) return null;
+    const stars = Number(value.trim());
+    if (!Number.isInteger(stars * 2) || stars < 0.5 || stars > 5) throw new Error(`Invalid rating in ${name}.`);
+    return stars * 2;
+  };
+
+  for (const name of ENTRY_NAMES.filter((entry) => entry !== 'diary.csv')) {
     const text = files[name];
     if (text === undefined) continue;
     for (const [index, row] of parseRows(name, text).entries()) {
@@ -109,35 +147,55 @@ export const parseLetterboxdExport = async (file: File): Promise<LetterboxdFilm[
       if (!uri || !title || !/^\d{4}$/.test(row.Year?.trim() ?? '') || year < 1870 || year > 2100) {
         throw new Error(`Invalid film at row ${index + 2} in ${name}.`);
       }
-      const film = films.get(uri) ?? { uri, title, year, watched: false, watchlist: false, liked: false, rating: null, watches: [] };
-      if (film.year !== year) throw new Error(`Conflicting years for a film in ${name}.`);
-      if (!films.has(uri) && films.size >= MAX_FILMS) throw new Error('Letterboxd export has too many films.');
-      films.set(uri, film);
+      const film = addFilm(uri, title, year);
+      const key = titleKey(title, year);
+      const known = filmUrisByTitle.get(key) ?? [];
+      if (!known.includes(uri)) filmUrisByTitle.set(key, [...known, uri]);
       if (name === 'watched.csv') film.watched = true;
       if (name === 'watchlist.csv') film.watchlist = true;
       if (name === 'likes/films.csv') film.liked = true;
-      if (name === 'ratings.csv' || name === 'diary.csv') {
-        const value = row.Rating?.trim();
-        if (value) {
-          const stars = Number(value);
-          if (!Number.isInteger(stars * 2) || stars < 0.5 || stars > 5) throw new Error(`Invalid rating in ${name}.`);
-          if (name === 'ratings.csv' || film.rating === null) film.rating = stars * 2;
-        }
+      if (name === 'ratings.csv') film.rating = parseRating(row.Rating, name) ?? film.rating;
+    }
+  }
+
+  const diary = files['diary.csv'];
+  if (diary !== undefined) {
+    for (const [index, row] of parseRows('diary.csv', diary).entries()) {
+      const sourceUri = filmKey(row['Letterboxd URI']?.trim() ?? '');
+      const title = row.Name?.trim();
+      const year = Number(row.Year);
+      if (!sourceUri || !title || !/^\d{4}$/.test(row.Year?.trim() ?? '') || year < 1870 || year > 2100) {
+        throw new Error(`Invalid film at row ${index + 2} in diary.csv.`);
       }
-      if (name === 'diary.csv') {
-        const date = row['Watched Date']?.trim();
-        if (date && !isDate(date)) throw new Error(`Invalid watched date in ${name}.`);
-        const logged = row.Date?.trim() ?? '';
-        if (!isDate(logged)) throw new Error(`Invalid diary date in ${name}.`);
-        const eventKey = `${uri}:${date ?? ''}:${logged}`;
-        const occurrence = (watchOccurrences.get(eventKey) ?? 0) + 1;
-        watchOccurrences.set(eventKey, occurrence);
-        if (film.watches.length >= 200) throw new Error(`Too many diary entries for ${film.title} (200 maximum per movie).`);
-        film.watched = true;
-        film.watches.push({ sourceId: `${date ?? 'undated'}:${logged}:${occurrence}`, watchedOn: date || null });
+      const date = row['Watched Date']?.trim();
+      if (date && !isDate(date)) throw new Error('Invalid watched date in diary.csv.');
+      const logged = row.Date?.trim() ?? '';
+      if (!isDate(logged)) throw new Error('Invalid diary date in diary.csv.');
+      const eventKey = `${sourceUri}:${date ?? ''}:${logged}`;
+      const occurrence = (watchOccurrences.get(eventKey) ?? 0) + 1;
+      watchOccurrences.set(eventKey, occurrence);
+      const watch = { sourceUri, sourceId: `${date ?? 'undated'}:${logged}:${occurrence}`, watchedOn: date || null };
+      const rating = parseRating(row.Rating, 'diary.csv');
+      const key = titleKey(title, year);
+      const filmUris = filmUrisByTitle.get(key) ?? [];
+      const diaryOnlyUri = diaryOnlyUrisByTitle.get(key);
+      const matchingUri = filmUris.includes(sourceUri) ? sourceUri : filmUris.length === 1 ? filmUris[0] : null;
+      if (filmUris.length > 1 && !matchingUri) {
+        ambiguousDiary.push({ title, year, rating, filmUris, diaryOnly: false, ...watch });
+        continue;
       }
+      if (!filmUris.length && diaryOnlyUri && diaryOnlyUri !== sourceUri) {
+        ambiguousDiary.push({ title, year, rating, filmUris: [diaryOnlyUri], diaryOnly: true, ...watch });
+        continue;
+      }
+      const film = addFilm(matchingUri ?? sourceUri, title, year);
+      if (!filmUris.length && !diaryOnlyUri) diaryOnlyUrisByTitle.set(key, sourceUri);
+      if (film.watches.length >= 200) throw new Error(`Too many diary entries for ${film.title} (200 maximum per movie).`);
+      film.watched = true;
+      film.watches.push(watch);
+      if (film.rating === null) film.rating = rating;
     }
   }
   if (!films.size) throw new Error('Letterboxd export contains no movies to import.');
-  return [...films.values()];
+  return { films: [...films.values()], ambiguousDiary };
 };
