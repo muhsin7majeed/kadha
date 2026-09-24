@@ -1,13 +1,16 @@
-import { Button, Card, Field, Heading, HStack, Input, Link, NativeSelect, Stack, Text } from '@chakra-ui/react';
+import { Button, Card, Field, Heading, HStack, Input, Progress, Stack, Text } from '@chakra-ui/react';
 import { useState, type ChangeEvent } from 'react';
 import { LuFileUp } from 'react-icons/lu';
 
 import SimpleCheckbox from '@/components/simple-checkbox';
+import SimpleDialog from '@/components/dialogs/simple-dialog';
 import { queryClient } from '@/lib/query-client';
-import { importLetterboxdFilms, previewLetterboxdFilms, type LetterboxdMatch } from '@/features/user/api/letterboxd-import';
+import { importLetterboxdFilms, previewLetterboxdFilms, type LetterboxdCandidate, type LetterboxdMatch } from '@/features/user/api/letterboxd-import';
+import LetterboxdMatchRow from './letterboxd-match-row';
 import { parseLetterboxdExport, type LetterboxdFilm } from './parse-letterboxd-export';
 
 const BATCH_SIZE = 100;
+const PREVIEW_SIZE = 20;
 type Category = 'watched' | 'watchlist' | 'liked' | 'ratings' | 'diary';
 const categories: { value: Category; label: string }[] = [
   { value: 'watched', label: 'Watched movies' },
@@ -17,12 +20,12 @@ const categories: { value: Category; label: string }[] = [
   { value: 'diary', label: 'Diary watches and rewatches' },
 ];
 
-const batches = <T extends LetterboxdFilm>(items: T[]): T[][] => {
+const batches = <T extends LetterboxdFilm>(items: T[], size = BATCH_SIZE): T[][] => {
   const result: T[][] = [];
   let group: T[] = [];
   let watches = 0;
   for (const film of items) {
-    if (group.length === BATCH_SIZE || watches + film.watches.length > 2000) {
+    if (group.length === size || watches + film.watches.length > 2000) {
       result.push(group);
       group = [];
       watches = 0;
@@ -38,65 +41,58 @@ const LetterboxdImportSection = () => {
   const [films, setFilms] = useState<LetterboxdFilm[]>([]);
   const [matches, setMatches] = useState<LetterboxdMatch[]>([]);
   const [choices, setChoices] = useState<Record<string, number | null>>({});
+  const [manualCandidates, setManualCandidates] = useState<Record<string, LetterboxdCandidate>>({});
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [selected, setSelected] = useState<Category[]>(categories.map(({ value }) => value));
+  const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState('');
+  const [stage, setStage] = useState<'matching' | 'importing' | null>(null);
+  const [processed, setProcessed] = useState(0);
   const [error, setError] = useState('');
   const [complete, setComplete] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
-  const [searches, setSearches] = useState<Record<string, string>>({});
-  const [visibleUnresolved, setVisibleUnresolved] = useState(50);
-  const [visibleMatched, setVisibleMatched] = useState(50);
+  const [visible, setVisible] = useState(50);
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setBusy(true);
+    setError('');
+    setComplete(false);
     setFilms([]);
     setMatches([]);
     setChoices({});
-    setComplete(false);
-    setVisibleUnresolved(50);
-    setVisibleMatched(50);
-    setError('');
-    if (!file) return;
-    setBusy(true);
+    setManualCandidates({});
+    setChecked({});
+    setVisible(50);
     try {
       const parsed = await parseLetterboxdExport(file);
-      const found: LetterboxdMatch[] = [];
-      let matchedCount = 0;
-      setProgress(`Matching movies: 0 of ${parsed.length}`);
-      for (const group of batches(parsed)) {
-        found.push(...await previewLetterboxdFilms(group));
-        matchedCount += group.length;
-        setProgress(`Matched ${matchedCount} of ${parsed.length} movies`);
-      }
       setFilms(parsed);
+      setStage('matching');
+      setProcessed(0);
+      setOpen(true);
+      const found: LetterboxdMatch[] = [];
+      let count = 0;
+      for (const group of batches(parsed, PREVIEW_SIZE)) {
+        found.push(...await previewLetterboxdFilms(group));
+        count += group.length;
+        setProcessed(count);
+      }
       setMatches(found);
       setChoices(Object.fromEntries(found.map((match) => [match.uri, match.suggestedId])));
+      setChecked(Object.fromEntries(found.map((match) => [match.uri, match.suggestedId != null])));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not read this Letterboxd export.');
     } finally {
       setBusy(false);
-      setProgress('');
-    }
-  };
-
-  const searchAgain = async (film: LetterboxdFilm) => {
-    setBusy(true);
-    setError('');
-    try {
-      const [result] = await previewLetterboxdFilms([{ ...film, title: searches[film.uri]?.trim() || film.title }]);
-      setMatches((current) => current.map((match) => match.uri === film.uri ? result : match));
-      setChoices((current) => ({ ...current, [film.uri]: null }));
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not search for this movie.');
-    } finally {
-      setBusy(false);
+      setStage(null);
     }
   };
 
   const included = films.flatMap((film) => {
     const tmdbId = choices[film.uri];
-    if (tmdbId == null) return [];
+    if (!checked[film.uri] || tmdbId == null) return [];
     const item = {
       ...film,
       watched: selected.includes('watched') && film.watched,
@@ -108,19 +104,22 @@ const LetterboxdImportSection = () => {
     };
     return item.watched || item.watchlist || item.liked || item.rating != null || item.watches.length ? [item] : [];
   });
-  const choiceCount = included.length;
-  const unresolved = films.filter((film) => choices[film.uri] == null);
-  const matched = films.filter((film) => choices[film.uri] != null);
+  const pending = films.filter((film) => checked[film.uri] && choices[film.uri] == null);
+  const includedUris = new Set(included.map((film) => film.uri));
+  const withoutSelectedData = films.filter((film) => checked[film.uri] && choices[film.uri] != null && !includedUris.has(film.uri));
   const matchByUri = new Map(matches.map((match) => [match.uri, match]));
   const conflicting = included.filter((film) => {
     const mappedId = matchByUri.get(film.uri)?.mappedId;
     return mappedId != null && mappedId !== film.tmdbId;
   });
-  const effects = { existing: 0, ratingsKept: 0, newWatches: 0, importedWatches: 0 };
+  const duplicateIds = new Set(included.map((film) => film.tmdbId)).size !== included.length;
+  const effects = { existing: 0, unknown: 0, ratingsKept: 0, newWatches: 0, importedWatches: 0 };
   for (const film of included) {
     const match = matchByUri.get(film.uri);
-    const candidate = match?.candidates.find((item) => item.id === film.tmdbId);
-    if (candidate?.existing) effects.existing += 1;
+    const previewCandidate = match?.candidates.find((item) => item.id === film.tmdbId);
+    const candidate = previewCandidate ?? (manualCandidates[film.uri]?.id === film.tmdbId ? manualCandidates[film.uri] : null);
+    if (!previewCandidate) effects.unknown += 1;
+    else if (previewCandidate.existing) effects.existing += 1;
     if (film.rating != null && candidate?.ratingKept) effects.ratingsKept += 1;
     if (film.watches.length) {
       effects.importedWatches += match?.importedWatches ?? 0;
@@ -129,24 +128,17 @@ const LetterboxdImportSection = () => {
   }
 
   const importSelected = async () => {
-    if (conflicting.length) {
-      setError('A previously imported match differs. Select the original TMDB movie or skip it.');
-      return;
-    }
-    const chosenIds = included.map((film) => film.tmdbId);
-    if (new Set(chosenIds).size !== chosenIds.length) {
-      setError('Two Letterboxd entries point to the same TMDB movie. Skip one before importing.');
-      return;
-    }
+    if (busy || pending.length || conflicting.length || duplicateIds || !included.length) return;
     setBusy(true);
+    setStage('importing');
+    setProcessed(0);
     setError('');
-    setComplete(false);
     let imported = 0;
     try {
       for (const group of batches(included)) {
         await importLetterboxdFilms(group);
         imported += group.length;
-        setProgress(`Imported ${imported} of ${included.length} movies`);
+        setProcessed(imported);
       }
       await queryClient.invalidateQueries();
       setCompletedCount(imported);
@@ -155,59 +147,8 @@ const LetterboxdImportSection = () => {
       setError(`Import stopped after ${imported} movies. ${caught instanceof Error ? caught.message : 'Please try again.'} Re-importing the same ZIP won't duplicate completed diary entries.`);
     } finally {
       setBusy(false);
-      setProgress('');
+      setStage(null);
     }
-  };
-
-  const renderChoice = (film: LetterboxdFilm) => {
-    const match = matchByUri.get(film.uri);
-    return (
-      <Field.Root key={film.uri}>
-        <Field.Label>{film.title} ({film.year})</Field.Label>
-        <NativeSelect.Root disabled={busy} colorPalette="brand">
-          <NativeSelect.Field
-            value={choices[film.uri] ?? ''}
-            onChange={(event) => setChoices((current) => ({
-              ...current,
-              [film.uri]: event.target.value ? Number(event.target.value) : null,
-            }))}
-          >
-            <option value="">Skip this movie</option>
-            {match?.candidates.map((candidate) => (
-              <option key={candidate.id} value={candidate.id}>
-                {candidate.title} ({candidate.year ?? 'year unknown'}) · TMDB #{candidate.id}
-              </option>
-            ))}
-          </NativeSelect.Field>
-        </NativeSelect.Root>
-        {match?.error ? <Field.HelperText>Search failed. Try again before importing.</Field.HelperText> : null}
-        {match?.mappedId != null && choices[film.uri] != null && match.mappedId !== choices[film.uri] ? (
-          <Field.HelperText>
-            Previously imported as TMDB #{match.mappedId}. Search for that movie or skip it; a different match is blocked.
-          </Field.HelperText>
-        ) : null}
-        {choices[film.uri] != null ? (
-          <Field.HelperText>
-            <Link href={`https://www.themoviedb.org/movie/${choices[film.uri]}`} target="_blank" rel="noopener noreferrer">
-              Check selected movie on TMDB
-            </Link>
-          </Field.HelperText>
-        ) : null}
-        {choices[film.uri] == null ? (
-          <HStack mt="2">
-            <Input
-              aria-label={`Search TMDB for ${film.title}`}
-              placeholder="Try another title"
-              value={searches[film.uri] ?? ''}
-              onChange={(event) => setSearches((current) => ({ ...current, [film.uri]: event.target.value }))}
-            />
-            <Button colorPalette="gray" variant="outline" disabled={busy} onClick={() => searchAgain(film)}>
-              Search
-            </Button>
-          </HStack>
-        ) : null}
-      </Field.Root>
-    );
   };
 
   return (
@@ -218,7 +159,7 @@ const LetterboxdImportSection = () => {
           <Heading as="h3" textStyle="subsectionTitle">Import from Letterboxd</Heading>
         </HStack>
         <Text textStyle="supporting" color="fg.muted">
-          Choose your Letterboxd export ZIP. I only read active film files; profile details, reviews and deleted entries stay out of the import.
+          Choose a Letterboxd export ZIP to review the movies before importing them. Your browser reads the supported CSV files and sends film data to this server for TMDB matching. Profile details and reviews are not sent.
         </Text>
       </Card.Header>
       <Card.Body>
@@ -226,75 +167,82 @@ const LetterboxdImportSection = () => {
           <Field.Root>
             <Field.Label>Letterboxd export ZIP</Field.Label>
             <Input type="file" accept=".zip,application/zip" disabled={busy} onChange={handleFile} />
-            <Field.HelperText>ZIP, up to 10 MB. Movie matching uses TMDB and may take a while for large libraries.</Field.HelperText>
+            <Field.HelperText>ZIP, up to 10 MB. Matching can take a while for large libraries.</Field.HelperText>
           </Field.Root>
-          {progress ? <Text role="status" textStyle="supporting">{progress}</Text> : null}
-          {error ? <Text role="alert" color="fg.error" textStyle="supporting">{error}</Text> : null}
-          {films.length ? (
-            <Stack gap="4">
-              <Text textStyle="supporting">
-                {matched.length} matched, {unresolved.length} need review or will be skipped. I won't replace existing ratings or invent watch dates.
-              </Text>
-              <Stack gap="2">
-                {categories.map(({ value, label }) => (
-                  <SimpleCheckbox
-                    key={value}
-                    checked={selected.includes(value)}
-                    onCheckedChange={(details) => setSelected((current) =>
-                      details.checked === true ? [...current, value] : current.filter((item) => item !== value),
-                    )}
-                    label={label}
-                  />
-                ))}
-              </Stack>
-              {included.length ? (
-                <Text textStyle="supporting">
-                  {included.length - effects.existing} new, {effects.existing} already tracked;{' '}
-                  {effects.ratingsKept} existing rating kept.
-                  {selected.includes('diary') ? (
-                    <> {effects.newWatches} new diary {effects.newWatches === 1 ? 'watch' : 'watches'}, {effects.importedWatches} already imported.</>
-                  ) : null}
-                </Text>
-              ) : null}
-              {conflicting.length ? (
-                <Text role="alert" textStyle="supporting" color="fg.error">
-                  A previously imported match differs for {conflicting.length} {conflicting.length === 1 ? 'movie' : 'movies'}. Search for the original TMDB movie or skip it before importing.
-                </Text>
-              ) : null}
-              {unresolved.length ? (
-                <Stack gap="3">
-                  <Heading as="h4" textStyle="cardTitle">Needs review</Heading>
-                  {unresolved.slice(0, visibleUnresolved).map(renderChoice)}
-                  {unresolved.length > visibleUnresolved ? (
-                    <Button colorPalette="gray" variant="outline" onClick={() => setVisibleUnresolved((count) => count + 50)}>
-                      Show more to review
-                    </Button>
-                  ) : null}
-                </Stack>
-              ) : null}
-              {matched.length ? (
-                <details>
-                  <summary>Review {matched.length} selected matches</summary>
-                  <Stack gap="3" mt="3">
-                    {matched.slice(0, visibleMatched).map(renderChoice)}
-                    {matched.length > visibleMatched ? (
-                      <Button colorPalette="gray" variant="outline" onClick={() => setVisibleMatched((count) => count + 50)}>
-                        Show more matches
-                      </Button>
-                    ) : null}
-                  </Stack>
-                </details>
-              ) : null}
-              <Button colorPalette="brand" disabled={busy || !choiceCount || !selected.length || conflicting.length > 0} onClick={importSelected}>
-                Import {choiceCount} {choiceCount === 1 ? 'film' : 'films'}
-              </Button>
-            </Stack>
-          ) : null}
-          {complete ? (
-            <Text role="status">Import complete: {completedCount} movies processed. {unresolved.length} unmatched or skipped.</Text>
-          ) : null}
+          {error && !open ? <Text role="alert" color="fg.error" textStyle="supporting">{error}</Text> : null}
+          {films.length && !open ? <Button colorPalette="gray" variant="outline" onClick={() => setOpen(true)}>Return to import review</Button> : null}
+          {complete && !open ? <Text role="status">Import complete: {completedCount} {completedCount === 1 ? 'movie' : 'movies'} processed.</Text> : null}
         </Stack>
       </Card.Body>
+      <SimpleDialog
+        open={open}
+        onOpenChange={(details) => { if (!busy) setOpen(details.open); }}
+        closeButton={!busy}
+        size="full"
+        scrollBehavior="inside"
+        title="Review Letterboxd import"
+        contentProps={{ maxH: '100dvh', maxW: '100%', w: '100%', py: 0 }}
+        bodyProps={{ px: { base: 3, md: 6 } }}
+      >
+        <Stack gap="5" maxW="6xl" mx="auto" pb="6">
+          {stage ? (
+            <Stack gap="2" role="status">
+              <Text textStyle="supporting">{stage === 'matching' ? 'Matching' : 'Importing'} {processed} of {stage === 'matching' ? films.length : included.length} movies{busy && processed < (stage === 'matching' ? films.length : included.length) ? ' (working on the next batch)' : ''}</Text>
+              <Progress.Root value={stage === 'matching' ? processed : null} max={stage === 'matching' ? films.length : included.length} colorPalette="brand">
+                <Progress.Track aria-label={stage === 'matching' ? 'Matching movies' : 'Importing movies'}><Progress.Range /></Progress.Track>
+              </Progress.Root>
+            </Stack>
+          ) : null}
+          {error ? <Text role="alert" color="fg.error" textStyle="supporting">{error}</Text> : null}
+          {!stage && matches.length ? (
+            <>
+              <Text textStyle="supporting" color="fg.muted">Check each entry you want to import, then choose its TMDB movie. Unchecked entries are skipped.</Text>
+              <Stack gap="2">
+                <Heading as="h3" textStyle="cardTitle">What to import</Heading>
+                <HStack gap="4" flexWrap="wrap">
+                  {categories.map(({ value, label }) => (
+                    <SimpleCheckbox key={value} checked={selected.includes(value)} disabled={busy || complete}
+                      onCheckedChange={(details) => setSelected((current) => details.checked === true ? [...current, value] : current.filter((item) => item !== value))}
+                      label={label} />
+                  ))}
+                </HStack>
+              </Stack>
+              <Stack gap="3">
+                <Heading as="h3" textStyle="cardTitle">Movie matches ({films.length})</Heading>
+                {films.slice(0, visible).map((film) => (
+                  <LetterboxdMatchRow key={film.uri} film={film} match={matchByUri.get(film.uri)} manualCandidate={manualCandidates[film.uri]} choice={choices[film.uri] ?? null}
+                    checked={checked[film.uri] ?? false} disabled={busy || complete}
+                    onChecked={(value) => setChecked((current) => ({ ...current, [film.uri]: value }))}
+                    onChoice={(candidate: LetterboxdCandidate | null) => {
+                      setChoices((current) => ({ ...current, [film.uri]: candidate?.id ?? null }));
+                      if (candidate) setManualCandidates((current) => ({ ...current, [film.uri]: candidate }));
+                    }} />
+                ))}
+                {films.length > visible ? <Button colorPalette="gray" variant="outline" onClick={() => setVisible((count) => count + 50)}>Show more movies</Button> : null}
+              </Stack>
+              <Stack gap="2" position="sticky" bottom="0" bg="bg.panel" p="4" borderWidth="1px" borderColor="border.subtle" borderRadius="lg">
+                <Text textStyle="body">{included.length} to import · {films.length - included.length} skipped</Text>
+                {withoutSelectedData.length ? <Text textStyle="supporting" color="fg.muted">{withoutSelectedData.length} checked {withoutSelectedData.length === 1 ? 'entry has' : 'entries have'} no data in the chosen categories and will be skipped.</Text> : null}
+                {pending.length ? <Text role="alert" textStyle="supporting" color="fg.error">{pending.length} checked {pending.length === 1 ? 'entry needs' : 'entries need'} a TMDB movie. Choose a match or uncheck them.</Text> : null}
+                {conflicting.length ? <Text role="alert" textStyle="supporting" color="fg.error">{conflicting.length} previously imported {conflicting.length === 1 ? 'match differs' : 'matches differ'}. Choose the original movie or uncheck the entry.</Text> : null}
+                {duplicateIds ? <Text role="alert" textStyle="supporting" color="fg.error">Two entries point to the same TMDB movie. Uncheck one or choose a different match.</Text> : null}
+                {included.length ? <Text textStyle="supporting">
+                  {effects.unknown ? 'Known matches: ' : ''}{included.length - effects.existing - effects.unknown} new, {effects.existing} already tracked.
+                  {effects.unknown ? ` ${effects.unknown} manually chosen ${effects.unknown === 1 ? 'movie may' : 'movies may'} already be tracked.` : ''}
+                  {' '}{effects.ratingsKept} existing ratings kept.
+                  {selected.includes('diary') ? ` ${effects.newWatches} new diary watches, ${effects.importedWatches} already imported.` : ''}
+                </Text> : null}
+                <Text textStyle="supporting" color="fg.muted">Movies only: the ZIP does not reliably identify TV entries, so skip series. Reviews, tags, lists, deleted entries and profile details are not imported. Existing ratings stay; watched movies without diary dates get no invented date. An interrupted import may have completed earlier batches.</Text>
+                {complete ? <Text role="status">Import complete: {completedCount} {completedCount === 1 ? 'movie' : 'movies'} processed. {films.length - completedCount} skipped.</Text> : (
+                  <Button colorPalette="brand" disabled={busy || !included.length || pending.length > 0 || conflicting.length > 0 || duplicateIds} onClick={importSelected}>
+                    Import {included.length} {included.length === 1 ? 'movie' : 'movies'}
+                  </Button>
+                )}
+              </Stack>
+            </>
+          ) : null}
+        </Stack>
+      </SimpleDialog>
     </Card.Root>
   );
 };

@@ -240,14 +240,16 @@ recommendation feedback are selected by default. Privacy settings and watch regi
 preferences default to off because they replace the target account's current values. Imports never change the target
 username, role, account ID, password, recovery code, or sessions.
 
-Letterboxd movie imports accept the original export ZIP (up to 10 MB) in **Settings → Data**. Kadha reads the active
-watched, diary, ratings, watchlist, and liked-film CSVs in your browser; profile details, reviews, tags, lists,
-deleted, and orphaned entries are not imported. Kadha searches TMDB by film title and year and preselects only unique
-exact matches. Review suggested movies, choose among other candidates or search another title, and skip any uncertain
-matches. The preview shows how many selected films are new or already tracked, which existing ratings stay, and how
-many diary watches are new or already imported. You can choose which tracking categories to import; films with no
-selected data are not added. Ratings convert from five stars to Kadha's ten-point scale; existing ratings are left
-alone. Diary logs keep their recorded viewing dates and same-day rewatches. Watched movies without diary logs are
+Letterboxd movie imports accept the original export ZIP (up to 10 MB) in **Settings → Data**. The browser reads active
+watched, diary, ratings, watchlist, and liked-film CSVs, then sends the extracted film data to the server for TMDB
+matching. Profile details, reviews, tags, lists, deleted, and orphaned entries are not imported. A full-screen review
+opens after ZIP validation and shows matching progress. Kadha searches TMDB by film title and year and preselects only
+unique exact movie matches. Check only the entries you want to import; uncertain entries start unchecked with no chosen
+TMDB movie. Search within an entry's dropdown to select another TMDB movie. Only checked entries with a movie match are
+imported; the confirmation area shows import and skip counts, existing ratings, and new or already imported diary watches.
+Letterboxd exports do not reliably identify TV entries, so this importer only supports TMDB movies; leave series unchecked.
+You can also choose which tracking categories to import; films with no selected data are not added. Ratings convert
+from five stars to Kadha's ten-point scale; existing ratings are left alone. Diary logs keep their recorded viewing dates and same-day rewatches. Watched movies without diary logs are
 marked watched without inventing a viewing date. Large imports run in batches, so a failed batch may leave earlier
 batches imported. Re-importing the same export avoids duplicate diary entries, and previously imported films cannot
 be rematched to a different TMDB movie by accident. A full Kadha JSON export currently does not include the internal
