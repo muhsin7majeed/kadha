@@ -2,6 +2,7 @@ import { Stack } from '@chakra-ui/react';
 
 import DataExportSection from '@/features/user/components/data-export-section';
 import DataImportSection from '@/features/user/components/data-import-section';
+import LetterboxdImportSection from '@/features/user/letterboxd/letterboxd-import-section';
 import DeleteAccountSection from '@/features/user/components/delete-account-section';
 
 import SettingsSectionHeader from './settings-section-header';
@@ -11,6 +12,7 @@ const DataSettings = () => (
     <SettingsSectionHeader title="Data" description="Download and manage the information stored in your account." />
     <DataExportSection headingAs="h3" />
     <DataImportSection headingAs="h3" />
+    <LetterboxdImportSection />
     <DeleteAccountSection headingAs="h3" />
   </Stack>
 );

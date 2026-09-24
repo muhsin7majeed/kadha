@@ -23,8 +23,8 @@ an early beta and mistakes, software failures, or infrastructure failures could 
 would not want to recreate, and do not store highly sensitive information in Kadha.
 
 Signup does not require an email address or phone number. New accounts receive a private recovery code instead; losing
-both the password and recovery code makes the account unrecoverable. Direct imports from Letterboxd and Trakt are not
-yet available.
+both the password and recovery code makes the account unrecoverable. Direct import from Letterboxd ZIP exports is
+available under **Settings → Data**; Trakt import is not yet available.
 
 ## Screenshots
 <img width="1856" height="907" alt="image" src="https://github.com/user-attachments/assets/d5304b28-7e39-4e60-ace8-fdc573d9da19" />
@@ -239,6 +239,20 @@ detected categories to import. Media tracking, watch history, owned collections,
 recommendation feedback are selected by default. Privacy settings and watch region can also be imported, but account
 preferences default to off because they replace the target account's current values. Imports never change the target
 username, role, account ID, password, recovery code, or sessions.
+
+Letterboxd movie imports accept the original export ZIP (up to 10 MB) in **Settings → Data**. Kadha reads the active
+watched, diary, ratings, watchlist, and liked-film CSVs in your browser; profile details, reviews, tags, lists,
+deleted, and orphaned entries are not imported. Kadha searches TMDB by film title and year and preselects only unique
+exact matches. Review suggested movies, choose among other candidates or search another title, and skip any uncertain
+matches. The preview shows how many selected films are new or already tracked, which existing ratings stay, and how
+many diary watches are new or already imported. You can choose which tracking categories to import; films with no
+selected data are not added. Ratings convert from five stars to Kadha's ten-point scale; existing ratings are left
+alone. Diary logs keep their recorded viewing dates and same-day rewatches. Watched movies without diary logs are
+marked watched without inventing a viewing date. Large imports run in batches, so a failed batch may leave earlier
+batches imported. Re-importing the same export avoids duplicate diary entries, and previously imported films cannot
+be rematched to a different TMDB movie by accident. A full Kadha JSON export currently does not include the internal
+Letterboxd match mapping; restoring one to a different account does not retain rematch protection or diary-event
+deduplication against the restored history.
 
 Imported records belong to the currently signed-in account and merge with existing data. Friendships, blocked-user
 relationships, notifications, collection memberships and invitations, and activity remain in a full export for

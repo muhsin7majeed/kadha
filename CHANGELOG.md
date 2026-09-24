@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Feature Changes
+
+- Added direct Letterboxd ZIP imports for watched movies, watchlists, likes, ratings, and dated diary watches, with TMDB match and import-effects review and re-import protection.
+
+### Engineering Changes
+
+- Added owner-scoped Letterboxd match identities to prevent conflicting rematches, with bounded matching and import workloads.
+
 ## v0.7.0
 
 ### Feature Changes

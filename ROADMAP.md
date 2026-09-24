@@ -85,7 +85,8 @@ operations, compliance maturity, and abuse-monitoring work move later unless the
 #### P1 — Portability, Useful Privacy, And Product Reliability
 
 - [x] Add selectable, versioned JSON export and import with validation, preview, idempotency, and conflict handling.
-- [ ] Add supported import adapters for services such as Letterboxd or Trakt.
+- [x] Add direct Letterboxd ZIP import for active film tracking, ratings, and diary events with TMDB match review.
+- [ ] Add a supported Trakt import adapter.
 - [x] Add watch-history totals and trends through the private Viewing Diary.
 - [ ] Add breached-password rejection without sending complete passwords to a third party.
 - [ ] Validate JWT secret strength and separation, document rotation, and restrict production environment-file access.

@@ -21,6 +21,8 @@ import {
   updateMe,
 } from './user.controller';
 import { importPayloadSchema } from './user-import.schema';
+import { letterboxdImportSchema, letterboxdPreviewSchema } from './letterboxd-import.schema';
+import { importLetterboxd, previewLetterboxd } from './letterboxd-import.controller';
 import { exportQuerySchema } from './user-export.schema';
 import { deleteMeSchema, updateMeSchema } from './user.schema';
 import { sensitiveActionRateLimit } from '@/features/auth/auth-rate-limit';
@@ -30,6 +32,8 @@ import { userMediaQuerySchema } from './user-media-query.schema';
 const router = Router();
 
 router.get('/me', getMe);
+router.post('/letterboxd/preview', validateAuthRequestOrigin, requireJsonAuthRequest, validate(letterboxdPreviewSchema), previewLetterboxd);
+router.post('/letterboxd/import', validateAuthRequestOrigin, requireJsonAuthRequest, validate(letterboxdImportSchema), importLetterboxd);
 router.get('/deletion-impact', getMyDeletionImpact);
 router.post(
   '/import/preview',

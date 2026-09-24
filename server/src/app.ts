@@ -40,7 +40,7 @@ export function createApp(): Express {
 
   app.use(cors(corsOptions));
   app.use(cookieParser());
-  app.use(['/api/user/import', '/api/users/import'], express.json({ limit: '10mb' }));
+  app.use(['/api/user/import', '/api/users/import', '/api/user/letterboxd', '/api/users/letterboxd'], express.json({ limit: '10mb' }));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 

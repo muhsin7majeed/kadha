@@ -321,6 +321,9 @@ const upsertImportedUserMedia = async (
   return 'created' as const;
 };
 
+export const importedWatchEventRequestId = (sourceAccountId: string, sourceEventId: string) =>
+  `import:${sourceAccountId}:watch-event:${sourceEventId}`;
+
 const importWatchEvent = async (
   tx: Prisma.TransactionClient,
   userId: string,
@@ -338,7 +341,7 @@ const importWatchEvent = async (
   const media = getMediaSnapshotPayload(event);
   if (media) await upsertMediaSnapshot(media, tx);
 
-  const clientRequestId = `import:${sourceAccountId}:watch-event:${sourceEventId}`;
+  const clientRequestId = importedWatchEventRequestId(sourceAccountId, sourceEventId);
   const existing = await tx.watchEvent.findUnique({
     where: {
       userId_clientRequestId: {
@@ -553,7 +556,7 @@ const importRecommendationFeedback = async (
   return 'created' as const;
 };
 
-export const applyUserImport = async (userId: string, payload: ImportPayload) => {
+export const applyUserImport = async (userId: string, payload: ImportPayload, transaction?: Prisma.TransactionClient) => {
   const exportData = getExportData(payload);
   const data = getData(exportData);
   const sourceAccountId = getSourceAccountId(exportData);
@@ -564,7 +567,7 @@ export const applyUserImport = async (userId: string, payload: ImportPayload) =>
   const overwriteUserMediaDetails = payload.options?.overwriteUserMediaDetails ?? false;
   const overwriteRecommendationSettings = payload.options?.overwriteRecommendationSettings ?? true;
 
-  return prisma.$transaction(async (tx) => {
+  const apply = async (tx: Prisma.TransactionClient) => {
     const summary = {
       created: {
         media: 0,
@@ -662,5 +665,6 @@ export const applyUserImport = async (userId: string, payload: ImportPayload) =>
     }
 
     return summary;
-  });
+  };
+  return transaction ? apply(transaction) : prisma.$transaction(apply);
 };

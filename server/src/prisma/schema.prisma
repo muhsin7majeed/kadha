@@ -134,6 +134,7 @@ model User {
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
   user_media             UserMedia[]
+  letterboxdMatches      LetterboxdFilmMatch[]
   watchEvents            WatchEvent[]
   recommendationSettings RecommendationSettings?
   recommendationFeedback RecommendationFeedback[]
@@ -296,6 +297,18 @@ model UserMedia {
   @@index([userId, watchlistAt])
   @@index([media_id, media_type])
   @@map("user_media")
+}
+
+model LetterboxdFilmMatch {
+  userId    String
+  uri       String
+  tmdbId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, uri])
+  @@map("letterboxd_film_matches")
 }
 
 model WatchEvent {
