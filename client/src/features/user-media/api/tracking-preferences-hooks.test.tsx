@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryObserver } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -69,6 +69,29 @@ describe('tracking preference hooks', () => {
     expect(mocks.put).toHaveBeenCalledWith('/api/user-media/tracking-preferences', updated);
     expect(queryClient.getQueryData(queryKeys.trackingPreferences)).toEqual(updated);
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+  });
+
+  it('does not let an older preference GET overwrite a successful save', async () => {
+    const updated: TrackingPreferences = { ...preferences, keepWatchedOnWatchlist: true };
+    mocks.put.mockResolvedValue({ data: { data: updated } });
+    const queryClient = new QueryClient();
+    queryClient.setQueryData(queryKeys.trackingPreferences, preferences);
+    let finish!: (value: TrackingPreferences) => void;
+    const observer = new QueryObserver(queryClient, {
+      queryKey: queryKeys.trackingPreferences,
+      queryFn: () => new Promise<TrackingPreferences>((resolve) => { finish = resolve; }),
+    });
+    const unsubscribe = observer.subscribe(() => undefined);
+    const { result } = renderHook(() => useUpdateTrackingPreferences(), { wrapper: createWrapper(queryClient) });
+
+    try {
+      await waitFor(() => expect(queryClient.getQueryState(queryKeys.trackingPreferences)?.fetchStatus).toBe('fetching'));
+      await act(() => result.current.mutateAsync(updated));
+      await act(async () => { finish(preferences); await new Promise((resolve) => setTimeout(resolve, 0)); });
+      expect(queryClient.getQueryData(queryKeys.trackingPreferences)).toEqual(updated);
+    } finally {
+      unsubscribe();
+    }
   });
 
   it('keeps saved preferences unchanged and reports a failed save', async () => {

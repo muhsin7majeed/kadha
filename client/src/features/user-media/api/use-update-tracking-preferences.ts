@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useErrorHandler } from '@/hooks/use-error-handler';
+import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
 import { queryKeys } from '@/lib/query-keys';
 import type { BaseResponse } from '@/types/common';
@@ -21,10 +21,16 @@ const useUpdateTrackingPreferences = () => {
       );
       return response.data.data;
     },
-    onMutate: () => ({
-      previousPreferences: queryClient.getQueryData<TrackingPreferences>(queryKeys.trackingPreferences),
-    }),
-    onError: useErrorHandler,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.trackingPreferences });
+      return {
+        previousPreferences: queryClient.getQueryData<TrackingPreferences>(queryKeys.trackingPreferences),
+      };
+    },
+    onError: async (error) => {
+      handleApiError(error);
+      await queryClient.invalidateQueries({ queryKey: queryKeys.trackingPreferences });
+    },
     onSuccess: async (preferences, _variables, context) => {
       queryClient.setQueryData(queryKeys.trackingPreferences, preferences);
 
