@@ -8,7 +8,7 @@
 
 ### Behavior Fixes
 
-- Refresh Continue Watching card tracking flags after changes so a saved Watchlist choice appears immediately.
+- Refresh tracking flags in Continue Watching and other lists after the server confirms an action, with loading feedback instead of unverified instant cache changes.
 
 ### Engineering Changes
 
