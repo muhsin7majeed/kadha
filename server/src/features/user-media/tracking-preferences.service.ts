@@ -35,6 +35,9 @@ export const getTrackingPreferences = async (userId: string) => {
   return stored ? parseStoredTrackingPreferences(stored.config) : { ...DEFAULT_TRACKING_PREFERENCES };
 };
 
+export const shouldPreserveWatchlistForTitleWatchedChange = async (userId: string) =>
+  (await getTrackingPreferences(userId)).keepWatchedOnWatchlist;
+
 export const updateTrackingPreferences = async (userId: string, preferences: TrackingPreferencesDocument) => {
   await prisma.trackingPreferences.upsert({
     where: { userId },

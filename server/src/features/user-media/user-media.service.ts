@@ -3,6 +3,7 @@ import { MediaType, Prisma, UserActivityType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { createUserActivity } from '@/features/activity/activity.service';
 import { upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
+import { shouldPreserveWatchlistForTitleWatchedChange } from './tracking-preferences.service';
 import { UserMediaPayload } from './user-media.schema';
 
 type UserMediaFlag = 'liked' | 'watched' | 'watchlist';
@@ -86,6 +87,15 @@ const getTrackingUpdates = (
 
 export async function upsertUserMedia(userId: string, payload: UserMediaPayload, flagUpdate: UserMediaFlagUpdate) {
   const mediaType = payload.media_type as MediaType;
+  const effectiveFlagUpdate = { ...flagUpdate };
+
+  if (
+    effectiveFlagUpdate.watchlist === false &&
+    typeof effectiveFlagUpdate.watched === 'boolean' &&
+    (await shouldPreserveWatchlistForTitleWatchedChange(userId))
+  ) {
+    delete effectiveFlagUpdate.watchlist;
+  }
 
   return prisma.$transaction(async (tx) => {
     await upsertMediaSnapshot(
@@ -112,7 +122,7 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
       },
     });
     const now = new Date();
-    const timestampUpdates = getTimestampUpdates(flagUpdate, now);
+    const timestampUpdates = getTimestampUpdates(effectiveFlagUpdate, now);
     const trackingUpdates = getTrackingUpdates(payload, existingMedia, now);
 
     const updatedMedia = await tx.userMedia.upsert({
@@ -124,7 +134,7 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
         },
       },
       update: {
-        ...flagUpdate,
+        ...effectiveFlagUpdate,
         ...timestampUpdates,
         ...trackingUpdates,
       },
@@ -132,14 +142,14 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
         userId,
         media_id: payload.media_id,
         media_type: mediaType,
-        ...flagUpdate,
+        ...effectiveFlagUpdate,
         ...timestampUpdates,
         ...trackingUpdates,
       },
     });
 
-    if (typeof flagUpdate.watched === 'boolean') {
-      if (!flagUpdate.watched) {
+    if (typeof effectiveFlagUpdate.watched === 'boolean') {
+      if (!effectiveFlagUpdate.watched) {
         await tx.watchEvent.deleteMany({
           where: {
             userId,
@@ -185,7 +195,7 @@ export async function upsertUserMedia(userId: string, payload: UserMediaPayload,
       }
     }
 
-    const activityEntries = Object.entries(flagUpdate).filter(
+    const activityEntries = Object.entries(effectiveFlagUpdate).filter(
       (entry): entry is [UserMediaFlag, boolean] => typeof entry[1] === 'boolean',
     );
 

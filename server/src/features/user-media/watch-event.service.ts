@@ -4,6 +4,7 @@ import { createUserActivity } from '@/features/activity/activity.service';
 import { upsertMediaSnapshot } from '@/features/media/media-snapshot.service';
 import { badRequest, notFound } from '@/lib/http';
 import { prisma } from '@/lib/prisma';
+import { shouldPreserveWatchlistForTitleWatchedChange } from './tracking-preferences.service';
 import { WatchEventCreatePayload, WatchEventUpdatePayload } from './user-media.schema';
 import { formatWatchedOnForApi } from './user-media.serializer';
 
@@ -88,6 +89,8 @@ export async function createWatchEvent(userId: string, payload: WatchEventCreate
   const mediaType = payload.media_type as MediaType;
   const watchedOn = normalizeWatchedOn(payload.watchedOn);
   const note = normalizeNote(payload.note);
+  const isTitleEvent = payload.seasonNumber == null && payload.episodeNumber == null;
+  const preserveWatchlist = isTitleEvent && (await shouldPreserveWatchlistForTitleWatchedChange(userId));
 
   await prisma.$transaction(async (tx) => {
     await upsertMediaSnapshot({ ...payload, media_type: mediaType }, tx);
@@ -112,7 +115,6 @@ export async function createWatchEvent(userId: string, payload: WatchEventCreate
     }
 
     const now = new Date();
-    const isTitleEvent = payload.seasonNumber == null && payload.episodeNumber == null;
     const existingUserMedia = await tx.userMedia.findUnique({
       where: {
         userId_media_id_media_type: {
@@ -135,8 +137,7 @@ export async function createWatchEvent(userId: string, payload: WatchEventCreate
       update: {
         ...(isTitleEvent
           ? {
-              watchlist: false,
-              watchlistAt: null,
+              ...(preserveWatchlist ? {} : { watchlist: false, watchlistAt: null }),
               watched: true,
               watchedAt: now,
               watchedOn,

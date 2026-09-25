@@ -59,6 +59,137 @@ describe('watch event routes', () => {
     });
   });
 
+  it('preserves movie and TV watchlist details for title events when retention is enabled', async () => {
+    const user = await registerTestUser('title-event-watchlist-retention-user');
+    const app = await getTestApp();
+    await prisma.trackingPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          keepWatchedOnWatchlist: true,
+          hideCaughtUpWithoutScheduledNext: false,
+        }),
+      },
+    });
+
+    for (const [mediaId, mediaType] of [
+      [889102, 'movie'],
+      [889103, 'tv'],
+    ] as const) {
+      const payload = buildTestMediaPayload({
+        mediaId,
+        mediaType,
+        title: `Watchlisted ${mediaType}`,
+      });
+      await request(app)
+        .post('/api/user-media/watchlist')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watchlist: true, watchlistNote: `Keep this ${mediaType} event` })
+        .expect(200);
+      const watchlistAt = (
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+          },
+        })
+      ).watchlistAt;
+
+      const response = await request(app)
+        .post('/api/user-media/watch-events')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watchedOn: '2026-01-15', note: `Watched ${mediaType}` })
+        .expect(201);
+
+      expect(response.body.data).toMatchObject({
+        watchCount: 1,
+        events: [
+          expect.objectContaining({
+            media_id: mediaId,
+            media_type: mediaType,
+            seasonNumber: null,
+            episodeNumber: null,
+            watchedOn: '2026-01-15',
+            note: `Watched ${mediaType}`,
+          }),
+        ],
+      });
+      expect(
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+          },
+        }),
+      ).toMatchObject({
+        watched: true,
+        watchlist: true,
+        watchlistAt,
+        watchlistNote: `Keep this ${mediaType} event`,
+      });
+      expect(
+        await prisma.watchEvent.count({
+          where: {
+            userId: user.userId,
+            media_id: mediaId,
+            media_type: mediaType,
+            seasonNumber: null,
+            episodeNumber: null,
+          },
+        }),
+      ).toBe(1);
+    }
+
+    expect(
+      await prisma.userActivity.count({
+        where: { userId: user.userId, type: 'MEDIA_REMOVED_FROM_WATCHLIST' },
+      }),
+    ).toBe(0);
+  });
+
+  it('clears watchlist details for title events by default without changing event persistence', async () => {
+    const user = await registerTestUser('title-event-watchlist-default-user');
+    const app = await getTestApp();
+    const mediaId = 889104;
+    const payload = buildTestMediaPayload({
+      mediaId,
+      mediaType: 'tv',
+      title: 'Default Watchlisted Show',
+    });
+    await request(app)
+      .post('/api/user-media/watchlist')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, watchlist: true, watchlistNote: 'Keep this note after removal' })
+      .expect(200);
+
+    const response = await request(app)
+      .post('/api/user-media/watch-events')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, watchedOn: '2026-01-15', note: 'Default title event' })
+      .expect(201);
+
+    expect(response.body.data).toMatchObject({
+      watchCount: 1,
+      events: [expect.objectContaining({ media_id: mediaId, media_type: 'tv', note: 'Default title event' })],
+    });
+    expect(
+      await prisma.userMedia.findUniqueOrThrow({
+        where: {
+          userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: 'tv' },
+        },
+      }),
+    ).toMatchObject({
+      watched: true,
+      watchlist: false,
+      watchlistAt: null,
+      watchlistNote: 'Keep this note after removal',
+    });
+    expect(
+      await prisma.userActivity.count({
+        where: { userId: user.userId, type: 'MEDIA_REMOVED_FROM_WATCHLIST' },
+      }),
+    ).toBe(0);
+  });
+
   it('preserves TV watchlist state when recording an episode', async () => {
     const user = await registerTestUser('episode-watchlist-user');
     const app = await getTestApp();
