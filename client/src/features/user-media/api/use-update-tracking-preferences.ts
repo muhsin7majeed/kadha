@@ -27,10 +27,7 @@ const useUpdateTrackingPreferences = () => {
         previousPreferences: queryClient.getQueryData<TrackingPreferences>(queryKeys.trackingPreferences),
       };
     },
-    onError: async (error) => {
-      handleApiError(error);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.trackingPreferences });
-    },
+    onError: handleApiError,
     onSuccess: async (preferences, _variables, context) => {
       queryClient.setQueryData(queryKeys.trackingPreferences, preferences);
 

@@ -98,6 +98,7 @@ describe('tracking preference hooks', () => {
     mocks.put.mockRejectedValue(new Error('Could not save'));
     const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
     queryClient.setQueryData(queryKeys.trackingPreferences, preferences);
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
     const { result } = renderHook(() => useUpdateTrackingPreferences(), { wrapper: createWrapper(queryClient) });
 
     act(() => result.current.mutate({ ...preferences, keepWatchedOnWatchlist: true }));
@@ -106,6 +107,7 @@ describe('tracking preference hooks', () => {
     expect(mocks.error).toHaveBeenCalledOnce();
     expect(mocks.error.mock.calls[0][0]).toBeInstanceOf(Error);
     expect(queryClient.getQueryData(queryKeys.trackingPreferences)).toEqual(preferences);
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.trackingPreferences });
   });
 
   it('does not refetch Continue Watching when only watchlist retention changes', async () => {
