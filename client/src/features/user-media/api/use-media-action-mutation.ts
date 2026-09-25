@@ -3,25 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
 import { BaseInfoResponse } from '@/types/common';
-import { MediaAction, TrackingPreferences, UserMediaPayload } from '../user-media.types';
+import { MediaAction, UserMediaPayload } from '../user-media.types';
 import { getMediaActionToast, getUndoMediaActionPayload } from '../utils/media-action-copy';
-import {
-  MediaActionCacheSnapshot,
-  cancelOptimisticMediaActionQueries,
-  getMediaActionCacheSnapshot,
-  hasFreshCachedInProgressTv,
-  invalidateMediaActionQueries,
-  restoreMediaActionCacheSnapshot,
-  updateMediaActionCache,
-} from './update-media-action-cache';
-
-interface MediaActionMutationContext {
-  keepWatchedOnWatchlist?: boolean;
-  episodeTracked: boolean;
-  snapshot: MediaActionCacheSnapshot;
-}
+import invalidateMediaActionQueries from './invalidate-media-action-queries';
 
 interface MediaActionToast {
   title: string;
@@ -52,28 +37,10 @@ const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
 const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMutationOptions) => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<BaseInfoResponse, unknown, UserMediaPayload, MediaActionMutationContext>({
-    mutationFn: (payload) => postMediaAction(endpoint, payload),
-    onMutate: async (payload) => {
-      const episodeTracked = hasFreshCachedInProgressTv(queryClient, payload);
-      await cancelOptimisticMediaActionQueries(queryClient);
-      const snapshot = getMediaActionCacheSnapshot(queryClient);
-      const keepWatchedOnWatchlist = queryClient.getQueryData<TrackingPreferences>(
-        queryKeys.trackingPreferences,
-      )?.keepWatchedOnWatchlist;
-
-      updateMediaActionCache(queryClient, action, payload, keepWatchedOnWatchlist);
-
-      return { keepWatchedOnWatchlist, episodeTracked, snapshot };
-    },
-    onError: (error, _payload, context) => {
-      if (context) {
-        restoreMediaActionCacheSnapshot(queryClient, context.snapshot);
-      }
-
-      handleApiError(error);
-    },
-    onSuccess: async (_data, payload, context) => {
+  const mutation = useMutation({
+    mutationFn: (payload: UserMediaPayload) => postMediaAction(endpoint, payload),
+    onError: handleApiError,
+    onSuccess: async (_data, payload) => {
       const toast = behavior?.getToast?.(action, payload) ?? getMediaActionToast(action, payload);
       const nextValue = payload[action];
       const customToastAction = behavior?.getToastAction?.(payload);
@@ -90,7 +57,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
             },
       });
 
-      await invalidateMediaActionQueries(queryClient, action, payload, context.keepWatchedOnWatchlist, context.episodeTracked);
+      await invalidateMediaActionQueries(queryClient, action, payload);
     },
   });
 
