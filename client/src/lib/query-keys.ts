@@ -135,6 +135,7 @@ export const upcomingQueryKeys = {
 };
 
 export const userMediaQueryKeys = {
+  trackingPreferences: ['tracking-preferences'] as const,
   inProgressTvRoot: ['in-progress-tv'] as const,
   inProgressTv: (page = 1, sort = 'recent', limit = 20) => ['in-progress-tv', page, sort, limit] as const,
   liked: ['liked'] as const,

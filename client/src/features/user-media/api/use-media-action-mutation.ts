@@ -3,18 +3,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
+import { queryKeys } from '@/lib/query-keys';
 import { BaseInfoResponse } from '@/types/common';
-import { MediaAction, UserMediaPayload } from '../user-media.types';
+import { MediaAction, TrackingPreferences, UserMediaPayload } from '../user-media.types';
 import { getMediaActionToast, getUndoMediaActionPayload } from '../utils/media-action-copy';
 import {
   MediaActionCacheSnapshot,
   getMediaActionCacheSnapshot,
-  invalidateMediaDiscoveryQueries,
+  invalidateMediaActionQueries,
   restoreMediaActionCacheSnapshot,
   updateMediaActionCache,
 } from './update-media-action-cache';
 
 interface MediaActionMutationContext {
+  keepWatchedOnWatchlist?: boolean;
   snapshot: MediaActionCacheSnapshot;
 }
 
@@ -51,10 +53,13 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
     mutationFn: (payload) => postMediaAction(endpoint, payload),
     onMutate: (payload) => {
       const snapshot = getMediaActionCacheSnapshot(queryClient);
+      const keepWatchedOnWatchlist = queryClient.getQueryData<TrackingPreferences>(
+        queryKeys.trackingPreferences,
+      )?.keepWatchedOnWatchlist;
 
-      updateMediaActionCache(queryClient, action, payload);
+      updateMediaActionCache(queryClient, action, payload, keepWatchedOnWatchlist);
 
-      return { snapshot };
+      return { keepWatchedOnWatchlist, snapshot };
     },
     onError: (error, _payload, context) => {
       if (context) {
@@ -63,7 +68,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
 
       handleApiError(error);
     },
-    onSuccess: async (_data, payload) => {
+    onSuccess: async (_data, payload, context) => {
       const toast = behavior?.getToast?.(action, payload) ?? getMediaActionToast(action, payload);
       const nextValue = payload[action];
       const customToastAction = behavior?.getToastAction?.(payload);
@@ -80,7 +85,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
             },
       });
 
-      await invalidateMediaDiscoveryQueries(queryClient);
+      await invalidateMediaActionQueries(queryClient, action, payload, context.keepWatchedOnWatchlist);
     },
   });
 

@@ -1,14 +1,15 @@
 import { QueryClient, QueryKey } from '@tanstack/react-query';
 
 import { MovieDetailsWithMeta, TvDetailsWithMeta } from '@/features/media/media.types';
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import { MediaMeta, PaginatedResponse, ResourceAccessResponse } from '@/types/common';
-import { MediaAction, UserMedia, UserMediaPayload } from '../user-media.types';
+import { MediaAction, TvInProgressItem, UserMedia, UserMediaPayload } from '../user-media.types';
 
 type MediaIdentity = Pick<UserMediaPayload, 'media_id' | 'media_type'>;
 type MediaDetailsCache = MovieDetailsWithMeta | TvDetailsWithMeta;
 type MediaDiscoveryCache = MediaIdentity[] | PaginatedResponse<MediaIdentity[]>;
 type SavedMediaCache = ResourceAccessResponse<UserMedia[]> & Partial<PaginatedResponse<UserMedia[]>>;
+type InProgressTvCache = ResourceAccessResponse<TvInProgressItem[]> & Partial<PaginatedResponse<TvInProgressItem[]>>;
 export type MediaActionCacheSnapshot = Array<[QueryKey, unknown]>;
 
 const mediaContentQueryKeys: QueryKey[] = [queryKeys.mediaDetails];
@@ -31,7 +32,12 @@ const savedListQueryKeys: Record<MediaAction, QueryKey[]> = {
 };
 
 const savedMediaQueryKeys: QueryKey[] = [queryKeys.liked, queryKeys.watched, queryKeys.watchList];
-const optimisticMediaQueryKeys: QueryKey[] = [...mediaContentQueryKeys, ...mediaDiscoveryQueryKeys, ...savedMediaQueryKeys];
+const optimisticMediaQueryKeys: QueryKey[] = [
+  ...mediaContentQueryKeys,
+  ...mediaDiscoveryQueryKeys,
+  ...savedMediaQueryKeys,
+  queryKeys.inProgressTvRoot,
+];
 
 const queryKeyStartsWith = (queryKey: QueryKey, prefix: QueryKey) =>
   prefix.every((keyPart, index) => queryKey[index] === keyPart);
@@ -50,23 +56,84 @@ export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapsh
   });
 };
 
-export const invalidateMediaDiscoveryQueries = (queryClient: QueryClient) =>
-  Promise.all(
-    [
-      ...mediaDiscoveryQueryKeys,
-      ...savedMediaQueryKeys,
-      queryKeys.viewingInsightsRoot,
-      queryKeys.recommendationsRoot,
-    ].map((queryKey) => queryClient.invalidateQueries({ queryKey })),
-  );
+const getAffectedSavedListActions = (
+  action: MediaAction,
+  payload: UserMediaPayload,
+  keepWatchedOnWatchlist: boolean | undefined,
+): MediaAction[] => {
+  const actions = new Set<MediaAction>([action]);
+  const changesWatched = action === 'watched' || (action === 'liked' && payload.watched === true);
 
-const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): MediaMeta => {
+  if (changesWatched) {
+    actions.add('watched');
+
+    if (keepWatchedOnWatchlist !== true) {
+      actions.add('watchlist');
+    }
+  }
+
+  if (action === 'watched' && typeof payload.liked === 'boolean') {
+    actions.add('liked');
+  }
+
+  return [...actions];
+};
+
+const profileQueryKeyByAction: Record<MediaAction, QueryKey> = {
+  liked: queryKeys.userLikedRoot,
+  watched: queryKeys.userWatchedRoot,
+  watchlist: queryKeys.userWatchListRoot,
+};
+
+export const invalidateMediaActionQueries = (
+  queryClient: QueryClient,
+  action: MediaAction,
+  payload: UserMediaPayload,
+  keepWatchedOnWatchlist: boolean | undefined,
+) => {
+  const affectedActions = getAffectedSavedListActions(action, payload, keepWatchedOnWatchlist);
+  const changesWatched = action === 'watched' || (action === 'liked' && payload.watched === true);
+  const queryKeysToInvalidate: QueryKey[] = [
+    ...mediaDiscoveryQueryKeys,
+    ...affectedActions.flatMap((affectedAction) => [
+      ...savedListQueryKeys[affectedAction],
+      profileQueryKeyByAction[affectedAction],
+    ]),
+    upcomingQueryKeys.root,
+    queryKeys.recommendationsRoot,
+  ];
+
+  if (action === 'liked' || changesWatched) {
+    queryKeysToInvalidate.push(queryKeys.viewingInsightsRoot);
+  }
+
+  if (changesWatched && keepWatchedOnWatchlist === undefined) {
+    queryKeysToInvalidate.push(queryKeys.mediaDetails);
+
+    if (!affectedActions.includes('liked')) {
+      queryKeysToInvalidate.push(queryKeys.liked, queryKeys.userLikedRoot);
+    }
+
+    if (payload.media_type === 'tv') {
+      queryKeysToInvalidate.push(queryKeys.inProgressTvRoot);
+    }
+  }
+
+  return Promise.all(queryKeysToInvalidate.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
+};
+
+const getActionMetaUpdate = (
+  action: MediaAction,
+  payload: UserMediaPayload,
+  keepWatchedOnWatchlist: boolean | undefined,
+): MediaMeta => {
   const trackingMeta = getTrackingMetaUpdate(payload);
+  const watchlistUpdate = keepWatchedOnWatchlist === false ? { watchlist: false } : {};
 
   if (action === 'watched') {
     return {
       watched: payload.watched ?? false,
-      watchlist: false,
+      ...watchlistUpdate,
       ...(hasPayloadKey(payload, 'liked') ? { liked: payload.liked ?? false } : {}),
       ...trackingMeta,
     };
@@ -74,7 +141,7 @@ const getActionMetaUpdate = (action: MediaAction, payload: UserMediaPayload): Me
 
   return {
     [action]: payload[action] ?? false,
-    ...(action === 'liked' && payload.watched ? { watched: true, watchlist: false } : {}),
+    ...(action === 'liked' && payload.watched ? { watched: true, ...watchlistUpdate } : {}),
     ...trackingMeta,
   };
 };
@@ -163,6 +230,9 @@ const formatPayloadForSavedList = (payload: UserMediaPayload, meta: MediaMeta): 
   original_language: payload.original_language,
   runtime: payload.runtime,
   status: payload.status,
+  liked: payload.liked,
+  watched: payload.watched,
+  watchlist: payload.watchlist,
   ...getTrackingMetaUpdate(payload),
   ...meta,
 });
@@ -190,10 +260,11 @@ const updateSavedListData = (
   action: MediaAction,
   payload: UserMediaPayload,
   shouldInclude: boolean,
+  keepWatchedOnWatchlist: boolean | undefined,
 ): SavedMediaCache | undefined => {
   if (!oldData) return oldData;
 
-  const meta = getActionMetaUpdate(action, payload);
+  const meta = getActionMetaUpdate(action, payload, keepWatchedOnWatchlist);
   const existingItem = oldData.data.find((item) => isSameMedia(item, payload));
   const patchedData = patchMediaList(oldData.data, payload, meta);
 
@@ -222,6 +293,7 @@ const updateSavedListQueries = (
   action: MediaAction,
   payload: UserMediaPayload,
   shouldInclude: boolean,
+  keepWatchedOnWatchlist: boolean | undefined,
 ) => {
   queryClient.getQueriesData<SavedMediaCache>({ queryKey }).forEach(([matchedQueryKey]) => {
     const queryState = matchedQueryKey[1];
@@ -244,20 +316,29 @@ const updateSavedListQueries = (
           ? updatePaginationTotal(
               {
                 ...oldData,
-                data: patchMediaList(oldData.data, payload, getActionMetaUpdate(action, payload)),
+                data: patchMediaList(
+                  oldData.data,
+                  payload,
+                  getActionMetaUpdate(action, payload, keepWatchedOnWatchlist),
+                ),
               },
               existingItem ? 0 : 1,
             )
           : oldData;
       }
 
-      return updateSavedListData(oldData, action, payload, shouldInclude);
+      return updateSavedListData(oldData, action, payload, shouldInclude, keepWatchedOnWatchlist);
     });
   });
 };
 
-export const updateMediaActionCache = (queryClient: QueryClient, action: MediaAction, payload: UserMediaPayload) => {
-  const meta = getActionMetaUpdate(action, payload);
+export const updateMediaActionCache = (
+  queryClient: QueryClient,
+  action: MediaAction,
+  payload: UserMediaPayload,
+  keepWatchedOnWatchlist?: boolean,
+) => {
+  const meta = getActionMetaUpdate(action, payload, keepWatchedOnWatchlist);
 
   mediaContentQueryKeys.forEach((queryKey) => {
     queryClient.setQueriesData<MediaDetailsCache>({ queryKey }, (oldData) =>
@@ -282,20 +363,50 @@ export const updateMediaActionCache = (queryClient: QueryClient, action: MediaAc
     );
   });
 
+  if (payload.media_type === 'tv') {
+    queryClient.setQueriesData<InProgressTvCache>({ queryKey: queryKeys.inProgressTvRoot }, (oldData) =>
+      oldData
+        ? {
+            ...oldData,
+            data: patchMediaList(oldData.data, payload, meta),
+          }
+        : oldData,
+    );
+  }
+
   savedListQueryKeys[action].forEach((queryKey) => {
-    updateSavedListQueries(queryClient, queryKey, action, payload, Boolean(payload[action]));
+    updateSavedListQueries(
+      queryClient,
+      queryKey,
+      action,
+      payload,
+      Boolean(payload[action]),
+      keepWatchedOnWatchlist,
+    );
   });
 
   if (action === 'watched') {
-    updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false);
+    if (keepWatchedOnWatchlist === false) {
+      updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false, keepWatchedOnWatchlist);
+    }
 
     if (hasPayloadKey(payload, 'liked')) {
-      updateSavedListQueries(queryClient, queryKeys.liked, 'liked', payload, Boolean(payload.liked));
+      updateSavedListQueries(
+        queryClient,
+        queryKeys.liked,
+        'liked',
+        payload,
+        Boolean(payload.liked),
+        keepWatchedOnWatchlist,
+      );
     }
   }
 
   if (action === 'liked' && payload.watched) {
-    updateSavedListQueries(queryClient, queryKeys.watched, 'watched', payload, true);
-    updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false);
+    updateSavedListQueries(queryClient, queryKeys.watched, 'watched', payload, true, keepWatchedOnWatchlist);
+
+    if (keepWatchedOnWatchlist === false) {
+      updateSavedListQueries(queryClient, queryKeys.watchList, 'watchlist', payload, false, keepWatchedOnWatchlist);
+    }
   }
 };

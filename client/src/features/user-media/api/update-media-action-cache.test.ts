@@ -1,13 +1,13 @@
 import { QueryClient } from '@tanstack/react-query';
 import { describe, expect, it, vi } from 'vitest';
 
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import type { PaginatedResponse, ResourceAccessResponse } from '@/types/common';
 
-import type { UserMedia, UserMediaPayload } from '../user-media.types';
+import type { TvInProgressItem, UserMedia, UserMediaPayload } from '../user-media.types';
 import {
   getMediaActionCacheSnapshot,
-  invalidateMediaDiscoveryQueries,
+  invalidateMediaActionQueries,
   restoreMediaActionCacheSnapshot,
   updateMediaActionCache,
 } from './update-media-action-cache';
@@ -58,6 +58,37 @@ const createSavedResponse = (data: UserMedia[], total = data.length): SavedMedia
   },
 });
 
+const createInProgressItem = (overrides: Partial<TvInProgressItem> = {}): TvInProgressItem => ({
+  ...createUserMedia({ media_id: 21, media_type: 'tv', title: 'Example Show', watchlist: true }),
+  tvProgress: {
+    status: 'in_progress',
+    watchedEpisodeCount: 1,
+    totalAiredEpisodeCount: 2,
+    nextEpisode: {
+      seasonNumber: 1,
+      episodeNumber: 2,
+      episodeId: 102,
+      name: 'Second episode',
+      airDate: '2025-01-08',
+    },
+    lastWatchedAt: '2025-01-01T00:00:00.000Z',
+  },
+  ...overrides,
+});
+
+const createInProgressResponse = (data: TvInProgressItem[]) => ({
+  access: { canView: true },
+  data,
+  pagination: {
+    hasNextPage: false,
+    hasPreviousPage: false,
+    limit: 20,
+    page: 1,
+    total: data.length,
+    totalPages: data.length > 0 ? 1 : 0,
+  },
+});
+
 describe('updateMediaActionCache', () => {
   it('patches details and removes watched media from the watchlist cache', () => {
     const queryClient = new QueryClient();
@@ -74,7 +105,7 @@ describe('updateMediaActionCache', () => {
     queryClient.setQueryData(queryKeys.liked, createSavedResponse([cachedMedia]));
     queryClient.setQueryData(queryKeys.watchList, createSavedResponse([cachedMedia]));
 
-    updateMediaActionCache(queryClient, 'watched', payload);
+    updateMediaActionCache(queryClient, 'watched', payload, false);
 
     expect(queryClient.getQueryData<{ watched?: boolean; watchlist?: boolean }>(queryKeys.mediaDetailsById('movie', '10'))).toMatchObject({
       watched: true,
@@ -178,7 +209,7 @@ describe('updateMediaActionCache', () => {
     queryClient.setQueryData(queryKeys.watched, createSavedResponse([], 0));
     queryClient.setQueryData(queryKeys.watchList, createSavedResponse([watchlistItem], 1));
 
-    updateMediaActionCache(queryClient, 'liked', payload);
+    updateMediaActionCache(queryClient, 'liked', payload, false);
 
     expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.liked)?.data[0]).toMatchObject({
       liked: true,
@@ -191,6 +222,127 @@ describe('updateMediaActionCache', () => {
       watchlist: false,
     });
     expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toEqual([]);
+  });
+
+  it('patches every cached in-progress TV row for a watchlist toggle and restores it on rollback', () => {
+    const queryClient = new QueryClient();
+    const recentKey = queryKeys.inProgressTv(1, 'recent', 20);
+    const nextKey = queryKeys.inProgressTv(1, 'next', 10);
+    const matchingItem = createInProgressItem();
+    const otherItem = createInProgressItem({ media_id: 22, title: 'Other Show' });
+    const payload = createPayload({
+      media_id: 21,
+      media_type: 'tv',
+      title: 'Example Show',
+      watchlist: false,
+    });
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
+
+    queryClient.setQueryData(recentKey, createInProgressResponse([matchingItem, otherItem]));
+    queryClient.setQueryData(nextKey, createInProgressResponse([matchingItem]));
+    const snapshot = getMediaActionCacheSnapshot(queryClient);
+
+    updateMediaActionCache(queryClient, 'watchlist', payload, false);
+
+    expect(queryClient.getQueryData<{ data: TvInProgressItem[] }>(recentKey)?.data).toMatchObject([
+      { media_id: 21, watchlist: false },
+      { media_id: 22, watchlist: true },
+    ]);
+    expect(queryClient.getQueryData<{ data: TvInProgressItem[] }>(nextKey)?.data[0]).toMatchObject({
+      media_id: 21,
+      watchlist: false,
+    });
+    expect(invalidate).not.toHaveBeenCalled();
+
+    restoreMediaActionCacheSnapshot(queryClient, snapshot);
+
+    expect(queryClient.getQueryData<{ data: TvInProgressItem[] }>(recentKey)?.data[0]).toMatchObject({
+      media_id: 21,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<{ data: TvInProgressItem[] }>(nextKey)?.data[0]).toMatchObject({
+      media_id: 21,
+      watchlist: true,
+    });
+  });
+
+  it('preserves watchlist state for optimistic watched actions when the loaded preference opts in', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ media_id: 23, watched: true, watchlist: true });
+    const cachedMedia = createUserMedia({ media_id: 23, watched: false, watchlist: true });
+
+    queryClient.setQueryData(queryKeys.mediaDetailsById('movie', '23'), cachedMedia);
+    queryClient.setQueryData(queryKeys.watched, createSavedResponse([]));
+    queryClient.setQueryData(queryKeys.watchList, createSavedResponse([cachedMedia]));
+
+    updateMediaActionCache(queryClient, 'watched', payload, true);
+
+    expect(queryClient.getQueryData<UserMedia>(queryKeys.mediaDetailsById('movie', '23'))).toMatchObject({
+      watched: true,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watched)?.data[0]).toMatchObject({
+      watched: true,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toHaveLength(1);
+  });
+
+  it('preserves watchlist state when liking also marks watched and the loaded preference opts in', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ liked: true, media_id: 24, watched: true, watchlist: true });
+    const cachedMedia = createUserMedia({ media_id: 24, watched: false, watchlist: true });
+
+    queryClient.setQueryData(queryKeys.liked, createSavedResponse([]));
+    queryClient.setQueryData(queryKeys.watched, createSavedResponse([]));
+    queryClient.setQueryData(queryKeys.watchList, createSavedResponse([cachedMedia]));
+
+    updateMediaActionCache(queryClient, 'liked', payload, true);
+
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.liked)?.data[0]).toMatchObject({
+      liked: true,
+      watched: true,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watched)?.data[0]).toMatchObject({
+      watched: true,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toHaveLength(1);
+  });
+
+  it('keeps the existing default optimistic watchlist clearing when the loaded preference is off', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ media_id: 25, watched: true, watchlist: true });
+    const cachedMedia = createUserMedia({ media_id: 25, watched: false, watchlist: true });
+
+    queryClient.setQueryData(queryKeys.mediaDetailsById('movie', '25'), cachedMedia);
+    queryClient.setQueryData(queryKeys.watchList, createSavedResponse([cachedMedia]));
+
+    updateMediaActionCache(queryClient, 'watched', payload, false);
+
+    expect(queryClient.getQueryData<UserMedia>(queryKeys.mediaDetailsById('movie', '25'))).toMatchObject({
+      watched: true,
+      watchlist: false,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toEqual([]);
+  });
+
+  it('does not optimistically clear watchlist state when the preference cache is absent', () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ media_id: 26, watched: true, watchlist: true });
+    const cachedMedia = createUserMedia({ media_id: 26, watched: false, watchlist: true });
+
+    queryClient.setQueryData(queryKeys.mediaDetailsById('movie', '26'), cachedMedia);
+    queryClient.setQueryData(queryKeys.watchList, createSavedResponse([cachedMedia]));
+
+    updateMediaActionCache(queryClient, 'watched', payload, undefined);
+
+    expect(queryClient.getQueryData<UserMedia>(queryKeys.mediaDetailsById('movie', '26'))).toMatchObject({
+      watched: true,
+      watchlist: true,
+    });
+    expect(queryClient.getQueryData<SavedMediaResponse>(queryKeys.watchList)?.data).toHaveLength(1);
   });
 
   it('captures and restores optimistic cache snapshots', () => {
@@ -238,14 +390,54 @@ describe('updateMediaActionCache', () => {
     expect(queryClient.getQueryData<SavedMediaResponse>(queryKey)?.data[0]).toMatchObject({ media_id: 17, liked: true });
   });
 
-  it('invalidates every saved-list root after successful mutations', async () => {
+  it('invalidates only watchlist membership dependents after a successful watchlist toggle', async () => {
     const queryClient = new QueryClient();
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+    const payload = createPayload({ media_id: 27, media_type: 'tv', watchlist: false });
 
-    await invalidateMediaDiscoveryQueries(queryClient);
+    await invalidateMediaActionQueries(queryClient, 'watchlist', payload, false);
 
-    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.liked });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userWatchListRoot });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: upcomingQueryKeys.root });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.watched });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.userWatchedRoot });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+  });
+
+  it('invalidates watched and possibly cleared watchlist dependents after a watched action', async () => {
+    const queryClient = new QueryClient();
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+    const payload = createPayload({ media_id: 28, media_type: 'tv', watched: true, watchlist: true });
+
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, false);
+
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watched });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userWatchedRoot });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userWatchListRoot });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: upcomingQueryKeys.root });
+  });
+
+  it('reconciles in-progress TV rows after watched success only when the preference was unknown', async () => {
+    const queryClient = new QueryClient();
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+    const payload = createPayload({ media_id: 29, media_type: 'tv', watched: true, watchlist: true });
+    delete payload.liked;
+
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, undefined);
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.mediaDetails });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.liked });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userLikedRoot });
+
+    invalidate.mockClear();
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, true);
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.mediaDetails });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.liked });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.userLikedRoot });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.userWatchListRoot });
   });
 });
