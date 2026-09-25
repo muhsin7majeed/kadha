@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router';
 
 import { APP_CONFIG } from '@/config/app-config';
 import AccountSettingsSection from '@/features/user/components/account-settings-section';
+import TrackingBehaviorSection from '@/features/user-media/components/tracking-behavior-section';
 import type { User } from '@/features/user/user.types';
 
 import SettingsSectionHeader from './settings-section-header';
@@ -17,6 +18,7 @@ const AccountSettings = () => {
         description={`Manage the details ${APP_CONFIG.appName} uses for your profile and streaming availability.`}
       />
       <AccountSettingsSection me={me} />
+      <TrackingBehaviorSection />
     </Stack>
   );
 };

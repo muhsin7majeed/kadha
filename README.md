@@ -10,11 +10,13 @@ Use the hosted beta at [kadha.org](https://kadha.org), or deploy your own instan
 
 - Track watched, liked, and watchlisted movies and TV shows with ratings, dates, and private notes.
 - Record movie rewatches and individual TV episodes in a private viewing diary.
-- Follow TV progress and find the next episode of an in-progress series.
+- Follow TV progress and find the next episode of an in-progress series. In **Settings → Account**, choose whether watched titles stay on your Watchlist and whether Continue Watching hides caught-up shows with nothing scheduled. Both choices follow your account and are off by default.
 - Choose Minimal or Detailed media cards in **Settings → Appearance**, with previews of both styles or an **Edit card view** shortcut in the poster menu. The choice syncs with your account across devices. In Progress and Continue Watching keep their own cards.
 - Build private collections, collaborate with invited members, or share selected collections through read-only links.
 - Explore personal recommendations and viewing insights derived from your own tracking activity.
 - Control the visibility of each profile section, export or import Kadha data, and permanently delete your account.
+
+Continue Watching uses TMDB's show summary to count aired episodes and decide when another episode is scheduled. That summary can lag behind TMDB's season episode list, so a newly aired episode might take time to appear. Checking each season for discrepancies would add TMDB requests; the account choice above does not change aired-count accuracy.
 
 ## Hosted Beta
 

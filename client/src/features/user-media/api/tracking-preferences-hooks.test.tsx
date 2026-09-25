@@ -11,6 +11,7 @@ import useUpdateTrackingPreferences from './use-update-tracking-preferences';
 const mocks = vi.hoisted(() => ({
   get: vi.fn(),
   put: vi.fn(),
+  error: vi.fn(),
 }));
 
 vi.mock('@/lib/axios-instance', () => ({
@@ -19,6 +20,7 @@ vi.mock('@/lib/axios-instance', () => ({
     put: mocks.put,
   },
 }));
+vi.mock('@/hooks/use-error-handler', () => ({ useErrorHandler: mocks.error }));
 
 const preferences: TrackingPreferences = {
   version: 1,
@@ -35,6 +37,7 @@ describe('tracking preference hooks', () => {
   beforeEach(() => {
     mocks.get.mockReset();
     mocks.put.mockReset();
+    mocks.error.mockReset();
   });
 
   it('loads tracking preferences into their account-scoped cache key', async () => {
@@ -66,6 +69,20 @@ describe('tracking preference hooks', () => {
     expect(mocks.put).toHaveBeenCalledWith('/api/user-media/tracking-preferences', updated);
     expect(queryClient.getQueryData(queryKeys.trackingPreferences)).toEqual(updated);
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+  });
+
+  it('keeps saved preferences unchanged and reports a failed save', async () => {
+    mocks.put.mockRejectedValue(new Error('Could not save'));
+    const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    queryClient.setQueryData(queryKeys.trackingPreferences, preferences);
+    const { result } = renderHook(() => useUpdateTrackingPreferences(), { wrapper: createWrapper(queryClient) });
+
+    act(() => result.current.mutate({ ...preferences, keepWatchedOnWatchlist: true }));
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(mocks.error).toHaveBeenCalledOnce();
+    expect(mocks.error.mock.calls[0][0]).toBeInstanceOf(Error);
+    expect(queryClient.getQueryData(queryKeys.trackingPreferences)).toEqual(preferences);
   });
 
   it('does not refetch Continue Watching when only watchlist retention changes', async () => {

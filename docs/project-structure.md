@@ -90,6 +90,7 @@ packages/contracts/
 - Admin user lists use an explicit identity-only projection; privacy settings and aggregate support totals are loaded only by the administrator user-detail service path.
 - Account-synced Home layout validation, normalization, and persistence belong in `server/src/features/home-preferences`; export and import orchestration remain in the user feature.
 - Media-card style validation and owner-scoped persistence belong in `server/src/features/media-card-preferences`; the client preference query and Settings control belong in `client/src/features/media-card-preferences`, while shared poster presentation stays in `client/src/components/media-card`. Account export/import remains owned by the user feature.
+- Versioned tracking-behavior preferences, Watchlist retention, and TV progress rules belong in `server/src/features/user-media`; their client query, settings controls, and tracking-action cache updates belong in `client/src/features/user-media`. The user feature owns preference export/import and assembles the Continue Watching list.
 - New server business logic should live in feature services, not controllers.
 - Account-deletion impact calculation and transaction orchestration live in the user feature's dedicated
   `account-deletion.service.ts`; reusable collection ownership invariants live in the collection feature.
