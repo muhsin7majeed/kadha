@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { getRouteParam, sendData, sendMessage, sendResponse } from '@/lib/http';
+import { badRequest, getRouteParam, sendData, sendMessage, sendResponse } from '@/lib/http';
 import { requireAuthUser } from '@/middlewares/auth';
 import { diaryInsightsQuerySchema, diaryQuerySchema } from './diary.schema';
 import { getDiaryInsights, getDiaryTimeline } from './diary.service';
@@ -19,8 +19,21 @@ import {
   markNextEpisodeWatched,
   markSeasonWatched,
 } from './tv-progress.service';
+import { trackingPreferencesSchema } from './tracking-preferences.schema';
+import { getTrackingPreferences, updateTrackingPreferences } from './tracking-preferences.service';
 import { upsertUserMedia } from './user-media.service';
 import { createWatchEvent, deleteWatchEvent, listWatchEvents, updateWatchEvent } from './watch-event.service';
+
+export const getTrackingPreferencesController = async (req: Request, res: Response) => {
+  return sendData(res, await getTrackingPreferences(requireAuthUser(req).id));
+};
+
+export const updateTrackingPreferencesController = async (req: Request, res: Response) => {
+  const payload = trackingPreferencesSchema.safeParse(req.body);
+  if (!payload.success) throw badRequest('Tracking preferences are invalid');
+
+  return sendData(res, await updateTrackingPreferences(requireAuthUser(req).id, payload.data));
+};
 
 export const addToLiked = async (req: Request, res: Response) => {
   const payload = req.body as UserMediaPayload;

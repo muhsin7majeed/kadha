@@ -8,6 +8,7 @@ import { normalizeHomePreferences } from '@/features/home-preferences/home-prefe
 import { mediaCardPreferencesSchema } from '@/features/media-card-preferences/media-card-preferences.schema';
 import { navigationPreferencesSchema } from '@/features/navigation-preferences/navigation-preferences.schema';
 import { normalizeNavigationPreferences } from '@/features/navigation-preferences/navigation-preferences.service';
+import { trackingPreferencesSchema } from '@/features/user-media/tracking-preferences.schema';
 import { ImportPayload } from './user-import.schema';
 import { IMPORT_CATEGORIES, type ImportCategory } from './user-export.types';
 
@@ -168,6 +169,11 @@ const getImportableMediaCardPreferences = (exportData: Record<string, unknown>) 
   return parsed.success ? parsed.data : null;
 };
 
+const getImportableTrackingPreferences = (exportData: Record<string, unknown>) => {
+  const parsed = trackingPreferencesSchema.safeParse(getAccount(exportData).tracking);
+  return parsed.success ? parsed.data : null;
+};
+
 const hasImportableAccountPreferences = (exportData: Record<string, unknown>) => {
   const account = getAccount(exportData);
   const watchRegion = asString(account.watchRegion);
@@ -180,7 +186,8 @@ const hasImportableAccountPreferences = (exportData: Record<string, unknown>) =>
     Boolean(watchRegion && isSupportedWatchRegion(normalizeWatchRegion(watchRegion))) ||
     Boolean(getImportableHomePreferences(exportData)) ||
     Boolean(getImportableNavigationPreferences(exportData)) ||
-    Boolean(getImportableMediaCardPreferences(exportData))
+    Boolean(getImportableMediaCardPreferences(exportData)) ||
+    Boolean(getImportableTrackingPreferences(exportData))
   );
 };
 
@@ -476,6 +483,7 @@ const importAccountPreferences = async (
   const homePreferences = getImportableHomePreferences(exportData);
   const navigationPreferences = getImportableNavigationPreferences(exportData);
   const mediaCardPreferences = getImportableMediaCardPreferences(exportData);
+  const trackingPreferences = getImportableTrackingPreferences(exportData);
 
   await tx.user.update({
     where: { id: userId },
@@ -511,6 +519,15 @@ const importAccountPreferences = async (
   if (mediaCardPreferences) {
     const config = JSON.stringify(mediaCardPreferences);
     await tx.mediaCardPreferences.upsert({
+      where: { userId },
+      update: { config },
+      create: { userId, config },
+    });
+  }
+
+  if (trackingPreferences) {
+    const config = JSON.stringify(trackingPreferences);
+    await tx.trackingPreferences.upsert({
       where: { userId },
       update: { config },
       create: { userId, config },
