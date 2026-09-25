@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import type { BaseResponse, MediaType } from '@/types/common';
 import type { CreateWatchEventPayload, UpdateWatchEventPayload, WatchHistory } from '../user-media.types';
 
@@ -20,6 +20,7 @@ interface UpdateWatchEventVariables {
 const invalidateWatchHistoryDependents = (
   queryClient: ReturnType<typeof useQueryClient>,
   identity: WatchEventMutationIdentity,
+  affectsUpcoming: boolean,
 ) =>
   Promise.all([
     queryClient.invalidateQueries({ queryKey: queryKeys.diaryRoot }),
@@ -32,6 +33,7 @@ const invalidateWatchHistoryDependents = (
     queryClient.invalidateQueries({ queryKey: queryKeys.userWatchListRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.viewingInsightsRoot }),
     queryClient.invalidateQueries({ queryKey: queryKeys.recommendationsRoot }),
+    ...(affectsUpcoming ? [queryClient.invalidateQueries({ queryKey: upcomingQueryKeys.root })] : []),
     queryClient.invalidateQueries({ queryKey: queryKeys.searchMedia }),
     queryClient.invalidateQueries({ queryKey: queryKeys.trendingMovies }),
     queryClient.invalidateQueries({ queryKey: queryKeys.popularMovies }),
@@ -41,17 +43,17 @@ const invalidateWatchHistoryDependents = (
     }),
   ]);
 
-const useWatchHistorySuccess = (identity: WatchEventMutationIdentity) => {
+const useWatchHistorySuccess = (identity: WatchEventMutationIdentity, affectsUpcoming: boolean) => {
   const queryClient = useQueryClient();
 
   return async (history: WatchHistory) => {
     queryClient.setQueryData(queryKeys.watchEventsByMedia(identity.mediaType, identity.mediaId), history);
-    await invalidateWatchHistoryDependents(queryClient, identity);
+    await invalidateWatchHistoryDependents(queryClient, identity, affectsUpcoming);
   };
 };
 
 export const useCreateWatchEvent = (identity: WatchEventMutationIdentity) => {
-  const handleSuccess = useWatchHistorySuccess(identity);
+  const handleSuccess = useWatchHistorySuccess(identity, true);
 
   return useMutation({
     mutationFn: async (payload: CreateWatchEventPayload) => {
@@ -67,7 +69,7 @@ export const useCreateWatchEvent = (identity: WatchEventMutationIdentity) => {
 };
 
 export const useUpdateWatchEvent = (identity: WatchEventMutationIdentity) => {
-  const handleSuccess = useWatchHistorySuccess(identity);
+  const handleSuccess = useWatchHistorySuccess(identity, false);
 
   return useMutation({
     mutationFn: async ({ eventId, payload }: UpdateWatchEventVariables) => {
@@ -83,7 +85,7 @@ export const useUpdateWatchEvent = (identity: WatchEventMutationIdentity) => {
 };
 
 export const useDeleteWatchEvent = (identity: WatchEventMutationIdentity) => {
-  const handleSuccess = useWatchHistorySuccess(identity);
+  const handleSuccess = useWatchHistorySuccess(identity, true);
 
   return useMutation({
     mutationFn: async (eventId: string) => {
