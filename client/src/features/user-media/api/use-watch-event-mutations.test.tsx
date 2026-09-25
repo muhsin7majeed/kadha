@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider, QueryObserver } from '@tanstack/react-query';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { upcomingQueryKeys } from '@/lib/query-keys';
+import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import { useCreateWatchEvent, useDeleteWatchEvent, useUpdateWatchEvent } from './use-watch-event-mutations';
 
 const mocks = vi.hoisted(() => ({ post: vi.fn(), patch: vi.fn(), delete: vi.fn() }));
@@ -83,6 +83,89 @@ describe('watch-event Upcoming reconciliation', () => {
     try {
       await act(() => result.current.mutateAsync('event-1'));
       expect(queryClient.getQueryData(key)).toEqual({ data: retainWatchlist ? [{ media_id: 12, watched: false }] : [] });
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it('restarts an active initial Upcoming request after a movie watch changes the schedule', async () => {
+    let finish!: (value: { data: Array<{ media_id: number; watched: boolean }> }) => void;
+    let watched = false;
+    mocks.post.mockImplementation(async () => {
+      watched = true;
+      return { data: { data: { watchCount: 1, events: [] } } };
+    });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const key = upcomingQueryKeys.schedule({ from: '2026-09-01', to: '2026-10-01' });
+    const before = { data: [{ media_id: 12, watched: false }] };
+    const queryFn = vi.fn().mockImplementationOnce(() => new Promise<typeof before>((resolve) => { finish = resolve; }))
+      .mockImplementation(() => ({ data: [{ media_id: 12, watched }] }));
+    const observer = new QueryObserver(queryClient, { queryKey: key, queryFn });
+    const unsubscribe = observer.subscribe(() => undefined);
+    const { result } = renderHook(() => useCreateWatchEvent(identity), { wrapper: createWrapper(queryClient) });
+
+    try {
+      let pending!: Promise<unknown>;
+      act(() => { pending = result.current.mutateAsync({ ...movie, watchedOn: null, note: null, clientRequestId: 'request-2' }); });
+      await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
+      await pending;
+      finish(before);
+      await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
+      expect(queryClient.getQueryData(key)).toEqual({ data: [{ media_id: 12, watched: true }] });
+    } finally {
+      finish(before);
+      unsubscribe();
+    }
+  });
+
+  it('does not trust an inactive Upcoming request started before a movie watch', async () => {
+    let finish!: (value: { data: Array<{ media_id: number; watched: boolean }> }) => void;
+    let watched = false;
+    mocks.post.mockImplementation(async () => {
+      watched = true;
+      return { data: { data: { watchCount: 1, events: [] } } };
+    });
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const key = upcomingQueryKeys.schedule({ from: '2026-09-01', to: '2026-10-01' });
+    const before = { data: [{ media_id: 12, watched: false }] };
+    const queryFn = vi.fn().mockImplementationOnce(() => new Promise<typeof before>((resolve) => { finish = resolve; }))
+      .mockImplementation(() => ({ data: [{ media_id: 12, watched }] }));
+    void queryClient.fetchQuery({ queryKey: key, queryFn }).catch(() => undefined);
+    const { result } = renderHook(() => useCreateWatchEvent(identity), { wrapper: createWrapper(queryClient) });
+
+    try {
+      await act(() => result.current.mutateAsync({ ...movie, watchedOn: null, note: null, clientRequestId: 'request-3' }));
+      finish(before);
+      const observer = new QueryObserver(queryClient, { queryKey: key, queryFn, staleTime: 300_000 });
+      const unsubscribe = observer.subscribe(() => undefined);
+      try {
+        await waitFor(() => expect(queryClient.getQueryData(key)).toEqual({ data: [{ media_id: 12, watched: true }] }));
+      } finally {
+        unsubscribe();
+      }
+    } finally {
+      finish(before);
+    }
+  });
+
+  it('refreshes Continue Watching after a TV episode watch is deleted from Diary', async () => {
+    mocks.delete.mockResolvedValue({ data: { data: { watchCount: 0, events: [] } } });
+    const queryClient = new QueryClient();
+    const key = queryKeys.inProgressTv();
+    queryClient.setQueryData(key, { data: [{ media_id: 12, tvProgress: { watchedEpisodeCount: 1 } }] });
+    const observer = new QueryObserver(queryClient, {
+      queryKey: key,
+      queryFn: () => ({ data: [] }),
+      staleTime: Infinity,
+    });
+    const unsubscribe = observer.subscribe(() => undefined);
+    const { result } = renderHook(() => useDeleteWatchEvent({ mediaId: 12, mediaType: 'tv' }), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    try {
+      await act(() => result.current.mutateAsync('event-1'));
+      expect(queryClient.getQueryData(key)).toEqual({ data: [] });
     } finally {
       unsubscribe();
     }

@@ -3,7 +3,7 @@ import type { QueryClient, QueryKey } from '@tanstack/react-query';
 import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import type { MediaAction, UserMediaPayload } from '../user-media.types';
 
-const mediaListKeys: QueryKey[] = [
+export const mediaListKeys: QueryKey[] = [
   queryKeys.searchMedia,
   queryKeys.trendingMovies,
   queryKeys.trendingTvs,

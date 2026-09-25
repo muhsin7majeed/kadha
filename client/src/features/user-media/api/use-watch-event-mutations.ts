@@ -3,56 +3,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toaster } from '@/components/ui/toaster-store';
 import { useErrorHandler as handleApiError } from '@/hooks/use-error-handler';
 import api from '@/lib/axios-instance';
-import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
-import type { BaseResponse, MediaType } from '@/types/common';
+import type { BaseResponse } from '@/types/common';
 import type { CreateWatchEventPayload, UpdateWatchEventPayload, WatchHistory } from '../user-media.types';
-
-interface WatchEventMutationIdentity {
-  mediaId: number;
-  mediaType: MediaType;
-}
+import invalidateWatchEventQueries, { type WatchEventIdentity } from './invalidate-watch-event-queries';
 
 interface UpdateWatchEventVariables {
   eventId: string;
   payload: UpdateWatchEventPayload;
 }
 
-const invalidateWatchHistoryDependents = (
-  queryClient: ReturnType<typeof useQueryClient>,
-  identity: WatchEventMutationIdentity,
-  affectsUpcoming: boolean,
-) =>
-  Promise.all([
-    queryClient.invalidateQueries({ queryKey: queryKeys.diaryRoot }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.diaryInsightsRoot }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.tvProgress }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.mediaDetails }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.watched }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.watchList }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.userWatchedRoot }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.userWatchListRoot }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.viewingInsightsRoot }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.recommendationsRoot }),
-    ...(affectsUpcoming ? [queryClient.invalidateQueries({ queryKey: upcomingQueryKeys.root })] : []),
-    queryClient.invalidateQueries({ queryKey: queryKeys.searchMedia }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.trendingMovies }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.popularMovies }),
-    queryClient.invalidateQueries({ queryKey: queryKeys.topRatedMovies }),
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.mediaDetailsById(identity.mediaType, String(identity.mediaId)),
-    }),
-  ]);
-
-const useWatchHistorySuccess = (identity: WatchEventMutationIdentity, affectsUpcoming: boolean) => {
+const useWatchHistorySuccess = (identity: WatchEventIdentity, changesWatchCount: boolean) => {
   const queryClient = useQueryClient();
-
-  return async (history: WatchHistory) => {
-    queryClient.setQueryData(queryKeys.watchEventsByMedia(identity.mediaType, identity.mediaId), history);
-    await invalidateWatchHistoryDependents(queryClient, identity, affectsUpcoming);
-  };
+  return () => invalidateWatchEventQueries(queryClient, identity, changesWatchCount);
 };
 
-export const useCreateWatchEvent = (identity: WatchEventMutationIdentity) => {
+export const useCreateWatchEvent = (identity: WatchEventIdentity) => {
   const handleSuccess = useWatchHistorySuccess(identity, true);
 
   return useMutation({
@@ -62,13 +27,13 @@ export const useCreateWatchEvent = (identity: WatchEventMutationIdentity) => {
     },
     onError: handleApiError,
     onSuccess: async (history) => {
-      await handleSuccess(history);
+      await handleSuccess();
       toaster.success({ title: history.watchCount === 1 ? 'Marked watched' : 'Rewatch logged' });
     },
   });
 };
 
-export const useUpdateWatchEvent = (identity: WatchEventMutationIdentity) => {
+export const useUpdateWatchEvent = (identity: WatchEventIdentity) => {
   const handleSuccess = useWatchHistorySuccess(identity, false);
 
   return useMutation({
@@ -77,14 +42,14 @@ export const useUpdateWatchEvent = (identity: WatchEventMutationIdentity) => {
       return response.data.data;
     },
     onError: handleApiError,
-    onSuccess: async (history) => {
-      await handleSuccess(history);
+    onSuccess: async () => {
+      await handleSuccess();
       toaster.success({ title: 'Watch updated' });
     },
   });
 };
 
-export const useDeleteWatchEvent = (identity: WatchEventMutationIdentity) => {
+export const useDeleteWatchEvent = (identity: WatchEventIdentity) => {
   const handleSuccess = useWatchHistorySuccess(identity, true);
 
   return useMutation({
@@ -93,8 +58,8 @@ export const useDeleteWatchEvent = (identity: WatchEventMutationIdentity) => {
       return response.data.data;
     },
     onError: handleApiError,
-    onSuccess: async (history) => {
-      await handleSuccess(history);
+    onSuccess: async () => {
+      await handleSuccess();
       toaster.success({ title: 'Watch removed' });
     },
   });
