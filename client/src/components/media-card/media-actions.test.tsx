@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { MediaCardModel } from '@/features/media/media-card-model';
 import { renderWithProviders } from '@/test/render';
@@ -10,16 +10,19 @@ const mocks = vi.hoisted(() => ({
   addLiked: vi.fn(),
   addWatched: vi.fn(),
   addWatchlist: vi.fn(),
+  likedPending: false,
+  watchedPending: false,
+  watchlistPending: false,
 }));
 
 vi.mock('@/features/user-media/api/use-add-to-liked', () => ({
-  default: () => ({ mutateAsync: mocks.addLiked, isPending: false }),
+  default: () => ({ mutateAsync: mocks.addLiked, isPending: mocks.likedPending }),
 }));
 vi.mock('@/features/user-media/api/use-add-to-watched', () => ({
-  default: () => ({ mutateAsync: mocks.addWatched, isPending: false }),
+  default: () => ({ mutateAsync: mocks.addWatched, isPending: mocks.watchedPending }),
 }));
 vi.mock('@/features/user-media/api/use-add-to-watch-list', () => ({
-  default: () => ({ mutateAsync: mocks.addWatchlist, isPending: false }),
+  default: () => ({ mutateAsync: mocks.addWatchlist, isPending: mocks.watchlistPending }),
 }));
 vi.mock('@/features/collections/components/add-to-collection-dialog', () => ({
   default: ({ open }: { open: boolean }) => (open ? <div role="dialog">Add to collection</div> : null),
@@ -52,6 +55,19 @@ const media: MediaCardModel = {
 };
 
 describe('MediaActions menu presentation', () => {
+  beforeEach(() => {
+    mocks.likedPending = false;
+    mocks.watchedPending = false;
+    mocks.watchlistPending = false;
+  });
+
+  it('shows the pending loader on the menu trigger', () => {
+    mocks.watchlistPending = true;
+    renderWithProviders(<MediaActions media={media} presentation="menu" />);
+
+    expect(screen.getByRole('button', { name: 'Manage Example Show' })).toHaveAttribute('data-loading');
+  });
+
   it('presents the existing media actions in a labelled overflow menu', async () => {
     const user = userEvent.setup();
     renderWithProviders(<MediaActions media={media} presentation="menu" />);
