@@ -3,9 +3,10 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { queryKeys } from '@/lib/query-keys';
+import { queryKeys, upcomingQueryKeys } from '@/lib/query-keys';
 import type { TrackingPreferences, UserMediaPayload } from '../user-media.types';
 import useAddToWatched from './use-add-to-watched';
+import useAddToWatchList from './use-add-to-watch-list';
 
 const mocks = vi.hoisted(() => ({ post: vi.fn() }));
 
@@ -43,6 +44,37 @@ const createWrapper = (queryClient: QueryClient) =>
 describe('useMediaActionMutation preference cache handling', () => {
   beforeEach(() => {
     mocks.post.mockReset();
+  });
+
+  it('prevents an older in-flight Continue Watching response from restoring stale flags', async () => {
+    mocks.post.mockResolvedValue({ data: { message: 'tv added to watchlist' } });
+    const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false }, queries: { retry: false } } });
+    const key = queryKeys.inProgressTv();
+    const oldData = { access: { canView: true }, data: [{ media_id: 41, media_type: 'tv', watchlist: false }] };
+    queryClient.setQueryData(key, oldData);
+    let finish!: (data: typeof oldData) => void;
+    void queryClient.fetchQuery({ queryKey: key, queryFn: () => new Promise<typeof oldData>((resolve) => { finish = resolve; }) }).catch(() => undefined);
+    await waitFor(() => expect(queryClient.getQueryState(key)?.fetchStatus).toBe('fetching'));
+    const { result } = renderHook(() => useAddToWatchList(), { wrapper: createWrapper(queryClient) });
+    await act(() => result.current.mutateAsync({ ...payload, watchlist: true }));
+    await act(async () => { finish(oldData); await new Promise((resolve) => setTimeout(resolve, 0)); });
+    expect(queryClient.getQueryState(key)?.fetchStatus).toBe('idle');
+    expect(queryClient.getQueryData<typeof oldData>(key)?.data[0].watchlist).toBe(true);
+  });
+
+  it('still refreshes Upcoming when the previously cached TV episode tracking is invalidated', async () => {
+    mocks.post.mockResolvedValue({ data: { message: 'tv added to watchlist' } });
+    const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+    queryClient.setQueryData(queryKeys.inProgressTv(), {
+      access: { canView: true }, data: [{ media_id: 41, media_type: 'tv', watchlist: false }],
+    });
+    await queryClient.invalidateQueries({ queryKey: queryKeys.inProgressTvRoot, refetchType: 'none' });
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries');
+    const { result } = renderHook(() => useAddToWatchList(), { wrapper: createWrapper(queryClient) });
+
+    await act(() => result.current.mutateAsync({ ...payload, watchlist: true }));
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: upcomingQueryKeys.root });
   });
 
   it('uses a loaded default preference for optimistic watchlist clearing', async () => {

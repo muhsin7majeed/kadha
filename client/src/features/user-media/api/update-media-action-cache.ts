@@ -42,12 +42,16 @@ const optimisticMediaQueryKeys: QueryKey[] = [
 const queryKeyStartsWith = (queryKey: QueryKey, prefix: QueryKey) =>
   prefix.every((keyPart, index) => queryKey[index] === keyPart);
 
+const isOptimisticMediaQuery = (query: { queryKey: QueryKey }) =>
+  optimisticMediaQueryKeys.some((queryKey) => queryKeyStartsWith(query.queryKey, queryKey));
+
+export const cancelOptimisticMediaActionQueries = (queryClient: QueryClient) =>
+  queryClient.cancelQueries({ predicate: isOptimisticMediaQuery });
+
 export const getMediaActionCacheSnapshot = (queryClient: QueryClient): MediaActionCacheSnapshot =>
   queryClient
     .getQueryCache()
-    .findAll({
-      predicate: (query) => optimisticMediaQueryKeys.some((queryKey) => queryKeyStartsWith(query.queryKey, queryKey)),
-    })
+    .findAll({ predicate: isOptimisticMediaQuery })
     .map((query) => [query.queryKey, query.state.data]);
 
 export const restoreMediaActionCacheSnapshot = (queryClient: QueryClient, snapshot: MediaActionCacheSnapshot) => {
@@ -85,22 +89,32 @@ const profileQueryKeyByAction: Record<MediaAction, QueryKey> = {
   watchlist: queryKeys.userWatchListRoot,
 };
 
+export const hasFreshCachedInProgressTv = (queryClient: QueryClient, payload: UserMediaPayload) =>
+  payload.media_type === 'tv' &&
+  queryClient.getQueryCache().findAll({ queryKey: queryKeys.inProgressTvRoot })
+    .some((query) => !query.state.isInvalidated &&
+      queryClient.getQueryData<InProgressTvCache>(query.queryKey)?.data.some(
+        (item) => item.media_id === payload.media_id && item.media_type === 'tv',
+      ));
+
 export const invalidateMediaActionQueries = (
   queryClient: QueryClient,
   action: MediaAction,
   payload: UserMediaPayload,
   keepWatchedOnWatchlist: boolean | undefined,
+  episodeTracked: boolean,
 ) => {
   const affectedActions = getAffectedSavedListActions(action, payload, keepWatchedOnWatchlist);
   const changesWatched = action === 'watched' || (action === 'liked' && payload.watched === true);
+  const affectsUpcoming = action !== 'watchlist' || !episodeTracked;
   const queryKeysToInvalidate: QueryKey[] = [
     ...mediaDiscoveryQueryKeys,
     ...affectedActions.flatMap((affectedAction) => [
       ...savedListQueryKeys[affectedAction],
       profileQueryKeyByAction[affectedAction],
     ]),
-    upcomingQueryKeys.root,
     queryKeys.recommendationsRoot,
+    ...(affectsUpcoming ? [upcomingQueryKeys.root] : []),
   ];
 
   if (action === 'liked' || changesWatched) {

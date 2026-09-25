@@ -9,7 +9,9 @@ import { MediaAction, TrackingPreferences, UserMediaPayload } from '../user-medi
 import { getMediaActionToast, getUndoMediaActionPayload } from '../utils/media-action-copy';
 import {
   MediaActionCacheSnapshot,
+  cancelOptimisticMediaActionQueries,
   getMediaActionCacheSnapshot,
+  hasFreshCachedInProgressTv,
   invalidateMediaActionQueries,
   restoreMediaActionCacheSnapshot,
   updateMediaActionCache,
@@ -17,6 +19,7 @@ import {
 
 interface MediaActionMutationContext {
   keepWatchedOnWatchlist?: boolean;
+  episodeTracked: boolean;
   snapshot: MediaActionCacheSnapshot;
 }
 
@@ -51,7 +54,9 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
 
   const mutation = useMutation<BaseInfoResponse, unknown, UserMediaPayload, MediaActionMutationContext>({
     mutationFn: (payload) => postMediaAction(endpoint, payload),
-    onMutate: (payload) => {
+    onMutate: async (payload) => {
+      const episodeTracked = hasFreshCachedInProgressTv(queryClient, payload);
+      await cancelOptimisticMediaActionQueries(queryClient);
       const snapshot = getMediaActionCacheSnapshot(queryClient);
       const keepWatchedOnWatchlist = queryClient.getQueryData<TrackingPreferences>(
         queryKeys.trackingPreferences,
@@ -59,7 +64,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
 
       updateMediaActionCache(queryClient, action, payload, keepWatchedOnWatchlist);
 
-      return { keepWatchedOnWatchlist, snapshot };
+      return { keepWatchedOnWatchlist, episodeTracked, snapshot };
     },
     onError: (error, _payload, context) => {
       if (context) {
@@ -85,7 +90,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
             },
       });
 
-      await invalidateMediaActionQueries(queryClient, action, payload, context.keepWatchedOnWatchlist);
+      await invalidateMediaActionQueries(queryClient, action, payload, context.keepWatchedOnWatchlist, context.episodeTracked);
     },
   });
 

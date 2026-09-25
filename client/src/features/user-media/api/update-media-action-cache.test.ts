@@ -7,6 +7,7 @@ import type { PaginatedResponse, ResourceAccessResponse } from '@/types/common';
 import type { TvInProgressItem, UserMedia, UserMediaPayload } from '../user-media.types';
 import {
   getMediaActionCacheSnapshot,
+  hasFreshCachedInProgressTv,
   invalidateMediaActionQueries,
   restoreMediaActionCacheSnapshot,
   updateMediaActionCache,
@@ -390,12 +391,38 @@ describe('updateMediaActionCache', () => {
     expect(queryClient.getQueryData<SavedMediaResponse>(queryKey)?.data[0]).toMatchObject({ media_id: 17, liked: true });
   });
 
+  it('does not reload Upcoming for a TV watchlist toggle already covered by episode tracking', async () => {
+    const queryClient = new QueryClient();
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+    const payload = createPayload({ media_id: 27, media_type: 'tv', watchlist: true });
+    queryClient.setQueryData(queryKeys.inProgressTv(), createSavedResponse([createUserMedia({ media_id: 27, media_type: 'tv' })]));
+
+    const episodeTracked = hasFreshCachedInProgressTv(queryClient, payload);
+    await invalidateMediaActionQueries(queryClient, 'watchlist', payload, false, episodeTracked);
+
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: upcomingQueryKeys.root });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
+  });
+
+  it('refreshes Upcoming when a cached In Progress row was invalidated by episode changes', async () => {
+    const queryClient = new QueryClient();
+    const payload = createPayload({ media_id: 27, media_type: 'tv', watchlist: true });
+    queryClient.setQueryData(queryKeys.inProgressTv(), createSavedResponse([createUserMedia({ media_id: 27, media_type: 'tv' })]));
+    await queryClient.invalidateQueries({ queryKey: queryKeys.inProgressTvRoot, refetchType: 'none' });
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
+
+    const episodeTracked = hasFreshCachedInProgressTv(queryClient, payload);
+    await invalidateMediaActionQueries(queryClient, 'watchlist', payload, false, episodeTracked);
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: upcomingQueryKeys.root });
+  });
+
   it('invalidates only watchlist membership dependents after a successful watchlist toggle', async () => {
     const queryClient = new QueryClient();
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
     const payload = createPayload({ media_id: 27, media_type: 'tv', watchlist: false });
 
-    await invalidateMediaActionQueries(queryClient, 'watchlist', payload, false);
+    await invalidateMediaActionQueries(queryClient, 'watchlist', payload, false, false);
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userWatchListRoot });
@@ -410,7 +437,7 @@ describe('updateMediaActionCache', () => {
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries').mockResolvedValue();
     const payload = createPayload({ media_id: 28, media_type: 'tv', watched: true, watchlist: true });
 
-    await invalidateMediaActionQueries(queryClient, 'watched', payload, false);
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, false, false);
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watched });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.watchList });
@@ -425,14 +452,14 @@ describe('updateMediaActionCache', () => {
     const payload = createPayload({ media_id: 29, media_type: 'tv', watched: true, watchlist: true });
     delete payload.liked;
 
-    await invalidateMediaActionQueries(queryClient, 'watched', payload, undefined);
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, undefined, false);
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.mediaDetails });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.liked });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: queryKeys.userLikedRoot });
 
     invalidate.mockClear();
-    await invalidateMediaActionQueries(queryClient, 'watched', payload, true);
+    await invalidateMediaActionQueries(queryClient, 'watched', payload, true, false);
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.inProgressTvRoot });
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.mediaDetails });
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: queryKeys.liked });
