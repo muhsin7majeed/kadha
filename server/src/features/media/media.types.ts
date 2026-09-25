@@ -133,7 +133,7 @@ export interface TMDBLastEpisodeToAir {
   overview: string;
   vote_average: number;
   vote_count: number;
-  air_date: string;
+  air_date: string | null;
   episode_number: number;
   production_code: string;
   runtime: number;

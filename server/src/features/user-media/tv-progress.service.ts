@@ -105,6 +105,11 @@ const getSeasonAiredCount = (season: TMDBSeason, details: TMDBTvDetails, today =
 
 const isShowEnded = (details: TMDBTvDetails) => !details.in_production && details.status.toLowerCase() === 'ended';
 
+const hasScheduledNextEpisode = (details: TMDBTvDetails, today = todayDateOnly()) => {
+  const airDate = details.next_episode_to_air?.air_date;
+  return Boolean(airDate && airDate >= today);
+};
+
 const getEpisodeKey = (seasonNumber: number, episodeNumber: number) => `${seasonNumber}:${episodeNumber}`;
 
 const getWatchedEpisodeMap = (watches: EpisodeWatchRow[]) => {
@@ -333,6 +338,7 @@ export async function getTvProgress(userId: string, mediaIdValue: string, option
   const nextEpisode = await findNextUnwatchedEpisode(mediaId, seasons, watches);
   const response: TvProgressResponse = {
     status: deriveStatus(watchedEpisodeCount, totalAiredEpisodeCount, Boolean(userMedia?.watchlist), details),
+    hasScheduledNextEpisode: hasScheduledNextEpisode(details),
     watchedEpisodeCount,
     totalAiredEpisodeCount,
     nextEpisode,

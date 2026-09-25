@@ -38,6 +38,7 @@ export interface TvProgressSelectedSeason {
 
 export interface TvProgressResponse {
   status: TvProgressStatus;
+  hasScheduledNextEpisode: boolean;
   watchedEpisodeCount: number;
   totalAiredEpisodeCount: number;
   nextEpisode: TvProgressNextEpisode | null;

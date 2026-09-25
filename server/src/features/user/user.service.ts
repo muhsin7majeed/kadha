@@ -6,6 +6,7 @@ import {
   formatUserMediaTrackingDetails,
   stripPrivateUserMediaTrackingDetails,
 } from '@/features/user-media/user-media.serializer';
+import { getTrackingPreferences } from '@/features/user-media/tracking-preferences.service';
 import { getTvProgress } from '@/features/user-media/tv-progress.service';
 import { normalizeWatchRegion } from '@/constants/watch-regions';
 import { DataPrivacy, LockedReason, ResourceAccessResponse } from '@/types/common';
@@ -608,21 +609,24 @@ export const getCurrentUserMediaByFlag = async (id: string, flag: UserMediaFlag,
 };
 
 export async function getCurrentUserInProgressTv(id: string, page: number, limit: number, sort: InProgressTvSort) {
-  const episodeWatches = await prisma.watchEvent.findMany({
-    where: {
-      userId: id,
-      media_type: 'tv',
-      seasonNumber: { not: null },
-      episodeNumber: { not: null },
-    },
-    orderBy: {
-      watchedAt: 'desc',
-    },
-    select: {
-      media_id: true,
-      watchedAt: true,
-    },
-  });
+  const [episodeWatches, trackingPreferences] = await Promise.all([
+    prisma.watchEvent.findMany({
+      where: {
+        userId: id,
+        media_type: 'tv',
+        seasonNumber: { not: null },
+        episodeNumber: { not: null },
+      },
+      orderBy: {
+        watchedAt: 'desc',
+      },
+      select: {
+        media_id: true,
+        watchedAt: true,
+      },
+    }),
+    getTrackingPreferences(id),
+  ]);
   const lastWatchedByMedia = new Map<number, Date>();
 
   episodeWatches.forEach((watch) => {
@@ -662,6 +666,13 @@ export async function getCurrentUserInProgressTv(id: string, page: number, limit
     const progress = await getTvProgress(id, String(mediaId));
 
     if (progress.watchedEpisodeCount === 0 || progress.status === 'completed') return null;
+    if (
+      trackingPreferences.hideCaughtUpWithoutScheduledNext &&
+      progress.status === 'caught_up' &&
+      !progress.hasScheduledNextEpisode
+    ) {
+      return null;
+    }
 
     return {
       ...formatUserMediaTrackingDetails(flattenMediaSnapshot(media)),
