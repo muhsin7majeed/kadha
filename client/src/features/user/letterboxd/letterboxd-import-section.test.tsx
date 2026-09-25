@@ -7,12 +7,13 @@ import { queryClient } from '@/lib/query-client';
 import { renderWithProviders } from '@/test/render';
 import LetterboxdImportSection from './letterboxd-import-section';
 
-const mocks = vi.hoisted(() => ({ parse: vi.fn(), post: vi.fn(), get: vi.fn() }));
+const mocks = vi.hoisted(() => ({ parse: vi.fn(), post: vi.fn(), get: vi.fn(), toastError: vi.fn() }));
 vi.mock('./parse-letterboxd-export', () => ({ parseLetterboxdExport: async (file: File) => {
   const result = await mocks.parse(file);
   return Array.isArray(result) ? { films: result, ambiguousDiary: [] } : result;
 } }));
 vi.mock('@/lib/axios-instance', () => ({ default: { post: mocks.post, get: mocks.get } }));
+vi.mock('@/components/ui/toaster-store', () => ({ toaster: { error: mocks.toastError } }));
 
 const film = (id: number) => ({
   uri: `https://boxd.it/${id}`, title: `Film ${id}`, year: 2001,
@@ -223,7 +224,34 @@ describe('LetterboxdImportSection', () => {
     await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/api/user/letterboxd/import', {
       films: [expect.objectContaining({ uri: film(1).uri, tmdbId: 800001 })],
     }));
-    expect(await screen.findByText(/Import complete: 1 movie processed/)).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Letterboxd import complete' });
+    expect(await within(dialog).findByRole('status')).toHaveTextContent('1 movie processed');
+    expect(within(dialog).getByText('1 skipped')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('checkbox', { name: 'Include Film 1 (2001)' })).not.toBeInTheDocument();
+    await userEvent.setup().click(within(dialog).getByRole('button', { name: 'Done' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('status')).toHaveTextContent('Import complete: 1 movie processed');
+    expect(screen.queryByRole('button', { name: 'Return to import review' })).not.toBeInTheDocument();
+  });
+
+  it('shows an import API error beside retry and in a toast without completing the import', async () => {
+    mocks.parse.mockResolvedValue([film(1)]);
+    let attempts = 0;
+    mocks.post.mockImplementation((path: string) => {
+      if (path.endsWith('/preview')) return Promise.resolve({ data: { data: [match(1)] } });
+      if (attempts++ === 0) return Promise.reject(Object.assign(new Error('Request failed with status code 502'), { isAxiosError: true, response: { data: { message: 'Unable to reach TMDB' } } }));
+      return Promise.resolve({ data: { data: {} } });
+    });
+    renderImport();
+    upload();
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Import 1 movie' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to reach TMDB');
+    expect(mocks.toastError).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining('Unable to reach TMDB') }));
+    expect(screen.getByRole('button', { name: 'Retry import of 1 movie' })).toBeEnabled();
+    expect(screen.getByRole('checkbox', { name: 'Include Film 1 (2001)' })).toBeChecked();
+    expect(screen.queryByText(/Import complete/)).not.toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Retry import of 1 movie' }));
+    expect(await screen.findByRole('dialog', { name: 'Letterboxd import complete' })).toBeInTheDocument();
   });
 
   it('leaves uncertain matches unchecked and allows searching inside the movie combobox', async () => {
@@ -294,7 +322,7 @@ describe('LetterboxdImportSection', () => {
     expect(await screen.findByText(/Importing 100 of 101 movies/)).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Importing movies' })).not.toHaveAttribute('aria-valuenow');
     rejectLast(new Error('TMDB unavailable'));
-    expect(await screen.findByRole('alert', { name: '' })).toHaveTextContent(/Import stopped after 100 movies/);
+    expect(await screen.findByRole('alert', { name: '' })).toHaveTextContent(/Import stopped after 100 of 101 movies/);
     expect(screen.getByText(/Re-importing the same ZIP won't duplicate completed diary entries/)).toBeInTheDocument();
   });
 

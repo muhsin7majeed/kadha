@@ -8,6 +8,7 @@
 
 ### Behavior Fixes
 
+- Show a clear Letterboxd import result with processed and skipped counts and a Done action; make import failures visible beside the import action and in a toast using the API error message.
 - Prevented duplicate Letterboxd movie rows when diary entry links differ from film links, while retaining viewing dates, rewatches, and safe re-imports. Ambiguous diary viewings now require a film assignment or an explicit skip.
 
 ### Engineering Changes

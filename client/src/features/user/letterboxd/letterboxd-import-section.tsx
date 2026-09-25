@@ -4,6 +4,7 @@ import { LuFileUp } from 'react-icons/lu';
 
 import SimpleCheckbox from '@/components/simple-checkbox';
 import SimpleDialog from '@/components/dialogs/simple-dialog';
+import { toaster } from '@/components/ui/toaster-store';
 import { queryClient } from '@/lib/query-client';
 import { getApiErrorMessage } from '@/hooks/use-error-handler';
 import { importLetterboxdFilms, previewLetterboxdFilms, type LetterboxdCandidate, type LetterboxdMatch } from '@/features/user/api/letterboxd-import';
@@ -53,6 +54,7 @@ const LetterboxdImportSection = () => {
   const [stage, setStage] = useState<'matching' | 'importing' | null>(null);
   const [processed, setProcessed] = useState(0);
   const [error, setError] = useState('');
+  const [importError, setImportError] = useState('');
   const [complete, setComplete] = useState(false);
   const [completedCount, setCompletedCount] = useState(0);
   const [visible, setVisible] = useState(50);
@@ -84,6 +86,7 @@ const LetterboxdImportSection = () => {
     if (!file) return;
     setBusy(true);
     setError('');
+    setImportError('');
     setComplete(false);
     setFilms([]);
     setAmbiguousDiary([]);
@@ -205,6 +208,7 @@ const LetterboxdImportSection = () => {
     setStage('importing');
     setProcessed(0);
     setError('');
+    setImportError('');
     let imported = 0;
     try {
       for (const group of batches(included)) {
@@ -216,7 +220,9 @@ const LetterboxdImportSection = () => {
       setCompletedCount(imported);
       setComplete(true);
     } catch (caught) {
-      setError(`Import stopped after ${imported} movies. ${caught instanceof Error ? caught.message : 'Please try again.'} Re-importing the same ZIP won't duplicate completed diary entries.`);
+      const message = getApiErrorMessage(caught) ?? (caught instanceof Error ? caught.message : 'Please try again.');
+      setImportError(`Import stopped after ${imported} of ${included.length} movies. ${message} Re-importing the same ZIP won't duplicate completed diary entries.`);
+      toaster.error({ title: message, description: `Import stopped after ${imported} of ${included.length} movies. You can retry from this review.` });
     } finally {
       setBusy(false);
       setStage(null);
@@ -242,7 +248,7 @@ const LetterboxdImportSection = () => {
             <Field.HelperText>ZIP, up to 10 MB. Matching can take a while for large libraries.</Field.HelperText>
           </Field.Root>
           {error && !open ? <Text role="alert" color="fg.error" textStyle="supporting">{error}</Text> : null}
-          {films.length && !open ? <Button colorPalette="gray" variant="outline" onClick={() => setOpen(true)}>Return to import review</Button> : null}
+          {films.length && !open && !complete ? <Button colorPalette="gray" variant="outline" onClick={() => setOpen(true)}>Return to import review</Button> : null}
           {complete && !open ? <Text role="status">Import complete: {completedCount} {completedCount === 1 ? 'movie' : 'movies'} processed.</Text> : null}
         </Stack>
       </Card.Body>
@@ -252,11 +258,19 @@ const LetterboxdImportSection = () => {
         closeButton={!busy}
         size="full"
         scrollBehavior="inside"
-        title="Review Letterboxd import"
+        title={complete ? 'Letterboxd import complete' : 'Review Letterboxd import'}
         contentProps={{ maxH: '100dvh', maxW: '100%', w: '100%', py: 0 }}
         bodyProps={{ px: { base: 3, md: 6 } }}
       >
-        <Stack gap="5" maxW="6xl" mx="auto" pb="6">
+        {complete ? (
+          <Stack gap="4" maxW="6xl" mx="auto" pb="6">
+            <Text role="status" textStyle="body">{completedCount} {completedCount === 1 ? 'movie' : 'movies'} processed</Text>
+            <Text textStyle="body">{films.length - completedCount} skipped</Text>
+            {skippedDiary ? <Text textStyle="supporting" color="fg.muted">{skippedDiary} diary {skippedDiary === 1 ? 'viewing was' : 'viewings were'} skipped by choice.</Text> : null}
+            <Text textStyle="supporting" color="fg.muted">Processed includes movies you already track; it is not a count of new movies.</Text>
+            <Button colorPalette="brand" alignSelf="start" onClick={() => setOpen(false)}>Done</Button>
+          </Stack>
+        ) : <Stack gap="5" maxW="6xl" mx="auto" pb="6">
           {stage ? (
             <Stack gap="2" role="status">
               <Text textStyle="supporting">{stage === 'matching' ? 'Matching' : 'Importing'} {processed} of {stage === 'matching' ? films.length : included.length} movies{busy && processed < (stage === 'matching' ? films.length : included.length) ? ' (working on the next batch)' : ''}</Text>
@@ -324,6 +338,7 @@ const LetterboxdImportSection = () => {
                 {pending.length ? <Text role="alert" textStyle="supporting" color="fg.error">{pending.length} checked {pending.length === 1 ? 'entry needs' : 'entries need'} a TMDB movie. Choose a match or uncheck them.</Text> : null}
                 {conflicting.length ? <Text role="alert" textStyle="supporting" color="fg.error">{conflicting.length} previously imported {conflicting.length === 1 ? 'match differs' : 'matches differ'}. Choose the original movie or uncheck the entry.</Text> : null}
                 {duplicateIds ? <Text role="alert" textStyle="supporting" color="fg.error">Two entries point to the same TMDB movie. Uncheck one or choose a different match.</Text> : null}
+                {importError ? <Text role="alert" textStyle="supporting" color="fg.error">{importError}</Text> : null}
                 {included.length ? <Text textStyle="supporting">
                   {effects.unknown ? 'Known matches: ' : ''}{included.length - effects.existing - effects.unknown} new, {effects.existing} already tracked.
                   {effects.unknown ? ` ${effects.unknown} manually chosen ${effects.unknown === 1 ? 'movie may' : 'movies may'} already be tracked.` : ''}
@@ -331,15 +346,13 @@ const LetterboxdImportSection = () => {
                   {selected.includes('diary') ? ` ${effects.newWatches} new diary watches, ${effects.importedWatches} already imported.` : ''}
                 </Text> : null}
                 <Text textStyle="supporting" color="fg.muted">Movies only: the ZIP does not reliably identify TV entries, so skip series. Reviews, tags, lists, deleted entries and profile details are not imported. Existing ratings stay; watched movies without diary dates get no invented date. An interrupted import may have completed earlier batches.</Text>
-                {complete ? <Text role="status">Import complete: {completedCount} {completedCount === 1 ? 'movie' : 'movies'} processed. {films.length - completedCount} skipped.</Text> : (
-                  <Button colorPalette="brand" disabled={busy || !included.length || pending.length > 0 || conflicting.length > 0 || duplicateIds} onClick={importSelected}>
-                    Import {included.length} {included.length === 1 ? 'movie' : 'movies'}
-                  </Button>
-                )}
+                <Button colorPalette="brand" disabled={busy || !included.length || pending.length > 0 || conflicting.length > 0 || duplicateIds} onClick={importSelected}>
+                  {importError ? 'Retry import of' : 'Import'} {included.length} {included.length === 1 ? 'movie' : 'movies'}
+                </Button>
               </Stack>
             </>
           ) : null}
-        </Stack>
+        </Stack>}
       </SimpleDialog>
     </Card.Root>
   );
