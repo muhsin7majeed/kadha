@@ -75,7 +75,7 @@ describe('user media routes', () => {
     expect(updatedWatchlist.data).toEqual([]);
   });
 
-  it('marks media watched and removes it from the watchlist', async () => {
+  it('marks media watched and removes it from the watchlist by default', async () => {
     const user = await registerTestUser('watched-user');
     const mediaId = 881301;
 
@@ -99,6 +99,204 @@ describe('user media routes', () => {
 
     expect(watchlist.pagination.total).toBe(0);
     expect(watchlist.data).toEqual([]);
+  });
+
+  it('preserves movie and TV watchlist details through watched and unwatched changes when enabled', async () => {
+    const user = await registerTestUser('watched-watchlist-retention-user');
+    const app = await getTestApp();
+    await prisma.trackingPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          keepWatchedOnWatchlist: true,
+          hideCaughtUpWithoutScheduledNext: false,
+        }),
+      },
+    });
+
+    for (const [mediaId, mediaType] of [
+      [881302, 'movie'],
+      [881303, 'tv'],
+    ] as const) {
+      const payload = buildTestMediaPayload({
+        mediaId,
+        mediaType,
+        title: `Retained ${mediaType}`,
+      });
+      await request(app)
+        .post('/api/user-media/watchlist')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watchlist: true, watchlistNote: `Keep this ${mediaType}` })
+        .expect(200);
+      const watchlistAt = (
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+          },
+        })
+      ).watchlistAt;
+
+      await request(app)
+        .post('/api/user-media/watched')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watched: true })
+        .expect(200);
+
+      expect(
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+          },
+        }),
+      ).toMatchObject({
+        watched: true,
+        watchlist: true,
+        watchlistAt,
+        watchlistNote: `Keep this ${mediaType}`,
+      });
+      expect(
+        await prisma.watchEvent.count({
+          where: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+        }),
+      ).toBe(1);
+
+      await request(app)
+        .post('/api/user-media/watched')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watched: false })
+        .expect(200);
+
+      expect(
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+          },
+        }),
+      ).toMatchObject({
+        watched: false,
+        watchlist: true,
+        watchlistAt,
+        watchlistNote: `Keep this ${mediaType}`,
+      });
+      expect(
+        await prisma.watchEvent.count({
+          where: { userId: user.userId, media_id: mediaId, media_type: mediaType },
+        }),
+      ).toBe(0);
+    }
+
+    expect(
+      await prisma.userActivity.count({
+        where: { userId: user.userId, type: 'MEDIA_REMOVED_FROM_WATCHLIST' },
+      }),
+    ).toBe(0);
+  });
+
+  it('preserves watchlist details when liking also marks a title watched and retention is enabled', async () => {
+    const user = await registerTestUser('liked-watched-watchlist-retention-user');
+    const app = await getTestApp();
+    const mediaId = 881304;
+    await prisma.trackingPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({
+          version: 1,
+          keepWatchedOnWatchlist: true,
+          hideCaughtUpWithoutScheduledNext: false,
+        }),
+      },
+    });
+    const payload = buildTestMediaPayload({ mediaId, mediaType: 'tv' });
+    await request(app)
+      .post('/api/user-media/watchlist')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, watchlist: true, watchlistNote: 'Keep this liked show' })
+      .expect(200);
+    const watchlistAt = (
+      await prisma.userMedia.findUniqueOrThrow({
+        where: {
+          userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: 'tv' },
+        },
+      })
+    ).watchlistAt;
+
+    await request(app)
+      .post('/api/user-media/liked')
+      .set('Authorization', authorization(user))
+      .send({ ...payload, liked: true, watched: true })
+      .expect(200);
+
+    expect(
+      await prisma.userMedia.findUniqueOrThrow({
+        where: {
+          userId_media_id_media_type: { userId: user.userId, media_id: mediaId, media_type: 'tv' },
+        },
+      }),
+    ).toMatchObject({
+      liked: true,
+      watched: true,
+      watchlist: true,
+      watchlistAt,
+      watchlistNote: 'Keep this liked show',
+    });
+    expect(
+      await prisma.watchEvent.count({ where: { userId: user.userId, media_id: mediaId, media_type: 'tv' } }),
+    ).toBe(1);
+    expect(
+      await prisma.userActivity.count({
+        where: { userId: user.userId, type: 'MEDIA_REMOVED_FROM_WATCHLIST' },
+      }),
+    ).toBe(0);
+  });
+
+  it('keeps default watchlist clearing for unwatched and liked-with-watched requests', async () => {
+    const user = await registerTestUser('watchlist-retention-default-user');
+    const app = await getTestApp();
+    const scenarios = [
+      { mediaId: 881305, mediaType: 'movie', route: 'watched', action: { watched: false } },
+      { mediaId: 881306, mediaType: 'tv', route: 'liked', action: { liked: true, watched: true } },
+    ] as const;
+
+    for (const scenario of scenarios) {
+      const payload = buildTestMediaPayload({
+        mediaId: scenario.mediaId,
+        mediaType: scenario.mediaType,
+      });
+      await request(app)
+        .post('/api/user-media/watchlist')
+        .set('Authorization', authorization(user))
+        .send({ ...payload, watchlist: true, watchlistNote: 'The note remains after default removal' })
+        .expect(200);
+
+      await request(app)
+        .post(`/api/user-media/${scenario.route}`)
+        .set('Authorization', authorization(user))
+        .send({ ...payload, ...scenario.action })
+        .expect(200);
+
+      expect(
+        await prisma.userMedia.findUniqueOrThrow({
+          where: {
+            userId_media_id_media_type: {
+              userId: user.userId,
+              media_id: scenario.mediaId,
+              media_type: scenario.mediaType,
+            },
+          },
+        }),
+      ).toMatchObject({
+        watchlist: false,
+        watchlistAt: null,
+        watchlistNote: 'The note remains after default removal',
+      });
+    }
+
+    expect(
+      await prisma.userActivity.count({
+        where: { userId: user.userId, type: 'MEDIA_REMOVED_FROM_WATCHLIST' },
+      }),
+    ).toBe(2);
   });
 
   it('keeps media state isolated between users', async () => {

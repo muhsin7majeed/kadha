@@ -60,6 +60,7 @@ const HeroSection = ({
   const mutedTextColor = 'fg.muted';
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked();
   const { mutateAsync: addToWatchList, isPending: isAddingToWatchList } = useAddToWatchList();
+  const isTrackingPending = isAddingToLiked || isAddingToWatchList;
   const watchHistory = useWatchEvents('movie', data.media_id, isMovie && !readOnly);
   const currentData = { ...data, ...savedDetails } as MovieDetailsWithMeta | TvDetailsWithMeta;
   const watchCount = watchHistory.data?.watchCount ?? data.watchCount ?? (data.watched ? 1 : 0);
@@ -72,7 +73,7 @@ const HeroSection = ({
   const getActionPayload = (action: MediaAction) => buildUserMediaPayload(currentData, action);
 
   const handleLike = async () => {
-    if (isAddingToLiked) return;
+    if (isTrackingPending) return;
     if (!data.liked) {
       setTrackingAction('liked');
       return;
@@ -96,7 +97,7 @@ const HeroSection = ({
   };
 
   const handleWatchlist = async () => {
-    if (isAddingToWatchList) return;
+    if (isTrackingPending) return;
     if (!data.watchlist) {
       setTrackingAction('watchlist');
       return;
@@ -343,6 +344,7 @@ const HeroSection = ({
                   colorPalette="red"
                   onClick={handleLike}
                   loading={isAddingToLiked}
+                  disabled={isTrackingPending && !isAddingToLiked}
                 >
                   <LuHeart fill={data.liked ? 'currentColor' : 'none'} />
                   {getMediaActionStateLabel('liked', Boolean(data.liked))}
@@ -365,6 +367,7 @@ const HeroSection = ({
                   colorPalette="green"
                   onClick={handleWatchlist}
                   loading={isAddingToWatchList}
+                  disabled={isTrackingPending && !isAddingToWatchList}
                 >
                   {data.watchlist ? <LuBookmark fill="currentColor" /> : <LuBookmarkPlus />}
                   {getMediaActionStateLabel('watchlist', Boolean(data.watchlist))}

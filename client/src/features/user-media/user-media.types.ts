@@ -3,6 +3,12 @@ import { MediaMeta, MediaType } from '@/types/common';
 export type MediaAction = 'liked' | 'watched' | 'watchlist';
 export type OwnerMediaLibraryKey = 'liked' | 'watched' | 'watchlist';
 
+export interface TrackingPreferences {
+  version: 1;
+  keepWatchedOnWatchlist: boolean;
+  hideCaughtUpWithoutScheduledNext: boolean;
+}
+
 export interface UserMedia extends MediaMeta {
   /**
    * The ID of the user media table item in the database

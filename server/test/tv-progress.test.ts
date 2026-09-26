@@ -348,10 +348,31 @@ describe('TV progress service', () => {
     });
   });
 
-  it('lists current user in-progress TV shows with next episode metadata', async () => {
+  const createCaughtUpListUser = async (username: string) => {
+    const user = await registerTestUser(username);
+    await markAllAiredWatched(user.userId, '887101');
+    vi.clearAllMocks();
+    return user;
+  };
+
+  const optInToCaughtUpFiltering = (userId: string) =>
+    prisma.trackingPreferences.create({
+      data: {
+        userId,
+        config: JSON.stringify({
+          version: 1,
+          keepWatchedOnWatchlist: false,
+          hideCaughtUpWithoutScheduledNext: true,
+        }),
+      },
+    });
+
+  it('lists current user in-progress TV shows with next episode metadata when caught-up filtering is enabled', async () => {
     const user = await registerTestUser('tv-progress-list-user');
 
     await markNextEpisodeWatched(user.userId, '887101');
+    await optInToCaughtUpFiltering(user.userId);
+    vi.clearAllMocks();
 
     const response = await request(await getTestApp())
       .get('/api/user/in-progress?sort=next&page=1&limit=1')
@@ -386,13 +407,16 @@ describe('TV progress service', () => {
         },
       ],
     });
+    expect(tmdbClient.fetchMediaDetails).toHaveBeenCalledTimes(1);
+    expect(tmdbClient.fetchTvSeasonDetails).toHaveBeenCalledTimes(1);
   });
 
-  it('includes ongoing shows with no aired unwatched episode', async () => {
-    const user = await registerTestUser('tv-caught-up-list-user');
-
-    await markSeasonWatched(user.userId, '887101', '1');
-    await markSeasonWatched(user.userId, '887101', '2');
+  it('includes caught-up ongoing shows with no schedule by default', async () => {
+    const user = await createCaughtUpListUser('tv-caught-up-default-list-user');
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      next_episode_to_air: null,
+    });
 
     const response = await request(await getTestApp())
       .get('/api/user/in-progress?sort=recent&page=1&limit=10')
@@ -417,17 +441,13 @@ describe('TV progress service', () => {
     });
   });
 
-  it('excludes completed shows with no next episode', async () => {
+  it('hides caught-up ongoing shows with no schedule when opted in', async () => {
+    const user = await createCaughtUpListUser('tv-caught-up-filtered-list-user');
+    await optInToCaughtUpFiltering(user.userId);
     tmdbClient.fetchMediaDetails.mockResolvedValue({
       ...createTvDetails(),
-      in_production: false,
       next_episode_to_air: null,
-      status: 'Ended',
     });
-    const user = await registerTestUser('tv-completed-list-user');
-
-    await markSeasonWatched(user.userId, '887101', '1');
-    await markSeasonWatched(user.userId, '887101', '2');
 
     const response = await request(await getTestApp())
       .get('/api/user/in-progress?sort=recent&page=1&limit=10')
@@ -440,5 +460,118 @@ describe('TV progress service', () => {
       },
       data: [],
     });
+    expect(tmdbClient.fetchMediaDetails).toHaveBeenCalledTimes(1);
+    expect(tmdbClient.fetchTvSeasonDetails).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['today', new Date().toISOString().slice(0, 10)],
+    ['in the future', unairedEpisodeDate],
+  ])('keeps caught-up shows with a next episode dated %s when opted in', async (label, airDate) => {
+    const user = await createCaughtUpListUser(`tv-caught-up-${label.replaceAll(' ', '-')}-list-user`);
+    await optInToCaughtUpFiltering(user.userId);
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      next_episode_to_air: {
+        ...createTvDetails().next_episode_to_air!,
+        air_date: airDate,
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=next&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 1,
+      },
+      data: [
+        {
+          media_id: 887101,
+          tvProgress: {
+            status: 'caught_up',
+            nextEpisode: null,
+          },
+        },
+      ],
+    });
+  });
+
+  it('hides caught-up shows with an undated next-episode placeholder when opted in', async () => {
+    const user = await createCaughtUpListUser('tv-caught-up-undated-list-user');
+    await optInToCaughtUpFiltering(user.userId);
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      next_episode_to_air: {
+        ...createTvDetails().next_episode_to_air!,
+        air_date: null,
+      },
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=recent&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 0,
+      },
+      data: [],
+    });
+  });
+
+  it('still excludes ended shows when caught-up filtering is enabled', async () => {
+    const user = await createCaughtUpListUser('tv-completed-list-user');
+    await optInToCaughtUpFiltering(user.userId);
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      in_production: false,
+      next_episode_to_air: null,
+      status: 'Ended',
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=recent&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 0,
+      },
+      data: [],
+    });
+  });
+
+  it('documents that a stale show summary can still hide a newly aired episode without another season request', async () => {
+    const user = await createCaughtUpListUser('tv-stale-summary-list-user');
+    await optInToCaughtUpFiltering(user.userId);
+    tmdbClient.fetchMediaDetails.mockResolvedValue({
+      ...createTvDetails(),
+      next_episode_to_air: null,
+    });
+    tmdbClient.fetchTvSeasonDetails.mockResolvedValue({
+      ...createSeasonDetails(2),
+      episodes: createSeasonDetails(2).episodes.map((episode) =>
+        episode.episode_number === 2 ? { ...episode, air_date: new Date().toISOString().slice(0, 10) } : episode,
+      ),
+    });
+
+    const response = await request(await getTestApp())
+      .get('/api/user/in-progress?sort=recent&page=1&limit=10')
+      .set('Authorization', authorization(user))
+      .expect(200);
+
+    expect(response.body).toMatchObject({
+      pagination: {
+        total: 0,
+      },
+      data: [],
+    });
+    expect(tmdbClient.fetchMediaDetails).toHaveBeenCalledTimes(1);
+    expect(tmdbClient.fetchTvSeasonDetails).not.toHaveBeenCalled();
   });
 });

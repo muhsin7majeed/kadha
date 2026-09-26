@@ -32,6 +32,7 @@ interface MediaActionIconButtonProps {
   colorPalette: IconButtonProps['colorPalette'];
   size?: IconButtonProps['size'];
   loading?: boolean;
+  disabled?: boolean;
   onClick: () => void;
   children: ReactNode;
 }
@@ -41,6 +42,7 @@ const MediaActionIconButton = ({
   colorPalette,
   size,
   loading,
+  disabled,
   onClick,
   children,
 }: MediaActionIconButtonProps) => (
@@ -54,6 +56,7 @@ const MediaActionIconButton = ({
       colorPalette={colorPalette}
       onClick={onClick}
       loading={loading}
+      disabled={disabled}
     >
       {children}
     </IconButton>
@@ -93,6 +96,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
   const { mutateAsync: addToLiked, isPending: isAddingToLiked } = useAddToLiked({
     getToastAction: getDetailsToastAction('liked', 'Add details'),
   });
+  const isTrackingPending = isAddingToLiked || isAddingToWatched || isAddingToWatchList;
   const likeLabel = getMediaActionLabel('liked', Boolean(media.liked));
   const watchedLabel =
     media.media_type === 'movie'
@@ -120,7 +124,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
   }, [media.media_id, media.media_type]);
 
   const handleWatchlist = async () => {
-    if (isAddingToWatchList) return;
+    if (isTrackingPending) return;
 
     const payload = buildUserMediaPayload(currentMedia, 'watchlist');
 
@@ -128,7 +132,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
   };
 
   const handleWatched = async () => {
-    if (isAddingToWatched) return;
+    if (isTrackingPending) return;
 
     if (media.media_type === 'movie') {
       if (media.watchCount || media.watched) {
@@ -150,7 +154,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
   };
 
   const handleLike = async () => {
-    if (isAddingToLiked) return;
+    if (isTrackingPending) return;
 
     const payload = buildUserMediaPayload(currentMedia, 'liked');
 
@@ -172,6 +176,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
             variant="surface"
             colorPalette="brand"
             borderRadius="full"
+            loading={isTrackingPending}
           >
             <LuEllipsis />
           </IconButton>
@@ -180,19 +185,19 @@ const MediaActions: React.FC<MediaActionsProps> = ({
         <Portal>
           <Menu.Positioner>
             <Menu.Content>
-              <Menu.Item value="liked" disabled={isAddingToLiked} onClick={() => void handleLike()}>
+              <Menu.Item value="liked" disabled={isTrackingPending} onClick={() => void handleLike()}>
                 <LuHeart />
                 {likeLabel}
               </Menu.Item>
 
               {!(media.media_type === 'tv' && media.watched) && (
-                <Menu.Item value="watched" disabled={isAddingToWatched} onClick={() => void handleWatched()}>
+                <Menu.Item value="watched" disabled={isTrackingPending} onClick={() => void handleWatched()}>
                   <LuEye />
                   {watchedLabel}
                 </Menu.Item>
               )}
 
-              <Menu.Item value="watchlist" disabled={isAddingToWatchList} onClick={() => void handleWatchlist()}>
+              <Menu.Item value="watchlist" disabled={isTrackingPending} onClick={() => void handleWatchlist()}>
                 <LuBookmark />
                 {watchlistLabel}
               </Menu.Item>
@@ -232,6 +237,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
           size={size}
           onClick={handleLike}
           loading={isAddingToLiked}
+          disabled={isTrackingPending && !isAddingToLiked}
         >
           <LuHeart fill={media.liked ? 'red' : 'none'} />
         </MediaActionIconButton>
@@ -242,6 +248,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
           size={size}
           onClick={handleWatched}
           loading={media.media_type === 'tv' && isAddingToWatched}
+          disabled={isTrackingPending && !isAddingToWatched}
         >
           {media.watched || Boolean(media.watchCount) ? <LuCheck fill="blue" /> : <LuEye />}
         </MediaActionIconButton>
@@ -252,6 +259,7 @@ const MediaActions: React.FC<MediaActionsProps> = ({
           size={size}
           onClick={handleWatchlist}
           loading={isAddingToWatchList}
+          disabled={isTrackingPending && !isAddingToWatchList}
         >
           {media.watchlist ? <LuBookmark fill="green" /> : <LuBookmarkPlus />}
         </MediaActionIconButton>

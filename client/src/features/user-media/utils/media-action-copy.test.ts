@@ -38,15 +38,13 @@ describe('media action copy', () => {
     expect(getMediaActionStateLabel('watchlist', true)).toBe('In watchlist');
   });
 
-  it('returns watched toast copy with the watchlist cleanup description', () => {
+  it('returns watched toast copy without assuming Watchlist cleanup', () => {
     expect(getMediaActionToast('watched', { ...payload, watched: true })).toEqual({
       title: 'Marked Example Movie watched',
-      description: 'Removed from watchlist too.',
     });
 
     expect(getMediaActionToast('watched', { ...payload, watched: false })).toEqual({
       title: 'Marked Example Movie unwatched',
-      description: undefined,
     });
   });
 

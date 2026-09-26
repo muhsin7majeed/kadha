@@ -147,7 +147,9 @@ const getRelevantSeasonNumbers = (details: TMDBTvDetails, from: string, to: stri
   if (relevantSeasons.length > 0) return relevantSeasons.map((season) => season.season_number);
 
   const nextSeason = details.next_episode_to_air;
-  return nextSeason && nextSeason.season_number > 0 && nextSeason.air_date <= to ? [nextSeason.season_number] : [];
+  return nextSeason && nextSeason.season_number > 0 && nextSeason.air_date && nextSeason.air_date <= to
+    ? [nextSeason.season_number]
+    : [];
 };
 
 const resolveTv = async (title: TrackedTitle, from: string, to: string): Promise<UpcomingEntry[]> => {

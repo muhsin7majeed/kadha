@@ -41,6 +41,12 @@ describe('user data export', () => {
       },
     });
     await prisma.mediaCardPreferences.create({ data: { userId: user.userId, config: JSON.stringify({ version: 1, style: 'minimal' }) } });
+    await prisma.trackingPreferences.create({
+      data: {
+        userId: user.userId,
+        config: JSON.stringify({ version: 1, keepWatchedOnWatchlist: true }),
+      },
+    });
     await prisma.navigationPreferences.create({
       data: {
         userId: user.userId,
@@ -123,6 +129,11 @@ describe('user data export', () => {
             ],
           },
           mediaCard: { version: 1, style: 'minimal' },
+          tracking: {
+            version: 1,
+            keepWatchedOnWatchlist: true,
+            hideCaughtUpWithoutScheduledNext: false,
+          },
           navigation: {
             version: 1,
             layout: 'grid',

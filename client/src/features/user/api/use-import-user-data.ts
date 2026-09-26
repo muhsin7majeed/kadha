@@ -16,6 +16,7 @@ const useImportUserData = () => {
     mutationFn: importUserData,
     onError: useErrorHandler,
     onSuccess: async () => {
+      await queryClient.cancelQueries();
       await queryClient.invalidateQueries();
       toaster.success({ title: 'Import complete' });
     },

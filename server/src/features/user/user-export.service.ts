@@ -17,6 +17,10 @@ import {
   parseStoredNavigationPreferences,
 } from '@/features/navigation-preferences/navigation-preferences.service';
 import {
+  DEFAULT_TRACKING_PREFERENCES,
+  parseStoredTrackingPreferences,
+} from '@/features/user-media/tracking-preferences.service';
+import {
   EXCLUDED_EXPORT_DATA,
   type ExportCategory,
   EXPORT_CATEGORIES,
@@ -45,6 +49,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
     homePreferences,
     navigationPreferences,
     mediaCardPreferences,
+    trackingPreferences,
     feedback,
   ] = await prisma.$transaction([
     prisma.user.findUnique({
@@ -217,6 +222,7 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       where: { userId: id },
     }),
     prisma.mediaCardPreferences.findUnique({ where: { userId: id } }),
+    prisma.trackingPreferences.findUnique({ where: { userId: id } }),
     prisma.feedback.findMany({
       where: { userId: id },
       orderBy: { createdAt: 'desc' },
@@ -264,6 +270,9 @@ export async function exportCurrentUserData(id: string, categories: ExportCatego
       mediaCard: mediaCardPreferences
         ? parseStoredMediaCardPreferences(mediaCardPreferences.config)
         : DEFAULT_MEDIA_CARD_PREFERENCES,
+      tracking: trackingPreferences
+        ? parseStoredTrackingPreferences(trackingPreferences.config)
+        : DEFAULT_TRACKING_PREFERENCES,
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
     };

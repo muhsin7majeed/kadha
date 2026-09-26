@@ -569,6 +569,108 @@ describe('user data import', () => {
     });
   });
 
+  it('previews and imports tracking-only account preferences', async () => {
+    const target = await registerTestUser('tracking-only-import-target');
+    const currentConfig = JSON.stringify({
+      version: 1,
+      keepWatchedOnWatchlist: false,
+      hideCaughtUpWithoutScheduledNext: false,
+    });
+    await prisma.trackingPreferences.create({ data: { userId: target.userId, config: currentConfig } });
+    const portablePreferences = {
+      version: 1,
+      keepWatchedOnWatchlist: true,
+      hideCaughtUpWithoutScheduledNext: true,
+    };
+    const exportData = {
+      format: 'kadha-data-export',
+      schemaVersion: 2,
+      data: {
+        accountPreferences: {
+          tracking: portablePreferences,
+        },
+      },
+    };
+
+    const previewResponse = await request(await getTestApp())
+      .post('/api/user/import/preview')
+      .set('Authorization', authorization(target))
+      .send({ export: exportData })
+      .expect(200);
+
+    expect(previewResponse.body.data).toMatchObject({
+      importable: { accountPreferences: 1 },
+      availableCategories: ['accountPreferences'],
+    });
+    expect(await prisma.trackingPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
+      config: currentConfig,
+    });
+
+    await request(await getTestApp())
+      .post('/api/user/import')
+      .set('Authorization', authorization(target))
+      .send({ export: exportData, options: { categories: ['accountPreferences'] } })
+      .expect(200);
+
+    expect(
+      JSON.parse((await prisma.trackingPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).config),
+    ).toEqual(portablePreferences);
+  });
+
+  it('preserves target tracking preferences for older, malformed, and unsupported exports', async () => {
+    const target = await registerTestUser('preserved-tracking-import-target');
+    const currentConfig = JSON.stringify({
+      version: 1,
+      keepWatchedOnWatchlist: true,
+      hideCaughtUpWithoutScheduledNext: true,
+    });
+    await prisma.trackingPreferences.create({ data: { userId: target.userId, config: currentConfig } });
+    const accountPreferences = [
+      { profilePrivacy: 'PUBLIC' },
+      {
+        tracking: {
+          version: 1,
+          keepWatchedOnWatchlist: false,
+          hideCaughtUpWithoutScheduledNext: 'sometimes',
+        },
+      },
+      {
+        tracking: {
+          version: 2,
+          keepWatchedOnWatchlist: false,
+          hideCaughtUpWithoutScheduledNext: false,
+        },
+      },
+      {
+        tracking: {
+          version: 1,
+          keepWatchedOnWatchlist: false,
+          hideCaughtUpWithoutScheduledNext: false,
+          unknownPreference: true,
+        },
+      },
+    ];
+
+    for (const account of accountPreferences) {
+      await request(await getTestApp())
+        .post('/api/user/import')
+        .set('Authorization', authorization(target))
+        .send({
+          export: {
+            format: 'kadha-data-export',
+            schemaVersion: 2,
+            data: { accountPreferences: account },
+          },
+          options: { categories: ['accountPreferences'] },
+        })
+        .expect(200);
+
+      expect(await prisma.trackingPreferences.findUniqueOrThrow({ where: { userId: target.userId } })).toMatchObject({
+        config: currentConfig,
+      });
+    }
+  });
+
   it('preserves existing recommendation feedback when importing a conflicting preference', async () => {
     const source = await registerTestUser('feedback-import-source');
     const target = await registerTestUser('feedback-import-target');

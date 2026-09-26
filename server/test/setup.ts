@@ -49,6 +49,7 @@ beforeEach(async () => {
     prisma.recommendationSettings.deleteMany(),
     prisma.homePreferences.deleteMany(),
     prisma.mediaCardPreferences.deleteMany(),
+    prisma.trackingPreferences.deleteMany(),
     prisma.navigationPreferences.deleteMany(),
     prisma.watchEvent.deleteMany(),
     prisma.userMedia.deleteMany(),

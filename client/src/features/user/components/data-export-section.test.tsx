@@ -29,7 +29,7 @@ describe('DataExportSection', () => {
     });
     renderWithProviders(<DataExportSection />);
 
-    expect(screen.getByText('Profile, privacy, region, Home, and navigation.')).toBeInTheDocument();
+    expect(screen.getByText('Profile, privacy, region, Home, navigation, card appearance, and tracking choices.')).toBeInTheDocument();
     const checkboxes = screen.getAllByRole('checkbox');
     expect(checkboxes).toHaveLength(10);
     checkboxes.forEach((checkbox) => expect(checkbox).toBeChecked());

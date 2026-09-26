@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Feature Changes
+
+- Added account-level opt-ins to keep watched titles on the Watchlist and hide caught-up shows without a dated next episode. Both choices default to the existing behavior and travel with account exports and imports.
+
+### Behavior Fixes
+
+- Refresh tracking flags in Continue Watching and other lists after the server confirms an action, with loading feedback instead of unverified instant cache changes.
+
+### Engineering Changes
+
+- Added a versioned, account-owned tracking-preferences store. Continue Watching still uses TMDB's show summary for aired counts; correcting occasional summary lag would require additional season requests and remains deferred.
+
 ## v0.7.0
 
 ### Feature Changes

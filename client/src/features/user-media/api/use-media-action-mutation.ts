@@ -6,17 +6,7 @@ import api from '@/lib/axios-instance';
 import { BaseInfoResponse } from '@/types/common';
 import { MediaAction, UserMediaPayload } from '../user-media.types';
 import { getMediaActionToast, getUndoMediaActionPayload } from '../utils/media-action-copy';
-import {
-  MediaActionCacheSnapshot,
-  getMediaActionCacheSnapshot,
-  invalidateMediaDiscoveryQueries,
-  restoreMediaActionCacheSnapshot,
-  updateMediaActionCache,
-} from './update-media-action-cache';
-
-interface MediaActionMutationContext {
-  snapshot: MediaActionCacheSnapshot;
-}
+import invalidateMediaActionQueries from './invalidate-media-action-queries';
 
 interface MediaActionToast {
   title: string;
@@ -47,22 +37,9 @@ const postMediaAction = async (endpoint: string, payload: UserMediaPayload) => {
 const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMutationOptions) => {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation<BaseInfoResponse, unknown, UserMediaPayload, MediaActionMutationContext>({
-    mutationFn: (payload) => postMediaAction(endpoint, payload),
-    onMutate: (payload) => {
-      const snapshot = getMediaActionCacheSnapshot(queryClient);
-
-      updateMediaActionCache(queryClient, action, payload);
-
-      return { snapshot };
-    },
-    onError: (error, _payload, context) => {
-      if (context) {
-        restoreMediaActionCacheSnapshot(queryClient, context.snapshot);
-      }
-
-      handleApiError(error);
-    },
+  const mutation = useMutation({
+    mutationFn: (payload: UserMediaPayload) => postMediaAction(endpoint, payload),
+    onError: handleApiError,
     onSuccess: async (_data, payload) => {
       const toast = behavior?.getToast?.(action, payload) ?? getMediaActionToast(action, payload);
       const nextValue = payload[action];
@@ -80,7 +57,7 @@ const useMediaActionMutation = ({ action, endpoint, behavior }: UseMediaActionMu
             },
       });
 
-      await invalidateMediaDiscoveryQueries(queryClient);
+      await invalidateMediaActionQueries(queryClient, action, payload);
     },
   });
 

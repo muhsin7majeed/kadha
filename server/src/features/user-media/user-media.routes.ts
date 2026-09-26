@@ -11,12 +11,14 @@ import {
   deleteWatchEventController,
   getDiaryInsightsController,
   getDiaryTimelineController,
+  getTrackingPreferencesController,
   getTvProgressController,
   markAllAiredWatchedController,
   markEpisodeWatchedController,
   markNextEpisodeWatchedController,
   markSeasonWatchedController,
   listWatchEventsController,
+  updateTrackingPreferencesController,
   updateWatchEventController,
 } from './user-media.controller';
 import { diaryInsightsQuerySchema, diaryQuerySchema } from './diary.schema';
@@ -29,6 +31,8 @@ import {
 
 const router = Router();
 
+router.get('/tracking-preferences', getTrackingPreferencesController);
+router.put('/tracking-preferences', updateTrackingPreferencesController);
 router.get('/diary/insights', validate(diaryInsightsQuerySchema, 'query'), getDiaryInsightsController);
 router.get('/diary', validate(diaryQuerySchema, 'query'), getDiaryTimelineController);
 router.get('/tv/:mediaId/progress', getTvProgressController);
