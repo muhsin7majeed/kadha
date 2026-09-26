@@ -30,7 +30,6 @@ const mediaActionCopy: Record<MediaAction, MediaActionCopy> = {
     stateLabel: (isActive) => (isActive ? 'Watched' : 'Mark watched'),
     toast: (payload, title) => ({
       title: payload.watched ? `Marked ${title} watched` : `Marked ${title} unwatched`,
-      description: payload.watched ? 'Removed from watchlist too.' : undefined,
     }),
   },
   watchlist: {
