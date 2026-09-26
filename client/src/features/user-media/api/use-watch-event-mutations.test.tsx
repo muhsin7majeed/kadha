@@ -171,6 +171,27 @@ describe('watch-event Upcoming reconciliation', () => {
     }
   });
 
+  it('refreshes an active Liked list after a movie watch changes its title data', async () => {
+    mocks.post.mockResolvedValue({ data: { data: { watchCount: 1, events: [] } } });
+    const queryClient = new QueryClient();
+    const key = queryKeys.liked;
+    queryClient.setQueryData(key, { data: [{ media_id: 12, rating: null, watchCount: 0 }] });
+    const observer = new QueryObserver(queryClient, {
+      queryKey: key,
+      queryFn: () => ({ data: [{ media_id: 12, rating: 8, watchCount: 1 }] }),
+      staleTime: Infinity,
+    });
+    const unsubscribe = observer.subscribe(() => undefined);
+    const { result } = renderHook(() => useCreateWatchEvent(identity), { wrapper: createWrapper(queryClient) });
+
+    try {
+      await act(() => result.current.mutateAsync({ ...movie, watchedOn: null, note: null, clientRequestId: 'request-liked-1' }));
+      expect(queryClient.getQueryData(key)).toEqual({ data: [{ media_id: 12, rating: 8, watchCount: 1 }] });
+    } finally {
+      unsubscribe();
+    }
+  });
+
   it('does not refetch Upcoming when only a watch date or note changes', async () => {
     mocks.patch.mockResolvedValue({ data: { data: { watchCount: 1, events: [] } } });
     const queryClient = new QueryClient();
