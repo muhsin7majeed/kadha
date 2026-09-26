@@ -174,7 +174,7 @@ describe('watch-event Upcoming reconciliation', () => {
   it('refreshes an active Liked list after a movie watch changes its title data', async () => {
     mocks.post.mockResolvedValue({ data: { data: { watchCount: 1, events: [] } } });
     const queryClient = new QueryClient();
-    const key = queryKeys.liked;
+    const key = [...queryKeys.liked, 1] as const;
     queryClient.setQueryData(key, { data: [{ media_id: 12, rating: null, watchCount: 0 }] });
     const observer = new QueryObserver(queryClient, {
       queryKey: key,

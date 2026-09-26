@@ -33,14 +33,13 @@ describe('useImportUserData', () => {
     mocks.post.mockReset();
   });
 
-  it('cancels an older preferences read before invalidating after import', async () => {
+  it('cancels an inactive preferences read before invalidating after import', async () => {
     let finishOldRead!: (value: { keepWatchedOnWatchlist: boolean }) => void;
     const key = queryKeys.trackingPreferences;
     const queryFn = vi.fn().mockImplementationOnce(
       () => new Promise<{ keepWatchedOnWatchlist: boolean }>((resolve) => { finishOldRead = resolve; }),
     ).mockImplementation(() => Promise.resolve({ keepWatchedOnWatchlist: false }));
-    const observer = new QueryObserver(queryClient, { queryKey: key, queryFn });
-    const unsubscribe = observer.subscribe(() => undefined);
+    void queryClient.fetchQuery({ queryKey: key, queryFn }).catch(() => undefined);
     mocks.post.mockResolvedValue({ data: { data: summary } });
     const { result } = renderHook(() => useImportUserData(), { wrapper: createWrapper() });
 
@@ -48,11 +47,16 @@ describe('useImportUserData', () => {
       await waitFor(() => expect(queryFn).toHaveBeenCalledOnce());
       await act(() => result.current.mutateAsync({ export: {} }));
       finishOldRead({ keepWatchedOnWatchlist: true });
-      await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
-      expect(queryClient.getQueryData(key)).toEqual({ keepWatchedOnWatchlist: false });
+      const observer = new QueryObserver(queryClient, { queryKey: key, queryFn, staleTime: 300_000 });
+      const unsubscribe = observer.subscribe(() => undefined);
+      try {
+        await waitFor(() => expect(queryFn).toHaveBeenCalledTimes(2));
+        expect(queryClient.getQueryData(key)).toEqual({ keepWatchedOnWatchlist: false });
+      } finally {
+        unsubscribe();
+      }
     } finally {
       finishOldRead({ keepWatchedOnWatchlist: true });
-      unsubscribe();
     }
   });
 });
